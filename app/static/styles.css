@@ -427,6 +427,12 @@ nav.navbar {
 #outer_container {
   margin-top: -4px;
 }
+
+.post_body blockquote {
+    border-left: 4px solid #dee2e6;
+    padding: 0.1em 5px;
+}
+
 @media (min-width: 992px) {
   #outer_container {
     margin-top: 1rem;
