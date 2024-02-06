@@ -9,7 +9,7 @@ A lemmy/kbin clone written in Python with Flask.
 
 ## Project goals
 
-To build a federated discussion and link aggregation platform, similar to Reddit, Lemmy, Mbin.
+To build a federated discussion and link aggregation platform, similar to Reddit, Lemmy, Kbin.
 
 ## For developers
 
