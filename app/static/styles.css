@@ -7,6 +7,8 @@
   color: orangered;
 }
 
+
+
 .pl-0 {
   padding-left: 0 !important;
 }
@@ -477,7 +479,7 @@ div.navbar {
 }
 
 #outer_container {
-  margin-top: -1px;
+  margin-top: -4px;
 }
 @media (min-width: 992px) {
   #outer_container {
@@ -514,7 +516,6 @@ div.navbar {
 .main_pane {
   border: solid 1px #ddd;
   border-radius: 5px;
-  padding-top: 8px;
   padding-bottom: 12px;
 }
 .main_pane .url_thumbnail {
@@ -526,8 +527,31 @@ div.navbar {
   height: auto;
 }
 
+.pane_header {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background-color: var(--bs-card-cap-bg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.175);
+  display: flex;
+  align-items: center;
+  height:6em;
+}
+
+[data-bs-theme=dark] .pane_header {
+  background-color: rgba(173,181,189, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15)
+}
+
 [data-bs-theme=dark] .main_pane {
   border-color: #424549;
+}
+
+.main_row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  --bs-gutter-x: 1.5rem;
+  --bs-gutter-y: 0;
 }
 
 .community_icon {

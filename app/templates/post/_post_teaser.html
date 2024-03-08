@@ -6,13 +6,35 @@
         {% if content_blocked %} title="{{ _('Filtered: ') }}{{ content_blocked }}"{% endif %} tabindex="0">
             <div class="row">
                 <div class="col-12">
-                    <div class="row main_row">
-                        <div class="col">
-                            <div class="voting_buttons" aria-hidden="true">
-                                {% include "post/_post_voting_buttons.html" %}
+                    <div class="main_row">
+                            <div class="col">
+
+                            <div class="post_metadata">
+                                <h3><a href="{{ url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None) }}" class="post_teaser_title_a">{{ post.title }}</a>
+                            {% if post.type == POST_TYPE_IMAGE %}<span class="fe fe-image" aria-hidden="true"> </span>{% endif %}
+                            {% if post.type == POST_TYPE_LINK and post.domain_id %}
+                                {% if post.url and 'youtube.com' in post.url %}
+                                    <span class="fe fe-video" aria-hidden="true"></span>
+                                {% elif post.url.endswith('.mp3') %}
+                                    <span class="fe fe-audio" aria-hidden="true"></span>
+                                {% endif %}
+                                <span class="domain_link" aria-hidden="true">(<a href="/d/{{ post.domain_id }}" aria-label="{{ _('All posts about this domain') }}">{{ post.domain.name }}</a>)</span>
+                            {% endif %}
+                            {% if post.nsfw %}<span class="warning_badge nsfw" title="{{ _('Not safe for work') }}">nsfw</span>{% endif %}
+                            {% if post.nsfl %}<span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">nsfl</span>{% endif %}
+                            {% if post.reports and current_user.is_authenticated and post.community.is_moderator(current_user) %}
+                                <span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span>
+                            {% endif %}
+                                </h3>
                             </div>
+
+                            <span class="small">{% if show_post_community %}In <strong><a href="/c/{{ post.community.link() }}" aria-label="{{ _('Go to community %(name)s', name=post.community.name) }}">{{ post.community.title }}</a></strong>{% endif %}
+                                by {{ render_username(post.author) }} {{ moment(post.last_active if sort == 'active' else post.posted_at).fromNow() }}</span>                            
+
+                            </div>
+
                             {% if post.image_id %}
-                                <div class="thumbnail{{ ' lbw' if low_bandwidth }}" aria-hidden="true">
+                                <div class="thumbnail{{ ' lbw' if low_bandwidth }} col-2" aria-hidden="true">
                                     {% if low_bandwidth %}
                                         {% if post.type == POST_TYPE_LINK %}
                                             <a href="{{ post.url }}" rel="nofollow ugc" target="_blank" aria-label="{{ _('Read article') }}"><span class="fe fe-external"></span></a>
@@ -38,34 +60,17 @@
                                 </div>
                             {% else %}
                                 {% if post.type == POST_TYPE_LINK and post.domain_id %}
-                                    <div class="thumbnail{{ ' lbw' if low_bandwidth }} missing_thumbnail" aria-hidden="true">
+                                    <div class="thumbnail{{ ' lbw' if low_bandwidth }} col-2 missing_thumbnail" aria-hidden="true">
                                         <a href="{{ post.url }}" rel="nofollow ugc" target="_blank" aria-label="{{ _('Read article') }}"><span class="fe fe-external"></span></a>
                                     </div>
                                 {% endif %}
                             {% endif %}
-                            <h3><a href="{{ url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None) }}" class="post_teaser_title_a">{{ post.title }}</a>
-                            {% if post.type == POST_TYPE_IMAGE %}<span class="fe fe-image" aria-hidden="true"> </span>{% endif %}
-                            {% if post.type == POST_TYPE_LINK and post.domain_id %}
-                                {% if post.url and 'youtube.com' in post.url %}
-                                    <span class="fe fe-video" aria-hidden="true"></span>
-                                {% elif post.url.endswith('.mp3') %}
-                                    <span class="fe fe-audio" aria-hidden="true"></span>
-                                {% endif %}
-                                <span class="domain_link" aria-hidden="true">(<a href="/d/{{ post.domain_id }}" aria-label="{{ _('All posts about this domain') }}">{{ post.domain.name }}</a>)</span>
-                            {% endif %}
-                            {% if post.nsfw %}<span class="warning_badge nsfw" title="{{ _('Not safe for work') }}">nsfw</span>{% endif %}
-                            {% if post.nsfl %}<span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">nsfl</span>{% endif %}
-                            {% if post.reports and current_user.is_authenticated and post.community.is_moderator(current_user) %}
-                                <span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span>
-                            {% endif %}
-                            </h3>
-
-                            <span class="small">{% if show_post_community %}<strong><a href="/c/{{ post.community.link() }}" aria-label="{{ _('Go to community %(name)s', name=post.community.name) }}">c/{{ post.community.name }}</a></strong>{% endif %}
-                                by {{ render_username(post.author) }} {{ moment(post.last_active if sort == 'active' else post.posted_at).fromNow() }}</span>
-
-                        </div>
-
-                    </div>
+                            <div class="voting_buttons col-1 pl-3" aria-hidden="true">
+                                {% include "post/_post_voting_buttons.html" %}
+                            </div>
+                            
+                            </div>
+                    
                     <div class="row utilities_row">
                         <div class="col-6">
                             <a href="{{ url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _anchor='post_replies') }}" aria-label="{{ _('View comments') }}"><span class="fe fe-reply"></span> <span aria-label="{{ _('Number of comments:') }}">{{ post.reply_count }}</span></a>

@@ -9,7 +9,9 @@
 {% block app_content %}
 <div class="row">
     <div class="col-12 col-md-8 position-relative main_pane">
+        <div class="pane_header row">
         {% include "_home_nav.html" %}
+        </div>
         <div class="post_list">
             {% for post in posts.items %}
                 {% include 'post/_post_teaser.html' %}

@@ -1,4 +1,4 @@
-<div class="btn-group mt-1 mb-2">
+<div class="btn-group mt-1 mb-2 col-4">
     <a href="/{{ type }}/hot" class="btn {{ 'btn-primary' if sort == 'hot' else 'btn-outline-secondary' }}" rel="nofollow noindex">
         {{ _('Hot') }}
     </a>
@@ -11,4 +11,7 @@
     <a href="/{{ type }}/active" class="btn {{ 'btn-primary' if sort == 'active' else 'btn-outline-secondary' }}" rel="nofollow noindex">
         {{ _('Active') }}
     </a>
+</div>
+<div class="col-8" style="text-align: center;">
+<h2>{% if sort == 'top' %} Top {% elif sort == 'new' %} New {% elif sort == 'hot' %} Hot {% else %} Active {% endif %} Posts </h2>
 </div>
