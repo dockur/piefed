@@ -23,7 +23,7 @@ class Config(object):
     RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY")
     MODE = os.environ.get('MODE') or 'development'
     LANGUAGES = ['en']
-    FULL_AP_CONTEXT = os.environ.get('FULL_AP_CONTEXT') is not None
+    FULL_AP_CONTEXT = bool(int(os.environ.get('FULL_AP_CONTEXT', 0)))
     CACHE_TYPE = os.environ.get('CACHE_TYPE') or 'FileSystemCache'
     CACHE_REDIS_URL = os.environ.get('CACHE_REDIS_URL') or 'redis://localhost:6379/1'
     CACHE_DIR = os.environ.get('CACHE_DIR') or '/dev/shm/pyfedi'

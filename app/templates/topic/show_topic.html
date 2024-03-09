@@ -12,16 +12,18 @@
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
             <li class="breadcrumb-item"><a href="/topics">{{ _('Topics') }}</a></li>
-            <li class="breadcrumb-item active">{{ topic.name|shorten }}</li>
+            {% for breadcrumb in breadcrumbs %}
+              <li class="breadcrumb-item">{% if breadcrumb.url %}<a href="{{ breadcrumb.url }}">{% endif %}{{ breadcrumb.text }}{% if breadcrumb.url %}</a>{% endif %}</li>
+            {% endfor %}
           </ol>
         </nav>
         <h1 class="mt-2">{{ topic.name }}
         </h1>
         {% if sub_topics %}
-        <h3 class="mb-0" id="sub-topics">{{ _('Sub-topics') }}</h3>
-        <ul class="nav" role="listbox" aria-labelledby="sub-topics">
-        {% for topic in sub_topics %}
-            <li class="nav-item" role="option"><a class="nav-link" href="/topic/{{ topic.machine_name }}">{{ topic.name }}</a></li>
+        <h5 class="mb-0" id="sub-topics">{{ _('Sub-topics') }}</h5>
+        <ul id="subtopic_nav" class="nav" role="listbox" aria-labelledby="sub-topics">
+        {% for sub_topic in sub_topics %}
+            <li class="nav-item" role="option"><a class="nav-link" href="/topic/{{ topic_path }}/{{ sub_topic.machine_name }}">{{ sub_topic.name }}</a></li>
         {% endfor %}
         </ul>
         {% endif %}

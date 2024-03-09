@@ -22,6 +22,9 @@
                                 {% if post.community.ap_id and '@beehaw.org' in post.community.ap_id %}
                                     <p>{{ _('This post is hosted on beehaw.org which has <a href="https://docs.beehaw.org/docs/core-principles/what-is-beehaw/" target="_blank" rel="nofollow">higher standards of behaviour than most places. Be nice</a>.') }}</p>
                                 {% endif %}
+                                {% if post.community.ap_id and '@lemmy.ml' in post.community.ap_id %}
+                                    <p>{{ _('This post is hosted on lemmy.ml which will ban you for saying anything negative about China, Russia or Putin. Tread carefully.') }}</p>
+                                {% endif %}
                                 {{ render_form(form) }}
                                 {% if not low_bandwidth %}
                                     {% if markdown_editor %}
@@ -196,6 +199,25 @@
                 {% endif %}
             </div>
         </div>
+        {% if related_communities %}
+        <div class="card mt-3">
+            <div class="card-header">
+                 <h2>{{ _('Related communities') }}</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for community in related_communities %}
+                        <li class="list-group-item">
+                            <a href="/c/{{ community.link() }}" aria-label="{{ _('Go to community') }}"><img src="{{ community.icon_image() }}" class="community_icon rounded-circle" loading="lazy" alt="" />
+                                {{ community.display_name() }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="mt-4"><a class="btn btn-primary" href="/communities">{{ _('Explore communities') }}</a></p>
+            </div>
+        </div>
+        {% endif %}
         {% if is_moderator %}
         <div class="card mt-3">
             <div class="card-header">

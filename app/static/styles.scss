@@ -338,6 +338,14 @@ div.navbar {
   }
 }
 
+#subtopic_nav {
+  position: relative;
+  left: -15px;
+  li a {
+    border: dotted 2px transparent;
+  }
+}
+
 
 /* high contrast */
 @media (prefers-contrast: more) {

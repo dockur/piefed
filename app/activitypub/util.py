@@ -115,13 +115,16 @@ def send_activity(sender: User, host: str, content: str):
 
 
 def post_to_activity(post: Post, community: Community):
+    # local PieFed posts do not have a create or announce id
+    create_id = post.ap_create_id if post.ap_create_id else f"https://{current_app.config['SERVER_NAME']}/activities/create/{gibberish(15)}"
+    announce_id = post.ap_announce_id if post.ap_announce_id else f"https://{current_app.config['SERVER_NAME']}/activities/announce/{gibberish(15)}"
     activity_data = {
         "actor": f"https://{current_app.config['SERVER_NAME']}/c/{community.name}",
         "to": [
             "https://www.w3.org/ns/activitystreams#Public"
         ],
         "object": {
-            "id": f"https://{current_app.config['SERVER_NAME']}/activities/create/{post.ap_create_id}",
+            "id": create_id,
             "actor": f"https://{current_app.config['SERVER_NAME']}/u/{post.author.user_name}",
             "to": [
                 "https://www.w3.org/ns/activitystreams#Public"
@@ -159,14 +162,14 @@ def post_to_activity(post: Post, community: Community):
             f"https://{current_app.config['SERVER_NAME']}/c/{community.name}/followers"
         ],
         "type": "Announce",
-        "id": f"https://{current_app.config['SERVER_NAME']}/activities/announce/{post.ap_announce_id}"
+        "id": announce_id
     }
     if post.edited_at is not None:
         activity_data["object"]["object"]["updated"] = ap_datetime(post.edited_at)
     if post.language is not None:
         activity_data["object"]["object"]["language"] = {"identifier": post.language}
     if post.type == POST_TYPE_LINK and post.url is not None:
-        activity_data["object"]["object"]["attachment"] = {"href": post.url, "type": "Link"}
+        activity_data["object"]["object"]["attachment"] = [{"href": post.url, "type": "Link"}]
     if post.image_id is not None:
         activity_data["object"]["object"]["image"] = {"url": post.image.view_url(), "type": "Image"}
         if post.image.alt_text:
@@ -578,66 +581,68 @@ def actor_json_to_model(activity_json, address, server):
 
 
 def post_json_to_model(post_json, user, community) -> Post:
-    post = Post(user_id=user.id, community_id=community.id,
-                title=html.unescape(post_json['name']),
-                comments_enabled=post_json['commentsEnabled'],
-                sticky=post_json['stickied'] if 'stickied' in post_json else False,
-                nsfw=post_json['sensitive'],
-                nsfl=post_json['nsfl'] if 'nsfl' in post_json else False,
-                ap_id=post_json['id'],
-                type=constants.POST_TYPE_ARTICLE,
-                posted_at=post_json['published'],
-                last_active=post_json['published'],
-                instance_id=user.instance_id
-                )
-    if 'source' in post_json and \
-            post_json['source']['mediaType'] == 'text/markdown':
-        post.body = post_json['source']['content']
-        post.body_html = markdown_to_html(post.body)
-    elif 'content' in post_json:
-        post.body_html = allowlist_html(post_json['content'])
-        post.body = html_to_markdown(post.body_html)
-    if 'attachment' in post_json and \
-            len(post_json['attachment']) > 0 and \
-            'type' in post_json['attachment'][0]:
-        if post_json['attachment'][0]['type'] == 'Link':
-            post.url = post_json['attachment'][0]['href']
-            if is_image_url(post.url):
-                post.type = POST_TYPE_IMAGE
-            else:
-                post.type = POST_TYPE_LINK
+    try:
+        post = Post(user_id=user.id, community_id=community.id,
+                    title=html.unescape(post_json['name']),
+                    comments_enabled=post_json['commentsEnabled'],
+                    sticky=post_json['stickied'] if 'stickied' in post_json else False,
+                    nsfw=post_json['sensitive'],
+                    nsfl=post_json['nsfl'] if 'nsfl' in post_json else False,
+                    ap_id=post_json['id'],
+                    type=constants.POST_TYPE_ARTICLE,
+                    posted_at=post_json['published'],
+                    last_active=post_json['published'],
+                    instance_id=user.instance_id
+                    )
+        if 'source' in post_json and \
+                post_json['source']['mediaType'] == 'text/markdown':
+            post.body = post_json['source']['content']
+            post.body_html = markdown_to_html(post.body)
+        elif 'content' in post_json:
+            post.body_html = allowlist_html(post_json['content'])
+            post.body = html_to_markdown(post.body_html)
+        if 'attachment' in post_json and len(post_json['attachment']) > 0 and 'type' in post_json['attachment'][0]:
+            if post_json['attachment'][0]['type'] == 'Link':
+                post.url = post_json['attachment'][0]['href']
+                if is_image_url(post.url):
+                    post.type = POST_TYPE_IMAGE
+                else:
+                    post.type = POST_TYPE_LINK
 
-            domain = domain_from_url(post.url)
-            # notify about links to banned websites.
-            already_notified = set()        # often admins and mods are the same people - avoid notifying them twice
-            if domain:
-                if domain.notify_mods:
-                    for community_member in post.community.moderators():
-                        notify = Notification(title='Suspicious content', url=post.ap_id, user_id=community_member.user_id, author_id=user.id)
-                        db.session.add(notify)
-                        already_notified.add(community_member.user_id)
-
-                if domain.notify_admins:
-                    for admin in Site.admins():
-                        if admin.id not in already_notified:
-                            notify = Notification(title='Suspicious content', url=post.ap_id, user_id=admin.id, author_id=user.id)
+                domain = domain_from_url(post.url)
+                # notify about links to banned websites.
+                already_notified = set()        # often admins and mods are the same people - avoid notifying them twice
+                if domain:
+                    if domain.notify_mods:
+                        for community_member in post.community.moderators():
+                            notify = Notification(title='Suspicious content', url=post.ap_id, user_id=community_member.user_id, author_id=user.id)
                             db.session.add(notify)
-                            admin.unread_notifications += 1
-                if domain.banned:
-                    post = None
-                if not domain.banned:
-                    domain.post_count += 1
-                    post.domain = domain
-    if 'image' in post_json and post:
-        image = File(source_url=post_json['image']['url'])
-        db.session.add(image)
-        post.image = image
+                            already_notified.add(community_member.user_id)
 
-    if post is not None:
-        db.session.add(post)
-        community.post_count += 1
-        db.session.commit()
-    return post
+                    if domain.notify_admins:
+                        for admin in Site.admins():
+                            if admin.id not in already_notified:
+                                notify = Notification(title='Suspicious content', url=post.ap_id, user_id=admin.id, author_id=user.id)
+                                db.session.add(notify)
+                                admin.unread_notifications += 1
+                    if domain.banned:
+                        post = None
+                    if not domain.banned:
+                        domain.post_count += 1
+                        post.domain = domain
+        if 'image' in post_json and post:
+            image = File(source_url=post_json['image']['url'])
+            db.session.add(image)
+            post.image = image
+
+        if post is not None:
+            db.session.add(post)
+            community.post_count += 1
+            db.session.commit()
+        return post
+    except KeyError as e:
+        current_app.logger.error(f'KeyError in post_json_to_model: ' + str(post_json))
+        return None
 
 
 # Save two different versions of a File, after downloading it from file.source_url. Set a width parameter to None to avoid generating one of that size

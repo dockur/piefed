@@ -1,3 +1,4 @@
+from collections import namedtuple
 from datetime import timedelta, timezone
 from random import randint
 
@@ -18,8 +19,8 @@ from app.utils import render_template, user_filters_posts, moderating_communitie
     community_membership, blocked_domains, validation_required, mimetype_from_url
 
 
-@bp.route('/topic/<topic_name>', methods=['GET'])
-def show_topic(topic_name):
+@bp.route('/topic/<path:topic_path>', methods=['GET'])
+def show_topic(topic_path):
 
     page = request.args.get('page', 1, type=int)
     sort = request.args.get('sort', '' if current_user.is_anonymous else current_user.default_sort)
@@ -27,11 +28,26 @@ def show_topic(topic_name):
     post_layout = request.args.get('layout', 'list' if not low_bandwidth else None)
 
     # translate topic_name from /topic/fediverse to topic_id
-    topic = Topic.query.filter(Topic.machine_name == topic_name.strip().lower()).first()
+    topic_url_parts = topic_path.split('/')
+    last_topic_machine_name = topic_url_parts[-1]
+    breadcrumbs = []
+    existing_url = '/topic'
+    topic = None
+    for url_part in topic_url_parts:
+        topic = Topic.query.filter(Topic.machine_name == url_part.strip().lower()).first()
+        if topic:
+            breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+            breadcrumb.text = topic.name
+            breadcrumb.url = f"{existing_url}/{topic.machine_name}" if topic.machine_name != last_topic_machine_name else ''
+            breadcrumbs.append(breadcrumb)
+            existing_url = breadcrumb.url
+        else:
+            abort(404)
+    current_topic = topic
 
-    if topic:
+    if current_topic:
         # get posts from communities in that topic
-        posts = Post.query.join(Community, Post.community_id == Community.id).filter(Community.topic_id == topic.id, Community.banned == False)
+        posts = Post.query.join(Community, Post.community_id == Community.id).filter(Community.topic_id == current_topic.id, Community.banned == False)
 
         # filter out nsfw and nsfl if desired
         if current_user.is_anonymous:
@@ -68,23 +84,23 @@ def show_topic(topic_name):
             per_page = 300
         posts = posts.paginate(page=page, per_page=per_page, error_out=False)
 
-        topic_communities = Community.query.filter(Community.topic_id == topic.id).order_by(Community.name)
+        topic_communities = Community.query.filter(Community.topic_id == current_topic.id).order_by(Community.name)
 
         next_url = url_for('topic.show_topic',
-                           topic_name=topic_name,
+                           topic_path=topic_path,
                            page=posts.next_num, sort=sort, layout=post_layout) if posts.has_next else None
         prev_url = url_for('topic.show_topic',
-                           topic_name=topic_name,
+                           topic_path=topic_path,
                            page=posts.prev_num, sort=sort, layout=post_layout) if posts.has_prev and page != 1 else None
 
-        sub_topics = Topic.query.filter_by(parent_id=topic.id).order_by(Topic.name).all()
+        sub_topics = Topic.query.filter_by(parent_id=current_topic.id).order_by(Topic.name).all()
 
-        return render_template('topic/show_topic.html', title=_(topic.name), posts=posts, topic=topic, sort=sort,
+        return render_template('topic/show_topic.html', title=_(current_topic.name), posts=posts, topic=current_topic, sort=sort,
                                page=page, post_layout=post_layout, next_url=next_url, prev_url=prev_url,
                                topic_communities=topic_communities, content_filters=content_filters,
-                               sub_topics=sub_topics,
-                               rss_feed=f"https://{current_app.config['SERVER_NAME']}/topic/{topic_name}.rss",
-                               rss_feed_name=f"{topic.name} on {g.site.name}",
+                               sub_topics=sub_topics, topic_path=topic_path, breadcrumbs=breadcrumbs,
+                               rss_feed=f"https://{current_app.config['SERVER_NAME']}/topic/{topic_path}.rss",
+                               rss_feed_name=f"{current_topic.name} on {g.site.name}",
                                show_post_community=True, moderating_communities=moderating_communities(current_user.get_id()),
                                joined_communities=joined_communities(current_user.get_id()),
                                inoculation=inoculation[randint(0, len(inoculation) - 1)],
@@ -93,10 +109,12 @@ def show_topic(topic_name):
         abort(404)
 
 
-@bp.route('/topic/<topic_name>.rss', methods=['GET'])
+@bp.route('/topic/<path:topic_path>.rss', methods=['GET'])
 @cache.cached(timeout=600)
-def show_topic_rss(topic_name):
-    topic = Topic.query.filter(Topic.machine_name == topic_name.strip().lower()).first()
+def show_topic_rss(topic_path):
+    topic_url_parts = topic_path.split('/')
+    last_topic_machine_name = topic_url_parts[-1]
+    topic = Topic.query.filter(Topic.machine_name == last_topic_machine_name.strip().lower()).first()
 
     if topic:
         posts = Post.query.join(Community, Post.community_id == Community.id).filter(Community.topic_id == topic.id,
@@ -105,12 +123,12 @@ def show_topic_rss(topic_name):
         posts = posts.order_by(desc(Post.created_at)).limit(100).all()
 
         fg = FeedGenerator()
-        fg.id(f"https://{current_app.config['SERVER_NAME']}/topic/{topic_name}")
+        fg.id(f"https://{current_app.config['SERVER_NAME']}/topic/{last_topic_machine_name}")
         fg.title(f'{topic.name} on {g.site.name}')
-        fg.link(href=f"https://{current_app.config['SERVER_NAME']}/topic/{topic_name}", rel='alternate')
+        fg.link(href=f"https://{current_app.config['SERVER_NAME']}/topic/{last_topic_machine_name}", rel='alternate')
         fg.logo(f"https://{current_app.config['SERVER_NAME']}/static/images/apple-touch-icon.png")
         fg.subtitle(' ')
-        fg.link(href=f"https://{current_app.config['SERVER_NAME']}/topic/{topic_name}.rss", rel='self')
+        fg.link(href=f"https://{current_app.config['SERVER_NAME']}/topic/{last_topic_machine_name}.rss", rel='self')
         fg.language('en')
 
         for post in posts:
@@ -174,10 +192,13 @@ def topic_create_post(topic_name):
 
 
 def topics_for_form():
-    topics = Topic.query.order_by(Topic.name).all()
+    topics = Topic.query.filter_by(parent_id=None).order_by(Topic.name).all()
     result = []
     for topic in topics:
         result.append((topic.id, topic.name))
+        sub_topics = Topic.query.filter_by(parent_id=topic.id).order_by(Topic.name).all()
+        for sub_topic in sub_topics:
+            result.append((sub_topic.id, ' --- ' + sub_topic.name))
     return result
 
 

@@ -1,3 +1,4 @@
+from collections import namedtuple
 from datetime import datetime
 from random import randint
 
@@ -16,7 +17,7 @@ from app.community.forms import CreatePostForm
 from app.post.util import post_replies, get_comment_branch, post_reply_count
 from app.constants import SUBSCRIPTION_MEMBER, POST_TYPE_LINK, POST_TYPE_IMAGE
 from app.models import Post, PostReply, \
-    PostReplyVote, PostVote, Notification, utcnow, UserBlock, DomainBlock, InstanceBlock, Report, Site, Community
+    PostReplyVote, PostVote, Notification, utcnow, UserBlock, DomainBlock, InstanceBlock, Report, Site, Community, Topic
 from app.post import bp
 from app.utils import get_setting, render_template, allowlist_html, markdown_to_html, validation_required, \
     shorten_string, markdown_to_text, gibberish, ap_datetime, return_304, \
@@ -172,7 +173,45 @@ def show_post(post_id: int):
     og_image = post.image.source_url if post.image_id else None
     description = shorten_string(markdown_to_text(post.body), 150) if post.body else None
 
+    breadcrumbs = []
+    breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+    breadcrumb.text = _('Home')
+    breadcrumb.url = '/'
+    breadcrumbs.append(breadcrumb)
+
+    if community.topic_id:
+        related_communities = Community.query.filter_by(topic_id=community.topic_id).\
+            filter(Community.id != community.id, Community.banned == False).order_by(Community.name)
+        topics = []
+        previous_topic = Topic.query.get(community.topic_id)
+        topics.append(previous_topic)
+        while previous_topic.parent_id:
+            topic = Topic.query.get(previous_topic.parent_id)
+            topics.append(topic)
+            previous_topic = topic
+        topics = list(reversed(topics))
+
+        breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+        breadcrumb.text = _('Topics')
+        breadcrumb.url = '/topics'
+        breadcrumbs.append(breadcrumb)
+
+        existing_url = '/topic'
+        for topic in topics:
+            breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+            breadcrumb.text = topic.name
+            breadcrumb.url = f"{existing_url}/{topic.machine_name}"
+            breadcrumbs.append(breadcrumb)
+            existing_url = breadcrumb.url
+    else:
+        related_communities = []
+        breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+        breadcrumb.text = _('Communities')
+        breadcrumb.url = '/communities'
+        breadcrumbs.append(breadcrumb)
+
     response = render_template('post/post.html', title=post.title, post=post, is_moderator=is_moderator, community=post.community,
+                           breadcrumbs=breadcrumbs, related_communities=related_communities,
                            canonical=post.ap_id, form=form, replies=replies, THREAD_CUTOFF_DEPTH=constants.THREAD_CUTOFF_DEPTH,
                            description=description, og_image=og_image, POST_TYPE_IMAGE=constants.POST_TYPE_IMAGE,
                            POST_TYPE_LINK=constants.POST_TYPE_LINK, POST_TYPE_ARTICLE=constants.POST_TYPE_ARTICLE,

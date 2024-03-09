@@ -1,3 +1,4 @@
+from collections import namedtuple
 from io import BytesIO
 from random import randint
 
@@ -17,7 +18,7 @@ from app.constants import SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, POST_TYPE_LIN
     SUBSCRIPTION_PENDING, SUBSCRIPTION_MODERATOR
 from app.inoculation import inoculation
 from app.models import User, Community, CommunityMember, CommunityJoinRequest, CommunityBan, Post, \
-    File, PostVote, utcnow, Report, Notification, InstanceBlock, ActivityPubLog
+    File, PostVote, utcnow, Report, Notification, InstanceBlock, ActivityPubLog, Topic
 from app.community import bp
 from app.utils import get_setting, render_template, allowlist_html, markdown_to_html, validation_required, \
     shorten_string, gibberish, community_membership, ap_datetime, \
@@ -170,11 +171,42 @@ def show_community(community: Community):
         per_page = 300
     posts = posts.paginate(page=page, per_page=per_page, error_out=False)
 
+    breadcrumbs = []
+    breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+    breadcrumb.text = _('Home')
+    breadcrumb.url = '/'
+    breadcrumbs.append(breadcrumb)
+
     if community.topic_id:
         related_communities = Community.query.filter_by(topic_id=community.topic_id).\
             filter(Community.id != community.id, Community.banned == False).order_by(Community.name)
+        topics = []
+        previous_topic = Topic.query.get(community.topic_id)
+        topics.append(previous_topic)
+        while previous_topic.parent_id:
+            topic = Topic.query.get(previous_topic.parent_id)
+            topics.append(topic)
+            previous_topic = topic
+        topics = list(reversed(topics))
+
+        breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+        breadcrumb.text = _('Topics')
+        breadcrumb.url = '/topics'
+        breadcrumbs.append(breadcrumb)
+
+        existing_url = '/topic'
+        for topic in topics:
+            breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+            breadcrumb.text = topic.name
+            breadcrumb.url = f"{existing_url}/{topic.machine_name}"
+            breadcrumbs.append(breadcrumb)
+            existing_url = breadcrumb.url
     else:
         related_communities = []
+        breadcrumb = namedtuple("Breadcrumb", ['text', 'url'])
+        breadcrumb.text = _('Communities')
+        breadcrumb.url = '/communities'
+        breadcrumbs.append(breadcrumb)
 
     description = shorten_string(community.description, 150) if community.description else None
     og_image = community.image.source_url if community.image_id else None
@@ -184,7 +216,7 @@ def show_community(community: Community):
     prev_url = url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name,
                        page=posts.prev_num, sort=sort, layout=post_layout) if posts.has_prev and page != 1 else None
 
-    return render_template('community/community.html', community=community, title=community.title,
+    return render_template('community/community.html', community=community, title=community.title, breadcrumbs=breadcrumbs,
                            is_moderator=is_moderator, is_owner=is_owner, is_admin=is_admin, mods=mod_list, posts=posts, description=description,
                            og_image=og_image, POST_TYPE_IMAGE=POST_TYPE_IMAGE, POST_TYPE_LINK=POST_TYPE_LINK, SUBSCRIPTION_PENDING=SUBSCRIPTION_PENDING,
                            SUBSCRIPTION_MEMBER=SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER=SUBSCRIPTION_OWNER, SUBSCRIPTION_MODERATOR=SUBSCRIPTION_MODERATOR,

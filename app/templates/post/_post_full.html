@@ -3,11 +3,9 @@
         <div class="col post_col post_type_image">
             <nav aria-label="breadcrumb" id="breadcrumb_nav" title="Navigation">
               <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
-                {% if community.topic_id %}
-                  <li class="breadcrumb-item"><a href="/topics">{{ _('Topics') }}</a></li>
-                  <li class="breadcrumb-item"><a href="/topic/{{ community.topic.machine_name }}" rel="nofollow">{{ community.topic.name }}</a></li>
-                {% endif %}
+                {% for breadcrumb in breadcrumbs %}
+                  <li class="breadcrumb-item">{% if breadcrumb.url %}<a href="{{ breadcrumb.url }}">{% endif %}{{ breadcrumb.text }}{% if breadcrumb.url %}</a>{% endif %}</li>
+                {% endfor %}
                 <li class="breadcrumb-item"><a href="/c/{{ post.community.link() }}" title="{{ post.community.ap_domain }}">{{ post.community.title }}@{{ post.community.ap_domain }}</a></li>
                 <li class="breadcrumb-item active">{{ post.title|shorten(15) }}</li>
               </ol>
@@ -52,11 +50,9 @@
         <div class="col post_col post_type_normal">
             <nav aria-label="breadcrumb" id="breadcrumb_nav" title="Navigation">
               <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
-                {% if community.topic_id %}
-                  <li class="breadcrumb-item"><a href="/topics">{{ _('Topics') }}</a></li>
-                  <li class="breadcrumb-item"><a href="/topic/{{ community.topic.machine_name }}" rel="nofollow">{{ community.topic.name }}</a></li>
-                {% endif %}
+                {% for breadcrumb in breadcrumbs %}
+                  <li class="breadcrumb-item">{% if breadcrumb.url %}<a href="{{ breadcrumb.url }}">{% endif %}{{ breadcrumb.text }}{% if breadcrumb.url %}</a>{% endif %}</li>
+                {% endfor %}
                 <li class="breadcrumb-item"><a href="/c/{{ post.community.link() }}">{{ post.community.title }}@{{ post.community.ap_domain }}</a></li>
                 <li class="breadcrumb-item active">{{ post.title|shorten(15) }}</li>
               </ol>

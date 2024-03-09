@@ -744,6 +744,14 @@ div.navbar {
   background-color: var(--bs-card-cap-bg);
 }
 
+#subtopic_nav {
+  position: relative;
+  left: -15px;
+}
+#subtopic_nav li a {
+  border: dotted 2px transparent;
+}
+
 /* high contrast */
 @media (prefers-contrast: more) {
   :root {
