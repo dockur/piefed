@@ -608,7 +608,7 @@ fieldset legend {
 .post_list .post_teaser {
   border-bottom: solid 2px #ddd;
   padding-top: 8px;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
 }
 .post_list .post_teaser h3 {
   font-size: 110%;
@@ -620,16 +620,23 @@ fieldset legend {
 }
 .post_list .post_teaser .utilities_row a {
   display: inline-block;
-  min-width: 44px;
 }
 .post_list .post_teaser .utilities_row .preview_image, .post_list .post_teaser .utilities_row .post_options {
   text-align: center;
 }
+
+.utilities_row_buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .post_list .post_teaser .thumbnail {
-  float: right;
+ /* float: right;
   padding-left: 0;
   padding-right: 0;
-  position: relative;
+  position: relative; */
+  padding-right:8px;
 }
 .post_list .post_teaser .thumbnail .fe {
   display: block;
@@ -964,13 +971,31 @@ fieldset legend {
 }
 
 .voting_buttons {
-  float: right;
+/*  float: right;
   display: block;
   width: 55px;
-  padding: 0 0 5px 5px;
+  padding: 0 0 5px 5px;*/
   line-height: 30px;
   font-size: 14px;
+  min-width: 55px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-height: 70px;
 }
+
+.post_metadata{
+  display: flex;
+  width: 100%;
+  min-height: 70px;
+}
+
+.post_thumb_vote {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top:4px;
+}
+
 @media (min-width: 1280px) {
   .voting_buttons {
     line-height: 25px;
@@ -1286,6 +1311,40 @@ fieldset legend {
   font-size: inherit;
   line-height: initial;
   max-width: 100%;
+}
+
+@media (orientation: portrait)  {
+  div.pane_header{
+    height:unset;
+  }
+  div.pane_header div{
+    width:100%;
+  }
+  .utilities_row {
+    flex-direction: column;
+  }
+  .index_text {
+    display: none;
+  }
+  div.post_title{
+    width: unset;
+    flex:initial;
+  }
+  .thumbnail-placeholder {
+    width:70px;
+    padding-right:8px;
+  }
+  div.post_thumb_vote{
+    width: unset;
+  }
+  .utilities_row_buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  div.card {
+    margin-top:var(--bs-card-spacer-y);
+  }
 }
 
 /*# sourceMappingURL=structure.css.map */
