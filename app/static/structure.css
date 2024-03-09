@@ -988,8 +988,12 @@ fieldset legend {
   display: flex;
   width: 100%;
   min-height: 70px;
+  justify-content: space-between;
 }
 
+.post_col .voting_buttons{
+  max-width: 70px;
+}
 .post_thumb_vote {
   display: flex;
   flex-direction: row-reverse;
@@ -1314,6 +1318,14 @@ fieldset legend {
 }
 
 @media (orientation: portrait)  {
+  div.navbar{
+    border-bottom:0px;
+  }
+
+  div.main_pane{
+    border-top:0;
+  }
+
   div.pane_header{
     height:unset;
   }

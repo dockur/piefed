@@ -9,7 +9,7 @@
                     <div class="main_row">
                             <div class="post_metadata mr-2">
                                 <div class="post_title col-9">
-                                <h3><a href="{{ post.url }}" class="post_teaser_title_a">{{ post.title }}</a>
+                                <h3><a href="{% if post.url %} {{ post.url }} {% else %} {{ url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None)}}{% endif %}" class="post_teaser_title_a">{{ post.title }}</a>
                             {% if post.type == POST_TYPE_IMAGE %}<span class="fe fe-image" aria-hidden="true"> </span>{% endif %}
                             {% if post.type == POST_TYPE_LINK and post.domain_id %}
                                 {% if post.url and 'youtube.com' in post.url %}
