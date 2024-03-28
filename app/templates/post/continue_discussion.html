@@ -7,7 +7,7 @@
 
 {% block app_content %}
 <div class="row">
-    <div class="col-12 col-md-8 position-relative main_pane">
+    <div class="col-12 col-md-8 my-3 position-relative main_pane">
         {% include 'post/_post_full.html' %}
         <p><a href="{{ url_for('activitypub.post_ap', post_id=post.id, _anchor='replies') }}">Back to main discussion</a></p>
         <div class="row post_replies">
@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    <aside id="side_pane" class="col-12 col-md-4 side_pane" role="complementary">
+    <aside id="side_pane" class="col-12 col-md-4 my-3 side_pane" role="complementary">
         <div class="card">
             <div class="card-body">
                 <div class="row">

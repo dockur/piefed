@@ -337,8 +337,7 @@ h1 .fe-bell, h1 .fe-no-bell {
   left: 1px;
 }
 .fe-poll:before {
-  content: "\e91b";
-  /* possibly e985 */
+  content: "\e91b"; /* possibly e985 */
 }
 
 .fe-sticky-left::before {
@@ -637,10 +636,14 @@ fieldset legend {
 }
 .post_list .post_teaser .meta_row a, .post_list .post_teaser .main_row a, .post_list .post_teaser .utilities_row a {
   text-decoration: none;
+  overflow: hidden;
 }
 .post_list .post_teaser .utilities_row a {
   display: inline-block;
   min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  align-content: center;
 }
 .post_list .post_teaser .utilities_row .preview_image, .post_list .post_teaser .utilities_row .post_options {
   text-align: center;
@@ -699,6 +702,24 @@ fieldset legend {
 .post_list .post_teaser.blocked .voting_buttons .upvote_button, .post_list .post_teaser.blocked .voting_buttons .downvote_button {
   font-size: 80%;
 }
+.post_list .post_teaser_title_a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* number of lines to show */
+  -webkit-box-orient: vertical;
+}
+
+.post_actions_bar {
+  height: 44px;
+}
+.post_actions_bar a {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  align-content: center;
+}
 
 .post_list_masonry, .post_list_masonry_wide {
   -webkit-column-count: 2;
@@ -722,6 +743,9 @@ fieldset legend {
 .post_list_masonry .post_teaser, .post_list_masonry_wide .post_teaser {
   margin-bottom: 5px;
   position: relative;
+  max-height: 0;
+  overflow: hidden;
+  padding-bottom: 100%;
 }
 .post_list_masonry .post_teaser img, .post_list_masonry_wide .post_teaser img {
   width: 100%;
@@ -736,6 +760,7 @@ fieldset legend {
   background-color: rgba(0, 0, 0, 0.3);
   width: 100%;
   text-align: center;
+  height: 42px;
 }
 .post_list_masonry .post_teaser .masonry_info .voting_buttons_masonry, .post_list_masonry_wide .post_teaser .masonry_info .voting_buttons_masonry {
   width: 100%;
@@ -778,6 +803,7 @@ fieldset legend {
   padding-top: 10px;
   width: 50%;
   position: relative;
+  min-width: 42px;
 }
 @media (min-width: 1280px) {
   .post_list_masonry .post_teaser .masonry_info .row .col .upvote_button, .post_list_masonry .post_teaser .masonry_info .row .col .downvote_button, .post_list_masonry_wide .post_teaser .masonry_info .row .col .upvote_button, .post_list_masonry_wide .post_teaser .masonry_info .row .col .downvote_button {
@@ -811,6 +837,9 @@ fieldset legend {
 .post_list_masonry .post_teaser .masonry_info_no_image, .post_list_masonry_wide .post_teaser .masonry_info_no_image {
   background-color: rgba(0, 0, 0, 0.2);
   width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  padding-bottom: 100%;
   text-align: center;
 }
 .post_list_masonry .post_teaser .masonry_info_no_image p, .post_list_masonry_wide .post_teaser .masonry_info_no_image p {
@@ -835,6 +864,16 @@ fieldset legend {
 @media (min-width: 992px) {
   .layout_switcher {
     float: right;
+  }
+}
+@media (min-width: 320px) {
+  .layout_switcher {
+    display: none;
+  }
+}
+@media (min-width: 481px) {
+  .layout_switcher {
+    display: inline-flex;
   }
 }
 
@@ -987,7 +1026,7 @@ fieldset legend {
 .voting_buttons {
   float: right;
   display: block;
-  width: 55px;
+  width: 95px;
   padding: 0 0 5px 5px;
   line-height: 30px;
   font-size: 14px;
@@ -1005,6 +1044,10 @@ fieldset legend {
   padding-left: 3px;
   border-radius: 3px;
   cursor: pointer;
+  height: 45px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 .voting_buttons .upvote_button.digits_4, .voting_buttons .downvote_button.digits_4 {
   width: 68px;
@@ -1099,6 +1142,10 @@ fieldset legend {
 .comment .comment_actions {
   margin-top: -10px;
   position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  align-content: center;
 }
 .comment .comment_actions a {
   text-decoration: none;

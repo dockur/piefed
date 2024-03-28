@@ -8,7 +8,7 @@
 
 {% block app_content %}
 <div class="row">
-    <div class="col-12 col-md-8 position-relative main_pane">
+    <div class="col-12 col-md-8 position-relative my-3 main_pane">
         {% include "_home_nav.html" %}
         <div class="post_list">
             {% for post in posts.items %}
@@ -33,7 +33,7 @@
         </nav>
     </div>
 
-    <aside id="side_pane" class="col-12 col-md-4 side_pane" role="complementary">
+    <aside id="side_pane" class="col-12 col-md-4 my-3 side_pane" role="complementary">
         <!-- <div class="card">
             <div class="card-body">
                 <form method="get">

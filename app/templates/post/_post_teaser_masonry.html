@@ -72,8 +72,25 @@
 
                 </div>
             {% else %}
-            <div class="masonry_info_no_image">
-                <p><a href="{{ url_for('activitypub.post_ap', post_id=post.id) }}">{{ post.title }}</a></p>
+                <div class="masonry_info_no_image" title="{{ post.title }}">
+                    <p><a href="{{ url_for('activitypub.post_ap', post_id=post.id) }}">{{ post.title }}</a></p>
+                </div>
+                <div class="masonry_info">
+                    <div class="row">
+                        <div class="col col-2">
+                            <div class="voting_buttons_masonry">
+                            {% include "post/_post_voting_buttons_masonry.html" %}
+                            </div>
+                        </div>
+                        <div class="col col-8">
+                            <p>&nbsp;</p>
+                        </div>
+                        <div class="col col-2 reply_col">
+                            <a href="{{ url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _anchor='post_replies') }}" aria-label="{{ _('View comments') }}" aria-hidden="true"><span class="fe fe-reply"></span></a>
+                            {% if post.reply_count %}<a href="{{ url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _anchor='post_replies') }}" aria-label="{{ _('View comments') }}">{{ post.reply_count }}</a>{% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
             {% endif %}
         {% endif %}
