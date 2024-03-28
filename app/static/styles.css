@@ -426,6 +426,10 @@ fieldset legend {
   background-color: #d8e5ee;
 }
 
+html, body {
+  overscroll-behavior-x: none;
+}
+
 body {
   font-size: 0.95rem;
 }

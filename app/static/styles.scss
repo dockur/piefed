@@ -4,6 +4,10 @@
 @import "scss/typography";
 @import "scss/controls";
 
+html, body {
+  overscroll-behavior-x: none;
+}
+
 body {
   font-size: 0.95rem;
 }
@@ -14,6 +18,7 @@ a {
 }
 
 #outer_container, footer {
+  //overscroll-behavior-x: none;
   a:not(.btn):hover {
     text-decoration: underline;
   }
