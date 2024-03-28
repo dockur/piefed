@@ -229,6 +229,7 @@ html {
     .meta_row, .main_row, .utilities_row {
       a {
         text-decoration: none;
+        overflow: hidden;
       }
     }
 
@@ -236,6 +237,9 @@ html {
       a {
         display: inline-block;
         min-width: 44px;
+        min-height: 44px;
+        justify-content: center;
+        align-content: center;
       }
       .preview_image, .post_options {
         text-align: center;
@@ -304,6 +308,25 @@ html {
       }
     }
   }
+  .post_teaser_title_a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* number of lines to show */
+    -webkit-box-orient: vertical;
+  }
+}
+
+.post_actions_bar {
+  height: 44px;
+  a {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    align-content: center;
+  }
+
 }
 
 .post_list_masonry, .post_list_masonry_wide {
@@ -327,6 +350,11 @@ html {
   .post_teaser {
     margin-bottom: 5px;
     position: relative;
+
+    max-height: 0;
+    overflow: hidden;
+    padding-bottom: 100%;
+
     img {
       width: 100%;
       height: auto;
@@ -342,6 +370,7 @@ html {
       background-color: rgba(0, 0, 0, 0.3);
       width: 100%;
       text-align: center;
+      height: 42px;
 
       .voting_buttons_masonry {
         width: 100%;
@@ -385,6 +414,7 @@ html {
             }
             width: 50%;
             position: relative;
+            min-width: 42px;
 
             .htmx-indicator {
               position: absolute;
@@ -420,6 +450,11 @@ html {
     .masonry_info_no_image {
       background-color: rgba(0, 0, 0, 0.2);
       width: 100%;
+
+      max-height: 0;
+      overflow: hidden;
+      padding-bottom: 100%;
+
       text-align: center;
       p {
         margin-bottom: 0;
@@ -448,6 +483,12 @@ html {
 .layout_switcher {
   @include breakpoint(tablet) {
     float: right;
+  }
+  @media (min-width:320px)  {
+    display: none
+  }
+  @media (min-width:481px)  {
+    display: inline-flex;
   }
 }
 
@@ -625,7 +666,8 @@ html {
 .voting_buttons {
   float: right;
   display: block;
-  width: 55px;
+  width: 95px;
+
   padding: 0 0 5px 5px;
   line-height: 30px;
   font-size: 14px;
@@ -643,6 +685,10 @@ html {
     padding-left: 3px;
     border-radius: 3px;
     cursor: pointer;
+    height:45px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
 
     &.digits_4 {
       width: 68px;
@@ -753,6 +799,10 @@ html {
   .comment_actions {
     margin-top: -10px;
     position: relative;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    align-content: center;
     a {
       text-decoration: none;
       padding: 5px 0;

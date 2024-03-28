@@ -13,7 +13,7 @@
             <div class="voting_buttons" aria-live="assertive">
                 {% include "post/_post_voting_buttons.html" %}
             </div>
-            <h1 class="mt-2 post_title">{{ post.title }}
+            <h1 class="mt-2 post_title" title="{{ post.title.strip() }}">{{ post.title }}
                 {% if current_user.is_authenticated and post.user_id == current_user.id %}
                     {% include 'post/_post_notification_toggle.html' %}
                 {% endif %}
@@ -59,7 +59,7 @@
             <div class="voting_buttons" aria-live="assertive">
                 {% include "post/_post_voting_buttons.html" %}
             </div>
-            <h1 class="mt-2 post_title">{{ post.title }}
+            <h1 class="mt-2 post_title" title="{{ post.title.strip() }}">{{ post.title }}
                 {% if current_user.is_authenticated and post.user_id == current_user.id %}
                     {% include 'post/_post_notification_toggle.html' %}
                 {% endif %}
@@ -103,5 +103,6 @@
             </div>
         </div>
     {% endif %}
-    <a href="{{ url_for('post.post_options', post_id=post.id) }}" class="post_options_link" rel="nofollow"><span class="fe fe-options" title="Options"> </span></a>
+    <div class="col-12 post_actions_bar"><a href="{{ url_for('post.post_options', post_id=post.id) }}" class="post_options_link" rel="nofollow"><span class="fe fe-options" title="Options"> </span></a></div>
 </div>
+
