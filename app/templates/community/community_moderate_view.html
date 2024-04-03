@@ -1,0 +1,52 @@
+{% if theme() and file_exists('app/templates/themes/' + theme() + '/base.html') %}
+    {% extends 'themes/' + theme() + '/base.html' %}
+{% else %}
+    {% extends "base.html" %}
+{% endif %} %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col-12 col-md-8 position-relative main_pane">
+        <nav aria-label="breadcrumb" id="breadcrumb_nav" title="Navigation">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not none else community.name) }}">{{ (community.title + '@' + community.ap_domain)|shorten }}</a></li>
+                <li class="breadcrumb-item active">{{ _('View Settings') }}</li>
+            </ol>
+        </nav>
+        {% if community %}
+        {% include "community/_community_moderation_nav.html" %}
+        {% endif %}
+        <h1 class="mt-2">{{ _('Moderate %(community)s settings', community=community.display_name()) }} </h1>
+        <p>{{ _('View and moderate this community') }}</p>
+
+        <form method="post" enctype="multipart/form-data" id="add_local_community_form" role="form">
+
+        <h2> Community Metadata </h2>
+        <p>Community title: {% if community.title %} {{ community.title }} </p> <button class="btn btn-sm btn-warning"> Delete Title </button> {% else %} No title set</p> {% endif %}
+        <p>Community description: {% if community.description %} {{ community.description }} </p> <button class="btn btn-sm btn-warning"> Delete description </button> {% else %} No description set </p> {% endif %}
+        <p>Community rules: {% if community.rules %} {{ community.rules }} </p> <button class="btn btn-sm btn-warning"> Delete rules </button> {% else %} No rules set </p> {% endif %}
+        <p> Community icon:
+        {% if community.icon_id %}
+                <img class="community_icon_big rounded-circle" src="{{ community.icon_image() }}" /> <button class="btn btn-sm btn-warning"> Delete Icon </button> </p>{% else %} No icon image set</p>{% endif %}
+        <p> Community banner: 
+        {% if community.image_id %}
+                <a href="{{ community.header_image() }}"><img class="community_icon_big" src="{{ community.header_image() }}" /></a><button class="btn btn-sm btn-warning"> Delete Banner </button> </p>
+                {% else %} No banner image set </p>
+        {% endif %}
+
+        <h2> Change Access </h2>
+        {{ form.csrf_token() }}
+        {{ render_field(form.topic) }}
+        {{ render_field(form.restricted_to_mods) }}
+        {{ render_field(form.local_only) }}
+        {{ render_field(form.submit) }}
+
+        {% if community.is_local() and (community.is_owner() or current_user.is_admin()) %}
+            <p><a class="btn btn-primary btn-warning" href="{{ url_for('community.community_delete', community_id=community.id) }}" rel="nofollow">Delete community</a></p>
+        {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}

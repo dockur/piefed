@@ -608,7 +608,7 @@ def community_report(community_id: int):
 def community_edit(community_id: int):
     from app.admin.util import topics_for_form
     community = Community.query.get_or_404(community_id)
-    if community.is_owner() or current_user.is_admin():
+    if community.is_owner():
         form = EditCommunityForm()
         form.topic.choices = topics_for_form(0)
         if form.validate_on_submit():
@@ -659,6 +659,33 @@ def community_edit(community_id: int):
                                current_app=current_app, current="edit_settings",
                                community=community, moderating_communities=moderating_communities(current_user.get_id()),
                                joined_communities=joined_communities(current_user.get_id()))
+    elif current_user.is_admin() or community.is_moderator():
+        form = EditCommunityForm()
+        form.topic.choices = topics_for_form(0)
+        if form.validate_on_submit():
+            community.topic_id = form.topic.data if form.topic.data != 0 else None
+            community.local_only = form.local_only.data
+            community.restricted_to_mods = form.restricted_to_mods.data
+
+            # if form.remove_avatar.data and user.avatar_id:
+            #     file = File.query.get(user.avatar_id)
+            #     file.delete_from_disk()
+            #     user.avatar_id = None
+            #     db.session.delete(file)
+
+            # if form.remove_banner.data and user.cover_id:
+            #     file = File.query.get(user.cover_id)
+            #     file.delete_from_disk()
+            #     user.cover_id = None
+            #     db.session.delete(file)
+            db.session.commit()
+            flash(_('Saved'))
+            return redirect(url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name))
+        return render_template('community/community_moderate_view.html', title=_('View community'), form=form,
+                       current_app=current_app, current="view_settings",
+                       community=community, moderating_communities=moderating_communities(current_user.get_id()),
+                       joined_communities=joined_communities(current_user.get_id()))
+
     else:
         abort(401)
 
@@ -945,7 +972,6 @@ def community_moderate(actor):
             abort(401)
     else:
         abort(404)
-
 
 @bp.route('/<actor>/moderate/subscribers', methods=['GET'])
 @login_required
