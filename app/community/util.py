@@ -106,10 +106,23 @@ def retrieve_mods_and_backfill(community_id: int):
                         db.session.add(activity_log)
                         if user:
                             post = post_json_to_model(activity_log, activity['object']['object'], user, community)
-                            post.ap_create_id = activity['object']['id']
-                            post.ap_announce_id = activity['id']
-                            post.ranking = post_ranking(post.score, post.posted_at)
-                            db.session.commit()
+                            if post:
+                                post.ap_create_id = activity['object']['id']
+                                post.ap_announce_id = activity['id']
+                                post.ranking = post_ranking(post.score, post.posted_at)
+                                if post.url:
+                                    other_posts = Post.query.filter(Post.id != post.id, Post.url == post.url,
+                                            Post.posted_at > post.posted_at - timedelta(days=3), Post.posted_at < post.posted_at + timedelta(days=3)).all()
+                                    for op in other_posts:
+                                        if op.cross_posts is None:
+                                            op.cross_posts = [post.id]
+                                        else:
+                                            op.cross_posts.append(post.id)
+                                        if post.cross_posts is None:
+                                            post.cross_posts = [op.id]
+                                        else:
+                                            post.cross_posts.append(op.id)
+                                db.session.commit()
                         else:
                             activity_log.exception_message = 'Could not find or create actor'
                             db.session.commit()
@@ -199,7 +212,7 @@ def save_post(form, post: Post):
         post.body = form.link_body.data
         post.body_html = markdown_to_html(post.body)
         url_changed = post.id is None or form.link_url.data != post.url
-        post.url = remove_tracking_from_link(form.link_url.data)
+        post.url = remove_tracking_from_link(form.link_url.data.strip())
         post.type = POST_TYPE_LINK
         domain = domain_from_url(form.link_url.data)
         domain.post_count += 1
@@ -227,7 +240,7 @@ def save_post(form, post: Post):
                     if file_extension.lower() in allowed_extensions and not filename.startswith('/'):
                         file = url_to_thumbnail_file(filename)
                         if file:
-                            file.alt_text = opengraph.get('og:title')
+                            file.alt_text = shorten_string(opengraph.get('og:title'), 295)
                             post.image = file
                             db.session.add(file)
 

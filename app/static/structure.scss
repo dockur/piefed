@@ -346,6 +346,17 @@ html {
   display: flex;
   min-height: $min-touch-target;
 
+  .cross_post_button {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: $min-touch-target;
+    height: $min-touch-target;
+    line-height: $min-touch-target;
+    padding: 3px;
+    padding-left: 0;
+  }
+
   .post_options_link {
     display: flex;
     width: $min-touch-target;

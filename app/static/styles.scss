@@ -132,6 +132,12 @@ div.navbar {
   }
 }
 
+.side_pane {
+  img {
+    max-width: 100%;
+  }
+}
+
 [data-bs-theme=dark] .main_pane {
   border-color: $super-dark-grey;
 }
@@ -139,7 +145,7 @@ div.navbar {
 .community_icon {
   width: 20vw;
   height: 20vw;
-  max-width: 30px;
+  max-width: 30px!important;
   max-height: 30px;
   min-width: 20px;
   min-height: 20px;

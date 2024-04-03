@@ -1,0 +1,24 @@
+{% if theme() and file_exists('app/templates/themes/' + theme() + '/base.html') %}
+    {% extends 'themes/' + theme() + '/base.html' %}
+{% else %}
+    {% extends "base.html" %}
+{% endif %} %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block app_content %}
+    <div class="row">
+        <div class="col col-login mx-auto">
+                    <h3 class="mt-2 post_title">{{ _('Cross-posts for "%(post_title)s"', post_title=post.title) }}</h3>
+                    <p>{{ _('Posts to the same url have also been created in the following communities:') }}</p>
+                    <ul class="cross_post_list">
+                        {% for cross_post in cross_posts %}
+                            <li><a href="{{ url_for('activitypub.post_ap', post_id=cross_post.id) }}">
+                                {{ cross_post.community.title }}@{{ cross_post.community.ap_domain }}</a>
+                                <span class="fe fe-reply"></span>
+                                <span>{{ cross_post.reply_count }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+        </div>
+    </div>
+{% endblock %}

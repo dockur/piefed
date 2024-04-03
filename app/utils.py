@@ -18,8 +18,8 @@ import warnings
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 import requests
 import os
-from flask import current_app, json, redirect, url_for, request, make_response, Response, g
-from flask_login import current_user
+from flask import current_app, json, redirect, url_for, request, make_response, Response, g, flash
+from flask_login import current_user, logout_user
 from sqlalchemy import text, or_
 from wtforms.fields  import SelectField, SelectMultipleField
 from wtforms.widgets import Select, html_params, ListWidget, CheckboxInput
@@ -829,3 +829,10 @@ def remove_tracking_from_link(url):
     else:
         return url
 
+
+def show_ban_message():
+    flash('You have been banned.', 'error')
+    logout_user()
+    resp = make_response(redirect(url_for('main.index')))
+    resp.set_cookie('sesion', '17489047567495', expires=datetime(year=2099, month=12, day=30))
+    return resp

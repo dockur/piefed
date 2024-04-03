@@ -5,6 +5,7 @@ from random import randint
 from flask import redirect, url_for, flash, request, make_response, session, Markup, current_app, abort, g, json
 from flask_login import current_user, login_required
 from flask_babel import _
+from slugify import slugify
 from sqlalchemy import or_, desc, text
 
 from app import db, constants, cache
@@ -28,7 +29,7 @@ from app.utils import get_setting, render_template, allowlist_html, markdown_to_
     shorten_string, gibberish, community_membership, ap_datetime, \
     request_etag_matches, return_304, instance_banned, can_create_post, can_upvote, can_downvote, user_filters_posts, \
     joined_communities, moderating_communities, blocked_domains, mimetype_from_url, blocked_instances, \
-    community_moderators, communities_banned_from
+    community_moderators, communities_banned_from, show_ban_message
 from feedgen.feed import FeedGenerator
 from datetime import timezone, timedelta
 
@@ -36,6 +37,8 @@ from datetime import timezone, timedelta
 @bp.route('/add_local', methods=['GET', 'POST'])
 @login_required
 def add_local():
+    if current_user.banned:
+        return show_ban_message()
     flash('PieFed is still being tested so hosting communities on piefed.social is not advised except for testing purposes.', 'warning')
     form = AddCommunityForm()
     if g.site.enable_nsfw is False:
@@ -45,6 +48,7 @@ def add_local():
         # todo: more intense data validation
         if form.url.data.strip().lower().startswith('/c/'):
             form.url.data = form.url.data[3:]
+        form.url.data = slugify(form.url.data.strip(), separator='_')
         private_key, public_key = RsaKeys.generate_keypair()
         community = Community(title=form.community_name.data, name=form.url.data, description=form.description.data,
                               rules=form.rules.data, nsfw=form.nsfw.data, private_key=private_key,
@@ -84,6 +88,8 @@ def add_local():
 @bp.route('/add_remote', methods=['GET', 'POST'])
 @login_required
 def add_remote():
+    if current_user.banned:
+        return show_ban_message()
     form = SearchRemoteCommunity()
     new_community = None
     if form.validate_on_submit():
@@ -438,6 +444,8 @@ def join_then_add(actor):
 @login_required
 @validation_required
 def add_post(actor):
+    if current_user.banned:
+        return show_ban_message()
     community = actor_to_community(actor)
     form = CreatePostForm()
     if g.site.enable_nsfl is False:
@@ -469,6 +477,21 @@ def add_post(actor):
         db.session.commit()
         if post.image_id and post.image.file_path is None:
             make_image_sizes(post.image_id, 150, 512, 'posts')  # the 512 sized image is for masonry view
+
+        # Update list of cross posts
+        if post.url:
+            other_posts = Post.query.filter(Post.id != post.id, Post.url == post.url,
+                                    Post.posted_at > post.posted_at - timedelta(days=6)).all()
+            for op in other_posts:
+                if op.cross_posts is None:
+                    op.cross_posts = [post.id]
+                else:
+                    op.cross_posts.append(post.id)
+                if post.cross_posts is None:
+                    post.cross_posts = [op.id]
+                else:
+                    post.cross_posts.append(op.id)
+            db.session.commit()
 
         notify_about_post(post)
 
@@ -565,7 +588,7 @@ def add_post(actor):
         form.notify_author.data = True
 
     return render_template('community/add_post.html', title=_('Add post to community'), form=form, community=community,
-                           markdown_editor=current_user.markdown_editor, low_bandwidth=request.cookies.get('low_bandwidth', '0') == '1',
+                           markdown_editor=current_user.markdown_editor, low_bandwidth=False,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.id),
                            inoculation=inoculation[randint(0, len(inoculation) - 1)]
@@ -607,6 +630,8 @@ def community_report(community_id: int):
 @login_required
 def community_edit(community_id: int):
     from app.admin.util import topics_for_form
+    if current_user.banned:
+        return show_ban_message()
     community = Community.query.get_or_404(community_id)
     if community.is_owner():
         form = EditCommunityForm()
@@ -693,6 +718,8 @@ def community_edit(community_id: int):
 @bp.route('/community/<int:community_id>/delete', methods=['GET', 'POST'])
 @login_required
 def community_delete(community_id: int):
+    if current_user.banned:
+        return show_ban_message()
     community = Community.query.get_or_404(community_id)
     if community.is_owner() or current_user.is_admin():
         form = DeleteCommunityForm()
@@ -700,9 +727,8 @@ def community_delete(community_id: int):
             if community.is_local():
                 community.banned = True
                 # todo: federate deletion out to all instances. At end of federation process, delete_dependencies() and delete community
-            else:
-                community.delete_dependencies()
-                db.session.delete(community)
+            community.delete_dependencies()
+            db.session.delete(community)
             db.session.commit()
             flash(_('Community deleted'))
             return redirect('/communities')
@@ -717,6 +743,8 @@ def community_delete(community_id: int):
 @bp.route('/community/<int:community_id>/moderators', methods=['GET', 'POST'])
 @login_required
 def community_mod_list(community_id: int):
+    if current_user.banned:
+        return show_ban_message()
     community = Community.query.get_or_404(community_id)
     if community.is_owner() or current_user.is_admin():
 
@@ -733,6 +761,8 @@ def community_mod_list(community_id: int):
 @bp.route('/community/<int:community_id>/moderators/add', methods=['GET', 'POST'])
 @login_required
 def community_add_moderator(community_id: int):
+    if current_user.banned:
+        return show_ban_message()
     community = Community.query.get_or_404(community_id)
     if community.is_owner() or current_user.is_admin():
         form = AddModeratorForm()
@@ -787,6 +817,8 @@ def community_add_moderator(community_id: int):
 @bp.route('/community/<int:community_id>/moderators/remove/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def community_remove_moderator(community_id: int, user_id: int):
+    if current_user.banned:
+        return show_ban_message()
     community = Community.query.get_or_404(community_id)
     if community.is_owner() or current_user.is_admin():
 
@@ -942,6 +974,8 @@ def community_notification(community_id: int):
 @bp.route('/<actor>/moderate', methods=['GET'])
 @login_required
 def community_moderate(actor):
+    if current_user.banned:
+        return show_ban_message()
     community = actor_to_community(actor)
 
     if community is not None:

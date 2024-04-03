@@ -104,6 +104,13 @@
         </div>
     {% endif %}
     <div class="post_utilities_bar">
+        {% if post.cross_posts %}
+        <div class="cross_post_button">
+            <a href="{{ url_for('post.post_cross_posts', post_id=post.id) }}" aria-label="{{ _('Show cross-posts') }}"
+               title="{{ _('Show cross-posts') }}"><span class="fe fe-layers"></span>
+            <span aria-label="{{ _('Number of cross-posts:') }}">{{ len(post.cross_posts) }}</span></a>
+        </div>
+        {% endif %}
         <a href="{{ url_for('post.post_options', post_id=post.id) }}" class="post_options_link" rel="nofollow"><span class="fe fe-options" title="Options"> </span></a>
     </div>
 </div>

@@ -10,6 +10,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_babel import _, lazy_gettext as _l
 from sqlalchemy.orm import backref
 from sqlalchemy_utils.types import TSVectorType # https://sqlalchemy-searchable.readthedocs.io/en/latest/installation.html
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.ext.mutable import MutableList
 from flask_sqlalchemy import BaseQuery
 from sqlalchemy_searchable import SearchQueryMixin
 from app import db, login, cache, celery
@@ -211,9 +213,10 @@ class File(db.Model):
         if self.thumbnail_path and os.path.isfile(self.thumbnail_path):
             os.unlink(self.thumbnail_path)
             purge_from_cache.append(self.thumbnail_path.replace('app/', f"https://{current_app.config['SERVER_NAME']}/"))
-        if self.source_url and not self.source_url.startswith('http') and os.path.isfile(self.source_url):
-            os.unlink(self.source_url)
-            purge_from_cache.append(self.source_url.replace('app/', f"https://{current_app.config['SERVER_NAME']}/"))
+        if self.source_url and self.source_url.startswith('http') and current_app.config['SERVER_NAME'] in self.source_url:
+            # self.source_url is always a url rather than a file path, which makes deleting the file a bit fiddly
+            os.unlink(self.source_url.replace(f"https://{current_app.config['SERVER_NAME']}/", 'app/'))
+            purge_from_cache.append(self.source_url) # otoh it makes purging the cdn cache super easy.
 
         if purge_from_cache:
             flush_cdn_cache(purge_from_cache)
@@ -402,7 +405,7 @@ class Community(db.Model):
                                      (or_(
                                          CommunityMember.is_owner,
                                          CommunityMember.is_moderator
-                                     ))
+                                     )) & CommunityMember.is_banned == False
                                      ).all()
 
     def is_moderator(self, user=None):
@@ -869,6 +872,7 @@ class Post(db.Model):
     language = db.Column(db.String(10))
     edited_at = db.Column(db.DateTime)
     reports = db.Column(db.Integer, default=0)                          # how many times this post has been reported. Set to -1 to ignore reports
+    cross_posts = db.Column(MutableList.as_mutable(ARRAY(db.Integer)))
 
     ap_id = db.Column(db.String(255), index=True)
     ap_create_id = db.Column(db.String(100))

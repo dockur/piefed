@@ -117,6 +117,23 @@ def nodeinfo2():
     return jsonify(nodeinfo_data)
 
 
+@bp.route('/api/v1/instance')
+@cache.cached(timeout=600)
+def api_v1_instance():
+    retval = {
+        'title': g.site.name,
+        'uri': current_app.config['SERVER_NAME'],
+        'stats': {
+            "user_count": users_total(),
+            "status_count": local_posts() + local_comments(),
+            "domain_count": 1
+        },
+        'registrations': g.site.registration_mode != 'Closed',
+        'approval_required': g.site.registration_mode == 'RequireApplication'
+    }
+    return jsonify(retval)
+
+
 @bp.route('/api/v1/instance/domain_blocks')
 @cache.cached(timeout=600)
 def domain_blocks():
@@ -629,6 +646,13 @@ def process_inbox_request(request_json, activitypublog_id, ip_address):
                             activity_log.result = 'failure'
                             activity_log.exception_message = 'dict instead of string ' + str(to_be_deleted_ap_id)
                         else:
+                            post = Post.query.filter_by(ap_id=to_be_deleted_ap_id).first()
+                            if post and post.url and post.cross_posts is not None:
+                                old_cross_posts = Post.query.filter(Post.id.in_(post.cross_posts)).all()
+                                post.cross_posts.clear()
+                                for ocp in old_cross_posts:
+                                    if ocp.cross_posts is not None:
+                                        ocp.cross_posts.remove(post.id)
                             delete_post_or_comment(user_ap_id, community_ap_id, to_be_deleted_ap_id)
                             activity_log.result = 'success'
                     elif request_json['object']['type'] == 'Page': # Editing a post
@@ -858,6 +882,12 @@ def process_inbox_request(request_json, activitypublog_id, ip_address):
                     post = Post.query.filter_by(ap_id=ap_id).first()
                     # Delete post
                     if post:
+                        if post.url and post.cross_posts is not None:
+                            old_cross_posts = Post.query.filter(Post.id.in_(post.cross_posts)).all()
+                            post.cross_posts.clear()
+                            for ocp in old_cross_posts:
+                                if ocp.cross_posts is not None:
+                                    ocp.cross_posts.remove(post.id)
                         post.delete_dependencies()
                         post.community.post_count -= 1
                         db.session.delete(post)

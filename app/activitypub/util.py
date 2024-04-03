@@ -1397,6 +1397,21 @@ def create_post(activity_log: ActivityPubLog, community: Community, request_json
         if post.image_id:
             make_image_sizes(post.image_id, 150, 512, 'posts')  # the 512 sized image is for masonry view
 
+        # Update list of cross posts
+        if post.url:
+            other_posts = Post.query.filter(Post.id != post.id, Post.url == post.url,
+                                    Post.posted_at > post.posted_at - timedelta(days=6)).all()
+            for op in other_posts:
+                if op.cross_posts is None:
+                    op.cross_posts = [post.id]
+                else:
+                    op.cross_posts.append(post.id)
+                if post.cross_posts is None:
+                    post.cross_posts = [op.id]
+                else:
+                    post.cross_posts.append(op.id)
+            db.session.commit()
+
         notify_about_post(post)
 
         if user.reputation > 100:
@@ -1503,6 +1518,27 @@ def update_post_from_activity(post: Post, request_json: dict):
             post.domain = domain
         else:
             post.url = old_url              # don't change if url changed from non-banned domain to banned domain
+
+        new_cross_posts = Post.query.filter(Post.id != post.id, Post.url == post.url,
+                                    Post.posted_at > utcnow() - timedelta(days=6)).all()
+        for ncp in new_cross_posts:
+            if ncp.cross_posts is None:
+                ncp.cross_posts = [post.id]
+            else:
+                ncp.cross_posts.append(post.id)
+            if post.cross_posts is None:
+                post.cross_posts = [ncp.id]
+            else:
+                post.cross_posts.append(ncp.id)
+
+    if post.url != old_url:
+        if post.cross_posts is not None:
+            old_cross_posts = Post.query.filter(Post.id.in_(post.cross_posts)).all()
+            post.cross_posts.clear()
+            for ocp in old_cross_posts:
+                if ocp.cross_posts is not None:
+                    ocp.cross_posts.remove(post.id)
+
     if post is not None:
         if 'image' in request_json['object'] and post.image is None:
             image = File(source_url=request_json['object']['image']['url'])

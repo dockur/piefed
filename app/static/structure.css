@@ -201,6 +201,15 @@ nav, etc which are used site-wide */
   content: "\e990";
 }
 
+.fe-layers {
+  position: relative;
+  top: 1px;
+}
+
+.fe-layers::before {
+  content: "\e97f";
+}
+
 .fe-report::before {
   content: "\e967";
 }
@@ -732,6 +741,16 @@ fieldset legend {
 .post_utilities_bar {
   display: flex;
   min-height: 44px;
+}
+.post_utilities_bar .cross_post_button {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  padding: 3px;
+  padding-left: 0;
 }
 .post_utilities_bar .post_options_link {
   display: flex;

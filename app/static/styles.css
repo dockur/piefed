@@ -200,6 +200,15 @@
   content: "\e990";
 }
 
+.fe-layers {
+  position: relative;
+  top: 1px;
+}
+
+.fe-layers::before {
+  content: "\e97f";
+}
+
 .fe-report::before {
   content: "\e967";
 }
@@ -550,6 +559,10 @@ div.navbar {
   height: auto;
 }
 
+.side_pane img {
+  max-width: 100%;
+}
+
 [data-bs-theme=dark] .main_pane {
   border-color: #424549;
 }
@@ -557,7 +570,7 @@ div.navbar {
 .community_icon {
   width: 20vw;
   height: 20vw;
-  max-width: 30px;
+  max-width: 30px !important;
   max-height: 30px;
   min-width: 20px;
   min-height: 20px;
