@@ -26,7 +26,7 @@ Mailing list, Matrix channel, etc still to come.
 - Redis
 
 Python developers with no Flask experience can quickly learn Flask by exploring the 
-[Flask Mega Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) 
+[Flask Mega Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world-2018)
 which will guide them through the process of building a simple social media app. Django is
 very similar to Flask so developers familiar with that framework will have an easier
 time of things.

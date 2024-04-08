@@ -85,21 +85,23 @@ class BanUserCommunityForm(FlaskForm):
     submit = SubmitField(_l('Ban'))
 
 
-class CreatePostForm(FlaskForm):
+class CreateDiscussionForm(FlaskForm):
     communities = SelectField(_l('Community'), validators=[DataRequired()], coerce=int)
-    post_type = HiddenField() # https://getbootstrap.com/docs/4.6/components/navs/#tabs
-    discussion_title = StringField(_l('Title'), validators=[Optional(), Length(min=3, max=255)])
-    discussion_body = TextAreaField(_l('Body'), validators=[Optional(), Length(min=3, max=5000)], render_kw={'placeholder': 'Text (optional)'})
-    link_title = StringField(_l('Title'), validators=[Optional(), Length(min=3, max=255)])
-    link_body = TextAreaField(_l('Body'), validators=[Optional(), Length(min=3, max=5000)],
-                                    render_kw={'placeholder': 'Text (optional)'})
-    link_url = StringField(_l('URL'), validators=[Optional(), Regexp(r'^https?://', message='Submitted links need to start with "http://"" or "https://"')], render_kw={'placeholder': 'https://...'})
-    image_title = StringField(_l('Title'), validators=[Optional(), Length(min=3, max=255)])
-    image_alt_text = StringField(_l('Alt text'), validators=[Optional(), Length(min=3, max=255)])
-    image_body = TextAreaField(_l('Body'), validators=[Optional(), Length(min=3, max=5000)],
-                                    render_kw={'placeholder': 'Text (optional)'})
-    image_file = FileField(_('Image'))
-    # flair = SelectField(_l('Flair'), coerce=int)
+    discussion_title = StringField(_l('Title'), validators=[DataRequired(), Length(min=3, max=255)])
+    discussion_body = TextAreaField(_l('Body'), validators=[Optional(), Length(min=3, max=5000)])
+    sticky = BooleanField(_l('Sticky'))
+    nsfw = BooleanField(_l('NSFW'))
+    nsfl = BooleanField(_l('Gore/gross'))
+    notify_author = BooleanField(_l('Notify about replies'))
+    submit = SubmitField(_l('Save'))
+
+
+class CreateLinkForm(FlaskForm):
+    communities = SelectField(_l('Community'), validators=[DataRequired()], coerce=int)
+    link_title = StringField(_l('Title'), validators=[DataRequired(), Length(min=3, max=255)])
+    link_body = TextAreaField(_l('Body'), validators=[Optional(), Length(min=3, max=5000)])
+    link_url = StringField(_l('URL'), validators=[DataRequired(), Regexp(r'^https?://', message='Submitted links need to start with "http://"" or "https://"')],
+                           render_kw={'placeholder': 'https://...'})
     sticky = BooleanField(_l('Sticky'))
     nsfw = BooleanField(_l('NSFW'))
     nsfl = BooleanField(_l('Gore/gross'))
@@ -107,53 +109,45 @@ class CreatePostForm(FlaskForm):
     submit = SubmitField(_l('Save'))
 
     def validate(self, extra_validators=None) -> bool:
-        if not super().validate():
+        domain = domain_from_url(self.link_url.data, create=False)
+        if domain and domain.banned:
+            self.link_url.errors.append(_("Links to %(domain)s are not allowed.", domain=domain.name))
             return False
-        if self.post_type.data is None or self.post_type.data == '':
-            self.post_type.data = 'discussion'
+        return True
 
-        if self.post_type.data == 'discussion':
-            if self.discussion_title.data == '':
-                self.discussion_title.errors.append(_('Title is required.'))
+
+class CreateImageForm(FlaskForm):
+    communities = SelectField(_l('Community'), validators=[DataRequired()], coerce=int)
+    image_title = StringField(_l('Title'), validators=[DataRequired(), Length(min=3, max=255)])
+    image_alt_text = StringField(_l('Alt text'), validators=[Optional(), Length(min=3, max=255)])
+    image_body = TextAreaField(_l('Body'), validators=[Optional(), Length(min=3, max=5000)])
+    image_file = FileField(_('Image'), validators=[DataRequired()])
+    sticky = BooleanField(_l('Sticky'))
+    nsfw = BooleanField(_l('NSFW'))
+    nsfl = BooleanField(_l('Gore/gross'))
+    notify_author = BooleanField(_l('Notify about replies'))
+    submit = SubmitField(_l('Save'))
+
+    def validate(self, extra_validators=None) -> bool:
+        uploaded_file = request.files['image_file']
+        if uploaded_file and uploaded_file.filename != '':
+            Image.MAX_IMAGE_PIXELS = 89478485
+            # Do not allow fascist meme content
+            try:
+                image_text = pytesseract.image_to_string(Image.open(BytesIO(uploaded_file.read())).convert('L'))
+            except FileNotFoundError as e:
+                image_text = ''
+            if 'Anonymous' in image_text and (
+                    'No.' in image_text or ' N0' in image_text):  # chan posts usually contain the text 'Anonymous' and ' No.12345'
+                self.image_file.errors.append(
+                    f"This image is an invalid file type.")  # deliberately misleading error message
+                current_user.reputation -= 1
+                db.session.commit()
                 return False
-        elif self.post_type.data == 'link':
-            if self.link_title.data == '':
-                self.link_title.errors.append(_('Title is required.'))
-                return False
-            if self.link_url.data == '':
-                self.link_url.errors.append(_('URL is required.'))
-                return False
-            domain = domain_from_url(self.link_url.data, create=False)
-            if domain and domain.banned:
-                self.link_url.errors.append(_("Links to %(domain)s are not allowed.", domain=domain.name))
-                return False
-        elif self.post_type.data == 'image':
-            if self.image_title.data == '':
-                self.image_title.errors.append(_('Title is required.'))
-                return False
-            if self.image_file.data == '':
-                self.image_file.errors.append(_('File is required.'))
-                return False
-            uploaded_file = request.files['image_file']
-            if uploaded_file and uploaded_file.filename != '':
-                Image.MAX_IMAGE_PIXELS = 89478485
-                # Do not allow fascist meme content
-                try:
-                    image_text = pytesseract.image_to_string(Image.open(BytesIO(uploaded_file.read())).convert('L'))
-                except FileNotFoundError as e:
-                    image_text = ''
-                if 'Anonymous' in image_text and ('No.' in image_text or ' N0' in image_text):  # chan posts usually contain the text 'Anonymous' and ' No.12345'
-                    self.image_file.errors.append(f"This image is an invalid file type.")       # deliberately misleading error message
-                    current_user.reputation -= 1
-                    db.session.commit()
-                    return False
-            if self.communities:
-                community = Community.query.get(self.communities.data)
-                if community.is_local() and g.site.allow_local_image_posts is False:
-                    self.communities.errors.append(_('Images cannot be posted to local communities.'))
-        elif self.post_type.data == 'poll':
-            self.discussion_title.errors.append(_('Poll not implemented yet.'))
-            return False
+        if self.communities:
+            community = Community.query.get(self.communities.data)
+            if community.is_local() and g.site.allow_local_image_posts is False:
+                self.communities.errors.append(_('Images cannot be posted to local communities.'))
 
         return True
 

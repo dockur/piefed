@@ -30,7 +30,7 @@
             <input type="search" name="search" value="{{ search }}">
             <input type="radio" name="local_remote" value="local" id="local_remote_local" {{ 'checked' if local_remote == 'local' }}><label for="local_remote_local"> Local</label>
             <input type="radio" name="local_remote" value="remote" id="local_remote_remote" {{ 'checked' if local_remote == 'remote' }}><label for="local_remote_remote"> Remote</label>
-            <input type="submit" name="submit" value="Search" class="btn btn-primary">
+            <input type="submit" name="submit" value="Search" class="btn btn-primary btn-sm">
         </form>
         <table class="table table-striped">
             <tr>
@@ -49,17 +49,27 @@
                     <td>{{ report.type_text() }}</td>
                     <td>{{ moment(report.created_at).fromNow() }}</td>
                     <td>
-                        {% if report.suspect_conversation_id %}
-                            <a href="/chat/{{ report.suspect_conversation_id }}#message">View</a>
-                        {% elif report.suspect_post_reply_id %}
-                            <a href="/post/{{ report.suspect_post_id }}#comment_{{ report.suspect_post_reply_id }}">View</a>
-                        {% elif report.suspect_post_id %}
-                            <a href="/post/{{ report.suspect_post_id }}">View</a>
-                        {% elif report.suspect_user_id %}
-                            <a href="/user/{{ report.suspect_user_id }}">View</a>
-                        {% endif %} |
-                        <a href="{{ url_for('community.community_moderate_report_escalate', community_id=community.id, report_id=report.id) }}">{{ _('Escalate') }}</a> |
-                        <a href="{{ url_for('community.community_moderate_report_resolve', community_id=community.id, report_id=report.id) }}">{{ _('Resolve') }}</a>
+                        <div class="dropdown">
+                          <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                          </button>
+                          <ul class="dropdown-menu">
+                            {% if report.suspect_conversation_id %}
+                                <li><a class="dropdown-item" href="/chat/{{ report.suspect_conversation_id }}#message">View</a></li>
+                            {% elif report.suspect_post_reply_id %}
+                                <li><a class="dropdown-item" href="/post/{{ report.suspect_post_id }}#comment_{{ report.suspect_post_reply_id }}">View</a></li>
+                            {% elif report.suspect_post_id %}
+                                <li><a class="dropdown-item" href="/post/{{ report.suspect_post_id }}">View</a></li>
+                            {% elif report.suspect_user_id %}
+                                <li><a class="dropdown-item" href="/user/{{ report.suspect_user_id }}">View</a></li>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
+                            <li><a class="dropdown-item" href="{{ url_for('community.community_moderate_report_escalate', community_id=community.id, report_id=report.id) }}">{{ _('Escalate') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('community.community_moderate_report_resolve', community_id=community.id, report_id=report.id) }}">{{ _('Resolve') }}</a></li>
+                            <div class="dropdown-divider"></div>
+                            <li><a class="confirm_first dropdown-item" href="{{ url_for('community.community_moderate_report_ignore', community_id=community.id, report_id=report.id) }}">{{ _('Ignore') }}</a></li>
+                          </ul>
+                        </div>
                     </td>
                 </tr>
             {% endfor %}

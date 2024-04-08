@@ -13,12 +13,12 @@ from app.activitypub.util import default_context
 from app.community.util import save_post, send_to_remote_instance
 from app.inoculation import inoculation
 from app.post.forms import NewReplyForm, ReportPostForm, MeaCulpaForm
-from app.community.forms import CreatePostForm
+from app.community.forms import CreateLinkForm, CreateImageForm, CreateDiscussionForm
 from app.post.util import post_replies, get_comment_branch, post_reply_count
-from app.constants import SUBSCRIPTION_MEMBER, POST_TYPE_LINK, POST_TYPE_IMAGE
+from app.constants import SUBSCRIPTION_MEMBER, POST_TYPE_LINK, POST_TYPE_IMAGE, POST_TYPE_ARTICLE
 from app.models import Post, PostReply, \
     PostReplyVote, PostVote, Notification, utcnow, UserBlock, DomainBlock, InstanceBlock, Report, Site, Community, \
-    Topic, User
+    Topic, User, Instance
 from app.post import bp
 from app.utils import get_setting, render_template, allowlist_html, markdown_to_html, validation_required, \
     shorten_string, markdown_to_text, gibberish, ap_datetime, return_304, \
@@ -654,11 +654,25 @@ def post_reply_options(post_id: int, comment_id: int):
                            )
 
 
-@bp.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
+@bp.route('/post/<int:post_id>/edit', methods=['GET'])
 @login_required
 def post_edit(post_id: int):
     post = Post.query.get_or_404(post_id)
-    form = CreatePostForm()
+    if post.type == POST_TYPE_ARTICLE:
+        return redirect(url_for('post.post_edit_discussion_post', post_id=post_id))
+    elif post.type == POST_TYPE_LINK:
+        return redirect(url_for('post.post_edit_link_post', post_id=post_id))
+    elif post.type == POST_TYPE_IMAGE:
+        return redirect(url_for('post.post_edit_image_post', post_id=post_id))
+    else:
+        abort(404)
+
+
+@bp.route('/post/<int:post_id>/edit_discussion', methods=['GET', 'POST'])
+@login_required
+def post_edit_discussion_post(post_id: int):
+    post = Post.query.get_or_404(post_id)
+    form = CreateDiscussionForm()
     del form.communities
 
     mods = post.community.moderators()
@@ -678,11 +692,67 @@ def post_edit(post_id: int):
             form.nsfl.data = True
             form.nsfw.render_kw = {'disabled': True}
 
-        #form.communities.choices = [(c.id, c.display_name()) for c in current_user.communities()]
+        if form.validate_on_submit():
+            save_post(form, post, 'discussion')
+            post.community.last_active = utcnow()
+            post.edited_at = utcnow()
+            db.session.commit()
+
+            post.flush_cache()
+            flash(_('Your changes have been saved.'), 'success')
+
+            # federate edit
+            if not post.community.local_only:
+                federate_post_update(post)
+
+            return redirect(url_for('activitypub.post_ap', post_id=post.id))
+        else:
+            form.discussion_title.data = post.title
+            form.discussion_body.data = post.body
+            form.notify_author.data = post.notify_author
+            form.nsfw.data = post.nsfw
+            form.nsfl.data = post.nsfl
+            form.sticky.data = post.sticky
+            if not (post.community.is_moderator() or post.community.is_owner() or current_user.is_admin()):
+                form.sticky.render_kw = {'disabled': True}
+            return render_template('post/post_edit_discussion.html', title=_('Edit post'), form=form, post=post,
+                                   markdown_editor=current_user.markdown_editor, mods=mod_list,
+                                   moderating_communities=moderating_communities(current_user.get_id()),
+                                   joined_communities=joined_communities(current_user.get_id()),
+                                   inoculation=inoculation[randint(0, len(inoculation) - 1)]
+                                   )
+    else:
+        abort(401)
+
+
+@bp.route('/post/<int:post_id>/edit_image', methods=['GET', 'POST'])
+@login_required
+def post_edit_image_post(post_id: int):
+    post = Post.query.get_or_404(post_id)
+    form = CreateImageForm()
+    del form.communities
+
+    mods = post.community.moderators()
+    if post.community.private_mods:
+        mod_list = []
+    else:
+        mod_user_ids = [mod.user_id for mod in mods]
+        mod_list = User.query.filter(User.id.in_(mod_user_ids)).all()
+
+    if post.user_id == current_user.id or post.community.is_moderator() or current_user.is_admin():
+        if g.site.enable_nsfl is False:
+            form.nsfl.render_kw = {'disabled': True}
+        if post.community.nsfw:
+            form.nsfw.data = True
+            form.nsfw.render_kw = {'disabled': True}
+        if post.community.nsfl:
+            form.nsfl.data = True
+            form.nsfw.render_kw = {'disabled': True}
+
         old_url = post.url
 
         if form.validate_on_submit():
-            save_post(form, post)
+            save_post(form, post, 'image')
             post.community.last_active = utcnow()
             post.edited_at = utcnow()
             db.session.commit()
@@ -714,104 +784,20 @@ def post_edit(post_id: int):
             # federate edit
 
             if not post.community.local_only:
-                page_json = {
-                    'type': 'Page',
-                    'id': post.ap_id,
-                    'attributedTo': current_user.ap_profile_id,
-                    'to': [
-                        post.community.ap_profile_id,
-                        'https://www.w3.org/ns/activitystreams#Public'
-                    ],
-                    'name': post.title,
-                    'cc': [],
-                    'content': post.body_html if post.body_html else '',
-                    'mediaType': 'text/html',
-                    'source': {
-                        'content': post.body if post.body else '',
-                        'mediaType': 'text/markdown'
-                    },
-                    'attachment': [],
-                    'commentsEnabled': post.comments_enabled,
-                    'sensitive': post.nsfw,
-                    'nsfl': post.nsfl,
-                    'stickied': post.sticky,
-                    'published': ap_datetime(post.posted_at),
-                    'updated': ap_datetime(post.edited_at),
-                    'audience': post.community.ap_profile_id
-                }
-                update_json = {
-                    'id': f"https://{current_app.config['SERVER_NAME']}/activities/update/{gibberish(15)}",
-                    'type': 'Update',
-                    'actor': current_user.profile_id(),
-                    'audience': post.community.profile_id(),
-                    'to': [post.community.profile_id(), 'https://www.w3.org/ns/activitystreams#Public'],
-                    'published': ap_datetime(utcnow()),
-                    'cc': [
-                        current_user.followers_url()
-                    ],
-                    'object': page_json,
-                }
-                if post.type == POST_TYPE_LINK:
-                    page_json['attachment'] = [{'href': post.url, 'type': 'Link'}]
-                elif post.image_id:
-                    if post.image.file_path:
-                        image_url = post.image.file_path.replace('app/static/', f"https://{current_app.config['SERVER_NAME']}/static/")
-                    elif post.image.thumbnail_path:
-                        image_url = post.image.thumbnail_path.replace('app/static/', f"https://{current_app.config['SERVER_NAME']}/static/")
-                    else:
-                        image_url = post.image.source_url
-                    # NB image is a dict while attachment is a list of dicts (usually just one dict in the list)
-                    page_json['image'] = {'type': 'Image', 'url': image_url}
-                    if post.type == POST_TYPE_IMAGE:
-                        page_json['attachment'] = [{'type': 'Link', 'href': post.image.source_url}]  # source_url is always a https link, no need for .replace() as done above
-
-                if not post.community.is_local():  # this is a remote community, send it to the instance that hosts it
-                    success = post_request(post.community.ap_inbox_url, update_json, current_user.private_key,
-                                           current_user.ap_profile_id + '#main-key')
-                    if not success:
-                        flash('Failed to send edit to remote server', 'error')
-                else:  # local community - send it to followers on remote instances
-                    announce = {
-                        "id": f"https://{current_app.config['SERVER_NAME']}/activities/announce/{gibberish(15)}",
-                        "type": 'Announce',
-                        "to": [
-                            "https://www.w3.org/ns/activitystreams#Public"
-                        ],
-                        "actor": post.community.ap_profile_id,
-                        "cc": [
-                            post.community.ap_followers_url
-                        ],
-                        '@context': default_context(),
-                        'object': update_json
-                    }
-
-                    for instance in post.community.following_instances():
-                        if instance.inbox and not current_user.has_blocked_instance(instance.id) and not instance_banned(instance.domain):
-                            send_to_remote_instance(instance.id, post.community.id, announce)
+                federate_post_update(post)
 
             return redirect(url_for('activitypub.post_ap', post_id=post.id))
         else:
-            if post.type == constants.POST_TYPE_ARTICLE:
-                form.post_type.data = 'discussion'
-                form.discussion_title.data = post.title
-                form.discussion_body.data = post.body
-            elif post.type == constants.POST_TYPE_LINK:
-                form.post_type.data = 'link'
-                form.link_title.data = post.title
-                form.link_body.data = post.body
-                form.link_url.data = post.url
-            elif post.type == constants.POST_TYPE_IMAGE:
-                form.post_type.data = 'image'
-                form.image_title.data = post.title
-                form.image_body.data = post.body
-                form.image_alt_text.data = post.image.alt_text
+            form.image_title.data = post.title
+            form.image_body.data = post.body
+            form.image_alt_text.data = post.image.alt_text
             form.notify_author.data = post.notify_author
             form.nsfw.data = post.nsfw
             form.nsfl.data = post.nsfl
             form.sticky.data = post.sticky
             if not (post.community.is_moderator() or post.community.is_owner() or current_user.is_admin()):
                 form.sticky.render_kw = {'disabled': True}
-            return render_template('post/post_edit.html', title=_('Edit post'), form=form, post=post,
+            return render_template('post/post_edit_image.html', title=_('Edit post'), form=form, post=post,
                                    markdown_editor=current_user.markdown_editor, mods=mod_list,
                                    moderating_communities=moderating_communities(current_user.get_id()),
                                    joined_communities=joined_communities(current_user.get_id()),
@@ -819,6 +805,168 @@ def post_edit(post_id: int):
                                    )
     else:
         abort(401)
+
+
+@bp.route('/post/<int:post_id>/edit_link', methods=['GET', 'POST'])
+@login_required
+def post_edit_link_post(post_id: int):
+    post = Post.query.get_or_404(post_id)
+    form = CreateLinkForm()
+    del form.communities
+
+    mods = post.community.moderators()
+    if post.community.private_mods:
+        mod_list = []
+    else:
+        mod_user_ids = [mod.user_id for mod in mods]
+        mod_list = User.query.filter(User.id.in_(mod_user_ids)).all()
+
+    if post.user_id == current_user.id or post.community.is_moderator() or current_user.is_admin():
+        if g.site.enable_nsfl is False:
+            form.nsfl.render_kw = {'disabled': True}
+        if post.community.nsfw:
+            form.nsfw.data = True
+            form.nsfw.render_kw = {'disabled': True}
+        if post.community.nsfl:
+            form.nsfl.data = True
+            form.nsfw.render_kw = {'disabled': True}
+
+        old_url = post.url
+
+        if form.validate_on_submit():
+            save_post(form, post, 'link')
+            post.community.last_active = utcnow()
+            post.edited_at = utcnow()
+            db.session.commit()
+
+            if post.url != old_url:
+                if post.cross_posts is not None:
+                    old_cross_posts = Post.query.filter(Post.id.in_(post.cross_posts)).all()
+                    post.cross_posts.clear()
+                    for ocp in old_cross_posts:
+                        if ocp.cross_posts is not None:
+                            ocp.cross_posts.remove(post.id)
+
+                new_cross_posts = Post.query.filter(Post.id != post.id, Post.url == post.url,
+                                                Post.posted_at > post.edited_at - timedelta(days=6)).all()
+                for ncp in new_cross_posts:
+                    if ncp.cross_posts is None:
+                        ncp.cross_posts = [post.id]
+                    else:
+                        ncp.cross_posts.append(post.id)
+                    if post.cross_posts is None:
+                        post.cross_posts = [ncp.id]
+                    else:
+                        post.cross_posts.append(ncp.id)
+
+                db.session.commit()
+
+            post.flush_cache()
+            flash(_('Your changes have been saved.'), 'success')
+            # federate edit
+
+            if not post.community.local_only:
+                federate_post_update(post)
+
+            return redirect(url_for('activitypub.post_ap', post_id=post.id))
+        else:
+            form.link_title.data = post.title
+            form.link_body.data = post.body
+            form.link_url.data = post.url
+            form.notify_author.data = post.notify_author
+            form.nsfw.data = post.nsfw
+            form.nsfl.data = post.nsfl
+            form.sticky.data = post.sticky
+            if not (post.community.is_moderator() or post.community.is_owner() or current_user.is_admin()):
+                form.sticky.render_kw = {'disabled': True}
+            return render_template('post/post_edit_link.html', title=_('Edit post'), form=form, post=post,
+                                   markdown_editor=current_user.markdown_editor, mods=mod_list,
+                                   moderating_communities=moderating_communities(current_user.get_id()),
+                                   joined_communities=joined_communities(current_user.get_id()),
+                                   inoculation=inoculation[randint(0, len(inoculation) - 1)]
+                                   )
+    else:
+        abort(401)
+
+
+def federate_post_update(post):
+    page_json = {
+        'type': 'Page',
+        'id': post.ap_id,
+        'attributedTo': current_user.ap_profile_id,
+        'to': [
+            post.community.ap_profile_id,
+            'https://www.w3.org/ns/activitystreams#Public'
+        ],
+        'name': post.title,
+        'cc': [],
+        'content': post.body_html if post.body_html else '',
+        'mediaType': 'text/html',
+        'source': {
+            'content': post.body if post.body else '',
+            'mediaType': 'text/markdown'
+        },
+        'attachment': [],
+        'commentsEnabled': post.comments_enabled,
+        'sensitive': post.nsfw,
+        'nsfl': post.nsfl,
+        'stickied': post.sticky,
+        'published': ap_datetime(post.posted_at),
+        'updated': ap_datetime(post.edited_at),
+        'audience': post.community.ap_profile_id
+    }
+    update_json = {
+        'id': f"https://{current_app.config['SERVER_NAME']}/activities/update/{gibberish(15)}",
+        'type': 'Update',
+        'actor': current_user.profile_id(),
+        'audience': post.community.profile_id(),
+        'to': [post.community.profile_id(), 'https://www.w3.org/ns/activitystreams#Public'],
+        'published': ap_datetime(utcnow()),
+        'cc': [
+            current_user.followers_url()
+        ],
+        'object': page_json,
+    }
+    if post.type == POST_TYPE_LINK:
+        page_json['attachment'] = [{'href': post.url, 'type': 'Link'}]
+    elif post.image_id:
+        if post.image.file_path:
+            image_url = post.image.file_path.replace('app/static/',
+                                                     f"https://{current_app.config['SERVER_NAME']}/static/")
+        elif post.image.thumbnail_path:
+            image_url = post.image.thumbnail_path.replace('app/static/',
+                                                          f"https://{current_app.config['SERVER_NAME']}/static/")
+        else:
+            image_url = post.image.source_url
+        # NB image is a dict while attachment is a list of dicts (usually just one dict in the list)
+        page_json['image'] = {'type': 'Image', 'url': image_url}
+        if post.type == POST_TYPE_IMAGE:
+            page_json['attachment'] = [{'type': 'Link',
+                                        'href': post.image.source_url}]  # source_url is always a https link, no need for .replace() as done above
+    if not post.community.is_local():  # this is a remote community, send it to the instance that hosts it
+        success = post_request(post.community.ap_inbox_url, update_json, current_user.private_key,
+                               current_user.ap_profile_id + '#main-key')
+        if not success:
+            flash('Failed to send edit to remote server', 'error')
+    else:  # local community - send it to followers on remote instances
+        announce = {
+            "id": f"https://{current_app.config['SERVER_NAME']}/activities/announce/{gibberish(15)}",
+            "type": 'Announce',
+            "to": [
+                "https://www.w3.org/ns/activitystreams#Public"
+            ],
+            "actor": post.community.ap_profile_id,
+            "cc": [
+                post.community.ap_followers_url
+            ],
+            '@context': default_context(),
+            'object': update_json
+        }
+
+        for instance in post.community.following_instances():
+            if instance.inbox and not current_user.has_blocked_instance(instance.id) and not instance_banned(
+                    instance.domain):
+                send_to_remote_instance(instance.id, post.community.id, announce)
 
 
 @bp.route('/post/<int:post_id>/delete', methods=['GET', 'POST'])
@@ -888,7 +1036,12 @@ def post_delete(post_id: int):
 def post_report(post_id: int):
     post = Post.query.get_or_404(post_id)
     form = ReportPostForm()
+    if post.reports == -1:  # When a mod decides to ignore future reports, post.reports is set to -1
+        flash(_('Moderators have already assessed reports regarding this post, no further reports are necessary.'), 'warning')
     if form.validate_on_submit():
+        if post.reports == -1:
+            flash(_('Post has already been reported, thank you!'))
+            return redirect(post.community.local_url())
         report = Report(reasons=form.reasons_to_string(form.reasons.data), description=form.description.data,
                         type=1, reporter_id=current_user.id, suspect_user_id=post.author.id, suspect_post_id=post.id,
                         suspect_community_id=post.community.id, in_community_id=post.community.id, source_instance_id=1)
@@ -911,9 +1064,29 @@ def post_report(post_id: int):
                 admin.unread_notifications += 1
         db.session.commit()
 
-        # todo: federate report to originating instance
+        # federate report to community instance
         if not post.community.is_local() and form.report_remote.data:
-            ...
+            summary = form.reasons_to_string(form.reasons.data)
+            if form.description.data:
+                summary += ' - ' + form.description.data
+            report_json = {
+              "actor": current_user.profile_id(),
+              "audience": post.community.profile_id(),
+              "content": None,
+              "id": f"https://{current_app.config['SERVER_NAME']}/activities/flag/{gibberish(15)}",
+              "object": post.ap_id,
+              "summary": summary,
+              "to": [
+                post.community.profile_id()
+              ],
+              "type": "Flag"
+            }
+            instance = Instance.query.get(post.community.instance_id)
+            if post.community.ap_inbox_url and not current_user.has_blocked_instance(instance.id) and not instance_banned(instance.domain):
+                success = post_request(post.community.ap_inbox_url, report_json, current_user.private_key,
+                                       current_user.ap_profile_id + '#main-key')
+                if not success:
+                    flash('Failed to send report to remote server', 'error')
 
         flash(_('Post has been reported, thank you!'))
         return redirect(post.community.local_url())
@@ -992,7 +1165,16 @@ def post_reply_report(post_id: int, comment_id: int):
     post = Post.query.get_or_404(post_id)
     post_reply = PostReply.query.get_or_404(comment_id)
     form = ReportPostForm()
+
+    if post_reply.reports == -1:  # When a mod decides to ignore future reports, post_reply.reports is set to -1
+        flash(_('Moderators have already assessed reports regarding this comment, no further reports are necessary.'), 'warning')
+
     if form.validate_on_submit():
+
+        if post_reply.reports == -1:
+            flash(_('Comment has already been reported, thank you!'))
+            return redirect(post.community.local_url())
+
         report = Report(reasons=form.reasons_to_string(form.reasons.data), description=form.description.data,
                         type=2, reporter_id=current_user.id, suspect_post_id=post.id, suspect_community_id=post.community.id,
                         suspect_user_id=post_reply.author.id, suspect_post_reply_id=post_reply.id, in_community_id=post.community.id,
@@ -1006,7 +1188,7 @@ def post_reply_report(post_id: int, comment_id: int):
                                         url=f"https://{current_app.config['SERVER_NAME']}/comment/{post_reply.id}",
                                         author_id=current_user.id)
             db.session.add(notification)
-            already_notified.add(mod.id)
+            already_notified.add(mod.user_id)
         post_reply.reports += 1
         # todo: only notify admins for certain types of report
         for admin in Site.admins():
@@ -1016,9 +1198,30 @@ def post_reply_report(post_id: int, comment_id: int):
                 admin.unread_notifications += 1
         db.session.commit()
 
-        # todo: federate report to originating instance
+        # federate report to originating instance
         if not post.community.is_local() and form.report_remote.data:
-            ...
+            summary = form.reasons_to_string(form.reasons.data)
+            if form.description.data:
+                summary += ' - ' + form.description.data
+            report_json = {
+                "actor": current_user.profile_id(),
+                "audience": post.community.profile_id(),
+                "content": None,
+                "id": f"https://{current_app.config['SERVER_NAME']}/activities/flag/{gibberish(15)}",
+                "object": post_reply.ap_id,
+                "summary": summary,
+                "to": [
+                    post.community.profile_id()
+                ],
+                "type": "Flag"
+            }
+            instance = Instance.query.get(post.community.instance_id)
+            if post.community.ap_inbox_url and not current_user.has_blocked_instance(
+                    instance.id) and not instance_banned(instance.domain):
+                success = post_request(post.community.ap_inbox_url, report_json, current_user.private_key,
+                                       current_user.ap_profile_id + '#main-key')
+                if not success:
+                    flash('Failed to send report to remote server', 'error')
 
         flash(_('Comment has been reported, thank you!'))
         return redirect(post.community.local_url())

@@ -1,0 +1,78 @@
+{% if theme() and file_exists('app/templates/themes/' + theme() + '/base.html') %}
+    {% extends 'themes/' + theme() + '/base.html' %}
+{% else %}
+    {% extends "base.html" %}
+{% endif %} %}
+{% from 'bootstrap/form.html' import render_form, render_field %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col-12 col-md-8 position-relative main_pane">
+        <h1>{{ _('Edit post') }}</h1>
+        <form method="post" enctype="multipart/form-data" role="form">
+            {{ form.csrf_token() }}
+            {{ render_field(form.image_title) }}
+              {{ render_field(form.image_file) }}
+              {{ render_field(form.image_alt_text) }}
+              <small class="field_hint">{{ _('Describe the image, to help visually impaired people.') }}</small>
+              {{ render_field(form.image_body) }}
+              {% if markdown_editor %}
+                <script nonce="{{ session['nonce'] }}">
+                    window.addEventListener("load", function () {
+                        var downarea = new DownArea({
+                            elem: document.querySelector('#image_body'),
+                            resize: DownArea.RESIZE_VERTICAL,
+                            hide: ['heading', 'bold-italic'],
+                            value: {{ form.image_body.data | tojson | safe }},
+                        });
+                        setupAutoResize('image_body');
+                    });
+                </script>
+              {% endif %}
+
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    {{ render_field(form.notify_author) }}
+                </div>
+                <div class="col-md-1">
+                    {{ render_field(form.sticky) }}
+                </div>
+                <div class="col-md-1">
+                    {{ render_field(form.nsfw) }}
+                </div>
+                <div class="col-md-1">
+                    {{ render_field(form.nsfl) }}
+                </div>
+
+                <div class="col">
+
+                </div>
+            </div>
+
+            {{ render_field(form.submit) }}
+        </form>
+    </div>
+
+    <aside id="side_pane" class="col-12 col-md-4 side_pane" role="complementary">
+        <div class="card mt-3">
+            <div class="card-header">
+                 <h2>{{ post.community.title }}</h2>
+            </div>
+            <div class="card-body">
+                <p>{{ post.community.description_html|safe if post.community.description_html else '' }}</p>
+                <p>{{ post.community.rules_html|safe if post.community.rules_html else '' }}</p>
+                {% if len(mods) > 0 and not post.community.private_mods %}
+                    <h3>Moderators</h3>
+                    <ul class="moderator_list">
+                        {% for mod in mods %}
+                            <li><a href="/u/{{ mod.link() }}">{{ mod.display_name() }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+            {% include "_inoculation_links.html" %}
+    </aside>
+
+</div>
+{% endblock %}

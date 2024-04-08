@@ -91,7 +91,7 @@ def show_topic(topic_path):
             per_page = 300
         posts = posts.paginate(page=page, per_page=per_page, error_out=False)
 
-        topic_communities = Community.query.filter(Community.topic_id == current_topic.id).order_by(Community.name)
+        topic_communities = Community.query.filter(Community.topic_id == current_topic.id, Community.banned == False).order_by(Community.name)
 
         next_url = url_for('topic.show_topic',
                            topic_path=topic_path,

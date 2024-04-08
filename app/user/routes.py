@@ -335,8 +335,18 @@ def report_profile(actor):
     else:
         user: User = User.query.filter_by(user_name=actor, deleted=False, ap_id=None).first()
     form = ReportUserForm()
+
+    if user and user.reports == -1:  # When a mod decides to ignore future reports, user.reports is set to -1
+        flash(_('Moderators have already assessed reports regarding this person, no further reports are necessary.'), 'warning')
+
     if user and not user.banned:
         if form.validate_on_submit():
+
+            if user.reports == -1:
+                flash(_('%(user_name)s has already been reported, thank you!', user_name=actor))
+                goto = request.args.get('redirect') if 'redirect' in request.args else f'/u/{actor}'
+                return redirect(goto)
+
             report = Report(reasons=form.reasons_to_string(form.reasons.data), description=form.description.data,
                             type=0, reporter_id=current_user.id, suspect_user_id=user.id, source_instance_id=1)
             db.session.add(report)

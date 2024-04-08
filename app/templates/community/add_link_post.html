@@ -1,0 +1,96 @@
+{% if theme() and file_exists('app/templates/themes/' + theme() + '/base.html') %}
+    {% extends 'themes/' + theme() + '/base.html' %}
+{% else %}
+    {% extends "base.html" %}
+{% endif %} %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col-12 col-md-8 position-relative main_pane">
+        <h1>{{ _('Create post') }}</h1>
+        <form method="post" enctype="multipart/form-data" role="form">
+            {{ form.csrf_token() }}
+            <div class="form-group">
+                <label class="form-control-label" for="type_of_post">
+                    {{ _('Type of post') }}
+                </label>
+                <div id="type_of_post" class="btn-group flex-wrap" role="navigation">
+                    <a href="{{ url_for('community.add_discussion_post', actor=actor) }}" class="btn btn-outline-secondary" aria-label="{{ _('Start a discussion') }}">{{ _('Discussion') }}</a>
+                    <a href="{{ url_for('community.add_link_post', actor=actor) }}" class="btn btn-primary" aria-label="{{ _('Share a link') }}">{{ _('Link') }}</a>
+                    <a href="{{ url_for('community.add_image_post', actor=actor) }}" class="btn btn-outline-secondary" aria-label="{{ _('Share an image') }}">{{ _('Image') }}</a>
+                    <!-- <a href="#" class="btn" aria-label="{{ _('Create a poll') }}">{{ _('Poll') }}</a>
+                    <a href="#" class="btn" aria-label="{{ _('Create an event') }}">{{ _('Event') }}</a> -->
+                </div>
+            </div>
+            {{ render_field(form.communities) }}
+
+            {{ render_field(form.link_title) }}
+            {{ render_field(form.link_url) }}
+            {{ render_field(form.link_body) }}
+            {% if not low_bandwidth %}
+                  {% if markdown_editor %}
+                        <script nonce="{{ session['nonce'] }}">
+                            window.addEventListener("load", function () {
+                                var downarea = new DownArea({
+                                    elem: document.querySelector('#link_body'),
+                                    resize: DownArea.RESIZE_VERTICAL,
+                                    hide: ['heading', 'bold-italic'],
+                                });
+                                setupAutoResize('link_body');
+                            });
+                        </script>
+                  {% else %}
+                        <a href="#" aria-hidden="true" class="markdown_editor_enabler create_post_markdown_editor_enabler" data-id="link_body">{{ _('Enable markdown editor') }}</a>
+                  {% endif %}
+            {% endif %}
+
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    {{ render_field(form.notify_author) }}
+                </div>
+                <div class="col-md-1">
+                    {{ render_field(form.sticky) }}
+                </div>
+                <div class="col-md-1">
+                    {{ render_field(form.nsfw) }}
+                </div>
+                <div class="col-md-1">
+                    {{ render_field(form.nsfl) }}
+                </div>
+                <div class="col">
+
+                </div>
+            </div>
+
+            {{ render_field(form.submit) }}
+        </form>
+    </div>
+
+    <aside id="side_pane" class="col-12 col-md-4 side_pane" role="complementary">
+        <div class="card mb-3">
+            <div class="card-header">
+                 <h2>{{ community.title }}</h2>
+            </div>
+            <div class="card-body">
+                <p>{{ community.description_html|safe if community.description_html else '' }}</p>
+                <p>{{ community.rules_html|safe if community.rules_html else '' }}</p>
+                {% if len(mods) > 0 and not community.private_mods %}
+                    <h3>Moderators</h3>
+                    <ul class="moderator_list">
+                        {% for mod in mods %}
+                            <li>{{ render_username(mod) }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if rss_feed %}
+                <p class="mt-4">
+                    <a class="no-underline" href="{{ rss_feed }}" rel="nofollow"><span class="fe fe-rss"></span> RSS feed</a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        {% include "_inoculation_links.html" %}
+    </aside>
+</div>
+{% endblock %}

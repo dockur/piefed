@@ -2,7 +2,7 @@
 {% if content_blocked and content_blocked == '-1' %}
     {# do nothing - blocked by keyword filter #}
 {% else %}
-    <div class="post_teaser type_{{ post.type }}{{ ' reported' if post.reports and current_user.is_authenticated and post.community.is_moderator() }}{{ ' blocked' if content_blocked }}"
+    <div class="post_teaser type_{{ post.type }}{{ ' reported' if post.reports > 0 and current_user.is_authenticated and post.community.is_moderator() }}{{ ' blocked' if content_blocked }}"
         {% if content_blocked %} title="{{ _('Filtered: ') }}{{ content_blocked }}"{% endif %} tabindex="0">
             <div class="row">
                 <div class="col-12">
@@ -55,7 +55,7 @@
                             {% endif %}
                             {% if post.nsfw %}<span class="warning_badge nsfw" title="{{ _('Not safe for work') }}">nsfw</span>{% endif %}
                             {% if post.nsfl %}<span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">nsfl</span>{% endif %}
-                            {% if post.reports and current_user.is_authenticated and post.community.is_moderator(current_user) %}
+                            {% if post.reports > 0 and current_user.is_authenticated and post.community.is_moderator(current_user) %}
                                 <span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span>
                             {% endif %}
                             {% if post.sticky %}<span class="fe fe-sticky-right"></span>{% endif %}

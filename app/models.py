@@ -208,14 +208,23 @@ class File(db.Model):
     def delete_from_disk(self):
         purge_from_cache = []
         if self.file_path and os.path.isfile(self.file_path):
-            os.unlink(self.file_path)
+            try:
+                os.unlink(self.file_path)
+            except FileNotFoundError as e:
+                ...
             purge_from_cache.append(self.file_path.replace('app/', f"https://{current_app.config['SERVER_NAME']}/"))
         if self.thumbnail_path and os.path.isfile(self.thumbnail_path):
-            os.unlink(self.thumbnail_path)
+            try:
+                os.unlink(self.thumbnail_path)
+            except FileNotFoundError as e:
+                ...
             purge_from_cache.append(self.thumbnail_path.replace('app/', f"https://{current_app.config['SERVER_NAME']}/"))
         if self.source_url and self.source_url.startswith('http') and current_app.config['SERVER_NAME'] in self.source_url:
             # self.source_url is always a url rather than a file path, which makes deleting the file a bit fiddly
-            os.unlink(self.source_url.replace(f"https://{current_app.config['SERVER_NAME']}/", 'app/'))
+            try:
+                os.unlink(self.source_url.replace(f"https://{current_app.config['SERVER_NAME']}/", 'app/'))
+            except FileNotFoundError as e:
+                ...
             purge_from_cache.append(self.source_url) # otoh it makes purging the cdn cache super easy.
 
         if purge_from_cache:
@@ -282,6 +291,18 @@ class Topic(db.Model):
     num_communities = db.Column(db.Integer, default=0)
     parent_id = db.Column(db.Integer)
     communities = db.relationship('Community', lazy='dynamic', backref='topic', cascade="all, delete-orphan")
+
+    def path(self):
+        return_value = [self.machine_name]
+        parent_id = self.parent_id
+        while parent_id is not None:
+            parent_topic = Topic.query.get(parent_id)
+            if parent_topic is None:
+                break
+            return_value.append(parent_topic.machine_name)
+            parent_id = parent_topic.parent_id
+        return_value = list(reversed(return_value))
+        return '/'.join(return_value)
 
 
 class Community(db.Model):
@@ -405,8 +426,8 @@ class Community(db.Model):
                                      (or_(
                                          CommunityMember.is_owner,
                                          CommunityMember.is_moderator
-                                     )) & CommunityMember.is_banned == False
-                                     ).all()
+                                     ))
+                                     ).filter(CommunityMember.is_banned == False).all()
 
     def is_moderator(self, user=None):
         if user is None:

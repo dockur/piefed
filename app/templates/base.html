@@ -136,8 +136,8 @@
                             <li class="nav-item dropdown{% if active_parent == 'communities' %} active{% endif %}">
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/topics" aria-haspopup="true" aria-expanded="false">{{ _('Topics') }}</a>
                                 <ul class="dropdown-menu">
-                                  <li><a class="dropdown-item{% if active_child == 'list_communities' %} active{% endif %}" href="/topics">{{ _('Browse by topic') }}</a></li>
-                                  <li><a class="dropdown-item{% if active_child == 'list_topics' %} active{% endif %}" href="/communities">{{ _('All communities') }}</a></li>
+                                  <li><a class="dropdown-item{% if active_child == 'list_topics' %} active{% endif %}" href="/topics">{{ _('Browse by topic') }}</a></li>
+                                  <li><a class="dropdown-item{% if active_child == 'list_communities' %} active{% endif %}" href="/communities">{{ _('All communities') }}</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="/auth/login">{{ _('Log in') }}</a></li>

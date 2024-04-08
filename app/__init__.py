@@ -18,8 +18,6 @@ from sqlalchemy_searchable import make_searchable
 
 from config import Config
 
-import re
-
 
 def get_locale():
     try:

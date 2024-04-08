@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, parse_qs
+
 from flask_login import current_user
 
 from app import db, constants, cache, celery
@@ -16,14 +18,26 @@ from app.models import User, Community, CommunityJoinRequest, CommunityMember, C
 from app.activitypub.util import public_key, users_total, active_half_year, active_month, local_posts, local_comments, \
     post_to_activity, find_actor_or_create, default_context, instance_blocked, find_reply_parent, find_liked_object, \
     lemmy_site_data, instance_weight, is_activitypub_request, downvote_post_reply, downvote_post, upvote_post_reply, \
-    upvote_post, activity_already_ingested, delete_post_or_comment, community_members, \
+    upvote_post, delete_post_or_comment, community_members, \
     user_removed_from_remote_server, create_post, create_post_reply, update_post_reply_from_activity, \
-    update_post_from_activity, undo_vote, undo_downvote, post_to_page
+    update_post_from_activity, undo_vote, undo_downvote, post_to_page, get_redis_connection, find_reported_object, \
+    process_report
 from app.utils import gibberish, get_setting, is_image_url, allowlist_html, render_template, \
     domain_from_url, markdown_to_html, community_membership, ap_datetime, ip_address, can_downvote, \
     can_upvote, can_create_post, awaken_dormant_instance, shorten_string, can_create_post_reply, sha256_digest, \
     community_moderators
 import werkzeug.exceptions
+
+
+@bp.route('/testredis')
+def testredis_get():
+    redis_client = get_redis_connection()
+    redis_client.set("cowbell", "1", ex=600)
+    x = redis_client.get('cowbell')
+    if x is not None:
+        return "Redis: OK"
+    else:
+        return "Redis: FAIL"
 
 
 @bp.route('/.well-known/webfinger')
@@ -350,13 +364,15 @@ def shared_inbox():
             return ''
 
         if 'id' in request_json:
-            if activity_already_ingested(request_json['id']):   # Lemmy has an extremely short POST timeout and tends to retry unnecessarily. Ignore their retries.
+            redis_client = get_redis_connection()
+            if redis_client.get(request_json['id']) is not None:   # Lemmy has an extremely short POST timeout and tends to retry unnecessarily. Ignore their retries.
                 activity_log.result = 'ignored'
                 activity_log.exception_message = 'Unnecessary retry attempt'
                 db.session.add(activity_log)
                 db.session.commit()
                 return ''
 
+            redis_client.set(request_json['id'], 1, ex=90)  # Save the activity ID into redis, to avoid duplicate activities that Lemmy sometimes sends
             activity_log.activity_id = request_json['id']
             if g.site.log_activitypub_json:
                 activity_log.activity_json = json.dumps(request_json)
@@ -975,7 +991,19 @@ def process_inbox_request(request_json, activitypublog_id, ip_address):
                         else:
                             activity_log.exception_message = 'Cannot downvote this'
                             activity_log.result = 'ignored'
-                # Flush the caches of any major object that was created. To be sure.
+                elif request_json['type'] == 'Flag':    # Reported content
+                    activity_log.activity_type = 'Report'
+                    user_ap_id = request_json['actor']
+                    user = find_actor_or_create(user_ap_id)
+                    target_ap_id = request_json['object']
+                    reported = find_reported_object(target_ap_id)
+                    if user and reported:
+                        process_report(user, reported, request_json, activity_log)
+                        activity_log.result = 'success'
+                    else:
+                        activity_log.exception_message = 'Report ignored due to missing user or content'
+
+                    # Flush the caches of any major object that was created. To be sure.
                 if 'user' in vars() and user is not None:
                     user.flush_cache()
                     if user.instance_id and user.instance_id != 1:
@@ -1038,6 +1066,9 @@ def process_delete_request(request_json, activitypublog_id, ip_address):
 
 
 def announce_activity_to_followers(community, creator, activity):
+    # remove context from what will be inner object
+    del activity["@context"]
+
     announce_activity = {
         '@context': default_context(),
         "actor": community.profile_id(),

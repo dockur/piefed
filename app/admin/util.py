@@ -9,7 +9,7 @@ from app import db, cache, celery
 from app.activitypub.signature import post_request
 from app.activitypub.util import default_context
 from app.models import User, Community, Instance, Site, ActivityPubLog, CommunityMember, Topic
-from app.utils import gibberish
+from app.utils import gibberish, topic_tree
 
 
 def unsubscribe_from_everything_then_delete(user_id):
@@ -104,21 +104,6 @@ def send_newsletter(form):
 
         if form.test.data:
             break
-
-
-# replies to a post, in a tree, sorted by a variety of methods
-def topic_tree() -> List:
-    topics = Topic.query.order_by(Topic.name)
-
-    topics_dict = {topic.id: {'topic': topic, 'children': []} for topic in topics.all()}
-
-    for topic in topics:
-        if topic.parent_id is not None:
-            parent_comment = topics_dict.get(topic.parent_id)
-            if parent_comment:
-                parent_comment['children'].append(topics_dict[topic.id])
-
-    return [topic for topic in topics_dict.values() if topic['topic'].parent_id is None]
 
 
 def topics_for_form(current_topic: int) -> List[Tuple[int, str]]:

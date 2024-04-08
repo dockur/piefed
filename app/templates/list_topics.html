@@ -8,14 +8,26 @@
 
 {% block app_content %}
 {% if len(topics) > 0 %}
+    {% macro render_topic(topic, depth) %}
+        <tr>
+            <td nowrap="nowrap">{{ '--' * depth }}
+                {% if depth == 0 %}<strong>{% endif %}
+                    <a href="/topic/{{ topic['topic'].path() }}">{{ topic['topic'].name }}</a>
+                {% if depth == 0 %}</strong>{% endif %}
+            </td>
+        </tr>
+        {% if topic['children'] %}
+            {% for topic in topic['children'] %}
+                {{ render_topic(topic, depth + 1)|safe }}
+            {% endfor %}
+        {% endif %}
+    {% endmacro %}
     <h1>{{ _('Choose a topic') }}</h1>
     <div class="table-responsive-md mt-4">
         <table class="communities_table table table-striped table-hover w-100">
             <tbody>
                 {% for topic in topics %}
-                    <tr>
-                        <th class="pl-2"><a href="/topic/{{ topic.machine_name }}">{{ topic.name }}</a></th>
-                    </tr>
+                    {{ render_topic(topic, 0)|safe }}
                 {% endfor %}
             </tbody>
         </table>

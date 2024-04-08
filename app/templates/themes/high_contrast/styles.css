@@ -36,6 +36,10 @@
     --bs-btn-color: white;
 }
 
+.post_body a, .comment_body a {
+    text-decoration: underline;
+}
+
 .post_list .post_teaser {
     border-bottom: solid 1px black;
 }

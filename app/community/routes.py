@@ -12,14 +12,15 @@ from app import db, constants, cache
 from app.activitypub.signature import RsaKeys, post_request
 from app.activitypub.util import default_context, notify_about_post, find_actor_or_create, make_image_sizes
 from app.chat.util import send_message
-from app.community.forms import SearchRemoteCommunity, CreatePostForm, ReportCommunityForm, \
+from app.community.forms import SearchRemoteCommunity, CreateDiscussionForm, CreateImageForm, CreateLinkForm, ReportCommunityForm, \
     DeleteCommunityForm, AddCommunityForm, EditCommunityForm, AddModeratorForm, BanUserCommunityForm, \
     EscalateReportForm, ResolveReportForm
 from app.community.util import search_for_community, community_url_exists, actor_to_community, \
     opengraph_parse, url_to_thumbnail_file, save_post, save_icon_file, save_banner_file, send_to_remote_instance, \
     delete_post_from_community, delete_post_reply_from_community
 from app.constants import SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, POST_TYPE_LINK, POST_TYPE_ARTICLE, POST_TYPE_IMAGE, \
-    SUBSCRIPTION_PENDING, SUBSCRIPTION_MODERATOR, REPORT_STATE_NEW, REPORT_STATE_ESCALATED, REPORT_STATE_RESOLVED
+    SUBSCRIPTION_PENDING, SUBSCRIPTION_MODERATOR, REPORT_STATE_NEW, REPORT_STATE_ESCALATED, REPORT_STATE_RESOLVED, \
+    REPORT_STATE_DISCARDED
 from app.inoculation import inoculation
 from app.models import User, Community, CommunityMember, CommunityJoinRequest, CommunityBan, Post, \
     File, PostVote, utcnow, Report, Notification, InstanceBlock, ActivityPubLog, Topic, Conversation, PostReply
@@ -443,11 +444,13 @@ def join_then_add(actor):
 @bp.route('/<actor>/submit', methods=['GET', 'POST'])
 @login_required
 @validation_required
-def add_post(actor):
+def add_discussion_post(actor):
     if current_user.banned:
         return show_ban_message()
     community = actor_to_community(actor)
-    form = CreatePostForm()
+
+    form = CreateDiscussionForm()
+
     if g.site.enable_nsfl is False:
         form.nsfl.render_kw = {'disabled': True}
     if community.nsfw:
@@ -469,7 +472,63 @@ def add_post(actor):
         if not can_create_post(current_user, community):
             abort(401)
         post = Post(user_id=current_user.id, community_id=form.communities.data, instance_id=1)
-        save_post(form, post)
+        save_post(form, post, 'discussion')
+        community.post_count += 1
+        community.last_active = g.site.last_active = utcnow()
+        db.session.commit()
+        post.ap_id = f"https://{current_app.config['SERVER_NAME']}/post/{post.id}"
+        db.session.commit()
+
+        notify_about_post(post)
+
+        if not community.local_only:
+            federate_post(community, post)
+
+        return redirect(f"/c/{community.link()}")
+    else:
+        form.communities.data = community.id
+        form.notify_author.data = True
+
+    return render_template('community/add_discussion_post.html', title=_('Add post to community'), form=form, community=community,
+                           markdown_editor=current_user.markdown_editor, low_bandwidth=False, actor=actor,
+                           moderating_communities=moderating_communities(current_user.get_id()),
+                           joined_communities=joined_communities(current_user.id),
+                           inoculation=inoculation[randint(0, len(inoculation) - 1)]
+    )
+
+
+@bp.route('/<actor>/submit_image', methods=['GET', 'POST'])
+@login_required
+@validation_required
+def add_image_post(actor):
+    if current_user.banned:
+        return show_ban_message()
+    community = actor_to_community(actor)
+
+    form = CreateImageForm()
+
+    if g.site.enable_nsfl is False:
+        form.nsfl.render_kw = {'disabled': True}
+    if community.nsfw:
+        form.nsfw.data = True
+        form.nsfw.render_kw = {'disabled': True}
+    if community.nsfl:
+        form.nsfl.data = True
+        form.nsfw.render_kw = {'disabled': True}
+    if not(community.is_moderator() or community.is_owner() or current_user.is_admin()):
+        form.sticky.render_kw = {'disabled': True}
+
+    form.communities.choices = [(c.id, c.display_name()) for c in current_user.communities()]
+
+    if not can_create_post(current_user, community):
+        abort(401)
+
+    if form.validate_on_submit():
+        community = Community.query.get_or_404(form.communities.data)
+        if not can_create_post(current_user, community):
+            abort(401)
+        post = Post(user_id=current_user.id, community_id=form.communities.data, instance_id=1)
+        save_post(form, post, 'image')
         community.post_count += 1
         community.last_active = g.site.last_active = utcnow()
         db.session.commit()
@@ -496,103 +555,181 @@ def add_post(actor):
         notify_about_post(post)
 
         if not community.local_only:
-            page = {
-                'type': 'Page',
-                'id': post.ap_id,
-                'attributedTo': current_user.ap_profile_id,
-                'to': [
-                    community.ap_profile_id,
-                    'https://www.w3.org/ns/activitystreams#Public'
-                ],
-                'name': post.title,
-                'cc': [],
-                'content': post.body_html if post.body_html else '',
-                'mediaType': 'text/html',
-                'source': {
-                    'content': post.body if post.body else '',
-                    'mediaType': 'text/markdown'
-                },
-                'attachment': [],
-                'commentsEnabled': post.comments_enabled,
-                'sensitive': post.nsfw,
-                'nsfl': post.nsfl,
-                'stickied': post.sticky,
-                'published': ap_datetime(utcnow()),
-                'audience': community.ap_profile_id
-            }
-            create = {
-                "id": f"https://{current_app.config['SERVER_NAME']}/activities/create/{gibberish(15)}",
-                "actor": current_user.ap_profile_id,
-                "to": [
-                    "https://www.w3.org/ns/activitystreams#Public"
-                ],
-                "cc": [
-                    community.ap_profile_id
-                ],
-                "type": "Create",
-                "audience": community.ap_profile_id,
-                "object": page,
-                '@context': default_context()
-            }
-            if post.type == POST_TYPE_LINK:
-                page['attachment'] = [{'href': post.url, 'type': 'Link'}]
-            elif post.image_id:
-                if post.image.file_path:
-                    image_url = post.image.file_path.replace('app/static/', f"https://{current_app.config['SERVER_NAME']}/static/")
-                elif post.image.thumbnail_path:
-                    image_url = post.image.thumbnail_path.replace('app/static/', f"https://{current_app.config['SERVER_NAME']}/static/")
-                else:
-                    image_url = post.image.source_url
-                # NB image is a dict while attachment is a list of dicts (usually just one dict in the list)
-                page['image'] = {'type': 'Image', 'url': image_url}
-                if post.type == POST_TYPE_IMAGE:
-                    page['attachment'] = [{'type': 'Link', 'href': post.image.source_url}]  # source_url is always a https link, no need for .replace() as done above
-            if not community.is_local():  # this is a remote community - send the post to the instance that hosts it
-                success = post_request(community.ap_inbox_url, create, current_user.private_key,
-                                       current_user.ap_profile_id + '#main-key')
-                if success:
-                    flash(_('Your post to %(name)s has been made.', name=community.title))
-                else:
-                    flash('There was a problem making your post to ' + community.title)
-            else:   # local community - send (announce) post out to followers
-                announce = {
-                    "id": f"https://{current_app.config['SERVER_NAME']}/activities/announce/{gibberish(15)}",
-                    "type": 'Announce',
-                    "to": [
-                        "https://www.w3.org/ns/activitystreams#Public"
-                    ],
-                    "actor": community.ap_profile_id,
-                    "cc": [
-                        community.ap_followers_url
-                    ],
-                    '@context': default_context(),
-                    'object': create
-                }
-
-                sent_to = 0
-                for instance in community.following_instances():
-                    if instance.inbox and not current_user.has_blocked_instance(instance.id) and not instance_banned(instance.domain):
-                        send_to_remote_instance(instance.id, community.id, announce)
-                        sent_to += 1
-                if sent_to:
-                    flash(_('Your post to %(name)s has been made.', name=community.title))
-                else:
-                    flash(_('Your post to %(name)s has been made.', name=community.title))
+            federate_post(community, post)
 
         return redirect(f"/c/{community.link()}")
     else:
-        # when request.form has some data in it, it means form validation failed. Set the post_type so the correct tab is shown. See setupPostTypeTabs() in scripts.js
-        if request.form.get('post_type', None):
-            form.post_type.data = request.form.get('post_type')
         form.communities.data = community.id
         form.notify_author.data = True
 
-    return render_template('community/add_post.html', title=_('Add post to community'), form=form, community=community,
-                           markdown_editor=current_user.markdown_editor, low_bandwidth=False,
+    return render_template('community/add_image_post.html', title=_('Add post to community'), form=form, community=community,
+                           markdown_editor=current_user.markdown_editor, low_bandwidth=False, actor=actor,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.id),
                            inoculation=inoculation[randint(0, len(inoculation) - 1)]
     )
+
+
+@bp.route('/<actor>/submit_link', methods=['GET', 'POST'])
+@login_required
+@validation_required
+def add_link_post(actor):
+    if current_user.banned:
+        return show_ban_message()
+    community = actor_to_community(actor)
+
+    form = CreateLinkForm()
+
+    if g.site.enable_nsfl is False:
+        form.nsfl.render_kw = {'disabled': True}
+    if community.nsfw:
+        form.nsfw.data = True
+        form.nsfw.render_kw = {'disabled': True}
+    if community.nsfl:
+        form.nsfl.data = True
+        form.nsfw.render_kw = {'disabled': True}
+    if not(community.is_moderator() or community.is_owner() or current_user.is_admin()):
+        form.sticky.render_kw = {'disabled': True}
+
+    form.communities.choices = [(c.id, c.display_name()) for c in current_user.communities()]
+
+    if not can_create_post(current_user, community):
+        abort(401)
+
+    if form.validate_on_submit():
+        community = Community.query.get_or_404(form.communities.data)
+        if not can_create_post(current_user, community):
+            abort(401)
+        post = Post(user_id=current_user.id, community_id=form.communities.data, instance_id=1)
+        save_post(form, post, 'link')
+        community.post_count += 1
+        community.last_active = g.site.last_active = utcnow()
+        db.session.commit()
+        post.ap_id = f"https://{current_app.config['SERVER_NAME']}/post/{post.id}"
+        db.session.commit()
+        if post.image_id and post.image.file_path is None:
+            make_image_sizes(post.image_id, 150, 512, 'posts')  # the 512 sized image is for masonry view
+
+        # Update list of cross posts
+        if post.url:
+            other_posts = Post.query.filter(Post.id != post.id, Post.url == post.url,
+                                    Post.posted_at > post.posted_at - timedelta(days=6)).all()
+            for op in other_posts:
+                if op.cross_posts is None:
+                    op.cross_posts = [post.id]
+                else:
+                    op.cross_posts.append(post.id)
+                if post.cross_posts is None:
+                    post.cross_posts = [op.id]
+                else:
+                    post.cross_posts.append(op.id)
+            db.session.commit()
+
+        notify_about_post(post)
+
+        if not community.local_only:
+            federate_post(community, post)
+
+        return redirect(f"/c/{community.link()}")
+    else:
+        form.communities.data = community.id
+        form.notify_author.data = True
+
+    return render_template('community/add_link_post.html', title=_('Add post to community'), form=form, community=community,
+                           markdown_editor=current_user.markdown_editor, low_bandwidth=False, actor=actor,
+                           moderating_communities=moderating_communities(current_user.get_id()),
+                           joined_communities=joined_communities(current_user.id),
+                           inoculation=inoculation[randint(0, len(inoculation) - 1)]
+    )
+
+
+def federate_post(community, post):
+    page = {
+        'type': 'Page',
+        'id': post.ap_id,
+        'attributedTo': current_user.ap_profile_id,
+        'to': [
+            community.ap_profile_id,
+            'https://www.w3.org/ns/activitystreams#Public'
+        ],
+        'name': post.title,
+        'cc': [],
+        'content': post.body_html if post.body_html else '',
+        'mediaType': 'text/html',
+        'source': {
+            'content': post.body if post.body else '',
+            'mediaType': 'text/markdown'
+        },
+        'attachment': [],
+        'commentsEnabled': post.comments_enabled,
+        'sensitive': post.nsfw,
+        'nsfl': post.nsfl,
+        'stickied': post.sticky,
+        'published': ap_datetime(utcnow()),
+        'audience': community.ap_profile_id
+    }
+    create = {
+        "id": f"https://{current_app.config['SERVER_NAME']}/activities/create/{gibberish(15)}",
+        "actor": current_user.ap_profile_id,
+        "to": [
+            "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+            community.ap_profile_id
+        ],
+        "type": "Create",
+        "audience": community.ap_profile_id,
+        "object": page,
+        '@context': default_context()
+    }
+    if post.type == POST_TYPE_LINK:
+        page['attachment'] = [{'href': post.url, 'type': 'Link'}]
+    elif post.image_id:
+        if post.image.file_path:
+            image_url = post.image.file_path.replace('app/static/',
+                                                     f"https://{current_app.config['SERVER_NAME']}/static/")
+        elif post.image.thumbnail_path:
+            image_url = post.image.thumbnail_path.replace('app/static/',
+                                                          f"https://{current_app.config['SERVER_NAME']}/static/")
+        else:
+            image_url = post.image.source_url
+        # NB image is a dict while attachment is a list of dicts (usually just one dict in the list)
+        page['image'] = {'type': 'Image', 'url': image_url}
+        if post.type == POST_TYPE_IMAGE:
+            page['attachment'] = [{'type': 'Link',
+                                   'href': post.image.source_url}]  # source_url is always a https link, no need for .replace() as done above
+    if not community.is_local():  # this is a remote community - send the post to the instance that hosts it
+        success = post_request(community.ap_inbox_url, create, current_user.private_key,
+                               current_user.ap_profile_id + '#main-key')
+        if success:
+            flash(_('Your post to %(name)s has been made.', name=community.title))
+        else:
+            flash('There was a problem making your post to ' + community.title)
+    else:  # local community - send (announce) post out to followers
+        announce = {
+            "id": f"https://{current_app.config['SERVER_NAME']}/activities/announce/{gibberish(15)}",
+            "type": 'Announce',
+            "to": [
+                "https://www.w3.org/ns/activitystreams#Public"
+            ],
+            "actor": community.ap_profile_id,
+            "cc": [
+                community.ap_followers_url
+            ],
+            '@context': default_context(),
+            'object': create
+        }
+
+        sent_to = 0
+        for instance in community.following_instances():
+            if instance.inbox and not current_user.has_blocked_instance(instance.id) and not instance_banned(
+                    instance.domain):
+                send_to_remote_instance(instance.id, community.id, announce)
+                sent_to += 1
+        if sent_to:
+            flash(_('Your post to %(name)s has been made.', name=community.title))
+        else:
+            flash(_('Your post to %(name)s has been made.', name=community.title))
 
 
 @bp.route('/community/<int:community_id>/report', methods=['GET', 'POST'])
@@ -1077,7 +1214,19 @@ def community_moderate_report_resolve(community_id, report_id):
             form = ResolveReportForm()
             if form.validate_on_submit():
                 report.status = REPORT_STATE_RESOLVED
+
+                # Reset the 'reports' counter on the comment, post or user
+                if report.suspect_post_reply_id:
+                    post_reply = PostReply.query.get(report.suspect_post_reply_id)
+                    post_reply.reports = 0
+                elif report.suspect_post_id:
+                    post = Post.query.get(report.suspect_post_id)
+                    post.reports = 0
+                elif report.suspect_user_id:
+                    user = User.query.get(report.suspect_user_id)
+                    user.reports = 0
                 db.session.commit()
+
                 # todo: remove unread notifications about this report
                 # todo: append to mod log
                 if form.also_resolve_others.data:
@@ -1096,6 +1245,44 @@ def community_moderate_report_resolve(community_id, report_id):
                 return redirect(url_for('community.community_moderate', actor=community.link()))
             else:
                 return render_template('community/community_moderate_report_resolve.html', form=form)
+
+
+@bp.route('/community/<int:community_id>/moderate_report/<int:report_id>/ignore', methods=['GET', 'POST'])
+@login_required
+def community_moderate_report_ignore(community_id, report_id):
+    community = Community.query.get_or_404(community_id)
+    if community.is_moderator() or current_user.is_admin():
+        report = Report.query.filter_by(in_community_id=community.id, id=report_id).first()
+        if report:
+            # Set the 'reports' counter on the comment, post or user to -1 to ignore all future reports
+            if report.suspect_post_reply_id:
+                post_reply = PostReply.query.get(report.suspect_post_reply_id)
+                post_reply.reports = -1
+            elif report.suspect_post_id:
+                post = Post.query.get(report.suspect_post_id)
+                post.reports = -1
+            elif report.suspect_user_id:
+                user = User.query.get(report.suspect_user_id)
+                user.reports = -1
+            db.session.commit()
+
+            # todo: append to mod log
+
+            if report.suspect_post_reply_id:
+                db.session.execute(text('UPDATE "report" SET status = :new_status WHERE suspect_post_reply_id = :suspect_post_reply_id'),
+                                   {'new_status': REPORT_STATE_DISCARDED,
+                                    'suspect_post_reply_id': report.suspect_post_reply_id})
+                # todo: remove unread notifications about these reports
+            elif report.suspect_post_id:
+                db.session.execute(text('UPDATE "report" SET status = :new_status WHERE suspect_post_id = :suspect_post_id'),
+                                   {'new_status': REPORT_STATE_DISCARDED,
+                                    'suspect_post_id': report.suspect_post_id})
+                # todo: remove unread notifications about these reports
+            db.session.commit()
+            flash(_('Report ignored.'))
+            return redirect(url_for('community.community_moderate', actor=community.link()))
+        else:
+            abort(404)
 
 
 @bp.route('/lookup/<community>/<domain>')

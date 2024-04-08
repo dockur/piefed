@@ -28,7 +28,7 @@ import re
 
 from app.email import send_welcome_email
 from app.models import Settings, Domain, Instance, BannedInstances, User, Community, DomainBlock, ActivityPubLog, IpBan, \
-    Site, Post, PostReply, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan
+    Site, Post, PostReply, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic
 
 
 # Flask's render_template function, with support for themes added
@@ -169,7 +169,7 @@ def allowlist_html(html: str) -> str:
     if html is None or html == '':
         return ''
     allowed_tags = ['p', 'strong', 'a', 'ul', 'ol', 'li', 'em', 'blockquote', 'cite', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre',
-                    'code', 'img', 'details', 'summary', 'table', 'tr', 'td', 'th', 'tbody', 'thead']
+                    'code', 'img', 'details', 'summary', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'hr']
     # Parse the HTML using BeautifulSoup
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -211,13 +211,17 @@ def allowlist_html(html: str) -> str:
             if tag.name == 'table':
                 tag.attrs['class'] = 'table'
 
-    return str(soup)
+    # avoid returning empty anchors
+    re_empty_anchor = re.compile(r'<a href="(.*?)" rel="nofollow ugc" target="_blank"><\/a>')
+    return re_empty_anchor.sub(r'<a href="\1" rel="nofollow ugc" target="_blank">\1</a>', str(soup))
 
 
 def markdown_to_html(markdown_text) -> str:
     if markdown_text:
         raw_html = markdown2.markdown(markdown_text, safe_mode=True, extras={'middle-word-em': False, 'tables': True, 'fenced-code-blocks': True, 'strike': True})
-        # todo: in raw_html, replace lemmy spoiler tokens with appropriate html tags instead.
+        # replace lemmy spoiler tokens with appropriate html tags instead. (until possibly added as extra to markdown2)
+        re_spoiler = re.compile(r':{3} spoiler\s+?(\S.+?\n)(.+?)\n:{3}', re.S)
+        raw_html = re_spoiler.sub(r'<details><summary>\1</summary>\2</details>', raw_html)
         return allowlist_html(raw_html)
     else:
         return ''
@@ -673,6 +677,21 @@ def finalize_user_setup(user, application_required=False):
     user.ap_inbox_url = f"https://{current_app.config['SERVER_NAME']}/u/{user.user_name}/inbox"
     db.session.commit()
     send_welcome_email(user, application_required)
+
+
+# topics, in a tree
+def topic_tree() -> List:
+    topics = Topic.query.order_by(Topic.name)
+
+    topics_dict = {topic.id: {'topic': topic, 'children': []} for topic in topics.all()}
+
+    for topic in topics:
+        if topic.parent_id is not None:
+            parent_comment = topics_dict.get(topic.parent_id)
+            if parent_comment:
+                parent_comment['children'].append(topics_dict[topic.id])
+
+    return [topic for topic in topics_dict.values() if topic['topic'].parent_id is None]
 
 
 # All the following post/comment ranking math is explained at https://medium.com/hacking-and-gonzo/how-reddit-ranking-algorithms-work-ef111e33d0d9

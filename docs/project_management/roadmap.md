@@ -29,15 +29,15 @@ The following are the goals for a 1.0 release, good enough for production use. I
 
 ### Moderation
 
-- community moderation
+- ✅ community moderation
 - ✅ blocking - users, communities, domains, instances. bi-directional.
 - import/export of block lists
 
 ### Onboarding
 
-- ✅ choose interests to auto-subscribe new accounts
+- ✅ choose topics to auto-subscribe new accounts
 
 ### Performance and scaling
 
 - ✅ background task runner
-
+- send queue for federation

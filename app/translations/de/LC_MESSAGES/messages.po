@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: piefed\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-03-17 19:06+1300\n"
-"PO-Revision-Date: 2024-04-02 18:46\n"
+"PO-Revision-Date: 2024-04-04 20:09\n"
 "Last-Translator: \n"
 "Language: de\n"
 "Language-Team: German\n"
@@ -728,7 +728,7 @@ msgstr "Mehr Info"
 #: app/chat/forms.py:33 app/community/forms.py:160 app/post/forms.py:30
 #: app/templates/user/show_profile.html:56 app/user/forms.py:77
 msgid "Report"
-msgstr "Bericht"
+msgstr "Melden"
 
 #: app/chat/routes.py:49
 #, python-format
@@ -808,7 +808,7 @@ msgstr "Bann"
 
 #: app/community/forms.py:78 app/templates/list_communities.html:56
 msgid "Community"
-msgstr "Gemeinschaft"
+msgstr "Community"
 
 #: app/community/forms.py:81 app/community/forms.py:83
 #: app/community/forms.py:88 app/post/forms.py:10
@@ -966,7 +966,7 @@ msgstr "Community wurde gemeldet, danke!"
 
 #: app/community/routes.py:588
 msgid "Report community"
-msgstr "Gemeinschaft melden"
+msgstr "Community melden"
 
 #: app/community/routes.py:683
 #: app/templates/community/community_mod_list.html:21
@@ -1302,7 +1302,7 @@ msgstr "Nächste Seite"
 
 #: app/templates/index.html:47 app/templates/search/results.html:45
 msgid "Active communities"
-msgstr "Aktive Gemeinschaften"
+msgstr "Aktive Communities"
 
 #: app/templates/keyboard_shortcuts.html:11
 msgid "Most shortcuts are the same as what reddit has."
@@ -1752,7 +1752,7 @@ msgstr "Diese Community durchsuchen"
 #: app/templates/post/continue_discussion.html:112
 #: app/templates/post/post.html:187 app/templates/post/post_reply_edit.html:60
 msgid "About community"
-msgstr "Über Community"
+msgstr "Über diese Community"
 
 #: app/templates/community/community.html:146
 #, python-format

@@ -5,19 +5,21 @@ import os
 from datetime import timedelta
 from random import randint
 from typing import Union, Tuple
+
+import redis
 from flask import current_app, request, g, url_for
 from flask_babel import _
 from sqlalchemy import text, func
 from app import db, cache, constants, celery
 from app.models import User, Post, Community, BannedInstances, File, PostReply, AllowedInstances, Instance, utcnow, \
-    PostVote, PostReplyVote, ActivityPubLog, Notification, Site, CommunityMember, InstanceRole
+    PostVote, PostReplyVote, ActivityPubLog, Notification, Site, CommunityMember, InstanceRole, Report, Conversation
 import time
 import base64
 import requests
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from app.constants import *
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 from PIL import Image, ImageOps
 from io import BytesIO
 import pytesseract
@@ -893,6 +895,21 @@ def find_liked_object(ap_id) -> Union[Post, PostReply, None]:
     return None
 
 
+def find_reported_object(ap_id) -> Union[User, Post, PostReply, None]:
+    post = Post.get_by_ap_id(ap_id)
+    if post:
+        return post
+    else:
+        post_reply = PostReply.get_by_ap_id(ap_id)
+        if post_reply:
+            return post_reply
+        else:
+            user = find_actor_or_create(ap_id, create_if_not_found=False)
+            if user:
+                return user
+    return None
+
+
 def find_instance_id(server):
     server = server.strip()
     instance = Instance.query.filter_by(domain=server).first()
@@ -1006,11 +1023,6 @@ def instance_weight(domain):
 
 def is_activitypub_request():
     return 'application/ld+json' in request.headers.get('Accept', '') or 'application/activity+json' in request.headers.get('Accept', '')
-
-
-def activity_already_ingested(ap_id):
-    return db.session.execute(text('SELECT id FROM "activity_pub_log" WHERE activity_id = :activity_id'),
-                              {'activity_id': ap_id}).scalar()
 
 
 def downvote_post(post, user):
@@ -1624,6 +1636,128 @@ def undo_vote(activity_log, comment, post, target_ap_id, user):
             activity_log.exception_message = 'Activity about local content which is already present'
             activity_log.result = 'ignored'
     return post
+
+
+def process_report(user, reported, request_json, activity_log):
+    if len(request_json['summary']) < 15:
+        reasons = request_json['summary']
+        description = ''
+    else:
+        reasons = request_json['summary'][:15]
+        description = request_json['summary'][15:]
+    if isinstance(reported, User):
+        if reported.reports == -1:
+            return
+        type = 0
+        report = Report(reasons=reasons, description=description,
+                        type=type, reporter_id=user.id, suspect_user_id=reported.id, source_instance_id=user.instance_id)
+        db.session.add(report)
+
+        # Notify site admin
+        already_notified = set()
+        for admin in Site.admins():
+            if admin.id not in already_notified:
+                notify = Notification(title='Reported user', url='/admin/reports', user_id=admin.id,
+                                      author_id=user.id)
+                db.session.add(notify)
+                admin.unread_notifications += 1
+        reported.reports += 1
+        db.session.commit()
+    elif isinstance(reported, Post):
+        if reported.reports == -1:
+            return
+        type = 1
+        report = Report(reasons=reasons, description=description, type=type, reporter_id=user.id,
+                        suspect_user_id=reported.author.id, suspect_post_id=reported.id,
+                        suspect_community_id=reported.community.id, in_community_id=reported.community.id,
+                        source_instance_id=user.instance_id)
+        db.session.add(report)
+
+        already_notified = set()
+        for mod in reported.community.moderators():
+            notification = Notification(user_id=mod.user_id, title=_('A post has been reported'),
+                                        url=f"https://{current_app.config['SERVER_NAME']}/post/{reported.id}",
+                                        author_id=user.id)
+            db.session.add(notification)
+            already_notified.add(mod.user_id)
+        reported.reports += 1
+        db.session.commit()
+    elif isinstance(reported, PostReply):
+        if reported.reports == -1:
+            return
+        type = 2
+        post = Post.query.get(reported.post_id)
+        report = Report(reasons=reasons, description=description, type=type, reporter_id=user.id, suspect_post_id=post.id,
+                        suspect_community_id=post.community.id,
+                        suspect_user_id=reported.author.id, suspect_post_reply_id=reported.id,
+                        in_community_id=post.community.id,
+                        source_instance_id=user.instance_id)
+        db.session.add(report)
+        # Notify moderators
+        already_notified = set()
+        for mod in post.community.moderators():
+            notification = Notification(user_id=mod.user_id, title=_('A comment has been reported'),
+                                        url=f"https://{current_app.config['SERVER_NAME']}/comment/{reported.id}",
+                                        author_id=user.id)
+            db.session.add(notification)
+            already_notified.add(mod.user_id)
+        reported.reports += 1
+        db.session.commit()
+    elif isinstance(reported, Community):
+        ...
+    elif isinstance(reported, Conversation):
+        ...
+
+
+def get_redis_connection() -> redis.Redis:
+    connection_string = current_app.config['CACHE_REDIS_URL']
+    if connection_string.startswith('unix://'):
+        unix_socket_path, db, password = parse_redis_pipe_string(connection_string)
+        return redis.Redis(unix_socket_path=unix_socket_path, db=db, password=password)
+    else:
+        host, port, db, password = parse_redis_socket_string(connection_string)
+        return redis.Redis(host=host, port=port, db=db, password=password)
+
+
+def parse_redis_pipe_string(connection_string: str):
+    if connection_string.startswith('unix://'):
+        # Parse the connection string
+        parsed_url = urlparse(connection_string)
+
+        # Extract the path (Unix socket path)
+        unix_socket_path = parsed_url.path
+
+        # Extract query parameters (if any)
+        query_params = parse_qs(parsed_url.query)
+
+        # Extract database number (default to 0 if not provided)
+        db = int(query_params.get('db', [0])[0])
+
+        # Extract password (if provided)
+        password = query_params.get('password', [None])[0]
+
+        return unix_socket_path, db, password
+
+
+def parse_redis_socket_string(connection_string: str):
+    # Parse the connection string
+    parsed_url = urlparse(connection_string)
+
+    # Extract username (if provided) and password
+    if parsed_url.username:
+        username = parsed_url.username
+    else:
+        username = None
+    password = parsed_url.password
+
+    # Extract host and port
+    host = parsed_url.hostname
+    port = parsed_url.port
+
+    # Extract database number (default to 0 if not provided)
+    db = int(parsed_url.path.lstrip('/') or 0)
+
+    return host, port, db, password
 
 
 def lemmy_site_data():

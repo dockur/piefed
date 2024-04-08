@@ -24,7 +24,7 @@
                 <p><a href="{{ post.url }}" rel="nofollow ugc" target="_blank" aria-label="Go to image">{{ post.url|shorten_url }}
                     <span class="fe fe-external"></span></a></p>
             {% endif %}
-            <p>{% if post.reports and current_user.is_authenticated and post.community.is_moderator(current_user) %}
+            <p>{% if post.reports > 0 and current_user.is_authenticated and post.community.is_moderator(current_user) %}
                     <span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span>
                 {% endif %}<small>submitted {{ moment(post.posted_at).fromNow() }} by {{ render_username(post.author) }}
                 {% if post.edited_at %} edited {{ moment(post.edited_at).fromNow() }}{% endif %}
@@ -72,7 +72,7 @@
                             width="{{ post.image.thumbnail_width }}" height="{{ post.image.thumbnail_height }}" loading="lazy" /></a>
                 </div>
             {% endif %}
-            <p>{% if post.reports and current_user.is_authenticated and post.community.is_moderator(current_user) %}
+            <p>{% if post.reports > 0 and current_user.is_authenticated and post.community.is_moderator(current_user) %}
                     <span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span>
                 {% endif %}<small>submitted {{ moment(post.posted_at).fromNow() }} by
                 {{ render_username(post.author) }}

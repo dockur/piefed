@@ -196,18 +196,18 @@ def url_to_thumbnail_file(filename) -> File:
                     source_url=filename)
 
 
-def save_post(form, post: Post):
+def save_post(form, post: Post, type: str):
     post.indexable = current_user.indexable
     post.sticky = form.sticky.data
     post.nsfw = form.nsfw.data
     post.nsfl = form.nsfl.data
     post.notify_author = form.notify_author.data
-    if form.post_type.data == '' or form.post_type.data == 'discussion':
+    if type == '' or type == 'discussion':
         post.title = form.discussion_title.data
         post.body = form.discussion_body.data
         post.body_html = markdown_to_html(post.body)
         post.type = POST_TYPE_ARTICLE
-    elif form.post_type.data == 'link':
+    elif type == 'link':
         post.title = form.link_title.data
         post.body = form.link_body.data
         post.body_html = markdown_to_html(post.body)
@@ -244,7 +244,7 @@ def save_post(form, post: Post):
                             post.image = file
                             db.session.add(file)
 
-    elif form.post_type.data == 'image':
+    elif type == 'image':
         post.title = form.image_title.data
         post.body = form.image_body.data
         post.body_html = markdown_to_html(post.body)
@@ -304,7 +304,7 @@ def save_post(form, post: Post):
                 post.image = file
                 db.session.add(file)
 
-    elif form.post_type.data == 'poll':
+    elif type == 'poll':
         ...
     else:
         raise Exception('invalid post type')

@@ -25,7 +25,7 @@ from sqlalchemy_searchable import search
 from app.utils import render_template, get_setting, gibberish, request_etag_matches, return_304, blocked_domains, \
     ap_datetime, ip_address, retrieve_block_list, shorten_string, markdown_to_text, user_filters_home, \
     joined_communities, moderating_communities, parse_page, theme_list, get_request, markdown_to_html, allowlist_html, \
-    blocked_instances, communities_banned_from
+    blocked_instances, communities_banned_from, topic_tree
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Domain, Topic, File, Instance, \
     InstanceRole, Notification
 from PIL import Image
@@ -158,7 +158,7 @@ def home_page(type, sort):
 @bp.route('/topics', methods=['GET'])
 def list_topics():
     verification_warning()
-    topics = Topic.query.filter_by(parent_id=None).order_by(Topic.name).all()
+    topics = topic_tree()
 
     return render_template('list_topics.html', topics=topics, title=_('Browse by topic'),
                            low_bandwidth=request.cookies.get('low_bandwidth', '0') == '1',

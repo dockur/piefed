@@ -2,7 +2,7 @@
 {% if content_blocked and content_blocked == '-1' %}
     {# do nothing - blocked by keyword filter #}
 {% else %}
-    <div class="post_teaser{{ ' reported' if post.reports and current_user.is_authenticated and post.community.is_moderator() }}{{ ' blocked' if content_blocked }}"
+    <div class="post_teaser{{ ' reported' if post.reports > 0 and current_user.is_authenticated and post.community.is_moderator() }}{{ ' blocked' if content_blocked }}"
         {% if content_blocked %} title="{{ _('Filtered: ') }}{{ content_blocked }}"{% endif %}>
         {% if post.image_id %}
             {% if post_layout == 'masonry' or low_bandwidth %}

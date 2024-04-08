@@ -22,7 +22,7 @@
                 <h1 class="mt-2">{{ _('Moderators for %(community)s', community=community.display_name()) }}</h1>
             </div>
             <p>{{ _('See and change who moderates this community') }}</p>
-            <div class="col-12 col-md-2 text-right">
+            <div class="col-12 text-right">
                 <a class="btn btn-primary" href="{{ url_for('community.community_add_moderator', community_id=community.id) }}">{{ _('Add moderator') }}</a>
             </div>
         </div>

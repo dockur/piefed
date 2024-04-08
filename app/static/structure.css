@@ -501,6 +501,14 @@ fieldset legend {
 .form-group {
   margin-bottom: 1.1rem;
 }
+.form-group.required label:after {
+  content: "*";
+  color: red;
+  margin-left: 2px;
+  font-size: 80%;
+  position: relative;
+  top: -1px;
+}
 
 .card {
   max-width: 350px;
