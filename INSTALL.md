@@ -285,6 +285,7 @@ Add the following, altering as appropriate
 [Unit]
 Description=Celery Service
 After=network.target
+PartOf=pyfedi.service
 
 [Service]
 Type=forking
