@@ -1,5 +1,68 @@
 <div class="post_reply_teaser">
-    {{ post_reply.body_html|safe }}
-    <p><a href="{{ url_for('activitypub.post_ap', post_id=post_reply.post.id, _anchor='comment_' + str(post_reply.id)) }}">{{ _('View context') }}</a></p>
+    <div class="limit_height">
+        Reply to: <a href="{{ url_for('activitypub.post_ap', post_id=post_reply.post.id, _anchor='comment_' + str(post_reply.id)) }}">{{ post_reply.post.title | truncate(80, True) }}</a>
+    </div>
+    <div class="comment_body hidable {% if post_reply.reports and current_user.is_authenticated and post_reply.post.community.is_moderator(current_user) -%}reported{% endif -%}">
+        {{ post_reply.body_html|safe }}
+    </div>
+    <div class="limit_height">
+        {% if current_user.is_authenticated and current_user.verified and can_upvote(current_user, post_reply.post.community) -%}
+            <span class="upvote_button{{ ' voted_up' if in_sorted_list(recently_upvoted_replies, post_reply.id) }}" role="button" aria-label="{{ _('UpVote') }}" aria-live="assertive"
+                  hx-post="/comment/{{ post_reply.id }}/upvote" hx-trigger="click throttle:1s" hx-target="find .upvote_num" tabindex="0">
+                <span class="fe fe-arrow-up"></span>
+                <span class="upvote_num">{{ shorten_number(post_reply.up_votes) }}</span>
+            </span>
+        {% else -%}
+            <span class="upvote_button digits_{{ digits(post_reply.up_votes) }}">
+                <span class="fe fe-arrow-up"></span>
+                <span>{{ shorten_number(post_reply.up_votes) }}</span>
+            </span>
+        {% endif -%}
+        {% if current_user.is_authenticated and current_user.verified and can_downvote(current_user, post_reply.post.community) -%}
+            <span class="downvote_button{{ ' voted_down' if in_sorted_list(recently_downvoted_replies, post_reply.id) }}" role="button" aria-label="{{ _('DownVote') }}" aria-live="assertive"
+                  hx-post="/comment/{{ post_reply.id }}/downvote" hx-trigger="click throttle:1s" hx-target="find .downvote_num" tabindex="0">
+                <span class="fe fe-arrow-down"></span>
+                <span class="downvote_num">{{ shorten_number(post_reply.down_votes) }}</span>
+            </span>
+        {% else -%}
+            <span class="downvote_button digits_{{ digits(post_reply.down_votes) }}">
+                <span class="fe fe-arrow-down"></span>
+                <span>{{ shorten_number(post_reply.down_votes) }}</span>
+            </span>
+        {% endif -%}
+
+        <a href="{{ url_for('activitypub.post_ap', post_id=post_reply.post.id, _anchor='comment_' + str(post_reply.id)) }}">
+            <span class="fe fe-reply"></span>
+            <span>{{ len(post_reply.children) }}</span>
+        </a>
+
+        <span class="author small">
+            <span><a href="/c/{{ post_reply.post.community.link() }}" aria-label="{{ _('Go to community %(name)s', name=post_reply.post.community.name) }}">c/{{ post_reply.post.community.name }}</a></span>
+            by
+            {% if post_reply.author.deleted -%}
+                [deleted]
+            {% else -%}
+                <a href="/u/{{ post_reply.author.link() }}" title="{{ post_reply.author.ap_id }}" aria-label="{{ _('Author') }}">
+                    <img src="{{ post_reply.author.avatar_thumbnail() }}" alt="" loading="lazy" />
+                    {{ post_reply.author.display_name() }}
+                </a>
+                {% if post_reply.author.created_recently() -%}
+                    <span class="fe fe-new-account small" title="New account"> </span>
+                {% endif -%}
+                {% if post_reply.author.bot -%}
+                    <span class="fe fe-bot-account small" title="Bot account"> </span>
+                {% endif -%}
+                {% if post_reply.author.id != current_user.id -%}
+                    {% if post_reply.author.reputation < -10 -%}
+                        <span class="fe fe-warning red" title="Very low reputation. Beware."> </span>
+                        <span class="fe fe-warning red" title="Very low reputation. Beware!"> </span>
+                    {% elif post_reply.author.reputation < 0 -%}
+                        <span class="fe fe-warning orangered" title="Low reputation."> </span>
+                    {% endif -%}
+                {% endif -%}
+            {% endif -%}
+            <span class="text-muted small" aria_label="{{ _('When: ') }}">{{ moment(post_reply.posted_at).fromNow(refresh=True) }}{% if post_reply.edited_at -%}, edited {{ moment(post_reply.edited_at).fromNow(refresh=True) }} {% endif -%}</span>
+        </span>
+    </div>
 </div>
 <hr />

@@ -1,7 +1,7 @@
 {% if current_user.is_authenticated and current_user.verified %}
         {% if can_upvote(current_user, community) %}
                 <div class="upvote_button {{ 'voted_up' if in_sorted_list(recently_upvoted_replies, comment.id) }}" role="button" aria-label="{{ _('UpVote button.') }}" aria-live="assertive"
-                 hx-post="/comment/{{ comment.id }}/upvote" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
+                 hx-post="/comment/{{ comment.id }}/upvote?style=htmx" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
                         <span class="fe fe-arrow-up"></span>
                         <img class="htmx-indicator" src="/static/images/spinner.svg" alt="" style="opacity: 0;">
                 </div>
@@ -9,7 +9,7 @@
         <span title="{{ comment.up_votes }}, {{ comment.down_votes }}" aria-live="assertive" aria-label="{{ _('Score: ') }}{{ comment.up_votes - comment.down_votes }}.">{{ comment.up_votes - comment.down_votes }}</span>
         {% if can_downvote(current_user, community) %}
                 <div class="downvote_button {{ 'voted_down' if in_sorted_list(recently_downvoted_replies, comment.id) }}" role="button" aria-label="{{ _('DownVote button.') }}" aria-live="assertive"
-                 hx-post="/comment/{{ comment.id }}/downvote" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
+                 hx-post="/comment/{{ comment.id }}/downvote?style=htmx" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
                         <span class="fe fe-arrow-down"></span>
                         <img class="htmx-indicator" src="/static/images/spinner.svg" alt="" style="opacity: 0;">
                 </div>

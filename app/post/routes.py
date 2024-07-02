@@ -336,6 +336,7 @@ def show_post(post_id: int):
 @validation_required
 def post_vote(post_id: int, vote_direction):
     post = Post.query.get_or_404(post_id)
+    response_style = request.args.get('style', '')
     existing_vote = PostVote.query.filter_by(user_id=current_user.id, post_id=post.id).first()
     undo = None
     if existing_vote:
@@ -457,9 +458,17 @@ def post_vote(post_id: int, vote_direction):
     cache.delete_memoized(recently_upvoted_posts, current_user.id)
     cache.delete_memoized(recently_downvoted_posts, current_user.id)
 
-    template = 'post/_post_voting_buttons.html' if request.args.get('style', '') == '' else 'post/_post_voting_buttons_masonry.html'
-    return render_template(template, post=post, community=post.community, recently_upvoted=recently_upvoted,
-                           recently_downvoted=recently_downvoted)
+    if response_style == 'button_big':
+        return render_template('post/_post_voting_buttons_big.html', post=post, community=post.community,
+                               recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted)
+    elif response_style == 'masonry':
+        return render_template('post/_post_voting_buttons_masonry.html', post=post, community=post.community,
+                               recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted)
+    else:
+        if vote_direction == 'downvote':
+            return str(post.down_votes)
+        else:
+            return str(post.up_votes)
 
 
 @bp.route('/comment/<int:comment_id>/<vote_direction>', methods=['POST'])
@@ -467,6 +476,7 @@ def post_vote(post_id: int, vote_direction):
 @validation_required
 def comment_vote(comment_id, vote_direction):
     comment = PostReply.query.get_or_404(comment_id)
+    response_style = request.args.get('style', '')
     existing_vote = PostReplyVote.query.filter_by(user_id=current_user.id, post_reply_id=comment.id).first()
     undo = None
     if existing_vote:
@@ -568,10 +578,14 @@ def comment_vote(comment_id, vote_direction):
     cache.delete_memoized(recently_upvoted_post_replies, current_user.id)
     cache.delete_memoized(recently_downvoted_post_replies, current_user.id)
 
-    return render_template('post/_comment_voting_buttons.html', comment=comment,
-                           recently_upvoted_replies=recently_upvoted,
-                           recently_downvoted_replies=recently_downvoted,
-                           community=comment.community)
+    if response_style == 'htmx':
+        return render_template('post/_comment_voting_buttons.html', comment=comment, community=comment.community,
+                               recently_upvoted_replies=recently_upvoted, recently_downvoted_replies=recently_downvoted)
+    else:
+        if vote_direction == 'downvote':
+            return str(comment.down_votes)
+        else:
+            return str(comment.up_votes)
 
 
 @bp.route('/poll/<int:post_id>/vote', methods=['POST'])

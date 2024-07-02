@@ -1,0 +1,25 @@
+{% if current_user.is_authenticated and current_user.verified -%}
+        {% if can_upvote(current_user, post.community) -%}
+                <span class="upvote_button {{ 'voted_up' if in_sorted_list(recently_upvoted, post.id) }}" role="button" aria-live="assertive" aria-label="{{ _('UpVote') }}"
+                    hx-post="/post/{{ post.id }}/upvote" hx-trigger="click throttle:1s" hx-target="find .upvote_num" tabindex="0">
+                        <span class="fe fe-arrow-up"></span>
+                        <span class="upvote_num">{{ shorten_number(post.up_votes) }}</span>
+                </span>
+        {% endif -%}
+        {% if can_downvote(current_user, post.community) -%}
+                <span class="downvote_button {{ 'voted_down' if in_sorted_list(recently_downvoted, post.id) }}" role="button" aria-live="assertive" aria-label="{{ _('DownVote') }}"
+                    hx-post="/post/{{ post.id }}/downvote" hx-trigger="click throttle:1s" hx-target="find .downvote_num" tabindex="0">
+                        <span class="fe fe-arrow-down"></span>
+                        <span class="downvote_num">{{ shorten_number(post.down_votes) }}</span>
+                </span>
+        {% endif -%}
+{% else -%}
+<div class="upvote_button digits_{{ digits(post.up_votes) }} {{ upvoted_class }} redirect_login">
+        <span class="fe fe-arrow-up"></span>
+        <span>{{ shorten_number(post.up_votes) }}</span>
+</div>
+<div class="downvote_button digits_{{ digits(post.down_votes) }} {{ downvoted_class }} redirect_login">
+        <span class="fe fe-arrow-down"></span>
+        <span>{{ shorten_number(post.down_votes) }}</span>
+</div>
+{% endif -%}

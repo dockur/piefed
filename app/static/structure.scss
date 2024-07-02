@@ -270,7 +270,7 @@ html {
         position: absolute;
         bottom: -12px;
         left: 10px;
-        a {
+        a, > div, > span {
           display: inline-block;
           min-width: 44px;
           line-height: 44px;
@@ -280,11 +280,6 @@ html {
             text-align: left;
           }
         }
-      }
-
-      .post_options {
-        position: absolute;
-        bottom: -1px;
       }
     }
 

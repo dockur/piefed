@@ -5,13 +5,14 @@ from typing import List, Union
 import requests
 from flask import current_app, escape, url_for, render_template_string
 from flask_login import UserMixin, current_user
-from sqlalchemy import or_, text, desc
+from sqlalchemy import or_, text, desc, func, select
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_babel import _, lazy_gettext as _l
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, column_property
 from sqlalchemy_utils.types import TSVectorType # https://sqlalchemy-searchable.readthedocs.io/en/latest/installation.html
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy.ext.hybrid import hybrid_property
 from flask_sqlalchemy import BaseQuery
 from sqlalchemy_searchable import SearchQueryMixin
 from app import db, login, cache, celery
@@ -976,6 +977,7 @@ class Post(db.Model):
     language_id = db.Column(db.Integer, db.ForeignKey('language.id'), index=True)
     cross_posts = db.Column(MutableList.as_mutable(ARRAY(db.Integer)))
     tags = db.relationship('Tag', lazy='dynamic', secondary=post_tag, backref=db.backref('posts', lazy='dynamic'))
+    length = column_property(func.length(body), deferred=True)
 
     ap_id = db.Column(db.String(255), index=True)
     ap_create_id = db.Column(db.String(100))
@@ -1073,7 +1075,7 @@ class PostReply(db.Model):
     community_id = db.Column(db.Integer, db.ForeignKey('community.id'), index=True)
     domain_id = db.Column(db.Integer, db.ForeignKey('domain.id'), index=True)
     image_id = db.Column(db.Integer, db.ForeignKey('file.id'), index=True)
-    parent_id = db.Column(db.Integer, index=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey("post_reply.id"), index=True)
     root_id = db.Column(db.Integer)
     depth = db.Column(db.Integer, default=0)
     instance_id = db.Column(db.Integer, db.ForeignKey('instance.id'), index=True)
@@ -1104,6 +1106,7 @@ class PostReply(db.Model):
 
     author = db.relationship('User', lazy='joined', foreign_keys=[user_id], single_parent=True, overlaps="post_replies")
     community = db.relationship('Community', lazy='joined', overlaps='replies', foreign_keys=[community_id])
+    parent = db.relationship('PostReply', remote_side=[id], backref='children', lazy='joined')
     language = db.relationship('Language', foreign_keys=[language_id])
 
     def language_code(self):

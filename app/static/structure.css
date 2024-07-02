@@ -205,6 +205,15 @@ nav, etc which are used site-wide */
   content: "\e990";
 }
 
+.fe-align-left {
+  position: relative;
+  top: 1px;
+}
+
+.fe-align-left::before {
+  content: "\e907";
+}
+
 .fe-layers {
   position: relative;
   top: 1px;
@@ -685,18 +694,14 @@ fieldset legend {
   bottom: -12px;
   left: 10px;
 }
-.post_list .post_teaser .main_row .post_utilities a {
+.post_list .post_teaser .main_row .post_utilities a, .post_list .post_teaser .main_row .post_utilities > div, .post_list .post_teaser .main_row .post_utilities > span {
   display: inline-block;
   min-width: 44px;
   line-height: 44px;
   text-align: center;
 }
-.post_list .post_teaser .main_row .post_utilities a:first-child {
+.post_list .post_teaser .main_row .post_utilities a:first-child, .post_list .post_teaser .main_row .post_utilities > div:first-child, .post_list .post_teaser .main_row .post_utilities > span:first-child {
   text-align: left;
-}
-.post_list .post_teaser .main_row .post_options {
-  position: absolute;
-  bottom: -1px;
 }
 .post_list .post_teaser .utilities_row a {
   display: inline-block;

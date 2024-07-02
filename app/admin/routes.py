@@ -625,7 +625,7 @@ def admin_content_trash():
     return render_template('admin/posts.html', title=_('Bad posts'), next_url=next_url, prev_url=prev_url, posts=posts,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
-                           menu_topics=menu_topics(),
+                           show_post_community=True, menu_topics=menu_topics(),
                            site=g.site
                            )
 
@@ -663,7 +663,7 @@ def admin_content_spam():
                            posts=posts, post_replies=post_replies,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
-                           menu_topics=menu_topics(),
+                           show_post_community=True, menu_topics=menu_topics(),
                            site=g.site
                            )
 
@@ -697,7 +697,7 @@ def admin_content_deleted():
                            posts=posts, post_replies=post_replies,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
-                           menu_topics=menu_topics(),
+                           show_post_community=True, menu_topics=menu_topics(),
                            site=g.site
                            )
 

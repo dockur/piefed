@@ -1,7 +1,7 @@
 {% if current_user.is_authenticated and current_user.verified -%}
         {% if can_upvote(current_user, post.community) -%}
                 <div class="upvote_button {{ 'voted_up' if in_sorted_list(recently_upvoted, post.id) }}" role="button" aria-label="{{ _('UpVote button, %(count)d upvotes so far.', count=post.up_votes) }}" aria-live="assertive"
-                 hx-post="/post/{{ post.id }}/upvote" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons" tabindex="0">
+                 hx-post="/post/{{ post.id }}/upvote?style=button_big" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons" tabindex="0">
                         <span class="fe fe-arrow-up"></span>
                         {{ shorten_number(post.up_votes) }}
                         <img class="htmx-indicator" src="/static/images/spinner.svg" alt="" style="opacity: 0;">
@@ -9,7 +9,7 @@
         {% endif -%}
         {% if can_downvote(current_user, post.community) -%}
                 <div class="downvote_button {{ 'voted_down' if in_sorted_list(recently_downvoted, post.id) }}" role="button" aria-label="{{ _('DownVote button, %(count)d downvotes so far.', count=post.down_votes) }}" aria-live="assertive"
-                 hx-post="/post/{{ post.id }}/downvote" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons" tabindex="0">
+                 hx-post="/post/{{ post.id }}/downvote?style=button_big" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons" tabindex="0">
                         <span class="fe fe-arrow-down"></span>
                         {{ shorten_number(post.down_votes) }}
                         <img class="htmx-indicator" src="/static/images/spinner.svg" alt="" style="opacity: 0;">

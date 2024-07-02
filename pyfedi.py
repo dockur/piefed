@@ -22,8 +22,8 @@ cli.register(app)
 def app_context_processor():
     def getmtime(filename):
         return os.path.getmtime('app/static/' + filename)
-    return dict(getmtime=getmtime, post_type_link=POST_TYPE_LINK, post_type_image=POST_TYPE_IMAGE,
-                post_type_article=POST_TYPE_ARTICLE, post_type_video=POST_TYPE_VIDEO)
+    return dict(getmtime=getmtime, POST_TYPE_LINK=POST_TYPE_LINK, POST_TYPE_IMAGE=POST_TYPE_IMAGE,
+                POST_TYPE_ARTICLE=POST_TYPE_ARTICLE, POST_TYPE_VIDEO=POST_TYPE_VIDEO)
 
 
 @app.shell_context_processor
