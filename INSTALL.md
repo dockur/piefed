@@ -373,7 +373,6 @@ upstream app_server {
 
 server {
     server_name piefed.social
-    root /whatever
 
     keepalive_timeout 5;
     ssi off;
@@ -389,11 +388,25 @@ server {
         proxy_pass http://app_server;
         ssi off;
     }
+;    location /static/ {
+;        alias /home/rimu/pyfedi/static/;
+;        try_files $uri =404;
+;        sendfile           on;
+;        sendfile_max_chunk 4m;
+;    }
+;    location /media/ {
+;        alias /home/rimu/pyfedi/static/media/;
+;        try_files $uri =404;
+;        sendfile           on;
+;        sendfile_max_chunk 4m;
+;    }
 }
 ```
 
 **_The above is not a complete configuration_** - you will want to add more settings for SSL, etc. See also
 https://codeberg.org/rimu/pyfedi/issues/136#issuecomment-1726739
+
+You can reduce the load on gunicorn by letting nginx serve the static files. Un-comment the blocks and adjust the paths. Pay attention to the trailing slashes. You also need to give nginx permissions to access the files, for example by adding the nginx user to the piefed(rimu) group: `sudo usermod -a -G rimu nginx`
 
 ### Cron tasks
 
