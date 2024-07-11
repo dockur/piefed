@@ -211,14 +211,14 @@ class File(db.Model):
     thumbnail_height = db.Column(db.Integer)
 
     def view_url(self, resize=False):
-        if self.source_url:
+        if self.file_path:
+            file_path = self.file_path.removeprefix('app/static/media/') # ToDo: path prefix is in the DB
+            return url_for('main.serve_media', filename=file_path)
+        elif self.source_url:
             if resize and '/pictrs/' in self.source_url and '?' not in self.source_url:
                 return f'{self.source_url}?thumbnail=1024'
             else:
                 return self.source_url
-        elif self.file_path:
-            file_path = self.file_path.removeprefix('app/static/media/') # ToDo: path prefix is in the DB
-            return url_for('main.serve_media', filename=file_path)
         else:
             return ''
 
