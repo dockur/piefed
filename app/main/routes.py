@@ -50,6 +50,16 @@ def index(sort=None):
     )
 
 
+@bp.route('/media/<path:filename>')
+def serve_media(filename):
+    path = os.path.abspath(current_app.config["MEDIA_DIR"])
+    file = os.path.join(path, filename)
+    if os.path.exists(file):
+        return flask.send_from_directory(path, filename)
+    else:
+        abort(404)
+
+
 @bp.route('/popular', methods=['GET'])
 @bp.route('/popular/<sort>', methods=['GET'])
 @cache.cached(timeout=5, make_cache_key=make_cache_key)
