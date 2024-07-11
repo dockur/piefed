@@ -302,7 +302,7 @@ def register(app):
     def remove_orphan_files():
         """ Any user-uploaded file that does not have a corresponding entry in the File table should be deleted """
         with app.app_context():
-            for file_path in list_files('app/static/media/users'):
+            for file_path in list_files(os.path.join(current_app.config["MEDIA_DIR"], 'users')):
                 if 'thumbnail' in file_path:
                     f = File.query.filter(File.thumbnail_path == file_path).first()
                 else:

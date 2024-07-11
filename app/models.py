@@ -217,16 +217,16 @@ class File(db.Model):
             else:
                 return self.source_url
         elif self.file_path:
-            file_path = self.file_path[4:] if self.file_path.startswith('app/') else self.file_path
-            return f"https://{current_app.config['SERVER_NAME']}/{file_path}"
+            file_path = self.file_path.removeprefix('app/static/media/') # ToDo: path prefix is in the DB
+            return url_for('main.serve_media', filename=file_path)
         else:
             return ''
 
     def medium_url(self):
         if self.file_path is None:
             return self.thumbnail_url()
-        file_path = self.file_path[4:] if self.file_path.startswith('app/') else self.file_path
-        return f"https://{current_app.config['SERVER_NAME']}/{file_path}"
+        file_path = self.file_path.removeprefix('app/static/media/') # ToDo: path prefix is in the DB
+        return url_for('main.serve_media', filename=file_path)
 
     def thumbnail_url(self):
         if self.thumbnail_path is None:
@@ -234,8 +234,8 @@ class File(db.Model):
                 return self.source_url
             else:
                 return ''
-        thumbnail_path = self.thumbnail_path[4:] if self.thumbnail_path.startswith('app/') else self.thumbnail_path
-        return f"https://{current_app.config['SERVER_NAME']}/{thumbnail_path}"
+        thumbnail_path = self.thumbnail_path.removeprefix('app/static/media/') # ToDo: path prefix is in the DB
+        return url_for('main.serve_media', filename=thumbnail_path)
 
     def delete_from_disk(self):
         purge_from_cache = []

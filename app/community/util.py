@@ -310,7 +310,7 @@ def save_post(form, post: Post, type: int):
             new_filename = gibberish(15)
 
             # set up the storage directory
-            directory = 'app/static/media/posts/' + new_filename[0:2] + '/' + new_filename[2:4]
+            directory = os.path.join(current_app.config["MEDIA_DIR"], 'posts', new_filename[0:2], new_filename[2:4])
             ensure_directory_exists(directory)
 
             # save the file
@@ -347,7 +347,7 @@ def save_post(form, post: Post, type: int):
                 file = File(file_path=final_place_medium, file_name=new_filename + file_ext, alt_text=alt_text,
                             width=img_width, height=img_height, thumbnail_width=thumbnail_width,
                             thumbnail_height=thumbnail_height, thumbnail_path=final_place_thumbnail,
-                            source_url=final_place.replace('app/static/', f"https://{current_app.config['SERVER_NAME']}/static/"))
+                            source_url = url_for('main.serve_media', filename=final_place.removeprefix('app/static/media/'), _external=True))
                 db.session.add(file)
                 db.session.commit()
                 post.image_id = file.id
@@ -611,7 +611,7 @@ def save_icon_file(icon_file, directory='communities') -> File:
     new_filename = gibberish(15)
 
     # set up the storage directory
-    directory = f'app/static/media/{directory}/' + new_filename[0:2] + '/' + new_filename[2:4]
+    directory = os.path.join(current_app.config["MEDIA_DIR"], directory, new_filename[0:2], new_filename[2:4])
     ensure_directory_exists(directory)
 
     # save the file
@@ -657,7 +657,7 @@ def save_banner_file(banner_file, directory='communities') -> File:
     new_filename = gibberish(15)
 
     # set up the storage directory
-    directory = f'app/static/media/{directory}/' + new_filename[0:2] + '/' + new_filename[2:4]
+    directory = os.path.join(current_app.config["MEDIA_DIR"], directory, new_filename[0:2], new_filename[2:4])
     ensure_directory_exists(directory)
 
     # save the file

@@ -247,10 +247,8 @@ def change_settings():
                 abort(400)
             new_filename = gibberish(15) + '.json'
 
-            directory = f'app/static/media/'
-
             # save the file
-            final_place = os.path.join(directory, new_filename + file_ext)
+            final_place = os.path.join(current_app.config["MEDIA_DIR"], new_filename + file_ext)
             import_file.save(final_place)
 
             # import settings in background task

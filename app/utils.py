@@ -895,7 +895,7 @@ def url_to_thumbnail_file(filename) -> File:
                     file_extension = file_extension.split('?')[0]
 
             new_filename = gibberish(15)
-            directory = 'app/static/media/posts/' + new_filename[0:2] + '/' + new_filename[2:4]
+            directory = os.path.join(current_app.config["MEDIA_DIR"], 'posts', new_filename[0:2], new_filename[2:4])
             ensure_directory_exists(directory)
             final_place = os.path.join(directory, new_filename + file_extension)
             with open(final_place, 'wb') as f:

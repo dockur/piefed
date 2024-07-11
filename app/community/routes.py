@@ -653,11 +653,9 @@ def federate_post(community, post):
         if post.image.source_url:
             image_url = post.image.source_url
         elif post.image.file_path:
-            image_url = post.image.file_path.replace('app/static/',
-                                                     f"https://{current_app.config['SERVER_NAME']}/static/")
+            image_url = url_for('main.serve_media', filename=post.image.file_path.removeprefix('app/static/media/'), _external=True)
         elif post.image.thumbnail_path:
-            image_url = post.image.thumbnail_path.replace('app/static/',
-                                                          f"https://{current_app.config['SERVER_NAME']}/static/")
+            image_url = url_for('main.serve_media', filename=post.image.thumbnail_path.removeprefix('app/static/media/'), _external=True)
         # NB image is a dict while attachment is a list of dicts (usually just one dict in the list)
         page['image'] = {'type': 'Image', 'url': image_url}
         if post.type == POST_TYPE_IMAGE:

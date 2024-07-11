@@ -11,6 +11,7 @@ User-Agent: *
   Disallow: /u/
   Disallow: /d/
   Disallow: /static/media/users/
+  Disallow: /media/users/
   Disallow: /post/*/options
 
 User-agent: GPTBot

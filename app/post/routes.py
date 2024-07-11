@@ -1050,11 +1050,9 @@ def federate_post_update(post):
         page_json['attachment'] = [{'href': post.url, 'type': 'Link'}]
     elif post.image_id:
         if post.image.file_path:
-            image_url = post.image.file_path.replace('app/static/',
-                                                     f"https://{current_app.config['SERVER_NAME']}/static/")
+            image_url = url_for('main.serve_media', filename=post.image.file_path.removeprefix('app/static/media/'), _external=True)
         elif post.image.thumbnail_path:
-            image_url = post.image.thumbnail_path.replace('app/static/',
-                                                          f"https://{current_app.config['SERVER_NAME']}/static/")
+            image_url = url_for('main.serve_media', filename=post.image.thumbnail_path.removeprefix('app/static/media/'), _external=True)
         else:
             image_url = post.image.source_url
         # NB image is a dict while attachment is a list of dicts (usually just one dict in the list)

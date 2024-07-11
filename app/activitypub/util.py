@@ -937,7 +937,7 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory):
             new_filename = gibberish(15)
 
             # set up the storage directory
-            directory = f'app/static/media/{directory}/' + new_filename[0:2] + '/' + new_filename[2:4]
+            directory = os.path.join(current_app.config["MEDIA_DIR"], directory, new_filename[0:2], new_filename[2:4])
             ensure_directory_exists(directory)
 
             # file path and names to store the resized images on disk
@@ -1009,7 +1009,7 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory):
                         new_filename = gibberish(15)
 
                         # set up the storage directory
-                        directory = f'app/static/media/{directory}/' + new_filename[0:2] + '/' + new_filename[2:4]
+                        directory = os.path.join(current_app.config["MEDIA_DIR"], directory, new_filename[0:2], new_filename[2:4])
                         ensure_directory_exists(directory)
 
                         # file path and names to store the resized images on disk
