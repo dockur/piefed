@@ -54,14 +54,14 @@
         <meta name="MobileOptimized" content="320">
         {% block styles -%}
             {{ bootstrap.load_css() }}
-            <link href="{{ url_for('static', filename='styles.css', changed=getmtime('styles.css')) }}" type="text/css" rel="stylesheet" />
-            <link href="{{ url_for('static', filename='themes/high_contrast/styles.css') }}" type="text/css" rel="alternate stylesheet" title="High contrast" />
+            <link href="{{ url_for('main.static', filename='styles.css', changed=getmtime('styles.css')) }}" type="text/css" rel="stylesheet" />
+            <link href="{{ url_for('main.static', filename='themes/high_contrast/styles.css') }}" type="text/css" rel="alternate stylesheet" title="High contrast" />
             {% if not low_bandwidth -%}
-                <link href="{{ url_for('static', filename='js/markdown/downarea.css') }}" type="text/css" rel="stylesheet" />
-                <link href="{{ url_for('static', filename='js/lightbox/baguetteBox.css') }}" type="text/css" rel="stylesheet" />
+                <link href="{{ url_for('main.static', filename='js/markdown/downarea.css') }}" type="text/css" rel="stylesheet" />
+                <link href="{{ url_for('main.static', filename='js/lightbox/baguetteBox.css') }}" type="text/css" rel="stylesheet" />
             {% endif -%}
             {% if theme() and file_exists('app/templates/themes/' + theme() + '/styles.css') -%}
-                <link href="{{ url_for('static', filename='themes/' + theme() + '/styles.css') }}" type="text/css" rel="stylesheet" />
+                <link href="{{ url_for('main.static', filename='themes/' + theme() + '/styles.css') }}" type="text/css" rel="stylesheet" />
             {% endif -%}
         {% endblock -%}
         <title>{% if title %}{{ title }}{% else %}{{ _('PieFed') }}{% endif %}</title>
@@ -289,18 +289,18 @@
     {% endblock -%}
     {% if not low_bandwidth -%}
         {{ str(bootstrap.load_js()).replace('<script ', '<script nonce="' + session['nonce'] + '" ')|safe }}
-        <script src="{{ url_for('static', filename='js/lightbox/baguetteBox.js') }}" nonce="{{ session['nonce'] }}"></script>
+        <script src="{{ url_for('main.static', filename='js/lightbox/baguetteBox.js') }}" nonce="{{ session['nonce'] }}"></script>
     {% endif -%}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/scripts.js', changed=getmtime('js/scripts.js')) }}"></script>
+    <script type="text/javascript" src="{{ url_for('main.static', filename='js/htmx.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('main.static', filename='js/scripts.js', changed=getmtime('js/scripts.js')) }}"></script>
     {% if not low_bandwidth -%}
         {% if post_layout == 'masonry' or post_layout == 'masonry_wide' -%}
             <!-- -->
         {% endif -%}
-        <script type="text/javascript" src="{{ url_for('static', filename='js/markdown/downarea.js', changed=getmtime('js/markdown/downarea.js')) }}"></script>
+        <script type="text/javascript" src="{{ url_for('main.static', filename='js/markdown/downarea.js', changed=getmtime('js/markdown/downarea.js')) }}"></script>
     {% endif -%}
     {% if theme() and file_exists('app/templates/themes/' + theme() + '/scripts.js') -%}
-        <script src="{{ url_for('static', filename='themes/' + theme() + '/scripts.js') }}"></script>
+        <script src="{{ url_for('main.static', filename='themes/' + theme() + '/scripts.js') }}"></script>
     {% endif -%}
     {% block end_scripts -%}
 

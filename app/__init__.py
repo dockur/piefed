@@ -46,7 +46,7 @@ celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder=None)
     app.config.from_object(config_class)
 
     if app.config['SENTRY_DSN']:

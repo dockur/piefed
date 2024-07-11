@@ -19,7 +19,7 @@ from app.constants import SUBSCRIPTION_PENDING, SUBSCRIPTION_MEMBER, POST_TYPE_I
 from app.email import send_email, send_welcome_email
 from app.inoculation import inoculation
 from app.main import bp
-from flask import g, session, flash, request, current_app, url_for, redirect, make_response, jsonify
+from flask import g, session, flash, request, current_app, url_for, redirect, abort, make_response, jsonify
 from flask_moment import moment
 from flask_login import current_user, login_required
 from flask_babel import _, get_locale
@@ -48,6 +48,16 @@ def index(sort=None):
         response=home_page('home', sort),
         timeout=50 if current_user.is_anonymous else 5,
     )
+
+
+@bp.route('/static/<path:filename>')
+def static(filename):
+    path = os.path.join(current_app.root_path, 'static', filename)
+    if os.path.exists(path):
+        max_age = current_app.get_send_file_max_age(filename)
+        return flask.send_from_directory("static/", filename, max_age=max_age)
+    else:
+        abort(404)
 
 
 @bp.route('/media/<path:filename>')
