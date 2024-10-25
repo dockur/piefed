@@ -1,8 +1,8 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, BooleanField, EmailField, TextAreaField, FileField, \
-    RadioField, DateField, SelectField, IntegerField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Optional
+    RadioField, DateField, DecimalField, SelectField, IntegerField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Optional, NumberRange
 from flask_babel import _, lazy_gettext as _l
 
 from app.utils import MultiCheckboxField
@@ -53,6 +53,7 @@ class SettingsForm(FlaskForm):
              ]
     default_sort = SelectField(_l('Default post sort'), choices=sorts, validators=[DataRequired()], coerce=str,
                                render_kw={'class': 'form-select'})
+    affinity_minimum = DecimalField(_l('Filter out users that are less than this % similar'), validators=[NumberRange(min=0, max=100, message='Choose number between 0 and 100')], default=0)
     filters = [('subscribed', _l('Subscribed')),
                ('local', _l('Local')),
                ('popular', _l('Popular')),

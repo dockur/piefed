@@ -1156,6 +1156,35 @@ def recently_downvoted_post_replies(user_id) -> List[int]:
                                {'user_id': user_id}).scalars()
     return sorted(reply_ids)
 
+def jaccard_similarity(user1_upvoted, user2_id):
+    user2_upvoted_posts = ['post/' + str(id) for id in recently_upvoted_posts(user2_id)]
+    user2_upvoted_replies = ['reply/' + str(id) for id in recently_upvoted_post_replies(user2_id)]
+
+    user2_upvoted = set(user2_upvoted_posts + user2_upvoted_replies)
+
+    intersection = len(user1_upvoted.intersection(user2_upvoted))
+    union = len(user1_upvoted.union(user2_upvoted))
+
+    return (intersection / union)*100
+
+def flatten_replies(l):
+    output = []
+    for i in l:
+        if len(i['replies']) > 0:
+            output.append(i['comment'])
+            output.extend(flatten_replies(i['replies']))
+        else:
+            output.append(i['comment'])
+    return output
+
+def filter_replies(l, cond_l):
+    output = []
+    for i in l:
+        if i['comment'].user_id in cond_l:
+            output.append({'comment': i['comment'], 'replies': filter_replies(i['replies'], cond_l)})
+        else:
+            pass
+    return output
 
 def languages_for_form():
     used_languages = []

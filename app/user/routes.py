@@ -375,6 +375,7 @@ def user_settings():
         current_user.indexable = form.indexable.data
         current_user.hide_read_posts = form.hide_read_posts.data
         current_user.default_sort = form.default_sort.data
+        current_user.affinity_minimum = form.affinity_minimum.data
         current_user.default_filter = form.default_filter.data
         current_user.theme = form.theme.data
         current_user.email_unread = form.email_unread.data
@@ -402,6 +403,7 @@ def user_settings():
         form.indexable.data = current_user.indexable
         form.hide_read_posts.data =  current_user.hide_read_posts
         form.default_sort.data = current_user.default_sort
+        form.affinity_minimum.data = current_user.affinity_minimum
         form.default_filter.data = current_user.default_filter
         form.theme.data = current_user.theme
         form.markdown_editor.data = current_user.markdown_editor
@@ -574,29 +576,6 @@ def block_profile(actor):
     return redirect(goto)
 
 
-@bp.route('/u/<actor>/block_instance', methods=['GET', 'POST'])
-@login_required
-def user_block_instance(actor):
-    actor = actor.strip()
-    user = User.query.filter_by(user_name=actor, deleted=False).first()
-    if user is None:
-        user = User.query.filter_by(ap_id=actor, deleted=False).first()
-        if user is None:
-            abort(404)
-
-    if user.instance_id == 1:
-        flash(_('You cannot block your instance.'), 'error')
-    else:
-        existing = InstanceBlock.query.filter_by(user_id=current_user.id, instance_id=user.instance_id).first()
-        if not existing:
-            db.session.add(InstanceBlock(user_id=current_user.id, instance_id=user.instance_id))
-            db.session.commit()
-            cache.delete_memoized(blocked_instances, current_user.id)
-        flash(_('Content from %(name)s will be hidden.', name=user.ap_domain))
-    goto = request.args.get('redirect') if 'redirect' in request.args else f'/u/{actor}'
-    return redirect(goto)
-
-
 @bp.route('/u/<actor>/unblock', methods=['GET'])
 @login_required
 def unblock_profile(actor):
@@ -703,6 +682,20 @@ def delete_profile(actor):
         abort(401)
 
     goto = request.args.get('redirect') if 'redirect' in request.args else f'/u/{actor}'
+    return redirect(goto)
+
+@bp.route('/instance/<int:instance_id>/unblock', methods=['GET'])
+@login_required
+def instance_unblock(instance_id):
+    instance = Instance.query.get_or_404(instance_id)
+    existing_block = InstanceBlock.query.filter_by(user_id=current_user.id, instance_id=instance.id).first()
+    if existing_block:
+        db.session.delete(existing_block)
+        db.session.commit()
+        cache.delete_memoized(blocked_instances, current_user.id)
+        flash(f'{instance.domain} has been unblocked.')
+
+    goto = request.args.get('redirect') if 'redirect' in request.args else url_for('user.user_settings_filters')
     return redirect(goto)
 
 

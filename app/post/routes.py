@@ -30,8 +30,8 @@ from app.utils import get_setting, render_template, allowlist_html, markdown_to_
     request_etag_matches, ip_address, user_ip_banned, instance_banned, \
     reply_already_exists, reply_is_just_link_to_gif_reaction, moderating_communities, joined_communities, \
     blocked_instances, blocked_domains, community_moderators, blocked_phrases, show_ban_message, recently_upvoted_posts, \
-    recently_downvoted_posts, recently_upvoted_post_replies, recently_downvoted_post_replies, reply_is_stupid, \
-    languages_for_form, menu_topics, add_to_modlog, blocked_communities, piefed_markdown_to_lemmy_markdown, \
+    recently_downvoted_posts, recently_upvoted_post_replies, recently_downvoted_post_replies, jaccard_similarity, flatten_replies, filter_replies, \
+    reply_is_stupid, languages_for_form, menu_topics, add_to_modlog, blocked_communities, piefed_markdown_to_lemmy_markdown, \
     permission_required, blocked_users
 
 
@@ -168,7 +168,22 @@ def show_post(post_id: int):
     else:
         replies = post_replies(post.id, sort)
         form.notify_author.data = True
+        
+        if current_user.is_anonymous:
+            pass
+        else:
+            flat_replies = flatten_replies(replies)
+            
+            current_user_upvoted_posts = ['post/' + str(id) for id in recently_upvoted_posts(current_user.id)]
+            current_user_upvoted_replies = ['reply/' + str(id) for id in recently_upvoted_post_replies(current_user.id)]
 
+            current_user_upvotes = set(current_user_upvoted_posts + current_user_upvoted_replies)
+
+            reply_author_ids = set([reply.user_id for reply in flat_replies])
+            reply_author_ids = [reply_author_id for reply_author_id in reply_author_ids if jaccard_similarity(current_user_upvotes, reply_author_id) >= current_user.affinity_minimum]
+            
+            replies = filter_replies(replies, reply_author_ids)
+        
     og_image = post.image.source_url if post.image_id else None
     description = shorten_string(markdown_to_text(post.body), 150) if post.body else None
 

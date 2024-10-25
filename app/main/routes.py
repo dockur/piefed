@@ -21,7 +21,7 @@ from sqlalchemy import desc, text
 from app.utils import render_template, get_setting, request_etag_matches, return_304, blocked_domains, \
     ap_datetime, shorten_string, markdown_to_text, user_filters_home, \
     joined_communities, moderating_communities, markdown_to_html, allowlist_html, \
-    blocked_instances, communities_banned_from, topic_tree, recently_upvoted_posts, recently_downvoted_posts, \
+    blocked_instances, communities_banned_from, topic_tree, recently_upvoted_posts, recently_downvoted_posts, recently_upvoted_post_replies, jaccard_similarity, \
     blocked_users, menu_topics, languages_for_form, blocked_communities, get_request
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
     Notification, Language, community_language, ModLog, read_posts
@@ -89,6 +89,16 @@ def home_page(sort, view_filter):
         if blocked_accounts:
             posts = posts.filter(Post.user_id.not_in(blocked_accounts))
         content_filters = user_filters_home(current_user.id)
+
+        current_user_upvoted_posts = ['post/' + str(id) for id in recently_upvoted_posts(current_user.id)]
+        current_user_upvoted_replies = ['reply/' + str(id) for id in recently_upvoted_post_replies(current_user.id)]
+
+        current_user_upvotes = set(current_user_upvoted_posts + current_user_upvoted_replies)
+
+        post_author_ids = set([post.user_id for post in list(posts)])
+        post_author_ids = [post_author_id for post_author_id in post_author_ids if jaccard_similarity(current_user_upvotes, post_author_id) >= current_user.affinity_minimum]
+             
+        posts = posts.filter(or_(Post.user_id.in_(post_author_ids), Post.user_id == None))
 
     # view filter - subscribed/local/all
     if view_filter == 'subscribed':
