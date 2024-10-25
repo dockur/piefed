@@ -576,6 +576,29 @@ def block_profile(actor):
     return redirect(goto)
 
 
+@bp.route('/u/<actor>/block_instance', methods=['GET', 'POST'])
+@login_required
+def user_block_instance(actor):
+    actor = actor.strip()
+    user = User.query.filter_by(user_name=actor, deleted=False).first()
+    if user is None:
+        user = User.query.filter_by(ap_id=actor, deleted=False).first()
+        if user is None:
+            abort(404)
+
+    if user.instance_id == 1:
+        flash(_('You cannot block your instance.'), 'error')
+    else:
+        existing = InstanceBlock.query.filter_by(user_id=current_user.id, instance_id=user.instance_id).first()
+        if not existing:
+            db.session.add(InstanceBlock(user_id=current_user.id, instance_id=user.instance_id))
+            db.session.commit()
+            cache.delete_memoized(blocked_instances, current_user.id)
+        flash(_('Content from %(name)s will be hidden.', name=user.ap_domain))
+    goto = request.args.get('redirect') if 'redirect' in request.args else f'/u/{actor}'
+    return redirect(goto)
+
+
 @bp.route('/u/<actor>/unblock', methods=['GET'])
 @login_required
 def unblock_profile(actor):
