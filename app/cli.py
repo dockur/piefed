@@ -10,7 +10,7 @@ import flask
 import httpx
 from flask import json, current_app
 from flask_babel import _
-from sqlalchemy import or_, desc, text
+from sqlalchemy import inspect, or_, desc, text
 
 from app import db
 import click
@@ -78,7 +78,13 @@ def register(app):
         print('Admin keys have been reset')
 
     @app.cli.command("init-db")
-    def init_db():
+    @click.option("--force", is_flag=True, help="Force reinitialize the database.")
+    def init_db(force):
+        inspector = inspect(db.engine)
+        tables_exist = 'user' in inspector.get_table_names()
+        if not force and tables_exist:
+            print("The database has already been initialized. Use --force to reinitialize.")
+            return
         with app.app_context():
             db.drop_all()
             db.configure_mappers()
@@ -146,9 +152,14 @@ def register(app):
             db.session.add(admin_role)
 
             # Admin user
-            user_name = input("Admin user name (ideally not 'admin'): ")
-            email = input("Admin email address: ")
-            password = input("Admin password: ")
+            if os.environ.get('MODE') == 'development':
+                user_name = "pyfedi_admin"
+                email = "pyfedi_admin@example.com"
+                password = "pyfedi"
+            else:
+                user_name = input("Admin user name (ideally not 'admin'): ")
+                email = input("Admin email address: ")
+                password = input("Admin password: ")
             while '@' in user_name or ' ' in user_name:
                 print('User name cannot be an email address or have spaces.')
                 user_name = input("Admin user name (ideally not 'admin'): ")

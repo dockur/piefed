@@ -1,0 +1,50 @@
+version: '3.8'
+
+# Pod can't work alongside userns
+x-podman:
+   in_pod: false
+  
+services:
+
+  piefed:
+    container_name: piefed
+    restart: unless-stopped
+    userns_mode: keep-id # keeps id:gid mapping with host
+    ports:
+      - 5000:5000
+    build:
+      context: podman/
+      dockerfile: piefed.Dockerfile
+    volumes:
+      - .:/home/piefed/src/:z  # Bind volume from host to container + Selinux label if needed
+    env_file:
+      - podman/env.dev
+    environment:
+      - PYTHONUNBUFFERED=1  #  Display prints in podman console for debugging purpose
+      # - NGROK_AUTHTOKEN=<authtoken>
+      # - NGROK_DOMAIN=<my_static_ngrok_domain.ngrok.app>
+    command: ["sh", "./podman/start-dev-server.sh"]
+    networks:
+      - piefed-network
+
+  database:
+    container_name: database
+    restart: unless-stopped
+    image: postgres:16-alpine3.20
+    ports:
+      - 5432:5432
+    env_file:
+      - podman/env.dev
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data:z
+    networks:
+      - piefed-network
+
+
+networks:
+  piefed-network:
+    driver: bridge
+
+# Volumes for data persistence
+volumes:
+  postgresql_data:

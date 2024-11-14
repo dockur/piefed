@@ -4,6 +4,8 @@
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
+import re
+import sys
 from flask import Flask, request, current_app, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -14,6 +16,7 @@ from flask_babel import Babel, lazy_gettext as _l
 from flask_caching import Cache
 from celery import Celery
 from sqlalchemy_searchable import make_searchable
+from werkzeug.serving import is_running_from_reloader
 import httpx
 
 from config import Config
@@ -48,6 +51,27 @@ httpx_client = httpx.Client(http2=True)
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Only use ngrok in development environment and with main process 
+    # to avoid creating the tunnel more than once when child process is reloading
+    if (os.environ.get('MODE') == 'development' 
+            and os.environ.get('NGROK_AUTHTOKEN')
+            and not is_running_from_reloader()):
+        from pyngrok import ngrok
+        port = sys.argv[sys.argv.index("--port") + 1] if '--port' in sys.argv else '5000'
+
+        ngrok_domain = os.environ.get('NGROK_DOMAIN')
+        if ngrok_domain:
+            ngrok_domain = re.sub(r'^https?://', '', ngrok_domain)
+            connection = ngrok.connect(port, url=ngrok_domain)
+        else:
+            connection = ngrok.connect(port)
+        # SERVER_NAME needs to be protocol free
+        app.config['SERVER_NAME'] = re.sub(r'^https?://', '', connection.public_url)
+        os.environ['SERVER_NAME'] = app.config['SERVER_NAME']
+        print('\n\n **************************')
+        print(f' * Ngrok tunnel {connection.public_url} -> {connection.config["addr"]}')
+        print(' **************************\n\n')
 
     if app.config['SENTRY_DSN']:
         import sentry_sdk
