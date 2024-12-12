@@ -15,6 +15,7 @@
     <a href="{{ url_for('admin.newsletter') }}">{{ _('Newsletter') }}</a> |
     <a href="{{ url_for('admin.admin_permissions') }}">{{ _('Permissions') }}</a> |
     <a href="{{ url_for('admin.admin_activities') }}">{{ _('Activities') }}</a>
+    <a href="{{ url_for('main.modlog') }}">{{ _('Modlog') }}</a>
     {% if debug_mode %}
         | <a href="{{ url_for('dev.tools') }}">{{ _('Dev Tools') }}</a>
     {% endif%}    

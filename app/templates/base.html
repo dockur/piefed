@@ -228,8 +228,9 @@
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_federation' }}" href="{{ url_for('admin.admin_federation') }}">{{ _('Federation') }}</a></li>
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_instances' }}" href="{{ url_for('admin.admin_instances') }}">{{ _('Instances') }}</a></li>
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_newsletter' }}" href="{{ url_for('admin.newsletter') }}">{{ _('Newsletter') }}</a></li>
-                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_activities' }}" href="{{ url_for('admin.admin_activities') }}">{{ _('Activities') }}</a></li>
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_permissions' }}" href="{{ url_for('admin.admin_permissions') }}">{{ _('Permissions') }}</a></li>
+                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_activities' }}" href="{{ url_for('admin.admin_activities') }}">{{ _('Activities') }}</a></li>
+                                      <li><a class="dropdown-item{{ ' active' if active_child == 'modlog' }}" href="{{ url_for('main.modlog') }}">{{ _('Modlog') }}</a></li>
                                         {% if debug_mode %}
                                             <li><a class="dropdown-item{{ ' active' if active_child == 'dev_tools' }}" href="{{ url_for('dev.tools') }}">{{ _('Dev Tools') }}</a></li>
                                         {% endif %}
