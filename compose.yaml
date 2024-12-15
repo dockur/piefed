@@ -1,4 +1,5 @@
 services:
+
   db:
     shm_size: 128mb
     image: postgres
@@ -6,37 +7,62 @@ services:
      - ./.env.docker
     volumes:
      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - pf_network
+
   redis:
     image: redis
     env_file:
      - ./.env.docker
+    networks:
+      - pf_network
+
   celery:
     build:
       context: .
       target: builder
+    container_name: piefed_celery1
+    depends_on:
+      - db
+      - redis
     env_file:
      - ./.env.docker
     entrypoint: ./entrypoint_celery.sh
     volumes:
      - ./media/:/app/app/static/media/
-  web: 
+    networks:
+      - pf_network
+
+  web:
     build:
       context: .
       target: builder
+    container_name: piefed_app1
     depends_on:
       - db
       - redis
     env_file:
      - ./.env.docker
     volumes:
-     - ./.gunicorn.conf.py:/app/gunicorn.conf.py
+     - ./gunicorn.conf.py:/app/gunicorn.conf.py
      - ./media/:/app/app/static/media/
     ports:
-      - '8080:5000'
+      - '8030:5000'
+    networks:
+      - pf_network
+
   adminer:
     image: adminer
     restart: always
     ports:
       - 8888:8080
+    depends_on:
+      - db
+    networks:
+      - pf_network
 
 
+networks:
+  pf_network:
+    name: pf_network
+    external: false
