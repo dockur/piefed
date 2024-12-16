@@ -10,7 +10,6 @@ import httpx
 import redis
 from flask import current_app, request, g, url_for, json
 from flask_babel import _
-from requests import JSONDecodeError
 from sqlalchemy import text, func, desc
 from sqlalchemy.exc import IntegrityError
 
@@ -29,7 +28,7 @@ import pytesseract
 from app.utils import get_request, allowlist_html, get_setting, ap_datetime, markdown_to_html, \
     is_image_url, domain_from_url, gibberish, ensure_directory_exists, head_request, \
     shorten_string, remove_tracking_from_link, \
-    microblog_content_to_title, generate_image_from_video_url, is_video_url, \
+    microblog_content_to_title, is_video_url, \
     notification_subscribers, communities_banned_from, actor_contains_blocked_words, \
     html_to_text, add_to_modlog_activitypub, joined_communities, \
     moderating_communities, get_task_session, is_video_hosting_site, opengraph_parse
@@ -1009,148 +1008,106 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory, to
     session = get_task_session()
     file: File = session.query(File).get(file_id)
     if file and file.source_url:
-        # Videos (old code. not invoked because file.source_url won't end .mp4 or .webm)
-        if file.source_url.endswith('.mp4') or file.source_url.endswith('.webm'):
-            new_filename = gibberish(15)
-
-            # set up the storage directory
-            directory = f'app/static/media/{directory}/' + new_filename[0:2] + '/' + new_filename[2:4]
-            ensure_directory_exists(directory)
-
-            # file path and names to store the resized images on disk
-            final_place = os.path.join(directory, new_filename + '.jpg')
-            final_place_thumbnail = os.path.join(directory, new_filename + '_thumbnail.webp')
-            try:
-                generate_image_from_video_url(file.source_url, final_place)
-            except Exception as e:
-                return
-
-            if final_place:
-                image = Image.open(final_place)
-                img_width = image.width
-
-                # Resize the image to medium
-                if medium_width:
-                    if img_width > medium_width:
-                        image.thumbnail((medium_width, medium_width))
-                    image.save(final_place)
-                    file.file_path = final_place
-                    file.width = image.width
-                    file.height = image.height
-
-                # Resize the image to a thumbnail (webp)
-                if thumbnail_width:
-                    if img_width > thumbnail_width:
-                        image.thumbnail((thumbnail_width, thumbnail_width))
-                    image.save(final_place_thumbnail, format="WebP", quality=93)
-                    file.thumbnail_path = final_place_thumbnail
-                    file.thumbnail_width = image.width
-                    file.thumbnail_height = image.height
-
-                session.commit()
-
-        # Images
+        try:
+            source_image_response = get_request(file.source_url)
+        except:
+            pass
         else:
-            try:
-                source_image_response = get_request(file.source_url)
-            except:
-                pass
-            else:
-                if source_image_response.status_code == 404 and '/api/v3/image_proxy' in file.source_url:
-                    source_image_response.close()
-                    # Lemmy failed to retrieve the image but we might have better luck. Example source_url: https://slrpnk.net/api/v3/image_proxy?url=https%3A%2F%2Fi.guim.co.uk%2Fimg%2Fmedia%2F24e87cb4d730141848c339b3b862691ca536fb26%2F0_164_3385_2031%2Fmaster%2F3385.jpg%3Fwidth%3D1200%26height%3D630%26quality%3D85%26auto%3Dformat%26fit%3Dcrop%26overlay-align%3Dbottom%252Cleft%26overlay-width%3D100p%26overlay-base64%3DL2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc%26enable%3Dupscale%26s%3D0ec9d25a8cb5db9420471054e26cfa63
-                    # The un-proxied image url is the query parameter called 'url'
-                    parsed_url = urlparse(file.source_url)
-                    query_params = parse_qs(parsed_url.query)
-                    if 'url' in query_params:
-                        url_value = query_params['url'][0]
-                        source_image_response = get_request(url_value)
-                    else:
-                        source_image_response = None
-                if source_image_response and source_image_response.status_code == 200:
-                    content_type = source_image_response.headers.get('content-type')
-                    if content_type:
-                        if content_type.startswith('image') or (content_type == 'application/octet-stream' and file.source_url.endswith('.avif')):
-                            source_image = source_image_response.content
-                            source_image_response.close()
+            if source_image_response.status_code == 404 and '/api/v3/image_proxy' in file.source_url:
+                source_image_response.close()
+                # Lemmy failed to retrieve the image but we might have better luck. Example source_url: https://slrpnk.net/api/v3/image_proxy?url=https%3A%2F%2Fi.guim.co.uk%2Fimg%2Fmedia%2F24e87cb4d730141848c339b3b862691ca536fb26%2F0_164_3385_2031%2Fmaster%2F3385.jpg%3Fwidth%3D1200%26height%3D630%26quality%3D85%26auto%3Dformat%26fit%3Dcrop%26overlay-align%3Dbottom%252Cleft%26overlay-width%3D100p%26overlay-base64%3DL2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc%26enable%3Dupscale%26s%3D0ec9d25a8cb5db9420471054e26cfa63
+                # The un-proxied image url is the query parameter called 'url'
+                parsed_url = urlparse(file.source_url)
+                query_params = parse_qs(parsed_url.query)
+                if 'url' in query_params:
+                    url_value = query_params['url'][0]
+                    source_image_response = get_request(url_value)
+                else:
+                    source_image_response = None
+            if source_image_response and source_image_response.status_code == 200:
+                content_type = source_image_response.headers.get('content-type')
+                if content_type:
+                    if content_type.startswith('image') or (content_type == 'application/octet-stream' and file.source_url.endswith('.avif')):
+                        source_image = source_image_response.content
+                        source_image_response.close()
 
-                            content_type_parts = content_type.split('/')
-                            if content_type_parts:
-                                # content type headers often are just 'image/jpeg' but sometimes 'image/jpeg;charset=utf8'
+                        content_type_parts = content_type.split('/')
+                        if content_type_parts:
+                            # content type headers often are just 'image/jpeg' but sometimes 'image/jpeg;charset=utf8'
 
-                                # Remove ;charset=whatever
-                                main_part = content_type.split(';')[0]
+                            # Remove ;charset=whatever
+                            main_part = content_type.split(';')[0]
 
-                                # Split the main part on the '/' character and take the second part
-                                file_ext = '.' + main_part.split('/')[1]
-                                file_ext = file_ext.strip() # just to be sure
+                            # Split the main part on the '/' character and take the second part
+                            file_ext = '.' + main_part.split('/')[1]
+                            file_ext = file_ext.strip() # just to be sure
 
-                                if file_ext == '.jpeg':
-                                    file_ext = '.jpg'
-                                elif file_ext == '.svg+xml':
-                                    return  # no need to resize SVG images
-                                elif file_ext == '.octet-stream':
-                                    file_ext = '.avif'
-                            else:
-                                file_ext = os.path.splitext(file.source_url)[1]
-                                file_ext = file_ext.replace('%3f', '?')  # sometimes urls are not decoded properly
-                                if '?' in file_ext:
-                                    file_ext = file_ext.split('?')[0]
+                            if file_ext == '.jpeg':
+                                file_ext = '.jpg'
+                            elif file_ext == '.svg+xml':
+                                return  # no need to resize SVG images
+                            elif file_ext == '.octet-stream':
+                                file_ext = '.avif'
+                        else:
+                            file_ext = os.path.splitext(file.source_url)[1]
+                            file_ext = file_ext.replace('%3f', '?')  # sometimes urls are not decoded properly
+                            if '?' in file_ext:
+                                file_ext = file_ext.split('?')[0]
 
-                            new_filename = gibberish(15)
+                        new_filename = gibberish(15)
 
-                            # set up the storage directory
-                            directory = f'app/static/media/{directory}/' + new_filename[0:2] + '/' + new_filename[2:4]
-                            ensure_directory_exists(directory)
+                        # set up the storage directory
+                        directory = f'app/static/media/{directory}/' + new_filename[0:2] + '/' + new_filename[2:4]
+                        ensure_directory_exists(directory)
 
-                            # file path and names to store the resized images on disk
-                            final_place = os.path.join(directory, new_filename + file_ext)
-                            final_place_thumbnail = os.path.join(directory, new_filename + '_thumbnail.webp')
+                        # file path and names to store the resized images on disk
+                        final_place = os.path.join(directory, new_filename + file_ext)
+                        final_place_thumbnail = os.path.join(directory, new_filename + '_thumbnail.webp')
 
-                            if file_ext == '.avif': # this is quite a big plugin so we'll only load it if necessary
-                                import pillow_avif
+                        if file_ext == '.avif': # this is quite a big plugin so we'll only load it if necessary
+                            import pillow_avif
 
-                            # Load image data into Pillow
-                            Image.MAX_IMAGE_PIXELS = 89478485
-                            image = Image.open(BytesIO(source_image))
-                            image = ImageOps.exif_transpose(image)
-                            img_width = image.width
-                            img_height = image.height
+                        # Load image data into Pillow
+                        Image.MAX_IMAGE_PIXELS = 89478485
+                        image = Image.open(BytesIO(source_image))
+                        image = ImageOps.exif_transpose(image)
+                        img_width = image.width
+                        img_height = image.height
 
-                            # Resize the image to medium
-                            if medium_width:
-                                if img_width > medium_width:
-                                    image.thumbnail((medium_width, medium_width))
-                                image.save(final_place)
-                                file.file_path = final_place
-                                file.width = image.width
-                                file.height = image.height
+                        # Resize the image to medium
+                        if medium_width:
+                            if img_width > medium_width:
+                                image.thumbnail((medium_width, medium_width))
+                            image.save(final_place)
+                            file.file_path = final_place
+                            file.width = image.width
+                            file.height = image.height
 
-                            # Resize the image to a thumbnail (webp)
-                            if thumbnail_width:
-                                if img_width > thumbnail_width:
-                                    image.thumbnail((thumbnail_width, thumbnail_width))
-                                image.save(final_place_thumbnail, format="WebP", quality=93)
-                                file.thumbnail_path = final_place_thumbnail
-                                file.thumbnail_width = image.width
-                                file.thumbnail_height = image.height
+                        # Resize the image to a thumbnail (webp)
+                        if thumbnail_width:
+                            if img_width > thumbnail_width:
+                                image.thumbnail((thumbnail_width, thumbnail_width))
+                            image.save(final_place_thumbnail, format="WebP", quality=93)
+                            file.thumbnail_path = final_place_thumbnail
+                            file.thumbnail_width = image.width
+                            file.thumbnail_height = image.height
 
-                            session.commit()
+                        session.commit()
 
-                            # Alert regarding fascist meme content
-                            if toxic_community and img_width < 2000:    # images > 2000px tend to be real photos instead of 4chan screenshots.
-                                try:
-                                    image_text = pytesseract.image_to_string(Image.open(BytesIO(source_image)).convert('L'), timeout=30)
-                                except Exception as e:
-                                    image_text = ''
-                                if 'Anonymous' in image_text and ('No.' in image_text or ' N0' in image_text):   # chan posts usually contain the text 'Anonymous' and ' No.12345'
-                                    post = Post.query.filter_by(image_id=file.id).first()
-                                    notification = Notification(title='Review this',
-                                                                user_id=1,
-                                                                author_id=post.user_id,
-                                                                url=url_for('activitypub.post_ap', post_id=post.id))
-                                    session.add(notification)
-                                    session.commit()
+                        # Alert regarding fascist meme content
+                        if toxic_community and img_width < 2000:    # images > 2000px tend to be real photos instead of 4chan screenshots.
+                            try:
+                                image_text = pytesseract.image_to_string(Image.open(BytesIO(source_image)).convert('L'), timeout=30)
+                            except Exception as e:
+                                image_text = ''
+                            if 'Anonymous' in image_text and ('No.' in image_text or ' N0' in image_text):   # chan posts usually contain the text 'Anonymous' and ' No.12345'
+                                post = Post.query.filter_by(image_id=file.id).first()
+                                notification = Notification(title='Review this',
+                                                            user_id=1,
+                                                            author_id=post.user_id,
+                                                            url=url_for('activitypub.post_ap', post_id=post.id))
+                                session.add(notification)
+                                session.commit()
 
 
 def find_reply_parent(in_reply_to: str) -> Tuple[int, int, int]:

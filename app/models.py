@@ -1364,7 +1364,7 @@ class Post(db.Model):
                     i += 1
                 db.session.commit()
 
-            if post.image_id:
+            if post.image_id and not post.type == constants.POST_TYPE_VIDEO:
                 make_image_sizes(post.image_id, 170, 512, 'posts',
                                  community.low_quality)  # the 512 sized image is for masonry view
 

@@ -4,7 +4,7 @@ FROM --platform=$BUILDPLATFORM python:3-alpine AS builder
 
 RUN apk update
 RUN apk add pkgconfig
-RUN apk add --virtual build-deps gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng ffmpeg
+RUN apk add --virtual build-deps gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng
 
 WORKDIR /app
 COPY . /app
