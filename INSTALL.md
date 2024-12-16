@@ -1,7 +1,8 @@
 # Contents
 
-* [Setup Database](#setup-database)   
-* [Install Python Libraries](#install-python-libraries)      
+* [Choose your path - easy way or hard way](#choose-path)
+* [Setup Database](#setup-database)
+* [Install Python Libraries](#install-python-libraries)
 * [Install additional requirements](#install-additional-requirements)      
 * [Setup pyfedi](#setup-pyfedi)
 * [Setup .env file](#setup-env-file)
@@ -13,6 +14,110 @@
 * [Pre-requisites for Mac OS](#pre-requisites-for-mac-os)
 * [Notes for Windows (WSL2)](#notes-for-windows-wsl2)        
 * [Notes for Pip Package Management](#notes-for-pip-package-management)
+
+<div id="choose-path"></div>
+
+## Do you want this the easy way or the hard way?
+
+### Easy way: docker
+
+Docker can be used to create an isolated environment that is separate from the host server and starts from a consistent
+configuration. While it is quicker and easier, it's not to everyone's taste.
+
+* Clone PieFed into a new directory
+
+```bash
+git clone https://codeberg.org/rimu/pyfedi.git
+```
+
+* Copy suggested docker config
+
+```bash
+cd pyfedi
+cp env.docker.sample .env.docker
+```
+
+* Edit docker environment file
+
+Open .env.docker in your text editor, set SECRET_KEY to something random and set SERVER_NAME to your domain name,
+WITHOUT the https:// at the front. The database login details doesn't really need to be changed because postgres will be
+locked away inside it's own docker network that only PieFed can access but if you want to change POSTGRES_PASSWORD go ahead
+just be sure to update DATABASE_URL accordingly.
+
+Check out compose.yaml and see if it is to your liking. Note the port (8030) and volume definitions - they might need to be
+tweaked.
+
+* First startup
+
+This will take a few minutes.
+
+```bash
+export DOCKER_BUILDKIT=1
+docker-compose up --build
+```
+
+After a while the gibberish will stop scrolling past. If you see errors let us know at [https://piefed.social/c/piefed_help](https://piefed.social/c/piefed_help).
+
+* Networking
+
+You need to somehow to allow client connections from outside to access port 8030 on your server. The details of this is outside the scope
+of this article. You could use a nginx reverse proxy, a cloudflare zero trust tunnel, tailscale, whatever. Just make sure it has SSL on
+it as PieFed assumes you're making requests that start with https://your-domain.
+
+Once you have the networking set up, go to https://your-domain in your browser and see if the docker output in your terminal
+shows signs of reacting to the request. There will be an error showing up in the console because we haven't done the next step yet.
+
+* Database initialization
+
+This must be done once and once only. Doing this will wipe all existing data in your instance so do not do it unless you have a
+brand new instance.
+
+Open a shell inside the PieFed docker container:
+
+`docker exec -it piefed_app1 sh`
+
+Inside the container, run the initialization command:
+
+```
+export FLASK_APP=pyfedi.py
+flask init-db
+```
+
+Among other things this process will get you set up with a username and password. Don't use 'admin' as the user name, script kiddies love that one.
+
+* The moment of truth
+
+Go to https://your-domain in your web browser and PieFed should appear. Log in with the username and password from the previous step.
+
+At this point docker is pretty much Ok so you don't need to see the terminal output as readily. Hit Ctrl + C to close down docker and then run
+
+```bash
+docker-compose up -d
+```
+
+to have PieFed run in the background.
+
+* But wait there's more
+
+Until you set the right environment variables, PieFed won't be able to send email. Check out env.sample for some hints.
+When you have a new value to set, add it to .env.docker and then restart docker with:
+
+```
+docker-compose down && docker-compose up -d
+```
+
+There are also regular cron jobs that need to be run. Set up cron on the host to run those scripts inside the container - see the Cron
+section of this document for details.
+
+You probably want a Captcha on the registration form - more environment variables.
+
+CDN, CloudFlare. More environment variables.
+
+All this is explained in the bare metal guide, below.
+
+### Hard way: bare metal
+
+Read on
 
 <div id="setup-database"></div>
 
@@ -77,7 +182,7 @@ sudo apt install tesseract-ocr
 
 ## Setup PyFedi
 
-* Clone PyFedi            
+* Clone PieFed
 
 ```bash
 git clone https://codeberg.org/rimu/pyfedi.git
