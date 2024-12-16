@@ -29,12 +29,18 @@
         <div class="col-auto comment_author">
             <span class="visually-hidden">by</span>
             {{ render_username(post_reply.author) }}
-            {% if post_reply.author.id == post_reply.post.author.id and post_reply.post.id == post.id -%}
-                <span title="Submitter of original post" aria-label="{{ _('Post creator') }}" class="small"> [OP]</span>
-            {% endif -%}
-            {% if post_reply.post.id != post.id -%}
-                <span title="Replying from a cross-post" aria-label="{{ _('Replying from a cross-post') }}" class="small"> [XP]</span>
-            {% endif -%}
+            {% if post %}
+                {% if post and post_reply.author.id == post_reply.post.author.id and post_reply.post.id == post.id -%}
+                    <span title="Submitter of original post" aria-label="{{ _('Post creator') }}" class="small"> [OP]</span>
+                {% endif -%}
+                {% if post and post_reply.post.id != post.id -%}
+                    <span title="Replying from a cross-post" aria-label="{{ _('Replying from a cross-post') }}" class="small"> [XP]</span>
+                {% endif -%}
+            {% else %}
+                {% if post_reply.author.id == post_reply.post.author.id -%}
+                    <span title="Submitter of original post" aria-label="{{ _('Post creator') }}" class="small"> [OP]</span>
+                {% endif -%}
+            {% endif %}
         </div>
         <div class="col-auto text-muted small pt-05">
             {{ arrow.get(post_reply.posted_at).humanize(locale=locale) }}{% if post_reply.edited_at -%}, edited {{ arrow.get(post_reply.edited_at).humanize(locale=locale) }}{% endif -%}
