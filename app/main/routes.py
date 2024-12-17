@@ -258,7 +258,6 @@ def list_communities():
                            next_url=next_url, prev_url=prev_url, current_user=current_user,
                            topics=topics, languages=languages, topic_id=topic_id, language_id=language_id, sort_by=sort_by,
                            low_bandwidth=low_bandwidth, moderating_communities=moderating_communities(current_user.get_id()),
-                        #    joined_communities=joined_communities(current_user.get_id()),
                            menu_topics=menu_topics(), site=g.site)
 
 
@@ -310,7 +309,6 @@ def list_local_communities():
                            next_url=next_url, prev_url=prev_url, current_user=current_user,
                            topics=topics, languages=languages, topic_id=topic_id, language_id=language_id, sort_by=sort_by,
                            low_bandwidth=low_bandwidth, moderating_communities=moderating_communities(current_user.get_id()),
-                        #    joined_communities=joined_communities(current_user.get_id()),
                            menu_topics=menu_topics(), site=g.site)
 
 
