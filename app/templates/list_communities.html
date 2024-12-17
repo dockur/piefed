@@ -85,9 +85,18 @@
                 <tr>
                     <th> </th>
                     <th {% if not low_bandwidth -%}colspan="2"{% endif -%} scope="col">
-                        <a href="?sort_by=title{{ ' asc' if sort_by == 'title desc' else ' desc' }}" title="{{ _('Sort by name') }}" rel="nofollow">{{ _('Community') }}
+                        <button 
+                            hx-get="/communities"
+                            hx-vals='{"sort_by": "title{{ ' asc' if sort_by == 'title desc' else ' desc' }}"}'
+                            hx-include="form[action='/communities']"
+                            hx-target="body"
+                            hx-push-url="true"
+                            title="{{ _('Sort by name') }}"
+                            class="btn"
+                        >
+                            {{ _('Community') }}
                             <span class="{{ 'fe fe-chevron-up' if sort_by == 'title asc' }}{{ 'fe fe-chevron-down' if sort_by == 'title desc' }}"></span>
-                        </a>
+                        </button>
                     </th>
                     <th scope="col">
                         <a href="?sort_by=post_count{{ ' asc' if sort_by == 'post_count desc' else ' desc' }}" title="{{ _('Sort by post count') }}" rel="nofollow">{{ _('Posts') }}
