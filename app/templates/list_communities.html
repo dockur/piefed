@@ -27,7 +27,8 @@
         </div>
     </div>
     <div class="col-auto">
-      <form action="/communities"
+      <form 
+        id="searchCommunities"
         method="get"
         hx-boost="true"
         hx-trigger="change[event.target.matches('select[name=topic_id] select[name=language_id]')]">
@@ -86,7 +87,7 @@
                     <th> </th>
                     <th {% if not low_bandwidth -%}colspan="2"{% endif -%} scope="col">
                         <button 
-                            hx-get="/communities"
+                            hx-get=""
                             hx-vals='{"sort_by": "title{{ ' asc' if sort_by == 'title desc' else ' desc' }}"}'
                             hx-include="form[action='/communities']"
                             hx-target="body"
@@ -100,9 +101,9 @@
                     </th>
                     <th scope="col">
                         <button 
-                            hx-get="/communities"
+                            hx-get=""
                             hx-vals='{"sort_by": "post_count{{ ' asc' if sort_by == 'post_count desc' else ' desc' }}"}'
-                            hx-include="form[action='/communities']"
+                            hx-include="#searchCommunities"
                             hx-target="body"
                             hx-push-url="true"
                             title="{{ _('Sort by post count') }}"
@@ -114,7 +115,7 @@
                     </th>
                     <th scope="col">
                         <button 
-                            hx-get="/communities"
+                            hx-get=""
                             hx-vals='{"sort_by": "post_reply_count{{ ' asc' if sort_by == 'post_reply_count desc' else ' desc' }}"}'
                             hx-include="form[action='/communities']"
                             hx-target="body"
@@ -128,7 +129,7 @@
                     </th>
                     <th scope="col">
                         <button 
-                            hx-get="/communities"
+                            hx-get=""
                             hx-vals='{"sort_by": "last_active{{ ' asc' if sort_by == 'last_active desc' else ' desc' }}"}'
                             hx-include="form[action='/communities']"
                             hx-target="body"
