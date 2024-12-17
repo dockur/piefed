@@ -87,11 +87,10 @@
                     <th> </th>
                     <th {% if not low_bandwidth -%}colspan="2"{% endif -%} scope="col">
                         <button 
-                            hx-get=""
-                            hx-vals='{"sort_by": "title{{ ' asc' if sort_by == 'title desc' else ' desc' }}"}'
-                            hx-include="form[action='/communities']"
-                            hx-target="body"
-                            hx-push-url="true"
+                            form="searchCommunities"
+                            hx-boost="true"
+                            name="sort_by"
+                            value="title{{ ' asc' if sort_by == 'title desc' else ' desc' }}" 
                             title="{{ _('Sort by name') }}"
                             class="btn"
                         >
@@ -101,11 +100,10 @@
                     </th>
                     <th scope="col">
                         <button 
-                            hx-get=""
-                            hx-vals='{"sort_by": "post_count{{ ' asc' if sort_by == 'post_count desc' else ' desc' }}"}'
-                            hx-include="#searchCommunities"
-                            hx-target="body"
-                            hx-push-url="true"
+                            form="searchCommunities"
+                            hx-boost="true"
+                            name="sort_by"
+                            value="post_count{{ ' asc' if sort_by == 'post_count desc' else ' desc' }}" 
                             title="{{ _('Sort by post count') }}"
                             class="btn"
                         >
@@ -115,11 +113,10 @@
                     </th>
                     <th scope="col">
                         <button 
-                            hx-get=""
-                            hx-vals='{"sort_by": "post_reply_count{{ ' asc' if sort_by == 'post_reply_count desc' else ' desc' }}"}'
-                            hx-include="form[action='/communities']"
-                            hx-target="body"
-                            hx-push-url="true"
+                            form="searchCommunities"
+                            hx-boost="true"
+                            name="sort_by"
+                            value="post_reply_count{{ ' asc' if sort_by == 'post_reply_count desc' else ' desc' }}" 
                             title="{{ _('Comments') }}"
                             class="btn"
                         >
@@ -129,11 +126,10 @@
                     </th>
                     <th scope="col">
                         <button 
-                            hx-get=""
-                            hx-vals='{"sort_by": "last_active{{ ' asc' if sort_by == 'last_active desc' else ' desc' }}"}'
-                            hx-include="form[action='/communities']"
-                            hx-target="body"
-                            hx-push-url="true"
+                            form="searchCommunities"
+                            hx-boost="true"
+                            name="sort_by"
+                            value="last_active{{ ' asc' if sort_by == 'last_active desc' else ' desc' }}" 
                             title="{{ _('Sort by recent activity') }}"
                             class="btn"
                         >
