@@ -113,9 +113,6 @@
                         </button>
                     </th>
                     <th scope="col">
-                        <a href="?sort_by=post_reply_count{{ ' asc' if sort_by == 'post_reply_count desc' else ' desc' }}" title="{{ _('Sort by reply count') }}" rel="nofollow">{{ _('Comments') }}
-                            <span class="{{ 'fe fe-chevron-up' if sort_by == 'post_reply_count asc' }}{{ 'fe fe-chevron-down' if sort_by == 'post_reply_count desc' }}"></span>
-                        </a>
                         <button 
                             hx-get="/communities"
                             hx-vals='{"sort_by": "post_reply_count{{ ' asc' if sort_by == 'post_reply_count desc' else ' desc' }}"}'
