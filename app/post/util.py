@@ -43,7 +43,7 @@ def post_replies(post_ids: List, sort_by: str, show_first: int = 0) -> List[Post
             if parent_comment:
                 parent_comment['replies'].append(comments_dict[comment.id])
 
-    return [comment for comment in comments_dict.values() if comment['comment'].parent_id is None]
+    return [comment for comment in comments_dict.values() if comment['comment'].parent_id is None], len(comments_dict)
 
 
 def get_comment_branch(post_id: int, comment_id: int, sort_by: str) -> List[PostReply]:

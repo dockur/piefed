@@ -45,7 +45,7 @@
                                 {% endif -%}
                             </div>
                         </div>
-                        {% if reply_count > 0 -%}
+                        {% if all_xposts_reply_count > 0 -%}
                         <hr class="mt-4" />
                         {% endif -%}
                     </div>
@@ -58,7 +58,7 @@
         {% else -%}
             <p>{{ _('Comments are disabled.') }}</p>
         {% endif -%}
-        {% if reply_count > 0 -%}
+        {% if all_xposts_reply_count > 0 -%}
         <h2 class="visually-hidden">{{ post.reply_count }} {{ _('Comments') }}</h2>
         <div id="post_replies" class="row">
             <div class="col">
@@ -74,14 +74,14 @@
                     </a>
                 </div>
             </div>
-            {%if post.cross_posts and reply_count > post.reply_count %}
-            <div class="col-2">
-                <div class="btn-group mt-1 mb-2">
+            {%if post.cross_posts and all_xposts_reply_count > post.reply_count %}
+            <div class="col">
+                <div class="view_filter btn-group mt-1 mb-2">
                     <a href="?view=one&sort={{ request.args.get('sort', 'hot') }}#post_replies" title="{{ _('Show comments from this post') }}" class="btn btn-sm {{ 'btn-primary' if request.args.get('view', '') == '' or request.args.get('view', '') == 'one' else 'btn-outline-secondary' }}" rel="nofollow noindex">
-                        {{ _('One') }}
+                        {{ _('Direct') }} ({{ post.reply_count }})
                     </a>
                     <a href="?view=all&sort={{ request.args.get('sort', 'hot') }}#post_replies" title="{{ _('Show comments from all posts') }}" class="btn  btn-sm {{ 'btn-primary' if request.args.get('view', '') == 'all' else 'btn-outline-secondary' }}" rel="nofollow noindex">
-                        {{ _('All')}} ({{ reply_count }})
+                        {{ _('All')}} ({{ all_xposts_reply_count }})
                     </a>
                 </div>
             </div>

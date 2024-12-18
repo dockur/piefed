@@ -34,7 +34,7 @@
                     <span title="Submitter of original post" aria-label="{{ _('Post creator') }}" class="small"> [OP]</span>
                 {% endif -%}
                 {% if post and post_reply.post.id != post.id -%}
-                    <span title="Post community" aria-label="{{ _('Post community') }}" class="small"> [{{ post_reply.community.name }}@{{ post_reply.community.ap_domain }}]</span>
+                    <span class="small fe fe-cross-post"></span><span title="Post community" aria-label="{{ _('Post community') }}" class="small"> /c/{{ post_reply.community.name }}@{{ post_reply.community.ap_domain }}</span>
                 {% endif -%}
             {% else %}
                 {% if post_reply.author.id == post_reply.post.author.id -%}
