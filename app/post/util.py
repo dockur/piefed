@@ -10,7 +10,7 @@ from app.utils import blocked_instances, blocked_users
 
 
 # replies to a post, in a tree, sorted by a variety of methods
-def post_replies(post_ids: List, sort_by: str, community_id: int = 0) -> List[PostReply]:
+def post_replies(post_ids: List, sort_by: str, direct_post_id: int = 0) -> List[PostReply]:
     comments = PostReply.query.filter(PostReply.post_id.in_(post_ids))
     if current_user.is_authenticated:
         instance_ids = blocked_instances(current_user.id)
@@ -34,8 +34,8 @@ def post_replies(post_ids: List, sort_by: str, community_id: int = 0) -> List[Po
         comments = comments.order_by(desc(PostReply.posted_at))
 
     all_xposts_reply_count = min(comments.count(), 2000)
-    if community_id > 0:
-        comments = comments.filter(PostReply.community_id == community_id)
+    if direct_post_id > 0:
+        comments = comments.filter(PostReply.post_id == direct_post_id)
     comments = comments.limit(2000) # paginating indented replies is too hard so just get the first 2000.
 
     comments_dict = {comment.id: {'comment': comment, 'replies': []} for comment in comments.all()}

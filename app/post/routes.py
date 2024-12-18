@@ -46,9 +46,10 @@ def show_post(post_id: int):
             flash(_('This post has been deleted and is only visible to staff and admins.'), 'warning')
 
     sort = request.args.get('sort', 'hot')
+    view = request.args.get('view', 'one')
 
     # If nothing has changed since their last visit, return HTTP 304
-    current_etag = f"{post.id}{sort}_{hash(post.last_active)}"
+    current_etag = f"{post.id}{sort}{view}_{hash(post.last_active)}"
     if current_user.is_anonymous and request_etag_matches(current_etag):
         return return_304(current_etag)
 
@@ -173,8 +174,8 @@ def show_post(post_id: int):
         if post.cross_posts:
             post_id_list.extend(post.cross_posts)
         view = request.args.get('view', 'one')
-        community_id = post.community_id if view == 'one' and post.cross_posts else 0
-        replies, all_xposts_reply_count = post_replies(post_id_list, sort, community_id)
+        direct_post_id = post.id if view == 'one' and post.cross_posts else 0
+        replies, all_xposts_reply_count = post_replies(post_id_list, sort, direct_post_id)
         form.notify_author.data = True
 
     og_image = post.image.source_url if post.image_id else None
@@ -272,7 +273,7 @@ def show_post(post_id: int):
                            recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted,
                            recently_upvoted_replies=recently_upvoted_replies, recently_downvoted_replies=recently_downvoted_replies,
                            reply_collapse_threshold=reply_collapse_threshold,
-                           etag=f"{post.id}{sort}_{hash(post.last_active)}", markdown_editor=current_user.is_authenticated and current_user.markdown_editor,
+                           etag=f"{post.id}{sort}{view}_{hash(post.last_active)}", markdown_editor=current_user.is_authenticated and current_user.markdown_editor,
                            low_bandwidth=request.cookies.get('low_bandwidth', '0') == '1',
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
