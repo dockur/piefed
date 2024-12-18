@@ -172,10 +172,9 @@ def show_post(post_id: int):
         post_id_list = [post.id]
         if post.cross_posts:
             post_id_list.extend(post.cross_posts)
-        replies, all_xposts_reply_count = post_replies(post_id_list, sort)
         view = request.args.get('view', 'one')
-        if view == 'one' and post.cross_posts and post.reply_count < all_xposts_reply_count:
-            replies = [reply for reply in replies if reply['comment'].community_id == post.community_id]
+        community_id = post.community_id if view == 'one' and post.cross_posts else 0
+        replies, all_xposts_reply_count = post_replies(post_id_list, sort, community_id)
         form.notify_author.data = True
 
     og_image = post.image.source_url if post.image_id else None
