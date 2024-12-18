@@ -173,6 +173,10 @@ def show_post(post_id: int):
         if post.cross_posts:
             post_id_list.extend(post.cross_posts)
         replies = post_replies(post_id_list, sort)
+        reply_count = len(replies)
+        view = request.args.get('view', 'one')
+        if view == 'one' and post.cross_posts and post.reply_count < reply_count:
+            replies = [reply for reply in replies if reply['comment'].community_id == post.community_id]
         form.notify_author.data = True
 
     og_image = post.image.source_url if post.image_id else None
@@ -274,7 +278,7 @@ def show_post(post_id: int):
                            low_bandwidth=request.cookies.get('low_bandwidth', '0') == '1',
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
-                           menu_topics=menu_topics(), site=g.site,
+                           menu_topics=menu_topics(), site=g.site, reply_count=reply_count,
                            inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None
                            )
     response.headers.set('Vary', 'Accept, Cookie, Accept-Language')

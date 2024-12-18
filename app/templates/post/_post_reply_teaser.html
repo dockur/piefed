@@ -6,7 +6,7 @@
   children: replies to this reply
 #}
 {% if current_user.is_authenticated -%}
-    {% set collapsed = ((post_reply.score <= current_user.reply_collapse_threshold) or post_reply.deleted or (post and post_reply.post.id != post.id))
+    {% set collapsed = ((post_reply.score <= current_user.reply_collapse_threshold) or post_reply.deleted)
                        and not no_collapse -%}
 {% else -%}
     {% set collapsed = (post_reply.score <= -10) and not no_collapse -%}
@@ -34,7 +34,7 @@
                     <span title="Submitter of original post" aria-label="{{ _('Post creator') }}" class="small"> [OP]</span>
                 {% endif -%}
                 {% if post and post_reply.post.id != post.id -%}
-                    <span title="Replying from a cross-post" aria-label="{{ _('Replying from a cross-post') }}" class="small"> [XP from {{ post_reply.community.name }}]</span>
+                    <span title="Post community" aria-label="{{ _('Post community') }}" class="small"> [{{ post_reply.community.name }}@{{ post_reply.community.ap_domain }}]</span>
                 {% endif -%}
             {% else %}
                 {% if post_reply.author.id == post_reply.post.author.id -%}
