@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function setupPostTeaserHandler() {
     document.querySelectorAll('.post_teaser_clickable').forEach(div => {
         div.onclick = function() {
-            const firstAnchor = this.parentElement.querySelector('a');
+            const firstAnchor = this.parentElement.querySelector('h3 a');
             if (firstAnchor) {
                 window.location.href = firstAnchor.href;
             }
