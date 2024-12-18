@@ -541,6 +541,48 @@ def replay_inbox():
     return 'ok'
 
 
+@bp.route('/test_crosspost_hiding')
+@login_required
+def test_crosspost_hiding():
+    from datetime import datetime
+
+    posts = Post.query.filter(Post.deleted == False)
+    posts = posts.all()
+    page = 1
+
+    ts1 = datetime.now()
+
+    # exclude extra cross-posts from feed
+    already_seen = []
+    limit = 100
+    #i = -1                                                 # option 1: don't exclude cross-posts
+    #i = min(limit - 1, len(posts) - 1)                     # option 2: exclude cross-posts from the first page only
+    i = min((limit * 10) - 1, len(posts) - 1)               # option 3: exclude cross-posts across a 'magic number' of pages
+    #i = len(posts) - 1                                     # option 4: exclude all cross-posts ever
+    while i >= 0:
+        if not posts[i].cross_posts:
+            i -= 1
+            continue
+        if posts[i].id in already_seen:
+            posts.pop(i)
+        else:
+            already_seen.extend(posts[i].cross_posts)
+        i -= 1
+
+    # paginate manually (can't use paginate())
+    start = (page - 1) * limit
+    end = start + limit
+    posts = posts[start:end]
+    next_page = page + 1 if len(posts) == limit else None
+    previous_page = page - 1 if page != 1 else None
+
+    ts2 = datetime.now()
+
+    times = 'times: ' + str(ts1) + ' => ' + str(ts2)
+
+    return times
+
+
 @bp.route('/test')
 def test():
 
