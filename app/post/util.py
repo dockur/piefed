@@ -6,7 +6,7 @@ from sqlalchemy import desc, text, or_
 
 from app import db
 from app.models import PostReply, Post
-from app.utils import blocked_instances, blocked_users
+from app.utils import blocked_instances, blocked_users, blocked_communities
 
 
 # replies to a post, in a tree, sorted by a variety of methods
@@ -21,6 +21,10 @@ def post_replies(post_ids: List, sort_by: str, direct_post_id: int = 0) -> List[
         blocked_accounts = blocked_users(current_user.id)
         if blocked_accounts:
             comments = comments.filter(PostReply.user_id.not_in(blocked_accounts))
+        if len(post_ids) > 1:
+            blocked_comms = blocked_communities(current_user.id)
+            if blocked_comms:
+                comments = comments.filter(PostReply.community_id.not_in(blocked_comms))
         if current_user.reply_hide_threshold:
             comments = comments.filter(PostReply.score > current_user.reply_hide_threshold)
     else:
