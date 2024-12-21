@@ -110,8 +110,10 @@ def show_topic(topic_path):
         postlist = posts.all()
         already_seen = []
         unwanted_duplicates = []
-        limit = 100 if not low_bandwidth else 50
-        search_ahead_limit = min((limit * 3) - 1, len(postlist) - 1)     # limit * 3 = 3 pages
+        post_limit = 100 if not low_bandwidth else 50
+        page_limit = 3
+        postlist = posts.limit(post_limit * page_limit).all()
+        search_ahead_limit = min((post_limit * page_limit) - 1, len(postlist) - 1)
         index = 0
         while index < search_ahead_limit:
             if not postlist[index].cross_posts:

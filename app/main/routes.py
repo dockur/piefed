@@ -114,11 +114,12 @@ def home_page(sort, view_filter):
 
     # try to filter out the more egregious cross-posts (do after sorting)
     if view_filter != 'all' and current_user.is_authenticated:         # and current_user.hide_xp
-        postlist = posts.all()
         already_seen = []
         unwanted_duplicates = []
-        limit = 100 if not low_bandwidth else 50
-        search_ahead_limit = min((limit * 3) - 1, len(postlist) - 1)     # limit * 3 = 3 pages
+        post_limit = 100 if not low_bandwidth else 50
+        page_limit = 3
+        postlist = posts.limit(post_limit * page_limit).all()
+        search_ahead_limit = min((post_limit * page_limit) - 1, len(postlist) - 1)
         index = 0
         while index < search_ahead_limit:
             if not postlist[index].cross_posts:
@@ -527,7 +528,6 @@ def replay_inbox():
 
     return 'ok'
 
-
 @bp.route('/test_crosspost_hiding')
 @login_required
 def test_crosspost_hiding():
@@ -537,11 +537,12 @@ def test_crosspost_hiding():
 
     ts1 = datetime.now()
     if current_user.is_authenticated:                                    # and current_user.hide_xp
-        postlist = posts.all()
         already_seen = []
         unwanted_duplicates = []
-        limit = 100
-        search_ahead_limit = min((limit * 3) - 1, len(postlist) - 1)     # limit * 3 = 3 pages
+        post_limit = 100
+        page_limit = 3
+        postlist = posts.limit(post_limit * page_limit).all()
+        search_ahead_limit = min((post_limit * page_limit) - 1, len(postlist) - 1)
         index = 0
         while index < search_ahead_limit:
             if not postlist[index].cross_posts:
