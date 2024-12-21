@@ -1618,9 +1618,10 @@ class Post(db.Model):
     def cross_post_reply_count(self):
         cross_posts_tuple = tuple(self.cross_posts) if self.cross_posts else None
         if cross_posts_tuple:
-            return self.reply_count + sum(list(db.session.execute(text('SELECT reply_count FROM "post" WHERE id IN :cross_posts'), {'cross_posts': cross_posts_tuple}).scalars()))
+            total = self.reply_count + sum(list(db.session.execute(text('SELECT reply_count FROM "post" WHERE id IN :cross_posts'), {'cross_posts': cross_posts_tuple}).scalars()))
+            return '[' + str(total) + ']' if total > 0 else ''
         else:
-            return self.reply_count
+            return ''
 
 
 class PostReply(db.Model):
