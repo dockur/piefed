@@ -118,33 +118,17 @@ def home_page(sort, view_filter):
         already_seen = []
         unwanted_duplicates = []
         limit = 100 if not low_bandwidth else 50
-        #i = -1                                                 # option 1: don't exclude cross-posts
-        #i = min(limit - 1, len(postlist) - 1)                  # option 2: exclude cross-posts from the first page only
-        i = min((limit * 10) - 1, len(postlist) - 1)            # option 3: exclude cross-posts across a 'magic number' of pages
-        #i = len(posts) - 1                                     # option 4: exclude all cross-posts ever
-        if sort == 'new':
-            while i >= 0:
-                if not postlist[i].cross_posts:
-                    i -= 1
-                    continue
-                if postlist[i].id in already_seen:
-                    if postlist[i].reply_count == 0 and postlist[i].user_id != current_user.id:
-                        unwanted_duplicates.append(postlist[i].id)
-                else:
-                    already_seen.extend(postlist[i].cross_posts)
-                i -= 1
-        else:
-            j = 0
-            while j < i:
-                if not postlist[j].cross_posts:
-                    j += 1
-                    continue
-                if postlist[j].id in already_seen:
-                    if postlist[j].reply_count == 0 and postlist[i].user_id != current_user.id:
-                        unwanted_duplicates.append(postlist[j].id)
-                else:
-                    already_seen.extend(postlist[j].cross_posts)
-                j += 1
+        search_ahead_limit = min((limit * 3) - 1, len(postlist) - 1)     # limit * 3 = 3 pages
+        index = 0
+        while index < search_ahead_limit:
+            if not postlist[index].cross_posts:
+                index += 1
+                continue
+            if postlist[index].id in already_seen:
+                unwanted_duplicates.append(postlist[index].id)
+            else:
+                already_seen.extend(postlist[index].cross_posts)
+            index += 1
 
         posts = posts.filter(Post.id.not_in(unwanted_duplicates))
 
@@ -550,35 +534,26 @@ def test_crosspost_hiding():
     from datetime import datetime
 
     posts = Post.query.filter(Post.deleted == False)
-    posts = posts.all()
-    page = 1
 
     ts1 = datetime.now()
+    if current_user.is_authenticated:                                    # and current_user.hide_xp
+        postlist = posts.all()
+        already_seen = []
+        unwanted_duplicates = []
+        limit = 100
+        search_ahead_limit = min((limit * 3) - 1, len(postlist) - 1)     # limit * 3 = 3 pages
+        index = 0
+        while index < search_ahead_limit:
+            if not postlist[index].cross_posts:
+                index += 1
+                continue
+            if postlist[index].id in already_seen:
+                unwanted_duplicates.append(postlist[index].id)
+            else:
+                already_seen.extend(postlist[index].cross_posts)
+            index += 1
 
-    # exclude extra cross-posts from feed
-    already_seen = []
-    limit = 100
-    #i = -1                                                 # option 1: don't exclude cross-posts
-    #i = min(limit - 1, len(posts) - 1)                     # option 2: exclude cross-posts from the first page only
-    i = min((limit * 10) - 1, len(posts) - 1)               # option 3: exclude cross-posts across a 'magic number' of pages
-    #i = len(posts) - 1                                     # option 4: exclude all cross-posts ever
-    while i >= 0:
-        if not posts[i].cross_posts:
-            i -= 1
-            continue
-        if posts[i].id in already_seen:
-            posts.pop(i)
-        else:
-            already_seen.extend(posts[i].cross_posts)
-        i -= 1
-
-    # paginate manually (can't use paginate())
-    start = (page - 1) * limit
-    end = start + limit
-    posts = posts[start:end]
-    next_page = page + 1 if len(posts) == limit else None
-    previous_page = page - 1 if page != 1 else None
-
+        posts = posts.filter(Post.id.not_in(unwanted_duplicates))
     ts2 = datetime.now()
 
     times = 'times: ' + str(ts1) + ' => ' + str(ts2)

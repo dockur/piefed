@@ -106,6 +106,24 @@ def show_topic(topic_path):
         elif sort == 'active':
             posts = posts.order_by(desc(Post.last_active))
 
+        # dupe filter
+        postlist = posts.all()
+        already_seen = []
+        unwanted_duplicates = []
+        limit = 100 if not low_bandwidth else 50
+        search_ahead_limit = min((limit * 3) - 1, len(postlist) - 1)     # limit * 3 = 3 pages
+        index = 0
+        while index < search_ahead_limit:
+            if not postlist[index].cross_posts:
+                index += 1
+                continue
+            if postlist[index].id in already_seen:
+                unwanted_duplicates.append(postlist[index].id)
+            else:
+                already_seen.extend(postlist[index].cross_posts)
+            index += 1
+        posts = posts.filter(Post.id.not_in(unwanted_duplicates))
+
         # paging
         per_page = 100
         if post_layout == 'masonry':

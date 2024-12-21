@@ -1615,6 +1615,13 @@ class Post(db.Model):
             db.session.commit()
         return undo
 
+    def cross_post_reply_count(self):
+        cross_posts_tuple = tuple(self.cross_posts) if self.cross_posts else None
+        if cross_posts_tuple:
+            return self.reply_count + sum(list(db.session.execute(text('SELECT reply_count FROM "post" WHERE id IN :cross_posts'), {'cross_posts': cross_posts_tuple}).scalars()))
+        else:
+            return self.reply_count
+
 
 class PostReply(db.Model):
     query_class = FullTextSearchQuery
