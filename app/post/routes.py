@@ -46,7 +46,7 @@ def show_post(post_id: int):
             flash(_('This post has been deleted and is only visible to staff and admins.'), 'warning')
 
     sort = request.args.get('sort', 'hot')
-    view = request.args.get('view', 'one')
+    view = request.args.get('view', 'direct')
 
     # If nothing has changed since their last visit, return HTTP 304
     current_etag = f"{post.id}{sort}{view}_{hash(post.last_active)}"
@@ -173,8 +173,8 @@ def show_post(post_id: int):
         post_id_list = [post.id]
         if post.cross_posts:
             post_id_list.extend(post.cross_posts)
-        view = request.args.get('view', 'one')
-        direct_post_id = post.id if view == 'one' and post.cross_posts else 0
+        view = request.args.get('view', 'direct')
+        direct_post_id = post.id if view == 'direct' and post.cross_posts else 0
         replies, all_xposts_reply_count = post_replies(post_id_list, sort, direct_post_id)
         form.notify_author.data = True
 

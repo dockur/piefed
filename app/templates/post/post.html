@@ -63,13 +63,13 @@
         <div id="post_replies" class="row">
             <div class="col">
                 <div class="btn-group mt-1 mb-2">
-                    <a href="?sort=hot&view={{ request.args.get('view', 'one') }}#post_replies" title="{{ _('Sort by magic') }}" class="btn btn-sm {{ 'btn-primary' if request.args.get('sort', '') == '' or request.args.get('sort', '') == 'hot' else 'btn-outline-secondary' }}" rel="nofollow noindex">
+                    <a href="?sort=hot&view={{ request.args.get('view', 'direct') }}#post_replies" title="{{ _('Sort by magic') }}" class="btn btn-sm {{ 'btn-primary' if request.args.get('sort', '') == '' or request.args.get('sort', '') == 'hot' else 'btn-outline-secondary' }}" rel="nofollow noindex">
                         {{ _('Hot') }}
                     </a>
-                    <a href="?sort=top&view={{ request.args.get('view', 'one') }}#post_replies" title="{{ _('Comments with the most upvotes') }}" class="btn  btn-sm {{ 'btn-primary' if request.args.get('sort', '') == 'top' else 'btn-outline-secondary' }}" rel="nofollow noindex">
+                    <a href="?sort=top&view={{ request.args.get('view', 'direct') }}#post_replies" title="{{ _('Comments with the most upvotes') }}" class="btn  btn-sm {{ 'btn-primary' if request.args.get('sort', '') == 'top' else 'btn-outline-secondary' }}" rel="nofollow noindex">
                         {{ _('Top') }}
                     </a>
-                    <a href="?sort=new&view={{ request.args.get('view', 'one') }}#post_replies" title="{{ _('Show newest first') }}" class="btn  btn-sm {{ 'btn-primary' if request.args.get('sort', '') == 'new' else 'btn-outline-secondary' }}" rel="nofollow noindex">
+                    <a href="?sort=new&view={{ request.args.get('view', 'direct') }}#post_replies" title="{{ _('Show newest first') }}" class="btn  btn-sm {{ 'btn-primary' if request.args.get('sort', '') == 'new' else 'btn-outline-secondary' }}" rel="nofollow noindex">
                         {{ _('New') }}
                     </a>
                 </div>
@@ -77,7 +77,7 @@
             {%if post.cross_posts and all_xposts_reply_count > post.reply_count %}
             <div class="col">
                 <div class="view_filter btn-group mt-1 mb-2">
-                    <a href="?view=one&sort={{ request.args.get('sort', 'hot') }}#post_replies" title="{{ _('Show comments from this post') }}" class="btn btn-sm {{ 'btn-primary' if request.args.get('view', '') == '' or request.args.get('view', '') == 'one' else 'btn-outline-secondary' }}" rel="nofollow noindex">
+                    <a href="?view=direct&sort={{ request.args.get('sort', 'hot') }}#post_replies" title="{{ _('Show comments from this post') }}" class="btn btn-sm {{ 'btn-primary' if request.args.get('view', '') == '' or request.args.get('view', '') == 'direct' else 'btn-outline-secondary' }}" rel="nofollow noindex">
                         {{ _('Direct') }} ({{ post.reply_count }})
                     </a>
                     <a href="?view=all&sort={{ request.args.get('sort', 'hot') }}#post_replies" title="{{ _('Show comments from all posts') }}" class="btn  btn-sm {{ 'btn-primary' if request.args.get('view', '') == 'all' else 'btn-outline-secondary' }}" rel="nofollow noindex">
