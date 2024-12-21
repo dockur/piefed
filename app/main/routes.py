@@ -102,22 +102,28 @@ def home_page(sort, view_filter):
         posts = posts.join(Community, Community.id == Post.community_id)
         posts = posts.filter(Community.show_all == True)
 
-    # Sorting
-    if sort == 'hot':
-        posts = posts.order_by(desc(Post.ranking)).order_by(desc(Post.posted_at))
-    elif sort == 'top':
-        posts = posts.filter(Post.posted_at > utcnow() - timedelta(days=1)).order_by(desc(Post.up_votes - Post.down_votes))
-    elif sort == 'new':
-        posts = posts.order_by(desc(Post.posted_at))
-    elif sort == 'active':
-        posts = posts.order_by(desc(Post.last_active))
-
-    # try to filter out the more egregious cross-posts (do after sorting)
+    # try to filter out the more egregious cross-posts
     if view_filter != 'all' and current_user.is_authenticated:         # and current_user.hide_xp
         already_seen = []
         unwanted_duplicates = []
         cross_posts_limit = 100
-        postlist = posts.filter(Post.cross_posts != None).limit(cross_posts_limit).all()
+        if sort == 'hot':
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    order_by(desc(Post.ranking)).order_by(desc(Post.posted_at)).\
+                                    limit(cross_posts_limit).all()
+        elif sort == 'top':
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    filter(Post.posted_at > utcnow() - timedelta(days=1)).\
+                                    order_by(desc(Post.up_votes - Post.down_votes)).\
+                                    limit(cross_posts_limit).all()
+        elif sort == 'new':
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    order_by(desc(Post.posted_at)).\
+                                    limit(cross_posts_limit).all()
+        else:
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    order_by(desc(Post.last_active)).\
+                                    limit(cross_posts_limit).all()
         search_ahead_limit = min((cross_posts_limit) - 1, len(postlist) - 1)
         index = 0
         while index < search_ahead_limit:
@@ -133,6 +139,16 @@ def home_page(sort, view_filter):
     if not current_user.is_anonymous and current_user.hide_read_posts:
         posts = posts.outerjoin(read_posts, (Post.id == read_posts.c.read_post_id) & (read_posts.c.user_id == current_user.id))
         posts = posts.filter(read_posts.c.read_post_id.is_(None))  # Filter where there is no corresponding read post for the current user
+
+    # Sorting (do last, as subsequent queries lose any earlier order_by)
+    if sort == 'hot':
+        posts = posts.order_by(desc(Post.ranking)).order_by(desc(Post.posted_at))
+    elif sort == 'top':
+        posts = posts.filter(Post.posted_at > utcnow() - timedelta(days=1)).order_by(desc(Post.up_votes - Post.down_votes))
+    elif sort == 'new':
+        posts = posts.order_by(desc(Post.posted_at))
+    elif sort == 'active':
+        posts = posts.order_by(desc(Post.last_active))
 
     # Pagination
     posts = posts.paginate(page=page, per_page=100 if current_user.is_authenticated and not low_bandwidth else 50, error_out=False)

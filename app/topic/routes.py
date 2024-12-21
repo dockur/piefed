@@ -96,22 +96,27 @@ def show_topic(topic_path):
             if banned_from:
                 posts = posts.filter(Post.community_id.not_in(banned_from))
 
-        # sorting
-        if sort == '' or sort == 'hot':
-            posts = posts.order_by(desc(Post.ranking)).order_by(desc(Post.posted_at))
-        elif sort == 'top':
-            posts = posts.filter(Post.posted_at > utcnow() - timedelta(days=7)).order_by(desc(Post.up_votes - Post.down_votes))
-        elif sort == 'new':
-            posts = posts.order_by(desc(Post.posted_at))
-        elif sort == 'active':
-            posts = posts.order_by(desc(Post.last_active))
-
         # dupe filter
-        postlist = posts.all()
         already_seen = []
         unwanted_duplicates = []
         cross_posts_limit = 100
-        postlist = posts.filter(Post.cross_posts != None).limit(cross_posts_limit).all()
+        if sort == 'hot':
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    order_by(desc(Post.ranking)).order_by(desc(Post.posted_at)).\
+                                    limit(cross_posts_limit).all()
+        elif sort == 'top':
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    filter(Post.posted_at > utcnow() - timedelta(days=1)).\
+                                    order_by(desc(Post.up_votes - Post.down_votes)).\
+                                    limit(cross_posts_limit).all()
+        elif sort == 'new':
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    order_by(desc(Post.posted_at)).\
+                                    limit(cross_posts_limit).all()
+        else:
+            postlist = posts.filter(Post.cross_posts != None).\
+                                    order_by(desc(Post.last_active)).\
+                                    limit(cross_posts_limit).all()
         search_ahead_limit = min((cross_posts_limit) - 1, len(postlist) - 1)
         index = 0
         while index < search_ahead_limit:
@@ -121,6 +126,16 @@ def show_topic(topic_path):
                 already_seen.extend(postlist[index].cross_posts)
             index += 1
         posts = posts.filter(Post.id.not_in(unwanted_duplicates))
+
+        # sorting
+        if sort == '' or sort == 'hot':
+            posts = posts.order_by(desc(Post.ranking)).order_by(desc(Post.posted_at))
+        elif sort == 'top':
+            posts = posts.filter(Post.posted_at > utcnow() - timedelta(days=7)).order_by(desc(Post.up_votes - Post.down_votes))
+        elif sort == 'new':
+            posts = posts.order_by(desc(Post.posted_at))
+        elif sort == 'active':
+            posts = posts.order_by(desc(Post.last_active))
 
         # paging
         per_page = 100
