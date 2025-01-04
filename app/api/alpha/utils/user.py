@@ -4,6 +4,7 @@ from app.api.alpha.utils.post import get_post_list
 from app.api.alpha.utils.reply import get_reply_list
 from app.api.alpha.utils.validators import required, integer_expected, boolean_expected
 from app.shared.user import block_another_user, unblock_another_user
+from app.models import User, Notification
 
 
 def get_user(auth, data):
@@ -34,6 +35,34 @@ def get_user(auth, data):
     user_json['comments'] = reply_list['comments']
     return user_json
 
+
+# get the counts for a user's unread replies, mentions, and private messages
+def get_user_unread_count(auth):
+    # user_id = logged in user
+    user_id = None
+    if auth:
+        user_id = authorise_api_user(auth)
+    
+    # get the user's unread notifications
+    # we have reply notifications and chat notifications
+    # TO-DO - add the mentions when we have those
+
+    # run a command to get the users notifications, then those that are unread, 
+    # then of those get the ones with urls that begin with /chat/, then get the count
+    chat_count = Notification.query.filter_by(user_id=user_id).filter_by(read=False).filter(Notification.url.like('%/chat/%')).count()
+
+    # run a command to get the users notifications, then those that are unread, 
+    # then of those get the ones with urls that begin with /post/, then get the count
+    reply_count = Notification.query.filter_by(user_id=user_id).filter_by(read=False).filter(Notification.url.like('%/post/%')).count()
+
+    # build the json
+    unread_json = {
+        "replies": reply_count,
+        "mentions": 0,
+        "private_messages": chat_count
+    }
+    
+    return unread_json
 
 # would be in app/constants.py
 SRC_API = 3

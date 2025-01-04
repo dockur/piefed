@@ -4,7 +4,8 @@ from app.api.alpha.utils import get_site, post_site_block, \
                                 get_post_list, get_post, post_post_like, put_post_save, put_post_subscribe, \
                                 get_reply_list, post_reply_like, put_reply_save, put_reply_subscribe, post_reply, put_reply, post_reply_delete, post_reply_report, \
                                 get_community_list, get_community, post_community_follow, post_community_block, \
-                                get_user, post_user_block
+                                get_user, post_user_block, get_user_unread_count
+
 from app.shared.auth import log_user_in
 
 from flask import current_app, jsonify, request
@@ -291,6 +292,17 @@ def post_alpha_user_block():
         return jsonify({"error": str(ex)}), 400
 
 
+@bp.route('/api/alpha/user/unread_count', methods=['GET'])
+def get_alpha_user_unread_count():
+    if not current_app.debug:
+        return jsonify({'error': 'alpha api routes only available in debug mode'})
+    try:
+        auth = request.headers.get('Authorization')
+        return jsonify(get_user_unread_count(auth))
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 400
+
+
 # Not yet implemented. Copied from lemmy's V3 api, so some aren't needed, and some need changing
 
 # Site - not yet implemented
@@ -369,7 +381,6 @@ def alpha_chat():
 @bp.route('/api/alpha/user/save_user_settings', methods=['PUT'])
 @bp.route('/api/alpha/user/change_password', methods=['PUT'])
 @bp.route('/api/alpha/user/repost_count', methods=['GET'])
-@bp.route('/api/alpha/user/unread_count', methods=['GET'])
 @bp.route('/api/alpha/user/verify_email', methods=['POST'])
 @bp.route('/api/alpha/user/leave_admin', methods=['POST'])
 @bp.route('/api/alpha/user/totp/generate', methods=['POST'])
