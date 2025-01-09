@@ -429,7 +429,7 @@ class Community(db.Model):
     nsfw = db.Column(db.Boolean, default=False)
     nsfl = db.Column(db.Boolean, default=False)
     instance_id = db.Column(db.Integer, db.ForeignKey('instance.id'), index=True)
-    low_quality = db.Column(db.Boolean, default=False)      # upvotes earned in low quality communities don't improve reputation
+    low_quality = db.Column(db.Boolean, default=False)      # votes in low quality communities don't affect reputation
     created_at = db.Column(db.DateTime, default=utcnow)
     last_active = db.Column(db.DateTime, default=utcnow)
     public_key = db.Column(db.Text)
@@ -1649,8 +1649,8 @@ class Post(db.Model):
                 self.score += spicy_effect                      # score + (-1) = score-1
             vote = PostVote(user_id=user.id, post_id=self.id, author_id=self.author.id,
                             effect=effect)
-            # upvotes do not increase reputation in low quality communities
-            if self.community.low_quality and effect > 0:
+            # votes do not affect reputation in low quality communities
+            if self.community.low_quality:
                 effect = 0
             self.author.reputation += effect
             db.session.add(vote)

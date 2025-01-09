@@ -85,7 +85,7 @@ class EditCommunityForm(FlaskForm):
     new_mods_wanted = BooleanField(_l('New moderators wanted'))
     show_popular = BooleanField(_l('Posts can be popular'))
     show_all = BooleanField(_l('Posts show in All list'))
-    low_quality = BooleanField(_l("Low quality / toxic - upvotes in here don't add to reputation"))
+    low_quality = BooleanField(_l("Low quality / toxic - votes in here don't affect reputation"))
     options = [(-1, _l('Forever')),
                (7, _l('1 week')),
                (14, _l('2 weeks')),
