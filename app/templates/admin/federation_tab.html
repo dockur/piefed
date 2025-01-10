@@ -1,0 +1,70 @@
+{% from 'bootstrap/form.html' import render_form, render_field %}
+{% set active_child = 'admin_federation' %}
+
+{% block app_content %}
+
+<div class="row">
+    <div class="col">
+        <h1>{{ _('Federation') }}</h1>
+        <form method="post" enctype="multipart/form-data" action="/admin/federation">
+        {{ render_form(form) }}
+        </form>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        <h4>{{ _('Import / Export Bans') }}</h4>
+        <p>Use this to import or export banned instances, domains, tags, and / or users.</p>
+        <p>JSON format:</p>
+        <pre><code>
+            {
+                "banned_instances": ["banned1.social", "banned2.social"], 
+                "allowed_instances": ["allowed1.social", "allowed2.social"], 
+                "banned_domains": ["banned3.social"], 
+                "banned_tags": [{"name":"badtag","display_as":"BaDtAg"},{...}], 
+                "banned_users": ["baduser@banned4.social"] 
+            }</code>
+        </pre>
+        <p>Note: only one of "banned_instances" or "allowed_instances" will be populated.</p>
+
+        <!-- {{ render_field(ban_lists_form.import_submit) }} -->
+        <!-- {{ render_field(ban_lists_form.export_submit) }} -->
+        <form method="post" enctype="multipart/form-data" action="/admin/federation">
+        {{ render_form(ban_lists_form) }}
+        </form>
+    </div>
+</div>
+<hr />
+<fieldset class="coolfieldset border mt-4 p-2 pb-3 mb-4">
+    <legend class="tweak-top">Bulk community import</legend>
+        <div class="row">
+            <div class="column">
+                <h4>{{ _('Remote server scan') }}</h4>
+                <p>{{ _('Use this to scan a remote lemmy server and "pre-load" it\'s communities, as ranked by posts and activity. NSFW communities and communities from banned instances are excluded.') }}</p>
+                <p>{{ _('Input should be in the form of <strong>https://server-name.tld</strong>') }}</p>
+                {% if current_app_debug %}
+                <p>*** This instance is in development mode. This function could cause timeouts depending on how your networking is setup. ***</p>
+                {% endif %}
+                <form method="post" enctype="multipart/form-data" action="/admin/federation">
+                {{ render_form(remote_scan_form) }}
+                </form>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="column">
+                <h4>{{ _('Load communities from Lemmyverse data') }}</h4>
+                <p>{{ _('Use this to "pre-load" known threadiverse communities, as ranked by posts and activity. The list of communities pulls from the same list as <a href="https://lemmyverse.net/communities">LemmyVerse</a>. NSFW communities and communities from banned instances are excluded. Communities with less than 100 posts and less than 500 active users in the past week are excluded.') }}</p>
+                {% if current_app_debug %}
+                <p>*** This instance is in development mode. This function could cause timeouts depending on how your networking is setup. ***</p>
+                {% endif %}
+                <form method="post" enctype="multipart/form-data" action="/admin/federation">
+                {{ render_form(preload_form) }}
+                </form>
+            </div>
+        </div>
+</fieldset>
+<hr />
+{% endblock %}

@@ -4,19 +4,38 @@
     {% extends "base.html" %}
 {% endif %}
 {% from 'bootstrap/form.html' import render_form %}
+{% set active_child = 'admin_home' -%}
 
 {% block app_content %}
 
-<div class="row">
-    <div class="col">
-        {% include 'admin/_nav.html' %}
-    </div>
+<div>
+    <nav id="block_chooser">
+        <div class="nav nav-tabs nav-justified" id="typeTab" role="tablist">
+        <button class="nav-link" id="site-profile-tab"
+            type="button" role="tab" hx-get="/admin/site" hx-target="#myTabContent" hx-trigger="click, load">{{ _('Site Profile') }}</button>
+        <button class="nav-link" id="misc-tab"
+            type="button" role="tab" hx-get="/admin/misc" hx-target="#myTabContent">{{ _('Misc') }}</button>
+        <!-- <button class="nav-link" id="communities-tab" type="button" role="tab" hx-get="/admin/communiteis" hx-target="#myTabContent">{{ _('Communities') }}</button> -->
+        <button class="nav-link" id="topics-tab" 
+            type="button" role="tab" hx-get="/admin/topics" hx-target="#myTabContent">{{ _('Topics') }}</button>
+        <!-- <button class="nav-link" id="users-tab" type="button" role="tab" hx-get="/dev/users" hx-target="#myTabContent">{{ _('Users') }}</button> -->
+        <!-- <button class="nav-link" id="content-tab" type="button" role="tab" hx-get="/dev/content" hx-target="#myTabContent">{{ _('Content') }}</button> -->
+        <!-- <button class="nav-link" id="moderation-tab" type="button" role="tab" hx-get="/dev/moderation" hx-target="#myTabContent">{{ _('Moderation') }}</button> -->
+        <button class="nav-link" id="federation-tab" 
+            type="button" role="tab" hx-get="/admin/federation" hx-target="#myTabContent">{{ _('Federation') }}</button>
+        <!-- <button class="nav-link" id="instances-tab" type="button" role="tab" hx-get="/dev/instances" hx-target="#myTabContent">{{ _('Instances') }}</button> -->
+        <button class="nav-link" id="newsletter-tab" 
+            type="button" role="tab" hx-get="/admin/newsletter" hx-target="#myTabContent">{{ _('Newsletter') }}</button>
+        <button class="nav-link" id="permissions-tab" 
+            type="button" role="tab" hx-get="/admin/permissions" hx-target="#myTabContent">{{ _('Permissions') }}</button>
+        <!-- <button class="nav-link" id="activities-tab" type="button" role="tab" hx-get="/dev/activities" hx-target="#myTabContent">{{ _('Activities') }}</button> -->
+        <!-- <button class="nav-link" id="modlog-tab" type="button" role="tab" hx-get="/modlog" hx-target="#myTabContent">{{ _('Modlog') }}</button> -->
+        </div>
+    </nav>
 </div>
-
-<div class="row">
-    <div class="col">
-        <p>Welcome to the admin area. This page will eventually have some helpful guides and links for new admins but
-        for now it does not.</p>
-    </div>
+<div>
+    <hr>
+    <div class="tab-content" id="myTabContent"></div>
+    <hr>
 </div>
 {% endblock %}

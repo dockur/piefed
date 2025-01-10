@@ -1,0 +1,14 @@
+{% from 'bootstrap/form.html' import render_form %}
+{% set active_child = 'admin_misc' %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col">
+        <h1>{{ _('Misc settings') }}</h1>
+        <form method="post" enctype="multipart/form-data" action="/admin/misc">
+        {{ render_form(form) }}
+        </form>
+    </div>
+</div>
+<hr />
+{% endblock %}

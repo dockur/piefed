@@ -123,6 +123,13 @@ def admin_site():
         db.session.commit()
         set_setting('announcement', form.announcement.data)
         flash('Settings saved.')
+        
+        # Get the referrer from the request headers
+        referrer = request.referrer
+        # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+        if referrer and referrer != request.url:
+            return redirect(referrer)
+
     elif request.method == 'GET':
         form.name.data = site.name
         form.description.data = site.description
@@ -131,7 +138,7 @@ def admin_site():
         form.legal_information.data = site.legal_information
         form.contact_email.data = site.contact_email
         form.announcement.data = get_setting('announcement', '')
-    return render_template('admin/site.html', title=_('Site profile'), form=form,
+    return render_template('admin/site_tab.html', title=_('Site profile'), form=form,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
                            menu_topics=menu_topics(),
@@ -169,6 +176,11 @@ def admin_misc():
         cache.delete_memoized(blocked_referrers)
         set_setting('public_modlog', form.public_modlog.data)
         flash('Settings saved.')
+        # Get the referrer from the request headers
+        referrer = request.referrer
+        # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+        if referrer and referrer != request.url:
+            return redirect(referrer)
     elif request.method == 'GET':
         form.enable_downvotes.data = site.enable_downvotes
         form.allow_local_image_posts.data = site.allow_local_image_posts
@@ -184,7 +196,7 @@ def admin_misc():
         form.show_inoculation_block.data = site.show_inoculation_block
         form.default_theme.data = site.default_theme if site.default_theme is not None else ''
         form.public_modlog.data = get_setting('public_modlog', False)
-    return render_template('admin/misc.html', title=_('Misc settings'), form=form,
+    return render_template('admin/misc_tab.html', title=_('Misc settings'), form=form,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
                            menu_topics=menu_topics(),
@@ -317,7 +329,12 @@ def admin_federation():
                 _('Subscription process for %(communities_to_add)d of %(parsed_communities_sorted)d communities launched in background, check admin/activities for details',
                   communities_to_add=communities_to_add, parsed_communities_sorted=len(parsed_communities_sorted)))
 
-        return redirect(url_for('admin.admin_federation'))
+        # Get the referrer from the request headers
+        referrer = request.referrer
+        # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+        if referrer and referrer != request.url:
+            return redirect(referrer)
+        # return redirect(url_for('admin.admin_federation'))
 
     # this is the remote server scan
     elif remote_scan_form.remote_scan_submit.data and remote_scan_form.validate():
@@ -463,7 +480,12 @@ def admin_federation():
                             Communities to join request: {communities_requested}, \
                             Communities to join based on current filters: {len(community_urls_to_join)}."
                 flash(_(message))
-                return redirect(url_for('admin.admin_federation'))
+                # Get the referrer from the request headers
+                referrer = request.referrer
+                # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+                if referrer and referrer != request.url:
+                    return redirect(referrer)
+                # return redirect(url_for('admin.admin_federation'))
 
         if is_mbin:
             # loop through and send the right number of requests to the remote endpoint for mbin
@@ -536,7 +558,12 @@ def admin_federation():
                             Magazines to join request: {communities_requested}, \
                             Magazines to join based on current filters: {len(community_urls_to_join)}."
                 flash(_(message))
-                return redirect(url_for('admin.admin_federation'))
+                # Get the referrer from the request headers
+                referrer = request.referrer
+                # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+                if referrer and referrer != request.url:
+                    return redirect(referrer)
+                # return redirect(url_for('admin.admin_federation'))
 
         user = User.query.get(1)
         remote_scan_messages = []
@@ -561,7 +588,12 @@ def admin_federation():
                 _('Based on current filters, the subscription process for %(communities_to_join)d of %(candidate_communities)d communities launched in background, check admin/activities for details',
                   communities_to_join=len(community_urls_to_join), candidate_communities=len(candidate_communities)))
 
-        return redirect(url_for('admin.admin_federation'))
+        # Get the referrer from the request headers
+        referrer = request.referrer
+        # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+        if referrer and referrer != request.url:
+            return redirect(referrer)
+        # return redirect(url_for('admin.admin_federation'))
 
     # this is the import bans button
     elif ban_lists_form.import_submit.data and ban_lists_form.validate():
@@ -585,10 +617,20 @@ def admin_federation():
             else:
                 import_bans_task.delay(final_place)
                 flash(_(f'Ban imports started in a background process.'))
-                return redirect(url_for('admin.admin_federation'))
+                # Get the referrer from the request headers
+                referrer = request.referrer
+                # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+                if referrer and referrer != request.url:
+                    return redirect(referrer)
+                # return redirect(url_for('admin.admin_federation'))
         else:
             flash(_(f'Ban imports requested, but no json provided.'))
-            return redirect(url_for('admin.admin_federation'))
+            # Get the referrer from the request headers
+            referrer = request.referrer
+            # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+            if referrer and referrer != request.url:
+                return redirect(referrer)
+            # return redirect(url_for('admin.admin_federation'))
 
     # this is the export bans button
     elif ban_lists_form.export_submit.data and ban_lists_form.validate():
@@ -686,6 +728,11 @@ def admin_federation():
         db.session.commit()
 
         flash(_('Admin settings saved'))
+        # Get the referrer from the request headers
+        referrer = request.referrer
+        # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+        if referrer and referrer != request.url:
+            return redirect(referrer)
     
     # this is just the regular page load
     elif request.method == 'GET':
@@ -699,7 +746,7 @@ def admin_federation():
         form.blocked_phrases.data = g.site.blocked_phrases
         form.blocked_actors.data = get_setting('actor_blocked_words', '88')
 
-    return render_template('admin/federation.html', title=_('Federation settings'), 
+    return render_template('admin/federation_tab.html', title=_('Federation settings'), 
                            form=form, preload_form=preload_form, ban_lists_form=ban_lists_form,
                            remote_scan_form=remote_scan_form, current_app_debug=current_app.debug,
                            moderating_communities=moderating_communities(current_user.get_id()),
@@ -1071,7 +1118,7 @@ def unsubscribe_everyone_then_delete_task(community_id):
 @permission_required('administer all communities')
 def admin_topics():
     topics = topic_tree()
-    return render_template('admin/topics.html', title=_('Topics'), topics=topics,
+    return render_template('admin/topics_tab.html', title=_('Topics'), topics=topics,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
                            menu_topics=menu_topics(),
@@ -1480,9 +1527,14 @@ def newsletter():
     if form.validate_on_submit():
         send_newsletter(form)
         flash('Newsletter sent')
-        return redirect(url_for('admin.newsletter'))
+        # Get the referrer from the request headers
+        referrer = request.referrer
+        # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+        if referrer and referrer != request.url:
+            return redirect(referrer)
+        # return redirect(url_for('admin.newsletter'))
 
-    return render_template("admin/newsletter.html", form=form, title=_('Send newsletter'),
+    return render_template("admin/newsletter_tab.html", form=form, title=_('Send newsletter'),
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
                            menu_topics=menu_topics(),
@@ -1505,11 +1557,16 @@ def admin_permissions():
         db.session.commit()
 
         flash(_('Settings saved'))
+        # Get the referrer from the request headers
+        referrer = request.referrer
+        # If the referrer exists and is not the same as the current request URL, redirect to the referrer
+        if referrer and referrer != request.url:
+            return redirect(referrer)
 
     roles = Role.query.filter(Role.id > 2).order_by(Role.weight).all()
     permissions = db.session.execute(text('SELECT DISTINCT permission FROM "role_permission"')).fetchall()
 
-    return render_template('admin/permissions.html', title=_('Role permissions'), roles=roles,
+    return render_template('admin/permissions_tab.html', title=_('Role permissions'), roles=roles,
                            permissions=permissions,
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),

@@ -1,0 +1,40 @@
+{% from 'bootstrap/form.html' import render_form %}
+{% set active_child = 'admin_topics' %}
+
+{% block app_content %}
+{% macro render_topic(topic, depth) %}
+    <tr>
+        <td nowrap="nowrap">{{ '--' * depth }} <a href="/topic/{{ topic['topic'].path() }}">{{ topic['topic'].name }}</a></td>
+        <td>{{ topic['topic'].num_communities  }}</td>
+        <td><a href="{{ url_for('admin.admin_topic_edit', topic_id=topic['topic'].id) }}">Edit</a> |
+            {% if topic['topic'].num_communities == 0 %}
+                <a href="{{ url_for('admin.admin_topic_delete', topic_id=topic['topic'].id) }}" class="confirm_first">Delete</a>
+            {% else %}
+                Delete
+            {% endif %}
+        </td>
+    </tr>
+    {% if topic['children'] %}
+        {% for topic in topic['children'] %}
+            {{ render_topic(topic, depth + 1)|safe }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+<div class="row">
+    <div class="col">
+        <h1><a href="{{ url_for('admin.admin_topic_add') }}" class="btn btn-primary" style="float: right;">{{ _('Add topic') }}</a>{{ _('Topics') }}</h1>
+        <table class="table table-striped">
+            <tr>
+               <th>Name</th>
+               <th># Communities</th>
+               <th>Actions</th>
+            </tr>
+            {% for topic in topics %}
+                {{ render_topic(topic, 0)|safe }}
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<hr />
+{% endblock %}

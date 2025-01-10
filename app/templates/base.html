@@ -224,20 +224,21 @@
                                 <li class="nav-item dropdown{% if active_parent == 'admin' %} active{% endif %}">
                                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/admin/" aria-haspopup="true" aria-expanded="false">{{ _('Admin') }}</a>
                                     <ul class="dropdown-menu">
-                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_site' }}" href="{{ url_for('admin.admin_site') }}">{{ _('Site profile') }}</a></li>
-                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_misc' }}" href="{{ url_for('admin.admin_misc') }}">{{ _('Misc settings') }}</a></li>
+                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_home' }}" href="{{ url_for('admin.admin_home') }}">{{ _('Admin Home') }}</a></li>
+                                      <!-- <li><a class="dropdown-item{{ ' active' if active_child == 'admin_site' }}" href="{{ url_for('admin.admin_site') }}">{{ _('Site profile') }}</a></li> -->
+                                      <!-- <li><a class="dropdown-item{{ ' active' if active_child == 'admin_misc' }}" href="{{ url_for('admin.admin_misc') }}">{{ _('Misc settings') }}</a></li> -->
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_communities' }}" href="{{ url_for('admin.admin_communities') }}">{{ _('Communities') }}</a></li>
-                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_topics' }}" href="{{ url_for('admin.admin_topics') }}">{{ _('Topics') }}</a></li>
+                                      <!-- <li><a class="dropdown-item{{ ' active' if active_child == 'admin_topics' }}" href="{{ url_for('admin.admin_topics') }}">{{ _('Topics') }}</a></li> -->
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_users' }}" href="{{ url_for('admin.admin_users', local_remote='local') }}">{{ _('Users') }}</a></li>
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_content' }}" href="{{ url_for('admin.admin_content') }}">{{ _('Content') }}</a></li>
                                         {% if g.site.registration_mode == 'RequireApplication' %}
                                             <li><a class="dropdown-item{{ ' active' if active_child == 'admin_approve_registrations' }}" href="{{ url_for('admin.admin_approve_registrations') }}">{{ _('Registration applications') }}</a></li>
                                         {% endif %}
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_reports' }}" href="{{ url_for('admin.admin_reports') }}">{{ _('Moderation') }}</a></li>
-                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_federation' }}" href="{{ url_for('admin.admin_federation') }}">{{ _('Federation') }}</a></li>
+                                      <!-- <li><a class="dropdown-item{{ ' active' if active_child == 'admin_federation' }}" href="{{ url_for('admin.admin_federation') }}">{{ _('Federation') }}</a></li> -->
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_instances' }}" href="{{ url_for('admin.admin_instances') }}">{{ _('Instances') }}</a></li>
-                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_newsletter' }}" href="{{ url_for('admin.newsletter') }}">{{ _('Newsletter') }}</a></li>
-                                      <li><a class="dropdown-item{{ ' active' if active_child == 'admin_permissions' }}" href="{{ url_for('admin.admin_permissions') }}">{{ _('Permissions') }}</a></li>
+                                      <!-- <li><a class="dropdown-item{{ ' active' if active_child == 'admin_newsletter' }}" href="{{ url_for('admin.newsletter') }}">{{ _('Newsletter') }}</a></li> -->
+                                      <!-- <li><a class="dropdown-item{{ ' active' if active_child == 'admin_permissions' }}" href="{{ url_for('admin.admin_permissions') }}">{{ _('Permissions') }}</a></li> -->
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'admin_activities' }}" href="{{ url_for('admin.admin_activities') }}">{{ _('Activities') }}</a></li>
                                       <li><a class="dropdown-item{{ ' active' if active_child == 'modlog' }}" href="{{ url_for('main.modlog') }}">{{ _('Modlog') }}</a></li>
                                         {% if debug_mode %}
