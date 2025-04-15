@@ -1,10 +1,11 @@
+import re
 from app import db
-from app.api.alpha.views import user_view, reply_view
+from app.api.alpha.views import user_view, reply_view, post_view, community_view
 from app.utils import authorise_api_user
 from app.api.alpha.utils.post import get_post_list
 from app.api.alpha.utils.reply import get_reply_list
 from app.api.alpha.utils.validators import required, integer_expected, boolean_expected
-from app.models import Conversation, ChatMessage, Notification, PostReply, User
+from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user
 from app.constants import *
 
@@ -198,3 +199,439 @@ def put_user_save_user_settings(auth, data):
     user_json = {"my_user": user_view(user=user, variant=6)}
     return user_json
 
+
+def get_user_notifications(auth, data):
+    pass
+
+
+def get_user_notifs_no_auth(data):
+    # get the user from data.user_id
+    user = User.query.get(data['user_id'])
+    # get the status from data.status_request
+    status = data['status_request']
+
+    # it could be optimized better, but lets just get the info one by one for now
+
+    # NOTIF_USER
+    all_notif_user_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_USER).count()
+    new_notif_user_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_USER).filter_by(read=False).count()
+
+    # NOTIF_COMMUNITY
+    all_notif_community_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_COMMUNITY).count()
+    new_notif_community_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_COMMUNITY).filter_by(read=False).count()
+
+    # NOTIF_TOPIC
+    all_notif_topic_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_TOPIC).count()
+    new_notif_topic_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_TOPIC).filter_by(read=False).count()
+
+    # NOTIF_POST
+    all_notif_post_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_POST).count()
+    new_notif_post_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_POST).filter_by(read=False).count()
+
+    # NOTIF_REPLY
+    all_notif_reply_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_REPLY).count()
+    new_notif_reply_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_REPLY).filter_by(read=False).count()
+
+    # NOTIF_MENTION
+    all_notif_mention_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_MENTION).count()
+    new_notif_mention_count = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_MENTION).filter_by(read=False).count()
+
+
+    # get counts for new/read/all
+    counts = {}
+    counts['total_notifications'] = all_notif_user_count + all_notif_community_count + \
+        all_notif_topic_count + all_notif_post_count + all_notif_reply_count + all_notif_mention_count
+    counts['new_notifications'] = new_notif_user_count + new_notif_community_count + \
+        new_notif_topic_count + new_notif_post_count + new_notif_reply_count + new_notif_mention_count
+
+    counts['all_notif_user_count'] = all_notif_user_count
+    counts['all_notif_community_count'] = all_notif_community_count
+    counts['all_notif_topic_count'] = all_notif_topic_count
+    counts['all_notif_post_count'] = all_notif_post_count
+    counts['all_notif_reply_count'] = all_notif_reply_count
+    counts['all_notif_mention_count'] = all_notif_mention_count
+
+    counts['new_notif_user_count'] = new_notif_user_count
+    counts['new_notif_community_count'] = new_notif_community_count
+    counts['new_notif_topic_count'] = new_notif_topic_count
+    counts['new_notif_post_count'] = new_notif_post_count
+    counts['new_notif_reply_count'] = new_notif_reply_count
+    counts['new_notif_mention_count'] = new_notif_mention_count
+
+    counts['read_notifications'] = counts['total_notifications'] - counts['new_notifications']
+
+    # items dict
+    items = []
+
+    # new
+    if status == 'new':
+        # get all the unread NOTIF_USER
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        new_notif_user_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_USER).filter_by(read=False).all()
+        for item in new_notif_user_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_USER
+            notification_json['notif_type_subtype'] = 'new_post_from_followed_user'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            items.append(notification_json)
+
+        # get all the unread NOTIF_COMMUNITY
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        #  - get the community info from the post.community_id
+        new_notif_community_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_COMMUNITY).filter_by(read=False).all()
+        for item in new_notif_community_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            community = Community.query.get(post.community_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_COMMUNITY
+            notification_json['notif_type_subtype'] = 'new_post_in_followed_community'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['community'] = community_view(community, variant=2)
+            items.append(notification_json)
+
+        # get all the unread NOTIF_TOPIC
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        new_notif_topic_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_TOPIC).filter_by(read=False).all()
+        for item in new_notif_topic_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_TOPIC
+            notification_json['notif_type_subtype'] = 'new_post_in_followed_topic'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            items.append(notification_json)
+
+        # get all the unread NOTIF_POST
+        # for each one
+        #  - get the author info
+        #  - get the postid and commentid from re.findall 
+        #  - get the post info
+        #  - get the comment info
+        new_notif_post_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_POST).filter_by(read=False).all()
+        for item in new_notif_post_items:
+            author = User.query.get(item.author_id)
+            # returns a list[] of numbers found, left-to-right in the url string
+            post_and_comment_ids = re.findall(r'\d+', item.url) 
+            post = Post.query.get(post_and_comment_ids[0])
+            comment = PostReply.query.get(post_and_comment_ids[1])
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_POST
+            notification_json['notif_type_subtype'] = 'top_level_comment_on_followed_post'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['comment'] = reply_view(comment, variant=1)
+            items.append(notification_json)
+
+        # get all the unread NOTIF_REPLY
+        # for each one
+        #  - get the author info
+        #  - get the postid and commentid from re.findall 
+        #  - get the post info
+        #  - get the comment info
+        new_notif_reply_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_REPLY).filter_by(read=False).all()
+        for item in new_notif_reply_items:
+            author = User.query.get(item.author_id)
+            # returns a list[] of numbers found, left-to-right in the url string
+            post_and_comment_ids = re.findall(r'\d+', item.url) 
+            post = Post.query.get(post_and_comment_ids[0])
+            comment = PostReply.query.get(post_and_comment_ids[1])
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_REPLY
+            notification_json['notif_type_subtype'] = 'new_reply_on_followed_comment'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['comment'] = reply_view(comment, variant=1)
+            items.append(notification_json)            
+
+        # get all the unread NOTIF_MENTION
+        # for each one
+        #  - get the author info
+        #  - figure out if it's a post mention or comment mention
+        #  - get the post/commentid from re.findall and then get the post/comment info
+        new_notif_mention_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_MENTION).filter_by(read=False).all()
+        for item in new_notif_mention_items:
+            notification_json = {}
+            if 'post' in item.url:
+                author = User.query.get(item.author_id)
+                post_id = re.findall(r'\d+', item.url)[0]
+                post = Post.query.get(post_id)
+                notification_json['author'] = user_view(user=author.id, variant=3)
+                notification_json['post'] = post_view(post, variant=2)
+                notification_json['notif_type'] = NOTIF_MENTION
+                notification_json['notif_type_subtype'] = 'post_mention'
+                items.append(notification_json)
+            if 'comment' in item.url:
+                author = User.query.get(item.author_id)
+                comment_id = re.findall(r'\d+', item.url)[0]
+                comment = PostReply.query.get(comment_id)
+                notification_json['author'] = user_view(user=author.id, variant=3)
+                notification_json['comment'] = reply_view(comment, variant=1)
+                notification_json['notif_type'] = NOTIF_MENTION
+                notification_json['notif_type_subtype'] = 'comment_mention'
+                items.append(notification_json)
+
+    # all
+    elif status == 'all':
+        # get all the NOTIF_USER
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        all_notif_user_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_USER).all()
+        for item in all_notif_user_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_USER
+            notification_json['notif_type_subtype'] = 'new_post_from_followed_user'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            items.append(notification_json)        
+
+        # get all the NOTIF_COMMUNITY
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        #  - get the community info from the post.community_id
+        all_notif_community_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_COMMUNITY).all()
+        for item in all_notif_community_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            community = Community.query.get(post.community_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_COMMUNITY
+            notification_json['notif_type_subtype'] = 'new_post_in_followed_community'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['community'] = community_view(community, variant=2)
+            items.append(notification_json)
+
+        # get all the NOTIF_TOPIC
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        all_notif_topic_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_TOPIC).all()
+        for item in all_notif_topic_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_TOPIC
+            notification_json['notif_type_subtype'] = 'new_post_in_followed_topic'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            items.append(notification_json)              
+
+        # get all the NOTIF_POST
+        # for each one
+        #  - get the author info
+        #  - get the postid and commentid from re.findall 
+        #  - get the post info
+        #  - get the comment info
+        all_notif_post_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_POST).all()
+        for item in all_notif_post_items:
+            author = User.query.get(item.author_id)
+            # returns a list[] of numbers found, left-to-right in the url string
+            post_and_comment_ids = re.findall(r'\d+', item.url) 
+            post = Post.query.get(post_and_comment_ids[0])
+            comment = PostReply.query.get(post_and_comment_ids[1])
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_POST
+            notification_json['notif_type_subtype'] = 'top_level_comment_on_followed_post'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['comment'] = reply_view(comment, variant=1)
+            items.append(notification_json)            
+
+        # get all the NOTIF_REPLY
+        # for each one
+        #  - get the author info
+        #  - get the postid and commentid from re.findall 
+        #  - get the post info
+        #  - get the comment info
+        all_notif_reply_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_REPLY).all()
+        for item in all_notif_reply_items:
+            author = User.query.get(item.author_id)
+            # returns a list[] of numbers found, left-to-right in the url string
+            post_and_comment_ids = re.findall(r'\d+', item.url) 
+            post = Post.query.get(post_and_comment_ids[0])
+            comment = PostReply.query.get(post_and_comment_ids[1])
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_REPLY
+            notification_json['notif_type_subtype'] = 'new_reply_on_followed_comment'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['comment'] = reply_view(comment, variant=1)
+            items.append(notification_json)               
+
+        # get all the NOTIF_MENTION
+        # for each one
+        #  - get the author info
+        #  - figure out if it's a post mention or comment mention
+        #  - get the post/commentid from re.findall and then get the post/comment info
+        all_notif_mention_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_MENTION).all()
+        for item in all_notif_mention_items:
+            notification_json = {}
+            if 'post' in item.url:
+                author = User.query.get(item.author_id)
+                post_id = re.findall(r'\d+', item.url)[0]
+                post = Post.query.get(post_id)
+                notification_json['author'] = user_view(user=author.id, variant=3)
+                notification_json['post'] = post_view(post, variant=2)
+                notification_json['notif_type'] = NOTIF_MENTION
+                notification_json['notif_type_subtype'] = 'post_mention'
+                items.append(notification_json)            
+            if 'comment' in item.url:
+                author = User.query.get(item.author_id)
+                comment_id = re.findall(r'\d+', item.url)[0]
+                comment = PostReply.query.get(comment_id)
+                notification_json['author'] = user_view(user=author.id, variant=3)
+                notification_json['comment'] = reply_view(comment, variant=1)
+                notification_json['notif_type'] = NOTIF_MENTION
+                notification_json['notif_type_subtype'] = 'comment_mention'
+                items.append(notification_json)            
+
+    # read
+    elif status == 'read':
+        # get all the read NOTIF_USER
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        read_notif_user_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_USER).filter_by(read=True).all()
+        for item in read_notif_user_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_USER
+            notification_json['notif_type_subtype'] = 'new_post_from_followed_user'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            items.append(notification_json)        
+
+        # get all the read NOTIF_COMMUNITY
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        #  - get the community info from the post.community_id
+        read_notif_community_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_COMMUNITY).filter_by(read=True).all()
+        for item in read_notif_community_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            community = Community.query.get(post.community_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_COMMUNITY
+            notification_json['notif_type_subtype'] = 'new_post_in_followed_community'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['community'] = community_view(community, variant=2)
+            items.append(notification_json)
+
+        # get all the read NOTIF_TOPIC
+        # for each one
+        #  - get the author info
+        #  - get the postid from re.findall and then get the post info
+        read_notif_topic_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_TOPIC).filter_by(read=True).all()
+        for item in read_notif_topic_items:
+            author = User.query.get(item.author_id)
+            post_id = re.findall(r'\d+', item.url)[0]
+            post = Post.query.get(post_id)
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_TOPIC
+            notification_json['notif_type_subtype'] = 'new_post_in_followed_topic'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            items.append(notification_json) 
+
+        # get all the read NOTIF_POST
+        # for each one
+        #  - get the author info
+        #  - get the postid and commentid from re.findall 
+        #  - get the post info
+        #  - get the comment info
+        read_notif_post_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_POST).filter_by(read=True).all()
+        for item in read_notif_post_items:
+            author = User.query.get(item.author_id)
+            # returns a list[] of numbers found, left-to-right in the url string
+            post_and_comment_ids = re.findall(r'\d+', item.url) 
+            post = Post.query.get(post_and_comment_ids[0])
+            comment = PostReply.query.get(post_and_comment_ids[1])
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_POST
+            notification_json['notif_type_subtype'] = 'top_level_comment_on_followed_post'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['comment'] = reply_view(comment, variant=1)
+            items.append(notification_json)            
+
+        # get all the read NOTIF_REPLY
+        # for each one
+        #  - get the author info
+        #  - get the postid and commentid from re.findall 
+        #  - get the post info
+        #  - get the comment info
+        read_notif_reply_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_REPLY).filter_by(read=True).all()
+        for item in read_notif_reply_items:
+            author = User.query.get(item.author_id)
+            # returns a list[] of numbers found, left-to-right in the url string
+            post_and_comment_ids = re.findall(r'\d+', item.url) 
+            post = Post.query.get(post_and_comment_ids[0])
+            comment = PostReply.query.get(post_and_comment_ids[1])
+            notification_json = {}
+            notification_json['notif_type'] = NOTIF_REPLY
+            notification_json['notif_type_subtype'] = 'new_reply_on_followed_comment'
+            notification_json['author'] = user_view(user=author.id, variant=3)
+            notification_json['post'] = post_view(post, variant=2)
+            notification_json['comment'] = reply_view(comment, variant=1)
+            items.append(notification_json)               
+
+        # get all the read NOTIF_MENTION
+        # for each one
+        #  - get the author info
+        #  - figure out if it's a post mention or comment mention
+        #  - get the post/commentid from re.findall and then get the post/comment info
+        read_notif_mention_items = Notification.query.filter_by(user_id=user.id).filter_by(notif_type=NOTIF_MENTION).filter_by(read=True).all()
+        for item in read_notif_mention_items:
+            notification_json = {}
+            if 'post' in item.url:
+                author = User.query.get(item.author_id)
+                post_id = re.findall(r'\d+', item.url)[0]
+                post = Post.query.get(post_id)
+                notification_json['author'] = user_view(user=author.id, variant=3)
+                notification_json['post'] = post_view(post, variant=2)
+                notification_json['notif_type'] = NOTIF_MENTION
+                notification_json['notif_type_subtype'] = 'post_mention'
+                items.append(notification_json)            
+            if 'comment' in item.url:
+                author = User.query.get(item.author_id)
+                comment_id = re.findall(r'\d+', item.url)[0]
+                comment = PostReply.query.get(comment_id)
+                notification_json['author'] = user_view(user=author.id, variant=3)
+                notification_json['comment'] = reply_view(comment, variant=1)
+                notification_json['notif_type'] = NOTIF_MENTION
+                notification_json['notif_type_subtype'] = 'comment_mention'
+
+    # make dicts of that and pass back
+    res = {}
+    res['user'] = user.user_name
+    res['status'] = status
+    res['counts'] = counts
+    res['items'] = items
+    return res
