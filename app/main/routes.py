@@ -93,6 +93,11 @@ def home_page(sort, view_filter):
     else:
         content_filters = user_filters_home(current_user.id)
 
+    # read posts
+    if current_user.is_authenticated and current_user.hide_read_posts:
+        posts = posts.outerjoin(read_posts, (Post.id == read_posts.c.read_post_id) & (read_posts.c.user_id == current_user.id))
+        posts = posts.filter(read_posts.c.read_post_id.is_(None))  # Filter where there is no corresponding read post for the current user
+
     # Pagination
     next_url = url_for('main.index', page=page + 1, sort=sort, view_filter=view_filter, result_id=result_id) if has_next_page else None
     prev_url = url_for('main.index', page=page - 1, sort=sort, view_filter=view_filter, result_id=result_id) if page > 0 else None
