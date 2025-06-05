@@ -1170,7 +1170,7 @@ time {
 #masonry .item .masonry_info {
   position: absolute;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.7);
   width: 100%;
   text-align: center;
 }
@@ -1233,6 +1233,9 @@ time {
 #masonry .item .masonry_info .row .col .upvote_button.voted_down, #masonry .item .masonry_info .row .col .downvote_button.voted_down {
   color: red;
 }
+#masonry .item .masonry_info .row .col-3 {
+  width: 20%;
+}
 #masonry .item .masonry_info .row .col-8 {
   justify-content: center;
 }
@@ -1244,18 +1247,24 @@ time {
 #masonry .item .masonry_info .row .reply_col {
   justify-content: right;
   padding-right: 5px;
+  flex-grow: 1;
 }
 #masonry .item .masonry_info_no_image {
   background-color: rgba(0, 0, 0, 0.2);
   width: 100%;
   text-align: center;
+  min-height: 8rem;
+  display: flex;
 }
 #masonry .item .masonry_info_no_image p {
   margin-bottom: 0;
+  flex-grow: 1;
+  display: flex;
 }
 #masonry .item .masonry_info_no_image p a {
   color: var(--bs-body-color);
   text-decoration: none;
+  flex-grow: 1;
 }
 
 @media (min-width: 992px) {
