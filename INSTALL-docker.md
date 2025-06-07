@@ -4,6 +4,8 @@
 - Registered domain name for external access
 - Require SSL connection (Nginx/Caddy reverse proxy, cloudflare zero trust tunnel, tailscale, ngrok, etc.)
 
+Note that SSL is not a hard requirement for local testing or development. By including `HTTP_PROTOCOL='http'` in the `.env.docker` file, some features will play a little nicer without SSL. This is not a teribly well-vetted workflow, so there might still be cases in which SSL is expected/required (such as S3 usage). This is primarily intended to ease development of basic features or UI changes.
+
 
 #### COPY GITHUB REPOSITORY INTO A NEW DIRECTORY (PYFEDI/)
 ```bash

@@ -356,7 +356,7 @@ def edit_post(input, post, type, src, user=None, auth=None, uploaded_file=None, 
             else:
                 raise Exception('filetype not allowed')
 
-        url = f"https://{current_app.config['SERVER_NAME']}/{final_place.replace('app/', '')}"
+        url = f"{current_app.config['HTTP_PROTOCOL']}://{current_app.config['SERVER_NAME']}/{final_place.replace('app/', '')}"
 
         if current_app.config['IMAGE_HASHING_ENDPOINT']: # and not user.trustworthy():
             hash = retrieve_image_hash(url)
