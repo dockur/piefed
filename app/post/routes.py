@@ -903,7 +903,7 @@ def post_purge(post_id: int):
     return redirect(url_for('user.show_profile_by_id', user_id=post.user_id))
 
 
-@bp.route('/post/<int:post_id>/bookmark', methods=['GET', 'POST'])
+@bp.route('/post/<int:post_id>/bookmark', methods=['POST'])
 @login_required
 def post_bookmark(post_id: int):
     try:
@@ -914,7 +914,7 @@ def post_bookmark(post_id: int):
     return render_template('post/_bookmark_add_remove.html', post_id=post_id, action_type="add", item_type="post")
 
 
-@bp.route('/post/<int:post_id>/remove_bookmark', methods=['GET', 'POST'])
+@bp.route('/post/<int:post_id>/remove_bookmark', methods=['POST'])
 @login_required
 def post_remove_bookmark(post_id: int):
     try:
@@ -925,7 +925,7 @@ def post_remove_bookmark(post_id: int):
     return render_template('post/_bookmark_add_remove.html', post_id=post_id, action_type="remove", item_type="post")
 
 
-@bp.route('/post/<int:post_id>/comment/<int:comment_id>/bookmark', methods=['GET', 'POST'])
+@bp.route('/post/<int:post_id>/comment/<int:comment_id>/bookmark', methods=['POST'])
 @login_required
 def post_reply_bookmark(post_id: int, comment_id: int):
     try:
@@ -937,7 +937,7 @@ def post_reply_bookmark(post_id: int, comment_id: int):
                            action_type="add", item_type="reply")
 
 
-@bp.route('/post/<int:post_id>/comment/<int:comment_id>/remove_bookmark', methods=['GET', 'POST'])
+@bp.route('/post/<int:post_id>/comment/<int:comment_id>/remove_bookmark', methods=['POST'])
 @login_required
 def post_reply_remove_bookmark(post_id: int, comment_id: int):
     try:
