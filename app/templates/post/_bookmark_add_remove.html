@@ -1,0 +1,13 @@
+{% if action_type == "remove" and item_type == "post" -%}
+<a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Bookmark') }}"
+  hx-post="/post/{{ post_id }}/bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Bookmark') }}</a>
+{% elif action_type == "add" and item_type == "post" -%}
+<a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Remove bookmark') }}"
+  hx-post="/post/{{ post_id }}/remove_bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Remove bookmark') }}</a>
+{% elif action_type == "remove" and item_type == "reply" -%}
+<a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Bookmark') }}"
+  hx-post="/post/{{ post_id }}/comment/{{ reply_id }}/bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Bookmark') }}</a>
+{% elif action_type == "add" and item_type == "reply" -%}
+<a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Remove bookmark') }}"
+  hx-post="/post/{{ post_id }}/comment/{{ reply_id }}/remove_bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Remove bookmark') }}</a>
+{% endif -%}

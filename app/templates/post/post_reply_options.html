@@ -34,11 +34,11 @@
         {% endif -%}
     {% endif -%}
     {% if existing_bookmark -%}
-        <li><a href="{{ url_for('post.post_reply_remove_bookmark', post_id=post.id, comment_id=post_reply.id) }}" class="dropdown-item no-underline" rel="nofollow"><span class="fe fe-bookmark"></span>
-                {{ _('Remove bookmark') }}</a></li>
+      <a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Remove bookmark') }}"
+        hx-post="/post/{{ post.id }}/comment/{{ post_reply.id }}/remove_bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Remove bookmark') }}</a>
     {% else -%}
-    <li><a href="{{ url_for('post.post_reply_bookmark', post_id=post.id, comment_id=post_reply.id) }}" class="dropdown-item no-underline" rel="nofollow"><span class="fe fe-bookmark"></span>
-                {{ _('Bookmark') }}</a></li>
+      <a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Bookmark') }}"
+        hx-post="/post/{{ post.id }}/comment/{{ post_reply.id }}/bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Bookmark') }}</a>
     {% endif -%}
     {% if post_reply.user_id != current_user.id -%}
         <li><a href="{{ url_for('post.post_reply_block_user', post_id=post.id, comment_id=post_reply.id) }}" class="dropdown-item no-underline"><span class="fe fe-block"></span>

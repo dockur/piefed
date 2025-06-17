@@ -51,8 +51,6 @@ def bookmark_reply(reply_id: int, src, auth=None):
     if not existing_bookmark:
         db.session.add(PostReplyBookmark(post_reply_id=reply_id, user_id=user_id))
         db.session.commit()
-        if src == SRC_WEB:
-            flash(_('Bookmark added.'))
     else:
         msg = 'This comment has already been bookmarked.'
         if src == SRC_API:
@@ -72,8 +70,6 @@ def remove_bookmark_reply(reply_id: int, src, auth=None):
     if existing_bookmark:
         db.session.delete(existing_bookmark)
         db.session.commit()
-        if src == SRC_WEB:
-            flash(_('Bookmark has been removed.'))
     else:
         msg = 'This comment was not bookmarked.'
         if src == SRC_API:

@@ -33,11 +33,11 @@
         {% endif -%}
     {% endif -%}
     {% if existing_bookmark -%}
-        <li><a href="{{ url_for('post.post_remove_bookmark', post_id=post.id) }}" style="white-space: normal" class="dropdown-item no-underline" rel="nofollow noindex"><span class="fe fe-bookmark"></span>
-                {{ _('Remove bookmark') }}</a></li>
+        <li><a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Remove bookmark') }}"
+          hx-post="/post/{{ post.id }}/remove_bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Remove bookmark') }}</a></li>
     {% else -%}
-        <li><a href="{{ url_for('post.post_bookmark', post_id=post.id) }}" style="white-space: normal" class="dropdown-item no-underline" rel="nofollow noindex"><span class="fe fe-bookmark"></span>
-                {{ _('Bookmark') }}</a></li>
+        <li><a class="dropdown-item no-underline" role="button" style="white-space: normal" aria-label="{{ _('Bookmark') }}"
+          hx-post="/post/{{ post.id }}/bookmark" hx-trigger="click throttle:1s" hx-target="this" hx-swap="outerHTML" tabindex="0"><span class="fe fe-bookmark"></span> {{ _('Bookmark') }}</a></li>
     {% endif -%}
     {% if post.user_id == current_user.id and not post.mea_culpa -%}
         <li><a href="{{ url_for('post.post_mea_culpa', post_id=post.id) }}" style="white-space: normal" class="dropdown-item no-underline"><span class="fe fe-mea-culpa"></span>

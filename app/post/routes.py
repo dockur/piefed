@@ -911,7 +911,7 @@ def post_bookmark(post_id: int):
     except NoResultFound:
         abort(404)
 
-    return redirect(referrer(url_for('activitypub.post_ap', post_id=post_id)))
+    return render_template('post/_bookmark_add_remove.html', post_id=post_id, action_type="add", item_type="post")
 
 
 @bp.route('/post/<int:post_id>/remove_bookmark', methods=['GET', 'POST'])
@@ -922,7 +922,19 @@ def post_remove_bookmark(post_id: int):
     except NoResultFound:
         abort(404)
 
-    return redirect(referrer(url_for('activitypub.post_ap', post_id=post_id)))
+    return render_template('post/_bookmark_add_remove.html', post_id=post_id, action_type="remove", item_type="post")
+
+
+@bp.route('/post/<int:post_id>/comment/<int:comment_id>/bookmark', methods=['GET', 'POST'])
+@login_required
+def post_reply_bookmark(post_id: int, comment_id: int):
+    try:
+        bookmark_reply(comment_id, SRC_WEB)
+    except NoResultFound:
+        abort(404)
+
+    return render_template('post/_bookmark_add_remove.html', post_id=post_id, reply_id=comment_id,
+                           action_type="add", item_type="reply")
 
 
 @bp.route('/post/<int:post_id>/comment/<int:comment_id>/remove_bookmark', methods=['GET', 'POST'])
@@ -933,7 +945,8 @@ def post_reply_remove_bookmark(post_id: int, comment_id: int):
     except NoResultFound:
         abort(404)
 
-    return redirect(url_for('activitypub.post_ap', post_id=post_id))
+    return render_template('post/_bookmark_add_remove.html', post_id=post_id, reply_id=comment_id,
+                           action_type="remove", item_type="reply")
 
 
 @bp.route('/post/<int:post_id>/report', methods=['GET', 'POST'])
@@ -1197,17 +1210,6 @@ def post_reply_report(post_id: int, comment_id: int):
         form.report_remote.data = True
 
     return render_template('post/post_reply_report.html', title=_('Report comment'), form=form, post=post, post_reply=post_reply)
-
-
-@bp.route('/post/<int:post_id>/comment/<int:comment_id>/bookmark', methods=['GET'])
-@login_required
-def post_reply_bookmark(post_id: int, comment_id: int):
-    try:
-        bookmark_reply(comment_id, SRC_WEB)
-    except NoResultFound:
-        abort(404)
-
-    return redirect(url_for('activitypub.post_ap', post_id=post_id, _anchor=f'comment_{comment_id}'))
 
 
 @bp.route('/post/<int:post_id>/comment/<int:comment_id>/block_user', methods=['GET', 'POST'])

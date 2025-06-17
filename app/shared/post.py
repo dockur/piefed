@@ -62,8 +62,6 @@ def bookmark_post(post_id: int, src, auth=None):
     if not existing_bookmark:
         db.session.add(PostBookmark(post_id=post_id, user_id=user_id))
         db.session.commit()
-        if src == SRC_WEB:
-            flash(_('Bookmark added.'))
     else:
         msg = 'This post has already been bookmarked.'
         if src == SRC_API:
@@ -83,8 +81,6 @@ def remove_bookmark_post(post_id: int, src, auth=None):
     if existing_bookmark:
         db.session.delete(existing_bookmark)
         db.session.commit()
-        if src == SRC_WEB:
-            flash(_('Bookmark has been removed.'))
     else:
         msg = 'This post was not bookmarked.'
         if src == SRC_API:
