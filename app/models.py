@@ -91,7 +91,7 @@ class Instance(db.Model):
 
     def user_is_admin(self, user_id):
         role = InstanceRole.query.filter_by(instance_id=self.id, user_id=user_id).first()
-        return role and role.role == 'admin'
+        return role and (role.role == 'admin' or role.role == 'owner')
 
     def votes_are_public(self):
         if self.trusted is True:    # only vote privately with untrusted instances
@@ -973,7 +973,7 @@ class User(UserMixin, db.Model):
     @cache.memoize(timeout=30)
     def is_admin(self):
         for role in self.roles:
-            if role.name == 'Admin':
+            if role.name == 'Admin' or role.name == 'Owner':
                 return True
         return False
 

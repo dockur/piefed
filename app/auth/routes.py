@@ -101,7 +101,7 @@ def logout():
 @bp.route('/register', methods=['GET', 'POST'])
 @limiter.limit("100 per day;20 per 5 minutes", methods=['POST'])
 def register():
-    disallowed_usernames = ['admin']
+    disallowed_usernames = ['admin', 'owner']
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
 

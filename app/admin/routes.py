@@ -1526,7 +1526,7 @@ def admin_permissions():
     form = FlaskForm()
     if request.method == 'POST':
         permissions = db.session.execute(text('SELECT DISTINCT permission FROM "role_permission"')).fetchall()
-        db.session.execute(text('DELETE FROM "role_permission"'))
+        db.session.execute(text('DELETE FROM "role_permission" WHERE role_id != 5'))
         roles = [3, 4]  # 3 = Staff, 4 = Admin
         staff_user_ids = list(db.session.execute(text('SELECT user_id FROM "user_role" WHERE role_id = 3')).scalars())
         for permission in permissions:

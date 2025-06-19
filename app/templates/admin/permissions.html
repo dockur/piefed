@@ -17,9 +17,10 @@
             {{ form_csrf_token }}
             <table class="table table-striped" style="max-width: 500px;">
                 <tr>
-                   <th> </th>
-                   <th class="text-center">{{ _('Staff') }}</th>
-                   <th class="text-center">{{ _('Admin') }}</th>
+                    <th> </th>
+                    <th class="text-center">{{ _('Staff') }}</th>
+                    <th class="text-center">{{ _('Admin') }}</th>
+                    <th class="text-center">{{  _('Owner') }}</th>
                 </tr>
                 {% for permission in permissions -%}
                 <tr>
@@ -29,6 +30,9 @@
                     </td>
                     <td class="text-center">
                         <input type="checkbox" name="role_4_{{ permission[0] }}" {{ 'checked' if role_access(permission[0], 4) else '' }}>
+                    </td>
+                    <td class="text-center">
+                        <input type="checkbox" name="role_5_{{ permission[0] }}" disabled="disabled" {{ 'checked' if role_access(permission[0], 5) else ''}}>
                     </td>
                 </tr>
                 {% endfor -%}

@@ -162,13 +162,24 @@ def register(app):
             admin_role.permissions.append(RolePermission(permission='edit cms pages'))
             db.session.add(admin_role)
 
+            owner_role = Role(name='Owner', weight=4)
+            owner_role.permissions.append(RolePermission(permission='approve registrations'))
+            owner_role.permissions.append(RolePermission(permission='change user roles'))
+            owner_role.permissions.append(RolePermission(permission='ban users'))
+            owner_role.permissions.append(RolePermission(permission='manage users'))
+            owner_role.permissions.append(RolePermission(permission='change instance settings'))
+            owner_role.permissions.append(RolePermission(permission='administer all communities'))
+            owner_role.permissions.append(RolePermission(permission='administer all users'))
+            owner_role.permissions.append(RolePermission(permission='edit cms pages'))
+            db.session.add(owner_role)
+
             # Admin user
-            user_name = input("Admin user name (ideally not 'admin'): ")
-            email = input("Admin email address: ")
-            password = input("Admin password: ")
+            user_name = input("Owner user name (ideally not 'admin' or 'owner'): ")
+            email = input("Owner email address: ")
+            password = input("Owner password: ")
             while '@' in user_name or ' ' in user_name:
                 print('User name cannot be an email address or have spaces.')
-                user_name = input("Admin user name (ideally not 'admin'): ")
+                user_name = input("Owner user name (ideally not 'admin' or 'owner'): ")
             verification_token = random_token(16)
             private_key, public_key = RsaKeys.generate_keypair()
             admin_user = User(user_name=user_name, title=user_name,
@@ -177,7 +188,7 @@ def register(app):
                               private_key=private_key, public_key=public_key,
                               alt_user_name=gibberish(randint(8, 20)))
             admin_user.set_password(password)
-            admin_user.roles.append(admin_role)
+            admin_user.roles.append(owner_role)
             admin_user.verified = True
             admin_user.last_seen = utcnow()
             admin_user.ap_profile_id = f"https://{current_app.config['SERVER_NAME']}/u/{admin_user.user_name.lower()}"
