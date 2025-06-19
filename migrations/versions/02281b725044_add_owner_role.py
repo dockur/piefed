@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     conn = op.get_bind()
-    conn.execute(text('INSERT INTO "role" (id, name, weight) VALUES (5, "Owner", 4) ON CONFLICT DO NOTHING'))
+    conn.execute(text('INSERT INTO "role" (id, name, weight) VALUES (5, \'Owner\', 4) ON CONFLICT DO NOTHING'))
     conn.execute(text('UPDATE "user_role" SET role = 5 WHERE user_id = 1'))
     conn.execute(text('INSERT INTO "role_permission" (role_id, permission) VALUES (5, \'approve registrations\') ON CONFLICT DO NOTHING'))
     conn.execute(text('INSERT INTO "role_permission" (role_id, permission) VALUES (5, \'change user roles\') ON CONFLICT DO NOTHING'))
