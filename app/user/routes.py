@@ -165,7 +165,7 @@ def show_profile(user):
                            user_notes=user_notes(current_user.get_id()),
                            post_next_url=post_next_url, post_prev_url=post_prev_url,
                            replies_next_url=replies_next_url, replies_prev_url=replies_prev_url,
-                           noindex=not user.indexable, show_post_community=True, hide_vote_buttons=True, show_deleted=current_user.is_admin_or_staff(),
+                           noindex=not user.indexable, show_post_community=True, hide_vote_buttons=True, show_deleted=current_user.is_authenticated and current_user.is_admin_or_staff(),
                            reported_posts=reported_posts(current_user.get_id(), g.admin_ids),
                            rss_feed=f"https://{current_app.config['SERVER_NAME']}/u/{user.link()}/feed" if user.post_count > 0 else None,
                            rss_feed_name=f"{user.display_name()} on {g.site.name}" if user.post_count > 0 else None,

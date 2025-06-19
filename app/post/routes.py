@@ -232,7 +232,7 @@ def show_post(post_id: int):
                                poll_form=poll_form, poll_results=poll_results, poll_data=poll_data, poll_choices=poll_choices, poll_total_votes=poll_total_votes,
                                canonical=post.ap_id, form=form, replies=replies, more_replies=more_replies, user_flair=user_flair,
                                THREAD_CUTOFF_DEPTH=constants.THREAD_CUTOFF_DEPTH,
-                               description=description, og_image=og_image, show_deleted=current_user.is_admin_or_staff(),
+                               description=description, og_image=og_image, show_deleted=current_user.is_authenticated and current_user.is_admin_or_staff(),
                                autoplay=request.args.get('autoplay', False), archive_link=archive_link,
                                noindex=not post.author.indexable, preconnect=post.url if post.url else None,
                                recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted,
