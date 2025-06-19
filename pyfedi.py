@@ -12,7 +12,7 @@ import arrow
 from flask import session, g, json, request, current_app
 from sqlalchemy import text
 from app.constants import POST_TYPE_LINK, POST_TYPE_IMAGE, POST_TYPE_ARTICLE, POST_TYPE_VIDEO, POST_TYPE_POLL, \
-    SUBSCRIPTION_MODERATOR, SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, SUBSCRIPTION_PENDING, ROLE_ADMIN
+    SUBSCRIPTION_MODERATOR, SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, SUBSCRIPTION_PENDING, ROLE_ADMIN, ROLE_OWNER
 from app.models import Site
 from app.utils import getmtime, gibberish, shorten_string, shorten_url, digits, user_access, community_membership, \
     can_create_post, can_upvote, can_downvote, shorten_number, ap_datetime, current_theme, community_link_to_href, \
@@ -80,8 +80,8 @@ def before_request():
     if request.path != '/inbox' and not request.path.startswith('/static/'):        # do not load g.site on shared inbox, to increase chance of duplicate detection working properly
         g.site = Site.query.get(1)
         g.admin_ids = list(db.session.execute(
-            text('SELECT DISTINCT u.id FROM "user" u LEFT JOIN user_role ur ON u.id = ur.user_id WHERE (ur.role_id = :role_admin AND u.deleted = false AND u.banned = false) OR u.id = 1 ORDER BY u.id'),
-            {'role_admin': ROLE_ADMIN}
+            text('SELECT DISTINCT u.id FROM "user" u LEFT JOIN user_role ur ON u.id = ur.user_id WHERE (ur.role_id = :role_admin AND u.deleted = false AND u.banned = false) OR (ur.role_id = :role_owner AND u.deleted = false AND u.banned = false) ORDER BY u.id'),
+            {'role_admin': ROLE_ADMIN, 'role_owner': ROLE_OWNER}
         ).scalars())
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()

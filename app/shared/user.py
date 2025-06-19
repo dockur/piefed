@@ -1,5 +1,5 @@
 from app import db, cache
-from app.constants import ROLE_STAFF, ROLE_ADMIN
+from app.constants import ROLE_STAFF, ROLE_ADMIN, ROLE_OWNER
 from app.models import UserBlock, NotificationSubscription, User
 from app.constants import *
 from app.utils import authorise_api_user, blocked_users, render_template
@@ -29,7 +29,7 @@ def block_another_user(person_id, src, auth=None):
             return
 
     role = db.session.execute(text('SELECT role_id FROM "user_role" WHERE user_id = :person_id'), {'person_id': person_id}).scalar()
-    if role == ROLE_ADMIN or role == ROLE_STAFF:
+    if role == ROLE_OWNER or role == ROLE_ADMIN or role == ROLE_STAFF:
         if src == SRC_API:
             raise Exception('cannot_block_admin_or_staff')
         else:
