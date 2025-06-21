@@ -221,7 +221,10 @@ def feed_edit(feed_id: int):
         except AttributeError:
             return redirect(referrer())
         else:
-            return redirect('/f/' + feed_to_edit.name)
+            if redirect(referrer().endswith(feed_to_edit.name)):
+                return redirect('/f/' + feed_to_edit.name)
+            else:
+                return redirect(referrer())
 
 
     # add the current data to the form
