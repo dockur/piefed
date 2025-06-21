@@ -216,7 +216,13 @@ def feed_edit(feed_id: int):
             _feed_remove_community(removed_community, feed_to_edit.id, current_user.id)
 
         flash(_('Settings saved.'))
-        return redirect(referrer())
+        try:
+            url_changed
+        except AttributeError:
+            return redirect(referrer())
+        else:
+            return redirect('/f/' + feed_to_edit.name)
+
 
     # add the current data to the form
     edit_feed_form.title.data = feed_to_edit.title
