@@ -69,6 +69,8 @@ def sync_user_to_ldap(username: str, email: str, password: str) -> bool:
     if not password or not password.strip():
         logger.info(f"No password provided for user {username}, skipping LDAP sync")
         return True
+
+    username = username.lower()
     
     conn = _get_ldap_connection()
     if not conn:
