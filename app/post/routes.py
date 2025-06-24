@@ -671,8 +671,9 @@ def post_edit(post_id: int):
                 flash(_('Your edit was not accepted because %(reason)s', reason=str(ex)), 'error')
                 abort(401)
 
-            return redirect(url_for('activitypub.post_ap', post_id=post.id))
+            return redirect(session.pop('origin_url', url_for('activitypub.post_ap', post_id=post.id)))
         else:
+            session['origin_url'] = referrer()
             form.title.data = post.title
             form.body.data = post.body
             form.notify_author.data = post.notify_author
@@ -734,14 +735,9 @@ def post_delete(post_id: int):
         form = DeleteConfirmationForm()
         if form.validate_on_submit():
             post_delete_post(community, post, current_user.id, form.reason.data)
-            ref = request.form.get('referrer')
-            if '/post/' not in ref:
-                return redirect(ref)
-            else:
-                return redirect(session.pop('origin_url', url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name)))
+            return redirect(session.pop('origin_url', url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name)))
         else:
             session['origin_url'] = referrer()
-            form.referrer.data = referrer(url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name))
             return render_template('generic_form.html', title=_('Are you sure you want to delete the post "%(post_title)s"?',
                                                                 post_title=post.title),
                                    form=form)
@@ -1015,8 +1011,9 @@ def post_report(post_id: int):
                                   current_user.public_url() + '#main-key')
 
         flash(_('Post has been reported, thank you!'))
-        return redirect(post.community.local_url())
+        return redirect(session.pop('origin_url', url_for('activitypub.post_ap', post_id=post.id)))
     elif request.method == 'GET':
+        session['origin_url'] = referrer()
         form.report_remote.data = True
 
     return render_template('post/post_report.html', title=_('Report post'), form=form, post=post)
@@ -1145,8 +1142,8 @@ def post_set_flair(post_id):
             db.session.commit()
             if post.status == POST_STATUS_PUBLISHED and post.author.is_local():
                 task_selector('edit_post', post_id=post.id)
-            return redirect(session.pop('origin_url', url_for('activitypub.community_profile', actor=post.community.link())))
-        session['origin_url'] = referrer()
+            return redirect(form.referrer.data)
+        form.referrer.data = referrer()
         form.flair.data = [flair.id for flair in post.flair]
         return render_template('generic_form.html', form=form, title=_('Set flair for %(post_title)s', post_title=post.title))
     else:
