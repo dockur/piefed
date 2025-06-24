@@ -4,7 +4,7 @@ from collections import namedtuple, defaultdict
 from datetime import datetime, timedelta
 from random import randint
 
-from flask import redirect, url_for, flash, current_app, abort, request, g, make_response, jsonify
+from flask import redirect, url_for, flash, current_app, abort, request, g, make_response, jsonify, session
 from flask_login import current_user
 from flask_babel import _
 from sqlalchemy import text, desc
@@ -738,8 +738,9 @@ def post_delete(post_id: int):
             if '/post/' not in ref:
                 return redirect(ref)
             else:
-                return redirect(url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name))
+                return redirect(session.pop('origin_url', url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name)))
         else:
+            session['origin_url'] = referrer()
             form.referrer.data = referrer(url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not None else community.name))
             return render_template('generic_form.html', title=_('Are you sure you want to delete the post "%(post_title)s"?',
                                                                 post_title=post.title),
@@ -1144,8 +1145,8 @@ def post_set_flair(post_id):
             db.session.commit()
             if post.status == POST_STATUS_PUBLISHED and post.author.is_local():
                 task_selector('edit_post', post_id=post.id)
-            return redirect(url_for('activitypub.community_profile', actor=post.community.link()))
-        form.referrer.data = referrer()
+            return redirect(session.pop('origin_url', url_for('activitypub.community_profile', actor=post.community.link())))
+        session['origin_url'] = referrer()
         form.flair.data = [flair.id for flair in post.flair]
         return render_template('generic_form.html', form=form, title=_('Set flair for %(post_title)s', post_title=post.title))
     else:
