@@ -41,7 +41,10 @@
                                         {{ _('Warning: You are writing in a language that isn\'t the same as the user you are replying to uses! (%(language)s)', language=recipient_language_name) }}
                                     </div>
                                 {% endif -%}
-                                <form method="post" role="form">
+                                <form method="post" role="form"
+                                  hx-post="{{ url_for('activitypub.post_ap', post_id=post.id) }}"
+                                  hx-target="#placeholder_comment"
+                                  hx-swap="beforebegin show:#post_replies:bottom">
                                     {{ form.csrf_token() }}
                                     {{ render_field(form.body) }}
                                     <fieldset id="post_reply_more_options" class="mt-2 coolfieldset {{ 'collapsed' if request.cookies.get('fieldset_post_reply_more_options_state', 'collapsed') == 'collapsed' }}">
@@ -128,6 +131,7 @@
                           {% include 'post/_post_reply_teaser.html' %}
                       {% endwith %}
                     {% endfor -%}
+                    <div id="placeholder_comment" class="d-none"></div>
                 </div>
 
                 {% if more_replies -%}

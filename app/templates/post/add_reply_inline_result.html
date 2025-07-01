@@ -45,7 +45,7 @@
 </div>
 {% endmacro -%}
 {% set collapsed = false -%}
-<div class="replies hidable depth_{{ post_reply.depth }}" role="group" aria-live="polite">
+{% if not top_level %}<div class="replies hidable depth_{{ post_reply.depth }}" role="group" aria-live="polite">{% endif %}
     <div class="container comment{% if post_reply.score and post_reply.score <= -10 %} low_score{% endif %}{% if post_reply.author.id == post_reply.post.author.id %} original_poster{% endif %}" id="comment_{{ post_reply.id }}"{% if post_reply.language_id and post_reply.language.code != 'en' %} lang="{{ post_reply.language.code }}"{% endif %} aria-level="{{ post_reply.depth+1 }}" role="treeitem">
         <div class="row">
             <div class="col-auto comment_author">
@@ -126,5 +126,5 @@
         </div>
         <div id="reply_to_{{ post_reply.id }}" class="hidable"></div>
     </div>
-</div>
+{% if not top_level %}</div>{% endif %}
 

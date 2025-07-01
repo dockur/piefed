@@ -134,7 +134,7 @@ def extra_rate_limit_check(user):
     return False
 
 
-def make_reply(input, post, parent_id, src, auth=None):
+def make_reply(input, post, parent_id, src, auth=None, hx_request=False):
     if src == SRC_API:
         user = authorise_api_user(auth, return_type='model')
         if extra_rate_limit_check(user):
@@ -171,7 +171,7 @@ def make_reply(input, post, parent_id, src, auth=None):
     user.language_id = language_id
     reply.ap_id = reply.profile_id()
     db.session.commit()
-    if src == SRC_WEB:
+    if src == SRC_WEB and not hx_request:
         input.body.data = ''
         flash(_('Your comment has been added.'))
 

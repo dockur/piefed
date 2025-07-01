@@ -106,13 +106,24 @@ def show_post(post_id: int):
         if current_user.is_authenticated:
             if not post.community.is_moderator() and not post.community.is_owner() and not current_user.is_staff() and not current_user.is_admin():
                 form.distinguished.render_kw = {'disabled': True}
+            
+            user_flair = {}
+            for u_flair in UserFlair.query.filter(UserFlair.community_id == post.community_id,
+                                                  UserFlair.user_id == current_user.id):
+                user_flair[u_flair.user_id] = u_flair.flair
 
         if current_user.is_authenticated and current_user.verified and form.validate_on_submit():
             try:
-                reply = make_reply(form, post, None, SRC_WEB)
+                reply = make_reply(form, post, None, SRC_WEB, hx_request=request.headers.get("HX-Request", False))
             except Exception as ex:
                 flash(_('Your reply was not accepted because %(reason)s', reason=str(ex)), 'error')
                 return redirect(url_for('activitypub.post_ap', post_id=post_id))
+            
+            if request.headers.get("HX-Request"):
+                # Added new top level comment, just return partial
+                resp = render_template("post/add_reply_inline_result.html", post_reply=reply, user_flair=user_flair,
+                                       nonce=g.nonce, top_level=True)
+                return resp
 
             return redirect(url_for('activitypub.post_ap', post_id=post_id, _anchor=f'comment_{reply.id}'))
         else:
@@ -609,7 +620,8 @@ def add_reply_inline(post_id: int, comment_id: int, nonce):
                                                   UserFlair.user_id == current_user.id):
                 user_flair[u_flair.user_id] = u_flair.flair
 
-        return render_template('post/add_reply_inline_result.html', post_reply=reply, user_flair=user_flair, nonce=nonce)
+        return render_template('post/add_reply_inline_result.html', post_reply=reply, user_flair=user_flair,
+                               nonce=nonce, top_level=False)
 
 
 @bp.route('/post/<int:post_id>/options_menu', methods=['GET'])
