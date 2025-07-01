@@ -668,6 +668,8 @@ def find_potential_moderators(search: str) -> List[User]:
 
 
 def normalize_font_size(tags, min_size=12, max_size=24):
+    if not tags:
+        return tags
     pcs = [tag['pc'] for tag in tags]
     min_pc, max_pc = min(pcs), max(pcs)
 
