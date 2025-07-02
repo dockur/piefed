@@ -482,6 +482,7 @@ def show_community(community: Community):
     INNER JOIN "post" ON pt.post_id = post.id
     WHERE post.community_id = :community_id
       AND t.banned IS FALSE
+      AND post.deleted IS FALSE
     GROUP BY t.id
     ORDER BY pc DESC
     LIMIT 30;"""), {'community_id': community.id}).mappings().all()
