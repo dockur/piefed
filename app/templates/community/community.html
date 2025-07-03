@@ -82,6 +82,9 @@
               document.addEventListener("DOMContentLoaded", function() {
                   const masonry = document.getElementById('masonry');
                   const htmlSnippets = [
+                      {% for post in sticky_posts -%}
+                        {% raw -%}`{% endraw -%}{% include 'post/_post_teaser_masonry.html' -%}{% raw -%}`{% endraw -%},
+                      {% endfor -%}
                       {% for post in posts.items -%}
                         {% raw -%}`{% endraw -%}{% include 'post/_post_teaser_masonry.html' -%}{% raw -%}`{% endraw -%},
                       {% endfor -%}
@@ -90,8 +93,32 @@
               });
             </script>
         {% else -%}
-            {% if posts %}
+            {% if posts or sticky_posts %}
                 <div class="post_list">
+                    {% if sort == "new"  and sticky_posts-%}
+                      <div class="accordion accordion-flush mt-2" id="sticky-posts">
+                        <div class="accordion-item">
+                          <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-body-secondary text-body" type="button" data-bs-toggle="collapse" data-bs-target="#sticky-collapse" aria-expanded="false" aria-controls="sticky-collapse">
+                              {{ _("Sticky Posts") }}
+                            </button>
+                          </h2>
+                          <div id="sticky-collapse" class="accordion-collapse collapse" data-bs-parent="#sticky-posts">
+                            <div class="accordion-body p-0">
+                              {% for post in sticky_posts -%}
+                                {% include 'post/_post_teaser.html' -%}
+                              {% endfor -%}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% else -%}
+                      {% if sticky_posts -%}
+                        {% for post in sticky_posts -%}
+                          {% include 'post/_post_teaser.html' -%}
+                        {% endfor -%}
+                      {% endif -%}
+                    {% endif -%}
                     {% for post in posts.items -%}
                         {% include 'post/_post_teaser.html' -%}
                     {% else -%}

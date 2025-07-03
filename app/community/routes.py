@@ -333,16 +333,24 @@ def show_community(community: Community):
             tag_record = Tag.query.filter(Tag.name == tag.strip()).first()
             if tag_record:
                 posts = posts.join(post_tag).filter(post_tag.c.tag_id == tag_record.id)
+        
+        sticky_posts = posts.filter(Post.sticky == True)
+        posts = posts.filter(Post.sticky == False)
 
         if sort == '' or sort == 'hot':
+            sticky_posts = sticky_posts.order_by(desc(Post.ranking)).order_by(desc(Post.posted_at))
             posts = posts.order_by(desc(Post.sticky)).order_by(desc(Post.ranking)).order_by(desc(Post.posted_at))
         elif sort == 'top':
+            sticky_posts = sticky_posts.order_by(desc(Post.up_votes - Post.down_votes))
             posts = posts.filter(Post.posted_at > utcnow() - timedelta(days=7)).order_by(desc(Post.sticky)).order_by(desc(Post.up_votes - Post.down_votes))
         elif sort == 'new':
+            sticky_posts = sticky_posts.order_by(desc(Post.posted_at))
             posts = posts.order_by(desc(Post.posted_at))
         elif sort == 'old':
+            sticky_posts = sticky_posts.order_by(asc(Post.posted_at))
             posts = posts.order_by(asc(Post.posted_at))
         elif sort == 'active':
+            sticky_posts = sticky_posts.order_by(desc(Post.last_active))
             posts = posts.order_by(desc(Post.sticky)).order_by(desc(Post.last_active))
         per_page = 20 if low_bandwidth else current_app.config['PAGE_LENGTH']
         if post_layout == 'masonry':
@@ -350,6 +358,7 @@ def show_community(community: Community):
         elif post_layout == 'masonry_wide':
             per_page = 300
         posts = posts.paginate(page=page, per_page=per_page, error_out=False)
+        sticky_posts = sticky_posts.all()
     else:
         content_filters = {}
         comments = community.replies
@@ -492,7 +501,7 @@ def show_community(community: Community):
                            inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
                            post_layout=post_layout, content_type=content_type, current_app=current_app,
                            user_has_feeds=user_has_feeds, current_feed_id=current_feed_id,
-                           current_feed_title=current_feed_title, user_flair=user_flair)
+                           current_feed_title=current_feed_title, user_flair=user_flair, sticky_posts=sticky_posts)
 
 
 # RSS feed of the community
