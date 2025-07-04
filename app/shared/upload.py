@@ -36,7 +36,7 @@ def process_upload(image_file, destination='posts'):
     if file_ext.lower() == '.heic':
         register_heif_opener()
     if file_ext.lower() == '.avif':
-        import pillow_avif
+        import pillow_avif  # NOQA
 
     Image.MAX_IMAGE_PIXELS = 89478485
 
@@ -46,7 +46,7 @@ def process_upload(image_file, destination='posts'):
     image_quality = current_app.config['MEDIA_IMAGE_QUALITY']
 
     if image_format == 'AVIF':
-        import pillow_avif
+        import pillow_avif  # NOQA
 
     if not final_place.endswith('.svg') and not final_place.endswith('.gif'):
         img = Image.open(final_place)

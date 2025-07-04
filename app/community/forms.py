@@ -256,7 +256,7 @@ class CreateImageForm(CreatePostForm):
                 # Do not allow fascist meme content
                 try:
                     if '.avif' in uploaded_file.filename:
-                        import pillow_avif
+                        import pillow_avif  # NOQA
                     image_text = pytesseract.image_to_string(Image.open(BytesIO(uploaded_file.read())).convert('L'))
                 except FileNotFoundError:
                     image_text = ''

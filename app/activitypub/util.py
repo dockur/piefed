@@ -1225,7 +1225,7 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory, to
                                 final_place_thumbnail = os.path.join(directory, new_filename + '_thumbnail.webp')
 
                                 if file_ext == '.avif':  # this is quite a big package so we'll only load it if necessary
-                                    import pillow_avif
+                                    import pillow_avif  # NOQA
 
                                 # Load image data into Pillow
                                 Image.MAX_IMAGE_PIXELS = 89478485
@@ -1247,7 +1247,7 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory, to
                                 thumbnail_ext = file_ext
 
                                 if medium_image_format == 'AVIF' or thumbnail_image_format == 'AVIF':
-                                    import pillow_avif
+                                    import pillow_avif  # NOQA
 
                                 # Resize the image to medium
                                 if medium_width:

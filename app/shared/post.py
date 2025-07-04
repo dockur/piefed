@@ -381,7 +381,7 @@ def edit_post(input, post, type, src, user=None, auth=None, uploaded_file=None, 
         if file_ext.lower() == '.heic':
             register_heif_opener()
         if file_ext.lower() == '.avif':
-            pass  # do not remove
+            import pillow_avif  # NOQA
 
         Image.MAX_IMAGE_PIXELS = 89478485
 
@@ -391,7 +391,7 @@ def edit_post(input, post, type, src, user=None, auth=None, uploaded_file=None, 
         image_quality = current_app.config['MEDIA_IMAGE_QUALITY']
 
         if image_format == 'AVIF':
-            pass  # do not remove
+            import pillow_avif  # NOQA
 
         if not final_place.endswith('.svg') and not final_place.endswith('.gif'):
             img = Image.open(final_place)
