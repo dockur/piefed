@@ -2,37 +2,69 @@ import os
 from zoneinfo import ZoneInfo
 
 import boto3
-from PIL import Image, ImageOps
-from flask import flash, request, current_app, g
+from flask import current_app, flash, g, request
 from flask_babel import _, force_locale, gettext
 from flask_login import current_user
+from PIL import Image, ImageOps
 from pillow_heif import register_heif_opener
 from sqlalchemy import text
 
-from app import db, cache
+from app import cache, db
 from app.activitypub.util import make_image_sizes, notify_about_post
-from app.community.util import tags_from_string_old, end_poll_date, flair_from_form
+from app.community.util import end_poll_date, flair_from_form, tags_from_string_old
 from app.constants import *
-from app.models import File, Notification, NotificationSubscription, Poll, PollChoice, Post, PostBookmark, PostVote, \
-    Report, Site, User, utcnow
+from app.models import (
+    File,
+    Notification,
+    NotificationSubscription,
+    Poll,
+    PollChoice,
+    Post,
+    PostBookmark,
+    PostVote,
+    Report,
+    Site,
+    User,
+    utcnow,
+)
 from app.shared.tasks import task_selector
-from app.utils import render_template, authorise_api_user, shorten_string, gibberish, ensure_directory_exists, \
-    piefed_markdown_to_lemmy_markdown, markdown_to_html, fixup_url, domain_from_url, \
-    opengraph_parse, url_to_thumbnail_file, can_create_post, is_video_hosting_site, recently_upvoted_posts, \
-    is_image_url, add_to_modlog_activitypub, store_files_in_s3, guess_mime_type, retrieve_image_hash, \
-    hash_matches_blocked_image, can_upvote, can_downvote, get_recipient_language
+from app.utils import (
+    add_to_modlog_activitypub,
+    authorise_api_user,
+    can_create_post,
+    can_downvote,
+    can_upvote,
+    domain_from_url,
+    ensure_directory_exists,
+    fixup_url,
+    get_recipient_language,
+    gibberish,
+    guess_mime_type,
+    hash_matches_blocked_image,
+    is_image_url,
+    is_video_hosting_site,
+    markdown_to_html,
+    opengraph_parse,
+    piefed_markdown_to_lemmy_markdown,
+    recently_upvoted_posts,
+    render_template,
+    retrieve_image_hash,
+    shorten_string,
+    store_files_in_s3,
+    url_to_thumbnail_file,
+)
 
 
 def vote_for_post(post_id: int, vote_direction, federate: bool, src, auth=None):
     if src == SRC_API:
-        post = Post.query.filter_by(id=post_id).one()
+        post = Post.query.options(db.joinedload(Post.community)).filter_by(id=post_id).one()
         user = authorise_api_user(auth, return_type='model')
         if vote_direction == 'upvote' and not can_upvote(user, post.community):
             return user.id
         elif vote_direction == 'downvote' and not can_downvote(user, post.community):
             return user.id
     else:
-        post = Post.query.get_or_404(post_id)
+        post = Post.query.options(db.joinedload(Post.community)).get_or_404(post_id)
         user = current_user
 
         if (vote_direction == 'upvote' and not can_upvote(user, post.community)) or (
@@ -349,7 +381,7 @@ def edit_post(input, post, type, src, user=None, auth=None, uploaded_file=None, 
         if file_ext.lower() == '.heic':
             register_heif_opener()
         if file_ext.lower() == '.avif':
-            import pillow_avif  # do not remove
+            pass  # do not remove
 
         Image.MAX_IMAGE_PIXELS = 89478485
 
@@ -359,7 +391,7 @@ def edit_post(input, post, type, src, user=None, auth=None, uploaded_file=None, 
         image_quality = current_app.config['MEDIA_IMAGE_QUALITY']
 
         if image_format == 'AVIF':
-            import pillow_avif  # do not remove
+            pass  # do not remove
 
         if not final_place.endswith('.svg') and not final_place.endswith('.gif'):
             img = Image.open(final_place)
