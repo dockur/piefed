@@ -7,14 +7,14 @@ import mimetypes
 import random
 import urllib
 import warnings
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from contextlib import contextmanager
-from datetime import datetime, timedelta, date
-from functools import wraps, lru_cache
+from datetime import date, datetime, timedelta
+from functools import lru_cache, wraps
 from json import JSONDecodeError
 from time import sleep
 from typing import List
-from urllib.parse import urlparse, parse_qs, urlencode
+from urllib.parse import parse_qs, urlencode, urlparse
 from zoneinfo import available_timezones
 
 import flask
@@ -26,29 +26,67 @@ from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 import os
-from furl import furl
-from flask import current_app, json, redirect, url_for, request, make_response, Response, g, flash, abort
-from flask_babel import _, lazy_gettext as _l
-from flask_login import current_user, logout_user
-from flask_wtf.csrf import validate_csrf
-from sqlalchemy import text, or_, desc, asc, event
-from sqlalchemy.orm import Session
-from wtforms.fields import SelectMultipleField, StringField
-from wtforms.widgets import ListWidget, CheckboxInput, TextInput
-from wtforms.validators import ValidationError
-from markupsafe import Markup
-import boto3
-from app import db, cache, httpx_client, celery
-from app.constants import *
 import re
-from PIL import Image, ImageOps
 
+import boto3
 from captcha.audio import AudioCaptcha
 from captcha.image import ImageCaptcha
+from flask import (
+    Response,
+    abort,
+    current_app,
+    flash,
+    g,
+    json,
+    make_response,
+    redirect,
+    request,
+    url_for,
+)
+from flask_babel import _
+from flask_babel import lazy_gettext as _l
+from flask_login import current_user, logout_user
+from flask_wtf.csrf import validate_csrf
+from furl import furl
+from markupsafe import Markup
+from PIL import Image, ImageOps
+from sqlalchemy import asc, desc, event, or_, text
+from sqlalchemy.orm import Session
+from wtforms.fields import SelectMultipleField, StringField
+from wtforms.validators import ValidationError
+from wtforms.widgets import CheckboxInput, ListWidget, TextInput
 
-from app.models import Settings, Domain, Instance, BannedInstances, User, Community, DomainBlock, IpBan, \
-    Site, Post, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic, UserBlock, Language, \
-    File, ModLog, CommunityBlock, Feed, FeedMember, CommunityFlair, CommunityJoinRequest, Notification, UserNote
+from app import cache, celery, db, httpx_client
+from app.constants import *
+from app.models import (
+    BannedInstances,
+    Community,
+    CommunityBan,
+    CommunityBlock,
+    CommunityFlair,
+    CommunityJoinRequest,
+    CommunityMember,
+    Domain,
+    DomainBlock,
+    Feed,
+    FeedMember,
+    File,
+    Filter,
+    Instance,
+    InstanceBlock,
+    IpBan,
+    Language,
+    ModLog,
+    Notification,
+    Post,
+    Settings,
+    Site,
+    Topic,
+    User,
+    UserBlock,
+    UserNote,
+    utcnow,
+)
 
 
 # Flask's render_template function, with support for themes added
@@ -1727,6 +1765,91 @@ def recently_downvoted_post_replies(user_id) -> List[int]:
     return sorted(reply_ids)
 
 
+def languages_for_form_and_community(community: Community, all: bool = False):
+    """
+    Returns a list of languages for a form, based on the community's read languages and the user's read languages.
+    Only returns languages that are allowed in the community.
+    """
+    used_languages = []
+    other_languages = []
+
+    # Get languages used by the community
+    community_language_ids = community.language_ids() or []
+    if not community_language_ids:
+        return languages_for_form(all)
+
+    if current_user.is_authenticated:
+        # Get intersection of user and community languages
+        if current_user.read_language_ids:
+            user_language_ids = set(current_user.read_language_ids)
+            allowed_ids = user_language_ids.intersection(community_language_ids)
+
+            for language in (
+                Language.query.filter(Language.id.in_(tuple(allowed_ids)))
+                .order_by(Language.name)
+                .all()
+            ):
+                used_languages.append((language.id, language.name))
+        else:
+            # Use recently used languages that are allowed in community
+            recent_languages = (
+                db.session.execute(
+                    text("""
+                SELECT language_id 
+                FROM (
+                    SELECT language_id, posted_at
+                    FROM "post"
+                    WHERE user_id = :user_id
+                    UNION ALL
+                    SELECT language_id, posted_at
+                    FROM "post_reply"
+                    WHERE user_id = :user_id
+                ) AS subquery
+                GROUP BY language_id
+                ORDER BY MAX(posted_at) DESC
+                LIMIT 10
+            """),
+                    {"user_id": current_user.id},
+                )
+                .scalars()
+                .all()
+            )
+
+            for lang_id in recent_languages:
+                if lang_id in community_language_ids:
+                    used_languages.append((lang_id, ""))
+
+    # If no used languages, add site default if allowed
+    if not used_languages:
+        site_lang = site_language_id()
+        if site_lang in community_language_ids:
+            used_languages.append((site_lang, ""))
+
+    # Fill in language names
+    for language in (
+        Language.query.filter(Language.id.in_([lang[0] for lang in used_languages]))
+        .order_by(Language.name)
+        .all()
+    ):
+        idx = next(i for i, v in enumerate(used_languages) if v[0] == language.id)
+        used_languages[idx] = (language.id, language.name)
+
+    # Add other allowed community languages if all=True
+    if all:
+        for language in (
+            Language.query.filter(Language.id.in_(tuple(community_language_ids)))
+            .order_by(Language.name)
+            .all()
+        ):
+            if (
+                language.code != "und"
+                and (language.id, language.name) not in used_languages
+            ):
+                other_languages.append((language.id, language.name))
+
+    return used_languages + other_languages
+
+
 def languages_for_form(all=False):
     used_languages = []
     other_languages = []
@@ -1897,8 +2020,9 @@ def get_task_session() -> Session:
 @contextmanager
 def patch_db_session(task_session):
     """Temporarily replace db.session with task_session for functions that use it internally"""
-    from app import db
     from flask import has_request_context
+
+    from app import db
     
     # Only patch if we're not in a Flask request context (i.e., in a Celery worker)
     if has_request_context():

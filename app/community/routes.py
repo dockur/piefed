@@ -1,59 +1,169 @@
 from collections import namedtuple
-
+from datetime import timedelta, timezone
 from random import randint
 
 import flask
 from bs4 import BeautifulSoup
-
-from flask import redirect, url_for, flash, request, make_response, session, Markup, current_app, abort, g, json
-from flask_login import current_user
+from feedgen.feed import FeedGenerator
+from flask import (
+    Markup,
+    abort,
+    current_app,
+    flash,
+    g,
+    json,
+    make_response,
+    redirect,
+    request,
+    url_for,
+)
 from flask_babel import _, force_locale, gettext
+from flask_login import current_user
 from slugify import slugify
-from sqlalchemy import or_, asc, desc, text
+from sqlalchemy import asc, desc, or_, text
 from sqlalchemy.orm.exc import NoResultFound
 
-from app import db, cache, celery, httpx_client, limiter
-from app.activitypub.signature import RsaKeys, post_request, send_post_request
+from app import cache, celery, db, httpx_client, limiter
+from app.activitypub.signature import RsaKeys, send_post_request
 from app.activitypub.util import extract_domain_and_actor, find_actor_or_create
-from app.chat.util import send_message
-from app.community.forms import SearchRemoteCommunity, CreateDiscussionForm, CreateImageForm, CreateLinkForm, \
-    ReportCommunityForm, \
-    DeleteCommunityForm, AddCommunityForm, EditCommunityForm, AddModeratorForm, BanUserCommunityForm, \
-    EscalateReportForm, ResolveReportForm, CreateVideoForm, CreatePollForm, EditCommunityWikiPageForm, \
-    InviteCommunityForm, MoveCommunityForm, EditCommunityFlairForm, SetMyFlairForm, FindAndBanUserCommunityForm
-from app.community.util import search_for_community, actor_to_community, \
-    save_icon_file, save_banner_file, \
-    delete_post_from_community, delete_post_reply_from_community, community_in_list, find_local_users, \
-    find_potential_moderators, hashtags_used_in_community
-from app.constants import SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, POST_TYPE_LINK, POST_TYPE_ARTICLE, POST_TYPE_IMAGE, \
-    SUBSCRIPTION_PENDING, SUBSCRIPTION_MODERATOR, REPORT_STATE_NEW, REPORT_STATE_ESCALATED, REPORT_STATE_RESOLVED, \
-    REPORT_STATE_DISCARDED, POST_TYPE_VIDEO, NOTIF_COMMUNITY, NOTIF_POST, POST_TYPE_POLL, MICROBLOG_APPS, SRC_WEB, \
-    NOTIF_REPORT, NOTIF_NEW_MOD, NOTIF_BAN, NOTIF_UNBAN, NOTIF_REPORT_ESCALATION, NOTIF_MENTION, POST_STATUS_REVIEWING
+from app.community import bp
+from app.community.forms import (
+    AddCommunityForm,
+    AddModeratorForm,
+    BanUserCommunityForm,
+    CreateDiscussionForm,
+    CreateImageForm,
+    CreateLinkForm,
+    CreatePollForm,
+    CreateVideoForm,
+    DeleteCommunityForm,
+    EditCommunityFlairForm,
+    EditCommunityForm,
+    EditCommunityWikiPageForm,
+    EscalateReportForm,
+    FindAndBanUserCommunityForm,
+    InviteCommunityForm,
+    MoveCommunityForm,
+    ReportCommunityForm,
+    ResolveReportForm,
+    SearchRemoteCommunity,
+    SetMyFlairForm,
+)
+from app.community.util import (
+    actor_to_community,
+    delete_post_from_community,
+    delete_post_reply_from_community,
+    find_potential_moderators,
+    hashtags_used_in_community,
+    save_banner_file,
+    save_icon_file,
+    search_for_community,
+)
+from app.constants import (
+    NOTIF_BAN,
+    NOTIF_COMMUNITY,
+    NOTIF_MENTION,
+    NOTIF_REPORT,
+    NOTIF_REPORT_ESCALATION,
+    NOTIF_UNBAN,
+    POST_STATUS_REVIEWING,
+    POST_TYPE_ARTICLE,
+    POST_TYPE_IMAGE,
+    POST_TYPE_LINK,
+    POST_TYPE_POLL,
+    POST_TYPE_VIDEO,
+    REPORT_STATE_DISCARDED,
+    REPORT_STATE_ESCALATED,
+    REPORT_STATE_NEW,
+    REPORT_STATE_RESOLVED,
+    SRC_WEB,
+    SUBSCRIPTION_MEMBER,
+    SUBSCRIPTION_MODERATOR,
+    SUBSCRIPTION_OWNER,
+    SUBSCRIPTION_PENDING,
+)
 from app.email import send_email
 from app.inoculation import inoculation
-from app.models import User, Community, CommunityMember, CommunityJoinRequest, CommunityBan, Post, Site, \
-    File, PostVote, utcnow, Report, Notification, ActivityPubLog, Topic, Conversation, PostReply, \
-    NotificationSubscription, UserFollower, Instance, Language, Poll, PollChoice, ModLog, CommunityWikiPage, \
-    CommunityWikiPageRevision, read_posts, Feed, FeedItem, CommunityBlock, CommunityFlair, post_flair, UserFlair, \
-    post_tag, Tag
-from app.community import bp
+from app.models import (
+    Community,
+    CommunityBan,
+    CommunityBlock,
+    CommunityFlair,
+    CommunityJoinRequest,
+    CommunityMember,
+    CommunityWikiPage,
+    CommunityWikiPageRevision,
+    Feed,
+    FeedItem,
+    File,
+    Language,
+    ModLog,
+    Notification,
+    NotificationSubscription,
+    Post,
+    PostReply,
+    Report,
+    Site,
+    Tag,
+    Topic,
+    User,
+    UserFlair,
+    post_flair,
+    post_tag,
+    read_posts,
+    utcnow,
+)
 from app.post.util import tags_to_string
-from app.shared.community import invite_with_chat, invite_with_email, subscribe_community, add_mod_to_community, \
-    remove_mod_from_community
-from app.utils import get_setting, render_template, allowlist_html, markdown_to_html, validation_required, \
-    shorten_string, gibberish, community_membership, ap_datetime, \
-    request_etag_matches, return_304, can_upvote, can_downvote, user_filters_posts, \
-    joined_communities, moderating_communities, blocked_domains, mimetype_from_url, blocked_instances, \
-    community_moderators, communities_banned_from, show_ban_message, recently_upvoted_posts, recently_downvoted_posts, \
-    blocked_users, languages_for_form, menu_topics, add_to_modlog, \
-    blocked_communities, remove_tracking_from_link, piefed_markdown_to_lemmy_markdown, \
-    instance_software, domain_from_email, referrer, flair_for_form, find_flair_id, login_required_if_private_instance, \
-    possible_communities, reported_posts, user_notes, login_required
+from app.shared.community import (
+    add_mod_to_community,
+    invite_with_chat,
+    invite_with_email,
+    remove_mod_from_community,
+    subscribe_community,
+)
 from app.shared.post import make_post, sticky_post
 from app.shared.tasks import task_selector
-from app.utils import get_recipient_language
-from feedgen.feed import FeedGenerator
-from datetime import timezone, timedelta
+from app.utils import (
+    add_to_modlog,
+    blocked_communities,
+    blocked_domains,
+    blocked_instances,
+    blocked_users,
+    can_downvote,
+    can_upvote,
+    communities_banned_from,
+    community_membership,
+    community_moderators,
+    domain_from_email,
+    find_flair_id,
+    flair_for_form,
+    get_recipient_language,
+    gibberish,
+    instance_software,
+    joined_communities,
+    languages_for_form,
+    languages_for_form_and_community,
+    login_required,
+    login_required_if_private_instance,
+    markdown_to_html,
+    mimetype_from_url,
+    moderating_communities,
+    piefed_markdown_to_lemmy_markdown,
+    possible_communities,
+    recently_downvoted_posts,
+    recently_upvoted_posts,
+    referrer,
+    remove_tracking_from_link,
+    render_template,
+    reported_posts,
+    request_etag_matches,
+    return_304,
+    shorten_string,
+    show_ban_message,
+    user_filters_posts,
+    user_notes,
+    validation_required,
+)
 
 
 @bp.route('/add_local', methods=['GET', 'POST'])
@@ -814,7 +924,10 @@ def add_post(actor, type):
 
     form.communities.choices = possible_communities()
 
-    form.language_id.choices = languages_for_form()
+    community_and_user_languages = languages_for_form_and_community(community) if current_user.is_authenticated else []
+
+    form.language_id.choices = community_and_user_languages if len(community_and_user_languages) > 0 else languages_for_form()
+
     flair_choices = flair_for_form(community.id)
     if len(flair_choices):
         form.flair.choices = flair_choices

@@ -1,52 +1,173 @@
 from __future__ import annotations
 
-from collections import namedtuple, defaultdict
+from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
 from random import randint
 
-from flask import redirect, url_for, flash, current_app, abort, request, g, make_response, jsonify
+from flask import (
+    abort,
+    current_app,
+    flash,
+    g,
+    jsonify,
+    make_response,
+    redirect,
+    request,
+    url_for,
+)
 from flask_babel import _, force_locale, gettext
 from flask_login import current_user
 from furl import furl
-from sqlalchemy import text, desc
+from sqlalchemy import desc, text
 from sqlalchemy.orm.exc import NoResultFound
 
-from app import db, constants, cache, limiter
+from app import cache, constants, db, limiter
 from app.activitypub.signature import default_context, send_post_request
 from app.activitypub.util import update_post_from_activity
-from app.community.forms import CreateLinkForm, CreateDiscussionForm, CreateVideoForm, CreatePollForm, EditImageForm
-from app.community.util import send_to_remote_instance, flair_from_form, hashtags_used_in_community
-from app.constants import NOTIF_REPORT, POST_STATUS_SCHEDULED, POST_STATUS_PUBLISHED
-from app.constants import SUBSCRIPTION_OWNER, SUBSCRIPTION_MODERATOR, POST_TYPE_LINK, \
-    POST_TYPE_IMAGE, \
-    POST_TYPE_ARTICLE, POST_TYPE_VIDEO, POST_TYPE_POLL, SRC_WEB
+from app.community.forms import (
+    CreateDiscussionForm,
+    CreateLinkForm,
+    CreatePollForm,
+    CreateVideoForm,
+    EditImageForm,
+)
+from app.community.util import (
+    flair_from_form,
+    hashtags_used_in_community,
+    send_to_remote_instance,
+)
+from app.constants import (
+    NOTIF_REPORT,
+    POST_STATUS_PUBLISHED,
+    POST_STATUS_SCHEDULED,
+    POST_TYPE_ARTICLE,
+    POST_TYPE_IMAGE,
+    POST_TYPE_LINK,
+    POST_TYPE_POLL,
+    POST_TYPE_VIDEO,
+    SRC_WEB,
+    SUBSCRIPTION_MODERATOR,
+    SUBSCRIPTION_OWNER,
+)
 from app.inoculation import inoculation
-from app.models import Post, PostReply, PostReplyValidationError, \
-    PostReplyVote, PostVote, Notification, utcnow, UserBlock, DomainBlock, Report, Site, Community, \
-    Topic, User, Instance, UserFollower, Poll, PollChoice, PollChoiceVote, PostBookmark, \
-    PostReplyBookmark, CommunityBlock, File, CommunityFlair, UserFlair, BlockedImage, CommunityBan, Language
+from app.models import (
+    BlockedImage,
+    Community,
+    CommunityBan,
+    CommunityBlock,
+    CommunityFlair,
+    DomainBlock,
+    File,
+    Instance,
+    Language,
+    Notification,
+    Poll,
+    PollChoice,
+    PollChoiceVote,
+    Post,
+    PostBookmark,
+    PostReply,
+    PostReplyBookmark,
+    PostReplyValidationError,
+    PostReplyVote,
+    PostVote,
+    Report,
+    Site,
+    Topic,
+    User,
+    UserBlock,
+    UserFlair,
+    UserFollower,
+    utcnow,
+)
 from app.post import bp
-from app.post.forms import NewReplyForm, ReportPostForm, MeaCulpaForm, CrossPostForm, ConfirmationForm, \
-    ConfirmationMultiDeleteForm, EditReplyForm, FlairPostForm, DeleteConfirmationForm
-from app.post.util import post_replies, get_comment_branch, tags_to_string, url_needs_archive, \
-    generate_archive_link, body_has_no_archive_link
-from app.post.util import post_type_to_form_url_type
-from app.shared.post import edit_post, sticky_post, lock_post, bookmark_post, remove_bookmark_post, subscribe_post, \
-    vote_for_post
-from app.shared.reply import make_reply, edit_reply, bookmark_reply, remove_bookmark_reply, subscribe_reply, \
-    delete_reply, mod_remove_reply, vote_for_reply
+from app.post.forms import (
+    ConfirmationForm,
+    ConfirmationMultiDeleteForm,
+    CrossPostForm,
+    DeleteConfirmationForm,
+    EditReplyForm,
+    FlairPostForm,
+    MeaCulpaForm,
+    NewReplyForm,
+    ReportPostForm,
+)
+from app.post.util import (
+    body_has_no_archive_link,
+    generate_archive_link,
+    get_comment_branch,
+    post_replies,
+    post_type_to_form_url_type,
+    tags_to_string,
+    url_needs_archive,
+)
+from app.shared.post import (
+    bookmark_post,
+    edit_post,
+    lock_post,
+    remove_bookmark_post,
+    sticky_post,
+    subscribe_post,
+    vote_for_post,
+)
+from app.shared.reply import (
+    bookmark_reply,
+    delete_reply,
+    edit_reply,
+    make_reply,
+    mod_remove_reply,
+    remove_bookmark_reply,
+    subscribe_reply,
+    vote_for_reply,
+)
 from app.shared.site import block_remote_instance
 from app.shared.tasks import task_selector
-from app.utils import render_template, markdown_to_html, validation_required, \
-    shorten_string, markdown_to_text, gibberish, ap_datetime, return_304, \
-    request_etag_matches, ip_address, instance_banned, \
-    blocked_instances, blocked_domains, community_moderators, show_ban_message, recently_upvoted_posts, \
-    recently_downvoted_posts, recently_upvoted_post_replies, recently_downvoted_post_replies, \
-    languages_for_form, add_to_modlog, blocked_communities, piefed_markdown_to_lemmy_markdown, \
-    permission_required, blocked_users, get_request, is_local_image_url, is_video_url, can_upvote, can_downvote, \
-    referrer, can_create_post_reply, communities_banned_from, \
-    block_bots, flair_for_form, login_required_if_private_instance, retrieve_image_hash, posts_with_blocked_images, \
-    possible_communities, user_notes, login_required, get_recipient_language, user_filters_posts
+from app.utils import (
+    add_to_modlog,
+    ap_datetime,
+    block_bots,
+    blocked_communities,
+    blocked_domains,
+    blocked_instances,
+    blocked_users,
+    can_create_post_reply,
+    can_downvote,
+    can_upvote,
+    communities_banned_from,
+    community_moderators,
+    flair_for_form,
+    get_recipient_language,
+    get_request,
+    gibberish,
+    instance_banned,
+    ip_address,
+    is_local_image_url,
+    is_video_url,
+    languages_for_form,
+    languages_for_form_and_community,
+    login_required,
+    login_required_if_private_instance,
+    markdown_to_html,
+    markdown_to_text,
+    permission_required,
+    piefed_markdown_to_lemmy_markdown,
+    possible_communities,
+    posts_with_blocked_images,
+    recently_downvoted_post_replies,
+    recently_downvoted_posts,
+    recently_upvoted_post_replies,
+    recently_upvoted_posts,
+    referrer,
+    render_template,
+    request_etag_matches,
+    retrieve_image_hash,
+    return_304,
+    shorten_string,
+    show_ban_message,
+    user_filters_posts,
+    user_notes,
+    validation_required,
+)
 
 
 @login_required_if_private_instance
@@ -718,7 +839,9 @@ def post_edit(post_id: int):
             form.nsfl.data = True
             form.nsfw.render_kw = {'disabled': True}
 
-        form.language_id.choices = languages_for_form()
+        community_and_user_languages = languages_for_form_and_community(post.community) if current_user.is_authenticated else []
+
+        form.language_id.choices = community_and_user_languages if len(community_and_user_languages) > 0 else languages_for_form()
 
         if form.validate_on_submit():
             try:
