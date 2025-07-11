@@ -31,10 +31,11 @@ def handle_user_verification(user, oauth_id_key, token, ip, country, user_info):
         username = user_info.get('username', '')
 
         # Register a new user
-        user, redirect_request = initialize_new_user(email, username, oauth_id_key, user_info, ip, country)
+        user = initialize_new_user(email, username, oauth_id_key, user_info, ip, country)
         if g.site.registration_mode == 'RequireApplication' and g.site.application_question:
             task_selector('check_application', application_id=user.registration_application.id)
             return redirect(url_for('auth.please_wait'))
+        return redirect_next_page()
     else:
         # Handle existing user
         return finalize_user_login(user, token, ip, country)
@@ -49,11 +50,12 @@ def initialize_new_user(email, username, oauth_id_key, user_info, ip, country):
         email=email,
         title=username,
         verified=True,
-        verification_token='',
+        verification_token="",
         instance_id=1,
         ip_address=ip,
         ip_address_country=country,
         banned=user_ip_banned() or user_cookie_banned(),
+        referrer=session.get("Referer", ""),
         alt_user_name=gibberish(randint(8, 20)),
     )
     setattr(user, oauth_id_key, user_info['id'])  # Assign OAuth provider ID
@@ -85,7 +87,8 @@ def get_token_and_user_info(provider, user_info_endpoint):
 
         resp = oauth_provider.get(user_info_endpoint, token=token)
         return token, resp.json()
-    except Exception:
+    except Exception as e:
+        print(f"Error retrieving token or user info for {provider}: {e}")
         return None, None
 
 
@@ -124,13 +127,19 @@ def can_user_register():
     return True
 
 
-def handle_oauth_authorize(provider, user_info_endpoint, oauth_id_key, form_class=None):
+def handle_oauth_authorize(provider, user_info_endpoint, oauth_id_key, form_class=None, transform_user_info=None):
     """
     Generalized handler for OAuth authorize routes.
     """
     token, user_info = get_token_and_user_info(provider, user_info_endpoint)
+
     if not token or not user_info:
         flash(_('Login failed due to a problem with the OAuth server.'), 'error')
+        return redirect(url_for('auth.login'))
+    if transform_user_info:
+        user_info = transform_user_info(user_info)
+    if not user_info:
+        flash(_('Login failed due to missing user information.'), 'error')
         return redirect(url_for('auth.login'))
 
     can_user_authenticate = can_user_register()
@@ -171,7 +180,7 @@ def finalize_user_login(user, token, ip, country):
     db.session.commit()
 
     login_user(user, remember=True)
-    return redirect(url_for('main.index'))
+    return redirect_next_page()
 
 
 def find_new_username(email: str) -> str:

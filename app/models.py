@@ -878,6 +878,8 @@ class User(UserMixin, db.Model):
     additional_css = db.Column(db.Text)
     mastodon_oauth_id = db.Column(db.String(64), unique=True, index=True)
     discord_oauth_id = db.Column(db.String(64), unique=True, index=True)
+    patreon_oauth_id = db.Column(db.String(64), unique=True, index=True)
+    is_patreon_supporter = db.Column(db.Boolean, default=False)
     password_updated_at = db.Column(db.DateTime, default=utcnow)
 
     avatar = db.relationship('File', lazy='joined', foreign_keys=[avatar_id], single_parent=True, cascade="all, delete-orphan")

@@ -7,68 +7,78 @@
 
 {% block app_content %}
 
-        <div class="row">
-            <div class="col col-login mx-auto">
-                <div class="card mt-5">
-                    <div class="card-body p-6" id="registration_form">
-                        {% if site.registration_mode != 'Closed' %}
-                            <div class="card-title text-center">{{ _('Create new account') }}</div>
-                            {% if google_oauth -%}
+    <div class="row">
+        <div class="col col-login mx-auto">
+            <div class="card mt-5">
+                <div class="card-body p-6" id="registration_form">
+                    {% if site.registration_mode != 'Closed' %}
+                        <div class="card-title text-center">{{ _('Create new account') }}</div>
+                        {% if google_oauth -%}
                             <p align="center">
-                                <a href="/auth/google_login" class="btn btn-outline-primary">{{ _('Log in with Google') }}
+                                <a href="/auth/google_login"
+                                   class="btn btn-outline-primary">{{ _('Log in with Google') }}
                                     <img src="/static/images/tiny_g_logo.png" width="16" alt="Logo"></a>
-
                             </p>
-                            {% endif -%}
-                            {% if mastodon_oauth -%}
+                        {% endif -%}
+                        {% if mastodon_oauth -%}
                             <p align="center">OR<br><br>
-                                <a href="/auth/mastodon_login" class="btn btn-outline-primary">{{ _('Log in with Mastodon') }}
+                                <a href="/auth/mastodon_login"
+                                   class="btn btn-outline-primary">{{ _('Log in with Mastodon') }}
                                     <img src="/static/images/mastodon_ico.png" width="16" alt="Logo"></a>
-
                             </p>
-                            {% endif -%}
-                            {% if discord_oauth -%}
+                        {% endif -%}
+                        {% if discord_oauth -%}
                             <p align="center">OR<br><br>
-                                <a href="/auth/discord_login" class="btn btn-outline-primary">{{ _('Log in with Discord') }}
+                                <a href="/auth/discord_login"
+                                   class="btn btn-outline-primary">{{ _('Log in with Discord') }}
                                     <img src="/static/images/discord_ico.png" width="16" alt="Logo"></a>
-
                             </p>
+                        {% endif -%}
+                        {% if patreon_oauth -%}
+                            <hr/>
+                            <p align="center">
+                                <a href="/auth/patreon_login"
+                                   class="btn btn-outline-primary">{{ _('Log in with Patreon') }}
+                                    <img src="/static/images/patreon_ico.png" width="16" alt="Logo"></a>
+                            </p>
+                        {% endif -%}
+                        <p align="center">{{ _('or use a username and password:') }}</p>
+                        <form method="post">
+                            {{ form.csrf_token() }}
+                            {{ render_field(form.user_name) }}
+                            {{ render_field(form.email) }}
+                            {{ render_field(form.real_email) }}
+                            {{ render_field(form.password) }}
+                            {{ render_field(form.password2) }}
+                            {% if form.question -%}
+                                <div class="mb-3 required">{{ form.question.label.text | safe }}
+                                    {{ form.question(class_="form-control", maxlength=255) }}
+                                    {% if len(form.question.errors) -%}
+                                        <br>
+                                        {% for error in form.question.errors %}
+                                            <span style="color: red;">[{{ error }}]</span>
+                                        {% endfor %}
+                                    {% endif -%}
+                                </div>
                             {% endif -%}
-                            <p align="center">{{ _('or use a username and password:') }}</p>
-                            <form method="post">
-                                {{ form.csrf_token() }}
-                                {{ render_field(form.user_name) }}
-                                {{ render_field(form.email) }}
-                                {{ render_field(form.real_email) }}
-                                {{ render_field(form.password) }}
-                                {{ render_field(form.password2) }}
-                                {% if form.question -%}
-                                    <div class="mb-3 required">{{ form.question.label.text | safe }}
-                                        {{ form.question(class_="form-control", maxlength=255) }}
-                                        {% if len(form.question.errors) -%}
-                                            <br>
-                                            {% for error in form.question.errors %}
-                                                <span style="color: red;">[{{ error }}]</span>
-                                            {% endfor %}
-                                        {% endif -%}
-                                    </div>
-                                {% endif -%}
-                                {% if form.terms -%}
-                                    {{ render_field(form.terms) }}
-                                {% endif -%}
-                                {% if form.captcha %}
-                                    {{ render_field(form.captcha) }}
-                                {% endif -%}
-                                {{ render_field(form.timezone) }}
-                                {{ render_field(form.submit) }}
-                            </form>
-                        {% else %}
-                            <p>{{ _('Registration is closed. Only admins can create accounts.') }}</p>
-                            <p>{{ _('If you would like to sign up for PieFed, choose one of the other instances in our network:') }}</p>
-                            <p class="text-center"><a class="btn btn-primary" href="https://join.piefed.social/try/" title="{{ _('List of open PieFed instances') }}">{{ _('Try PieFed') }}</a></p>
-                        {% endif %}
-                    </div>
+                            {% if form.terms -%}
+                                {{ render_field(form.terms) }}
+                            {% endif -%}
+                            {% if form.captcha %}
+                                {{ render_field(form.captcha) }}
+                            {% endif -%}
+                            {{ render_field(form.timezone) }}
+                            {{ render_field(form.submit) }}
+                        </form>
+                    {% else %}
+                        <p>{{ _('Registration is closed. Only admins can create accounts.') }}</p>
+                        <p>{{ _('If you would like to sign up for PieFed, choose one of the other instances in our network:') }}</p>
+                        <p class="text-center"><a class="btn btn-primary" href="https://join.piefed.social/try/"
+                                                  title="{{ _('List of open PieFed instances') }}">{{ _('Try PieFed') }}</a>
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
+    </div>
 {% endblock %}

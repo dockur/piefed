@@ -7,42 +7,51 @@
 {% from 'bootstrap5/form.html' import render_form -%}
 
 {% block app_content -%}
-<script src="/static/js/simplewebauthn13.umd.min.js" nonce="{{ session.nonce }}"></script>
+    <script src="/static/js/simplewebauthn13.umd.min.js" nonce="{{ session.nonce }}"></script>
     <div class="row">
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
                     <div class="card-title text-center">{{ _('Log in') }}</div>
                     {{ render_form(form) }}
-                    <hr />
+                    <hr/>
                     <p align="center">
-                        <button class="btn btn-outline-primary mt-4 mb-3" id="log_in_with_passkey">{{ _('Log in with a passkey') }}</button>
+                        <button class="btn btn-outline-primary mt-4 mb-3"
+                                id="log_in_with_passkey">{{ _('Log in with a passkey') }}</button>
                     </p>
                     {% if google_oauth -%}
-                    <hr />
-                    <p align="center">
-                        <a href="/auth/google_login" class="btn btn-outline-primary">{{ _('Log in with Google') }}
-                            <img src="/static/images/tiny_g_logo.png" width="16" alt="Logo"></a>
-                    </p>
+                        <hr/>
+                        <p align="center">
+                            <a href="/auth/google_login" class="btn btn-outline-primary">{{ _('Log in with Google') }}
+                                <img src="/static/images/tiny_g_logo.png" width="16" alt="Logo"></a>
+                        </p>
                     {% endif -%}
                     {% if mastodon_oauth -%}
-                    <hr />
-                    <p align="center">
-                        <a href="/auth/mastodon_login" class="btn btn-outline-primary">{{ _('Log in with Mastodon') }}
-                            <img src="/static/images/mastodon_ico.png" width="16" alt="Logo"></a>
-                    </p>
+                        <hr/>
+                        <p align="center">
+                            <a href="/auth/mastodon_login"
+                               class="btn btn-outline-primary">{{ _('Log in with Mastodon') }}
+                                <img src="/static/images/mastodon_ico.png" width="16" alt="Logo"></a>
+                        </p>
                     {% endif -%}
                     {% if discord_oauth -%}
-                    <hr />
-                    <p align="center">
-                        <a href="/auth/discord_login" class="btn btn-outline-primary">{{ _('Log in with Discord') }}
-                            <img src="/static/images/discord_ico.png" width="16" alt="Logo"></a>
-                        </a>
-
-                    </p>
+                        <hr/>
+                        <p align="center">
+                            <a href="/auth/discord_login" class="btn btn-outline-primary">{{ _('Log in with Discord') }}
+                                <img src="/static/images/discord_ico.png" width="16" alt="Logo"></a>
+                        </p>
                     {% endif -%}
-                    <hr />
-                    <p>{{ _('New User?') }} <a href="{{ url_for('auth.register') }}">{{ _('Register new account') }}</a></p>
+                    {% if patreon_oauth -%}
+                        <hr/>
+                        <p align="center">
+                            <a href="/auth/patreon_login"
+                               class="btn btn-outline-primary">{{ _('Log in with Patreon') }}
+                                <img src="/static/images/patreon_ico.png" width="16" alt="Logo"></a>
+                        </p>
+                    {% endif -%}
+                    <hr/>
+                    <p>{{ _('New User?') }} <a href="{{ url_for('auth.register') }}">{{ _('Register new account') }}</a>
+                    </p>
                     <p class="mb-0">
                         {{ _('Forgot Your Password?') }}
                         <a href="{{ url_for('auth.reset_password_request') }}">{{ _('Reset it') }}</a>

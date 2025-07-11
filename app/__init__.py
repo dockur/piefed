@@ -128,6 +128,17 @@ def create_app(config_class=Config):
             api_base_url="https://discord.com/api/",
             client_kwargs={"scope": "identify email"}
         )
+    
+    if app.config['PATREON_CLIENT_ID']:
+        oauth.register(
+            name='patreon',
+            client_id=app.config['PATREON_CLIENT_ID'],
+            client_secret=app.config['PATREON_CLIENT_SECRET'],
+            access_token_url='https://www.patreon.com/api/oauth2/token',
+            authorize_url='https://www.patreon.com/oauth2/authorize',
+            api_base_url='https://www.patreon.com/api/oauth2/v2/',
+            client_kwargs={'scope': 'identity[email]'}
+        )
 
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)

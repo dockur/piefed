@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib.parse import urlencode
 
 from flask import flash, g, make_response, redirect, request, url_for, current_app, session
 from flask_babel import _
@@ -367,3 +368,64 @@ def discord_connect_callback():
     except Exception as e:
         flash(_('Failed to connect Discord account: %(error)s', error=str(e)), 'error')
         return redirect(url_for('user.connect_oauth'))
+
+
+@bp.route("/patreon_login")
+def patreon_login():
+    # If user is already logged in, redirect to connect route
+    if current_user.is_authenticated:
+        return redirect(url_for("auth.patreon_connect"))
+    return oauth.patreon.authorize_redirect(
+        redirect_uri=url_for("auth.patreon_authorize", _external=True)
+    )
+
+
+@bp.route("/patreon_connect")
+@login_required
+def patreon_connect():
+    return oauth.patreon.authorize_redirect(
+        redirect_uri=url_for("auth.patreon_connect_callback", _external=True)
+    )
+
+
+@bp.route("/patreon_authorize")
+def patreon_authorize():
+    return handle_oauth_authorize(
+        provider="patreon",
+        user_info_endpoint="identity?%s" % urlencode({"fields[user]": "email,full_name"}, safe=","),
+        oauth_id_key="patreon_oauth_id",
+        transform_user_info=lambda user_info: {
+            "id": user_info["data"]["id"],
+            "email": user_info["data"].get("attributes", {}).get("email"),
+            "full_name": user_info["data"].get("attributes", {}).get("full_name", ""),
+        }
+    )
+
+
+@bp.route("/patreon_connect_callback")
+@login_required
+def patreon_connect_callback():
+    try:
+        token = oauth.patreon.authorize_access_token()
+        resp = oauth.patreon.get("identity", token=token)
+        user_info = resp.json()
+
+        # Check if this OAuth ID is already connected to another account
+        existing_user = User.query.filter_by(
+            patreon_oauth_id=user_info["data"]["id"]
+        ).first()
+        if existing_user and existing_user.id != current_user.id:
+            flash(
+                _("This Patreon account is already connected to another user."), "error"
+            )
+            return redirect(url_for("user.connect_oauth"))
+
+        # Connect the OAuth ID to the current user
+        current_user.patreon_oauth_id = user_info["data"]["id"]
+        db.session.commit()
+
+        flash(_("Your Patreon account has been connected successfully."), "success")
+        return redirect(url_for("user.connect_oauth"))
+    except Exception as e:
+        flash(_("Failed to connect Patreon account: %(error)s", error=str(e)), "error")
+        return redirect(url_for("user.connect_oauth"))
