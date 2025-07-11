@@ -92,9 +92,8 @@ class Config(object):
     DISCORD_OAUTH_CLIENT_ID = os.environ.get('DISCORD_OAUTH_CLIENT_ID') or ""
     DISCORD_OAUTH_SECRET = os.environ.get('DISCORD_OAUTH_SECRET') or ""
 
-    PATREON_CLIENT_ID = os.environ.get('PATRON_CLIENT_ID') or ''
-    PATREON_CLIENT_SECRET = os.environ.get('PATRON_CLIENT_SECRET') or ''
-    PATREON_ENABLE_SUPPORTER_FLAIR = os.environ.get('PATRON_ENABLE_SUPPORTER_FLAIR', '0') in ('1', 'true', 'True')
+    PATREON_OAUTH_CLIENT_ID = os.environ.get('PATREON_OAUTH_CLIENT_ID') or ''
+    PATREON_OAUTH_CLIENT_SECRET = os.environ.get('PATRON_OAUTH_CLIENT_SECRET') or ''
 
     # enable the aplha api
     ENABLE_ALPHA_API = os.environ.get('ENABLE_ALPHA_API') or False

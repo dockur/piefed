@@ -5,7 +5,7 @@ from flask_babel import _
 from flask_login import login_user, current_user
 
 from app import db, oauth
-from app.auth.util import create_registration_application, get_country, handle_banned_user
+from app.auth.util import create_registration_application, get_country, handle_banned_user, redirect_next_page
 from app.models import User, utcnow
 from app.shared.tasks import task_selector
 from app.utils import finalize_user_setup, get_setting, gibberish, ip_address, user_cookie_banned, user_ip_banned

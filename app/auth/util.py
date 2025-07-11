@@ -326,7 +326,7 @@ def render_registration_form(form):
         google_oauth=current_app.config["GOOGLE_OAUTH_CLIENT_ID"],
         mastodon_oauth=current_app.config["MASTODON_OAUTH_CLIENT_ID"],
         discord_oauth=current_app.config["DISCORD_OAUTH_CLIENT_ID"],
-        patreon_oauth=current_app.config["PATREON_CLIENT_ID"],
+        patreon_oauth=current_app.config["PATREON_OAUTH_CLIENT_ID"],
     )
 
 
@@ -473,5 +473,5 @@ def render_login_form(form):
         google_oauth=current_app.config["GOOGLE_OAUTH_CLIENT_ID"],
         mastodon_oauth=current_app.config["MASTODON_OAUTH_CLIENT_ID"],
         discord_oauth=current_app.config["DISCORD_OAUTH_CLIENT_ID"],
-        patreon_oauth=current_app.config["PATREON_CLIENT_ID"],
+        patreon_oauth=current_app.config["PATREON_OAUTH_CLIENT_ID"],
     )

@@ -597,13 +597,15 @@ def connect_oauth():
     oauth_connections = {
         'google': user.google_oauth_id is not None,
         'discord': user.discord_oauth_id is not None,
-        'mastodon': user.mastodon_oauth_id is not None
+        'mastodon': user.mastodon_oauth_id is not None,
+        'patreon': user.patreon_oauth_id is not None,
     }
 
     oauth_providers = {
         'google': current_app.config["GOOGLE_OAUTH_CLIENT_ID"] != '',
         'mastodon': current_app.config["MASTODON_OAUTH_CLIENT_ID"] != '',
-        'discord': current_app.config["DISCORD_OAUTH_CLIENT_ID"] != ''
+        'discord': current_app.config["DISCORD_OAUTH_CLIENT_ID"] != '',
+        'patreon': current_app.config["PATREON_OAUTH_CLIENT_ID"] != ''
     }
 
     # Handle disconnect requests
@@ -616,6 +618,8 @@ def connect_oauth():
                 user.discord_oauth_id = None
             elif provider == 'mastodon':
                 user.mastodon_oauth_id = None
+            elif provider == 'patreon':
+                user.patreon_oauth_id = None
 
             db.session.commit()
             flash(_('Your %(provider)s account has been disconnected.', provider=provider.capitalize()), 'success')

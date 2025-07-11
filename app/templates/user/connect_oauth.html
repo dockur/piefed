@@ -129,6 +129,40 @@
                                 </div>
                             </div>
                         {% endif %}
+
+                        <!-- Patreon -->
+                        {% if oauth_providers.discord %}
+                            <div>
+                                <div class="card h-100">
+                                    <h3 class="card-header d-flex align-items-center justify-content-center gap-2">
+                                        <img src="/static/images/patreon_ico.png" width="16" alt="Logo"/>
+                                        Patreon
+                                    </h3>
+                                    <div class="card-body d-flex flex-column w-100">
+                                        {% if oauth_connections.patreon %}
+                                            <p class="text-success">
+                                                <i class="fas fa-check-circle"></i> {{ _('Connected') }}
+                                            </p>
+                                            <form method="post" class="mt-auto">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="disconnect_provider" value="patreon">
+                                                <button type="submit" class="btn btn-outline-danger w-100">
+                                                    {{ _('Disconnect') }}
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <p class="text-muted">
+                                                <i class="fas fa-times-circle"></i> {{ _('Not connected') }}
+                                            </p>
+                                            <a href="{{ url_for('auth.patreon_login') }}"
+                                               class="btn btn-primary mt-auto">
+                                                {{ _('Connect Patreon') }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="alert alert-info mt-3">

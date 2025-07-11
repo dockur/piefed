@@ -129,11 +129,11 @@ def create_app(config_class=Config):
             client_kwargs={"scope": "identify email"}
         )
     
-    if app.config['PATREON_CLIENT_ID']:
+    if app.config['PATREON_OAUTH_CLIENT_ID']:
         oauth.register(
             name='patreon',
-            client_id=app.config['PATREON_CLIENT_ID'],
-            client_secret=app.config['PATREON_CLIENT_SECRET'],
+            client_id=app.config['PATREON_OAUTH_CLIENT_ID'],
+            client_secret=app.config['PATREON_OAUTH_CLIENT_SECRET'],
             access_token_url='https://www.patreon.com/api/oauth2/token',
             authorize_url='https://www.patreon.com/oauth2/authorize',
             api_base_url='https://www.patreon.com/api/oauth2/v2/',
