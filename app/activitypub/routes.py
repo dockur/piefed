@@ -1421,8 +1421,7 @@ def process_inbox_request(request_json, store_ap_json):
                     else:  # Mastodon does not have a target when blocking, only object
                         if 'object' in core_activity and isinstance(core_activity['object'], str):
                             if not blocker.has_blocked_user(blocked.id):
-                                session.add(UserBlock(blocker_id=blocker.id, blocked_id=blocked.id))
-                                session.commit()
+                                blocker.block_user(blocked.id)
 
                     return
 

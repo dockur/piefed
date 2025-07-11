@@ -1102,12 +1102,8 @@ def post_report(post_id: int):
 @login_required
 def post_block_user(post_id: int):
     post = Post.query.get_or_404(post_id)
-    existing = UserBlock.query.filter_by(blocker_id=current_user.id, blocked_id=post.author.id).first()
-    if not existing:
-        db.session.add(UserBlock(blocker_id=current_user.id, blocked_id=post.author.id))
-        db.session.commit()
+    current_user.block_user(post.author.id)
     flash(_('%(name)s has been blocked.', name=post.author.user_name))
-    cache.delete_memoized(blocked_users, current_user.id)
 
     if request.headers.get('HX-Request'):
         resp = make_response()
@@ -1423,12 +1419,8 @@ def post_reply_report(post_id: int, comment_id: int):
 def post_reply_block_user(post_id: int, comment_id: int):
     post = Post.query.get_or_404(post_id)
     post_reply = PostReply.query.get_or_404(comment_id)
-    existing = UserBlock.query.filter_by(blocker_id=current_user.id, blocked_id=post_reply.author.id).first()
-    if not existing:
-        db.session.add(UserBlock(blocker_id=current_user.id, blocked_id=post_reply.author.id))
-        db.session.commit()
+    current_user.block_user(post_reply.author.id)
     flash(_('%(name)s has been blocked.', name=post_reply.author.user_name))
-    cache.delete_memoized(blocked_users, current_user.id)
 
     if request.headers.get('HX-Request'):
         resp = make_response()

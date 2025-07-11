@@ -807,21 +807,12 @@ def block_profile(actor):
     if user.id == current_user.id:
         flash(_('You cannot block yourself.'), 'error')
     else:
-        existing_block = UserBlock.query.filter_by(blocker_id=current_user.id, blocked_id=user.id).first()
-        if not existing_block:
-            block = UserBlock(blocker_id=current_user.id, blocked_id=user.id)
-            db.session.add(block)
-            db.session.execute(
-                text('DELETE FROM "notification_subscription" WHERE entity_id = :current_user AND user_id = :user_id'),
-                {'current_user': current_user.id, 'user_id': user.id})
-            db.session.commit()
-
+        current_user.block_user(user.id)
         if not user.is_local():
             ...
             # federate block
 
         flash(_('%(actor)s has been blocked.', actor=actor))
-        cache.delete_memoized(blocked_users, current_user.id)
 
     if request.headers.get('HX-Request'):
         resp = make_response()
@@ -882,17 +873,12 @@ def unblock_profile(actor):
     if user.id == current_user.id:
         flash(_('You cannot unblock yourself.'), 'error')
     else:
-        existing_block = UserBlock.query.filter_by(blocker_id=current_user.id, blocked_id=user.id).first()
-        if existing_block:
-            db.session.delete(existing_block)
-            db.session.commit()
-
+        current_user.unblock_user(user.id)
         if not user.is_local():
             ...
             # federate unblock
 
         flash(_('%(actor)s has been unblocked.', actor=actor))
-        cache.delete_memoized(blocked_users, current_user.id)
 
     if request.headers.get('HX-Request'):
         resp = make_response()
@@ -1322,12 +1308,9 @@ def import_settings_task(user_id, filename):
         for user_ap_id in contents_json['blocked_users'] if 'blocked_users' in contents_json else []:
             blocked_user = find_actor_or_create(user_ap_id)
             if blocked_user:
-                existing_block = UserBlock.query.filter_by(blocker_id=user.id, blocked_id=blocked_user.id).first()
-                if not existing_block:
-                    user_block = UserBlock(blocker_id=user.id, blocked_id=blocked_user.id)
-                    db.session.add(user_block)
-                    if not blocked_user.is_local():
-                        ...  # todo: federate block
+                user.block_user(blocked_user)
+                if not blocked_user.is_local():
+                    ...  # todo: federate block
 
         for instance_domain in contents_json['blocked_instances']:
             ...

@@ -1237,6 +1237,28 @@ class User(UserMixin, db.Model):
         existing_block = UserBlock.query.filter_by(blocker_id=self.id, blocked_id=user_id).first()
         return existing_block is not None
 
+    def block_user(self, target_user_id: int):
+        from app.utils import blocked_users
+        assert self.id != target_user_id
+        existing = UserBlock.query.filter_by(blocker_id=self.id, blocked_id=target_user_id).first()
+        if not existing:
+            db.session.add(UserBlock(blocker_id=self.id, blocked_id=target_user_id))
+            db.session.execute(
+                text('DELETE FROM "notification_subscription" WHERE entity_id = :current_user AND user_id = :user_id'),
+                {'current_user': self.id, 'user_id': target_user_id})
+            db.session.commit()
+        if self.is_local():
+            cache.delete_memoized(blocked_users, self.id)
+
+    def unblock_user(self, target_user_id: int):
+        from app.utils import blocked_users
+        existing = UserBlock.query.filter_by(blocker_id=self.id, blocked_id=target_user_id).first()
+        if existing:
+            db.session.delete(existing)
+            db.session.commit()
+        if self.is_local():
+            cache.delete_memoized(blocked_users, self.id)
+
     @staticmethod
     def verify_reset_password_token(token):
         try:
