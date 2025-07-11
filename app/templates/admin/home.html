@@ -35,4 +35,59 @@
         <p>{{ disk_usage | safe }}</p>
     </div>
 </div>
+
+<div class="row">
+    <div class="col mt-4">
+        <h3>{{ _('Installed Plugins') }}</h3>
+        {% if plugins %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>{{ _('Plugin Name') }}</th>
+                            <th>{{ _('Version') }}</th>
+                            <th>{{ _('Description') }}</th>
+                            <th>{{ _('Source') }}</th>
+                            <th>{{ _('Hooks') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plugin_name, plugin_data in plugins.items() %}
+                        <tr>
+                            <td><strong>{{ plugin_data.info.get('name', plugin_name) }}</strong></td>
+                            <td>{{ plugin_data.info.get('version', 'Unknown') }}</td>
+                            <td>{{ plugin_data.info.get('description', 'No description') }}</td>
+                            <td>
+                                {% if plugin_data.info.get('source_url') %}
+                                    <a href="{{ plugin_data.info.get('source_url') }}" target="_blank" rel="noopener noreferrer">
+                                        <i class="fas fa-external-link-alt"></i> {{ _('Source Code') }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">{{ _('No source URL') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if plugin_hooks.get(plugin_name) %}
+                                    <ul class="list-unstyled mb-0">
+                                        {% for hook_name, handlers in plugin_hooks[plugin_name].items() %}
+                                        <li>
+                                            <code>{{ hook_name }}</code>
+                                            <small class="text-muted">({{ handlers|join(', ') }})</small>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted">{{ _('No hooks') }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">{{ _('No plugins installed.') }}</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

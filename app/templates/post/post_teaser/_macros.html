@@ -44,7 +44,7 @@
 </h3>
 <div class="author small">{% if show_post_community -%}<a href="{{ url_for('activitypub.community_profile', actor=post.community.link(), _external=embed) }}" {{ 'target="_blank"' if embed }} aria-label="{{ _('Go to community %(name)s', name=post.community.name) }}">
     {% if post.community.icon_id and not low_bandwidth %}<img class="community_icon_small rounded-circle" src="{{ post.community.icon_image('tiny') }}" alt="Community icon" />{% endif -%}
-    c/{{ post.community.name }}</a>{% endif -%}
+    c/{{ post.community.name }}</a><span class="community_instance text-muted {{ 'local' if post.community.is_local() }}">@{{ post.community.ap_domain }}</span> {% endif -%}
     by {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
     {% if user_flair and post.author.id in user_flair %}<span class="user_flair">{{ user_flair[post.author.id] }}</span>{% endif %}
     <time datetime="{{ post.last_active }}" title="{{ post.last_active }}">{{ post.posted_at_localized(sort, locale) }}</time></div>

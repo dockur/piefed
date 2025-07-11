@@ -87,10 +87,10 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
         session = get_task_session()
         try:
             with patch_db_session(session):
-                community = Community.query.get(community_id)
+                community = session.query(Community).get(community_id)
                 if not community:
                     return
-                site = Site.query.get(1)
+                site = session.query(Site).get(1)
 
                 is_peertube = is_guppe = is_wordpress = False
                 if community.ap_profile_id == f"https://{server}/video-channels/{name}":
@@ -106,7 +106,7 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                             sleep(0.5)
                             mod = find_actor_or_create(actor)
                             if mod:
-                                existing_membership = CommunityMember.query.filter_by(community_id=community.id, user_id=mod.id).first()
+                                existing_membership = session.query(CommunityMember).filter_by(community_id=community.id, user_id=mod.id).first()
                                 if existing_membership:
                                     existing_membership.is_moderator = True
                                 else:
@@ -115,7 +115,7 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                 try:
                                     session.commit()
                                 except IntegrityError:
-                                    db.session.rollback()
+                                    session.rollback()
 
                 elif community_json and 'attributedTo' in community_json:
                     mods = community_json['attributedTo']
@@ -124,7 +124,7 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                             if 'type' in m and m['type'] == 'Person' and 'id' in m:
                                 mod = find_actor_or_create(m['id'])
                                 if mod:
-                                    existing_membership = CommunityMember.query.filter_by(community_id=community.id, user_id=mod.id).first()
+                                    existing_membership = session.query(CommunityMember).filter_by(community_id=community.id, user_id=mod.id).first()
                                     if existing_membership:
                                         existing_membership.is_moderator = True
                                     else:
@@ -133,10 +133,10 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                     try:
                                         session.commit()
                                     except IntegrityError:
-                                        db.session.rollback()
+                                        session.rollback()
                 if is_peertube:
                     community.restricted_to_mods = True
-                db.session.commit()
+                session.commit()
 
                 # only backfill nsfw if nsfw communities are allowed
                 if (community.nsfw and not site.enable_nsfw) or (community.nsfl and not site.enable_nsfl):
@@ -185,29 +185,108 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                 request_json = announce
                             else:
                                 request_json = announce['object']
-                            post = create_post(True, community, request_json, user, announce['id'])
+                            try:
+                                post = create_post(True, community, request_json, user, announce['id'])
+                            except Exception as e:
+                                session.rollback()
+                                # Log the error but continue processing other posts
+                                print(f"Error creating post: {e}")
+                                continue
                             if post:
                                 if 'published' in activity:
                                     post.posted_at = activity['published']
                                     post.last_active = activity['published']
                                     session.commit()
 
-                                    # todo: create post_replies based on activity['replies'], if it exists
+                                    # create post_replies based on activity['replies'], if it exists
+                                    if 'replies' in activity and isinstance(activity['replies'], str):
+                                        replies = remote_object_to_json(activity['replies'])
+                                        if replies and replies['type'] == 'OrderedCollection' and 'orderedItems' in replies:
+                                            for reply_data in replies['orderedItems']:
+                                                # Skip if reply already exists
+                                                if session.query(PostReply).filter_by(ap_id=reply_data['id']).first():
+                                                    continue
+                                                
+                                                # Find the author of the reply
+                                                reply_author = find_actor_or_create(reply_data['attributedTo'])
+                                                if not reply_author:
+                                                    continue
+                                                
+                                                # Extract reply content
+                                                body = body_html = ''
+                                                if 'content' in reply_data:
+                                                    if not (reply_data['content'].startswith('<p>') or reply_data['content'].startswith('<blockquote>')):
+                                                        reply_data['content'] = '<p>' + reply_data['content'] + '</p>'
+                                                    from app.utils import allowlist_html, markdown_to_html, html_to_text
+                                                    body_html = allowlist_html(reply_data['content'])
+                                                    if 'source' in reply_data and isinstance(reply_data['source'], dict) and \
+                                                            'mediaType' in reply_data['source'] and reply_data['source']['mediaType'] == 'text/markdown':
+                                                        body = reply_data['source']['content']
+                                                        body_html = markdown_to_html(body)
+                                                    else:
+                                                        body = html_to_text(body_html)
+                                                
+                                                # Find parent (post or comment this is replying to)
+                                                in_reply_to = None
+                                                if 'inReplyTo' in reply_data:
+                                                    # Check if replying to the post itself
+                                                    if reply_data['inReplyTo'] == post.ap_id:
+                                                        in_reply_to = None  # Direct reply to post
+                                                    else:
+                                                        # Check if replying to another comment
+                                                        parent_comment = session.query(PostReply).filter_by(ap_id=reply_data['inReplyTo']).first()
+                                                        if parent_comment:
+                                                            in_reply_to = parent_comment
+                                                
+                                                # Get language
+                                                language_id = None
+                                                if 'language' in reply_data and isinstance(reply_data['language'], dict):
+                                                    from app.activitypub.util import find_language_or_create
+                                                    language = find_language_or_create(reply_data['language']['identifier'],
+                                                                                     reply_data['language']['name'])
+                                                    language_id = language.id
+                                                
+                                                # Check if distinguished
+                                                distinguished = reply_data.get('distinguished', False)
+                                                
+                                                # Create the reply
+                                                try:
+                                                    reply_data['object'] = {'id': reply_data['id']}
+                                                    post_reply = PostReply.new(reply_author, post, in_reply_to, body, body_html,
+                                                                               False, language_id, distinguished, reply_data, session=session)
+                                                    session.add(post_reply)
+                                                    community.post_reply_count += 1
+                                                    session.commit()
+                                                except Exception as e:
+                                                    session.rollback()
+                                                    # Log the error but continue processing other replies
+                                                    print(f"Error creating post reply: {e}")
+                                                    continue
                             activities_processed += 1
                             if activities_processed >= max:
                                 break
                         if community.post_count > 0:
-                            community.last_active = Post.query.filter(Post.community_id == community.id).order_by(desc(Post.posted_at)).first().posted_at
+                            community.last_active = session.query(Post).filter(Post.community_id == community.id).order_by(desc(Post.posted_at)).first().posted_at
                             session.commit()
                 if community.ap_featured_url:
                     featured_data = remote_object_to_json(community.ap_featured_url)
                     if featured_data and 'type' in featured_data and featured_data['type'] == 'OrderedCollection' and 'orderedItems' in featured_data:
                         for item in featured_data['orderedItems']:
-                            post = Post.get_by_ap_id(item['id'])
+                            post = session.query(Post).filter_by(ap_id=item['id']).first()
                             if post:
                                 post.sticky = True
                                 session.commit()
-        except Exception:
+            session.execute(text("""UPDATE "post"
+                                  SET reply_count = (
+                                      SELECT COUNT(*)
+                                      FROM post_reply
+                                      WHERE post_reply.post_id = post.id
+                                      AND post_reply.deleted = false
+                                  )
+                                  WHERE post.community_id = :community_id;
+                                 """), {'community_id': community.id})
+            session.commit()
+        except Exception as e:
             session.rollback()
             raise
         finally:

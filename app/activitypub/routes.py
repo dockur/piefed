@@ -16,7 +16,8 @@ from app.activitypub.util import users_total, active_half_year, active_month, lo
     update_post_from_activity, undo_vote, post_to_page, find_reported_object, \
     process_report, ensure_domains_match, resolve_remote_post, refresh_community_profile, \
     comment_model_to_json, restore_post_or_comment, ban_user, unban_user, \
-    log_incoming_ap, find_community, site_ban_remove_data, community_ban_remove_data, verify_object_from_source
+    log_incoming_ap, find_community, site_ban_remove_data, community_ban_remove_data, verify_object_from_source, \
+    post_replies_for_ap
 from app.community.routes import show_community
 from app.community.util import send_to_remote_instance
 from app.constants import *
@@ -1814,6 +1815,23 @@ def post_ap(post_id):
         return resp
     else:
         return show_post(post_id)
+
+
+@bp.route('/post/<int:post_id>/replies', methods=['GET'])
+def post_replies_ap(post_id):
+    if request.method == 'GET' or request.method == 'HEAD' and is_activitypub_request():
+        post = Post.query.get_or_404(post_id)
+
+        if request.method == 'GET':
+            replies = post_replies_for_ap(post.id)
+            replies_collection = {"type": "OrderedCollection", "totalItems": len(replies), "orderedItems": replies}
+        else:
+            replies_collection = {}
+        replies_collection['@context'] = default_context()
+        resp = jsonify(replies_collection)
+        resp.content_type = 'application/activity+json'
+        resp.headers.set('Vary', 'Accept')
+        return resp
 
 
 @bp.route('/activities/<type>/<id>')

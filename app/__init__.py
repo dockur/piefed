@@ -222,6 +222,10 @@ def create_app(config_class=Config):
     app.logger.setLevel(logging.INFO)
     app.logger.info('Started!') # let's go!
 
+    # Load plugins
+    from app.plugins import load_plugins
+    load_plugins()
+
     return app
 
 

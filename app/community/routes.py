@@ -12,7 +12,7 @@ from slugify import slugify
 from sqlalchemy import or_, asc, desc, text
 from sqlalchemy.orm.exc import NoResultFound
 
-from app import db, cache, celery, httpx_client, limiter
+from app import db, cache, celery, httpx_client, limiter, plugins
 from app.activitypub.signature import RsaKeys, post_request, send_post_request
 from app.activitypub.util import extract_domain_and_actor, find_actor_or_create
 from app.chat.util import send_message
@@ -877,6 +877,16 @@ def add_post(actor, type):
 
     if form.validate_on_submit():
         try:
+            # Fire before_post_create hook for plugins
+            post_data = {
+                'title': form.title.data,
+                'content': form.body.data if hasattr(form, 'body') else '',
+                'community': community.name,
+                'post_type': post_type,
+                'user_id': current_user.id
+            }
+            plugins.fire_hook('before_post_create', post_data)
+            
             uploaded_file = request.files['image_file'] if type == 'image' else None
             post = make_post(form, community, post_type, SRC_WEB, uploaded_file=uploaded_file)
         except Exception as ex:

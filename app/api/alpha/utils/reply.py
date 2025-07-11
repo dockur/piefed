@@ -14,6 +14,7 @@ from app.utils import authorise_api_user, blocked_users, blocked_instances, site
 
 def get_reply_list(auth, data, user_id=None):
     sort = data['sort'] if data and 'sort' in data else "New"
+    depth_first = data['depth_first'] if data and 'depth_first' in data else ""  # sort by depth before sorting by anything else
     max_depth = data['max_depth'] if data and 'max_depth' in data else None
     page = int(data['page']) if data and 'page' in data else 1
     limit = int(data['limit']) if data and 'limit' in data else 10
@@ -79,6 +80,8 @@ def get_reply_list(auth, data, user_id=None):
             {"user_id": user_id}).scalars()
         replies = replies.filter(PostReply.id.in_(bookmarked_reply_ids))
 
+    if depth_first:
+        replies = replies.order_by(PostReply.depth)
     if sort == "Hot":
         replies = replies.order_by(desc(PostReply.ranking)).order_by(desc(PostReply.posted_at))
     elif sort == "Top":

@@ -19,6 +19,7 @@ from app import db, celery, cache
 from app.activitypub.routes import process_inbox_request, process_delete_request, replay_inbox_request
 from app.activitypub.signature import post_request, default_context, RsaKeys
 from app.activitypub.util import instance_allowed, extract_domain_and_actor
+from app.admin.constants import ReportTypes
 from app.admin.forms import FederationForm, SiteMiscForm, SiteProfileForm, EditCommunityForm, EditUserForm, \
     EditTopicForm, SendNewsletterForm, AddUserForm, PreLoadCommunitiesForm, ImportExportBannedListsForm, \
     EditInstanceForm, RemoteInstanceScanForm, MoveCommunityForm, EditBlockedImageForm, AddBlockedImageForm, CmsPageForm
@@ -61,9 +62,17 @@ def admin_home():
         disk_usage = f"<span class='blink red'>Storage used: {percent_used:.2f}%</span>"
     else:
         disk_usage = f"Storage used: {percent_used:.2f}%"
+    
+    # Get plugin information
+    from app.plugins import get_loaded_plugins, get_plugin_hooks
+    plugins = get_loaded_plugins()
+    plugin_hooks = get_plugin_hooks()
+    
     return render_template('admin/home.html', title=_('Admin'), load1=load1, load5=load5, load15=load15,
                            num_cores=num_cores,
-                           disk_usage=disk_usage)
+                           disk_usage=disk_usage,
+                           plugins=plugins,
+                           plugin_hooks=plugin_hooks)
 
 
 @bp.route('/site', methods=['GET', 'POST'])
@@ -1635,6 +1644,7 @@ def admin_user_delete(user_id):
     return redirect(referrer())
 
 
+
 @bp.route('/reports', methods=['GET'])
 @permission_required('administer all users')
 @login_required
@@ -1642,19 +1652,25 @@ def admin_reports():
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search', '')
     local_remote = request.args.get('local_remote', '')
-
+    report_types = request.args.getlist('report_types',  type=int)  # Extract multiple values
+    
+    if len(report_types) == 0:
+        report_types = [-1]
+    
     reports = Report.query.filter(or_(Report.status == REPORT_STATE_NEW, Report.status == REPORT_STATE_ESCALATED))
     if local_remote == 'local':
         reports = reports.filter_by(source_instance_id=1)
     if local_remote == 'remote':
         reports = reports.filter(Report.source_instance_id != 1)
+    if len(report_types) > 0 and -1 not in report_types:
+        reports = reports.filter(Report.type.in_(report_types))
     reports = reports.order_by(desc(Report.created_at)).paginate(page=page, per_page=1000, error_out=False)
 
     next_url = url_for('admin.admin_reports', page=reports.next_num) if reports.has_next else None
     prev_url = url_for('admin.admin_reports', page=reports.prev_num) if reports.has_prev and page != 1 else None
 
     return render_template('admin/reports.html', title=_('Reports'), next_url=next_url, prev_url=prev_url,
-                           reports=reports, local_remote=local_remote, search=search)
+                           reports=reports, local_remote=local_remote, search=search, report_types=report_types, report_types_list=ReportTypes.get_choices())
 
 
 @bp.route('/newsletter', methods=['GET', 'POST'])

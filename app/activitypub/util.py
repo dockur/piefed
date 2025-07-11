@@ -147,7 +147,7 @@ def post_to_page(post: Post):
         "stickied": post.sticky,
         "audience": post.community.public_url(),
         "tag": post.tags_for_activitypub(),
-        "replies": post_replies_for_ap(post.id),
+        "replies": f'https://{current_app.config["SERVER_NAME"]}/post/{post.id}/replies',
         "language": {
             "identifier": post.language_code(),
             "name": post.language_name()
@@ -2955,7 +2955,8 @@ def remote_object_to_json(uri):
         except:
             object_request.close()
             return None
-        object_request.close()
+        finally:
+            object_request.close()
     elif object_request.status_code == 401:
         site = Site.query.get(1)
         try:
@@ -2970,9 +2971,9 @@ def remote_object_to_json(uri):
             object = object_request.json()
             return object
         except:
-            object_request.close()
             return None
-        object_request.close()
+        finally:
+            object_request.close()
     else:
         return None
 

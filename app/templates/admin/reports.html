@@ -7,50 +7,63 @@
 {% set active_child = 'admin_reports' %}
 
 {% block app_content %}
-{% include 'admin/_tabbed_nav.html' %}
-<br>
-<div class="row">
-    <div class="col">
-        <h1>{{ _('Reports') }}</h1>
-        <form method="get">
-            <input type="search" name="search" value="{{ search }}">
-            <input type="radio" name="local_remote" value="local" id="local_remote_local" {{ 'checked' if local_remote == 'local' }}><label for="local_remote_local"> Local</label>
-            <input type="radio" name="local_remote" value="remote" id="local_remote_remote" {{ 'checked' if local_remote == 'remote' }}><label for="local_remote_remote"> Remote</label>
-            <input type="submit" name="submit" value="Search" class="btn btn-primary">
-        </form>
-        <table class="table table-striped">
-            <tr>
-               <th>Local/Remote</th>
-               <th>Reasons</th>
-               <th>Description</th>
-               <th>Type</th>
-               <th>Created</th>
-               <th>Actions</th>
-            </tr>
-            {% for report in reports.items %}
+    <script src="/static/js/tomselect/tom-select.complete.min.js"></script>
+    {% include 'admin/_tabbed_nav.html' %}
+    <br>
+    <div class="row">
+        <div class="col">
+            <h1>{{ _('Reports') }}</h1>
+            <form method="get" class="mb-3 d-flex gap-3 align-items-center">
+                <input type="search" name="search" placeholder="{{ _('Query') }}" value="{{ search }}">
+                <label for="local_remote_local">
+                    <input type="radio" name="local_remote" value="local"
+                           id="local_remote_local" {{ 'checked' if local_remote == 'local' }} /> Local</label>
+                <label for="local_remote_remote">
+                    <input type="radio" name="local_remote" value="remote"
+                           id="local_remote_remote" {{ 'checked' if local_remote == 'remote' }} /> Remote</label>
+                <select name="report_types" id="report_types" multiple class="form-select" style="width: 200px">
+                    {% for value, label in report_types_list %}
+                        <option value="{{ value }}" {% if value in report_types %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="submit" name="submit" value="Search" class="btn btn-primary"/>
+            </form>
+            <table class="table table-striped">
                 <tr>
-                    <td>{{ 'Local' if report.is_local() else 'Remote' }}</td>
-                    <td>{{ report.reasons }}</td>
-                    <td>{{ report.description }}</td>
-                    <td>{{ report.type_text() }}</td>
-                    <td>{{ arrow.get(report.created_at).humanize(locale=locale) }}</td>
-                    <td>
-                        {% if report.suspect_conversation_id %}
-                            <a href="/chat/{{ report.suspect_conversation_id }}#message">View</a>
-                        {% elif report.suspect_post_reply_id %}
-                            <a href="/post/{{ report.suspect_post_id }}#comment_{{ report.suspect_post_reply_id }}">View</a>
-                        {% elif report.suspect_post_id %}
-                            <a href="/post/{{ report.suspect_post_id }}">View</a>
-                        {% elif report.suspect_user_id %}
-                            <a href="/user/{{ report.suspect_user_id }}">View</a>
-                        {% elif report.suspect_community_id %}
-                            <a href="/user/{{ report.suspect_community_id }}">View</a>
-                        {% endif %}
-                    </td>
+                    <th>Local/Remote</th>
+                    <th>Reasons</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Created</th>
+                    <th>Actions</th>
                 </tr>
-            {% endfor %}
-        </table>
-        <nav aria-label="Pagination" class="mt-4" role="navigation">
+                {% for report in reports.items %}
+                    <tr>
+                        <td>{{ 'Local' if report.is_local() else 'Remote' }}</td>
+                        <td>{{ report.reasons }}</td>
+                        <td>{{ report.description }}</td>
+                        <td>{{ report.type_text() }}</td>
+                        <td>{{ arrow.get(report.created_at).humanize(locale=locale) }}</td>
+                        <td>
+                            {% if report.suspect_conversation_id %}
+                                <a href="/chat/{{ report.suspect_conversation_id }}#message">View</a>
+                            {% elif report.suspect_post_reply_id %}
+                                <a href="/post/{{ report.suspect_post_id }}#comment_{{ report.suspect_post_reply_id }}">View</a>
+                            {% elif report.suspect_post_id %}
+                                <a href="/post/{{ report.suspect_post_id }}">View</a>
+                            {% elif report.suspect_user_id %}
+                                <a href="/user/{{ report.suspect_user_id }}">View</a>
+                            {% elif report.suspect_community_id %}
+                                <a href="/user/{{ report.suspect_community_id }}">View</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <nav aria-label="Pagination" class="mt-4" role="navigation">
                 {% if prev_url %}
                     <a href="{{ prev_url }}" class="btn btn-primary">
                         <span aria-hidden="true">&larr;</span> {{ _('Previous page') }}
@@ -61,14 +74,14 @@
                         {{ _('Next page') }} <span aria-hidden="true">&rarr;</span>
                     </a>
                 {% endif %}
-        </nav>
+            </nav>
+        </div>
     </div>
-</div>
-<hr />
-<div class="row">
-    <div class="col">
-        {% include 'admin/_nav.html' %}
+    <hr/>
+    <div class="row">
+        <div class="col">
+            {% include 'admin/_nav.html' %}
+        </div>
     </div>
-</div>
-<hr />
+    <hr/>
 {% endblock %}

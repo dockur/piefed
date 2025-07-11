@@ -165,7 +165,7 @@ def delete_old_soft_deleted_content():
             post_reply = session.query(PostReply).get(post_reply_id)
             if post_reply:  # Check if still exists
                 post_reply.delete_dependencies()
-                if not post_reply.has_replies():
+                if not post_reply.has_replies(include_deleted=True):
                     session.delete(post_reply)
                     session.commit()
 
