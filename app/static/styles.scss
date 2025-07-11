@@ -1043,6 +1043,9 @@ time {
     p {
       padding-right: 9px;
     }
+    p:last-child {
+      margin-bottom: 0px;
+    }
   }
 
   &:first-child {
@@ -1322,7 +1325,6 @@ time {
   }
 
   .comment_actions {
-    margin-top: -18px;
     display: flex;
     min-height: $min-touch-target;
     container-type: inline-size;

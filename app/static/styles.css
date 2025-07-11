@@ -1462,6 +1462,9 @@ time {
 .comments > .comment .comment_body p {
   padding-right: 9px;
 }
+.comments > .comment .comment_body p:last-child {
+  margin-bottom: 0px;
+}
 .comments > .comment:first-child {
   border-top: none;
   padding-top: 0;
@@ -1692,7 +1695,6 @@ time {
   text-decoration: none;
 }
 .comment .comment_actions {
-  margin-top: -18px;
   display: flex;
   min-height: 44px;
   container-type: inline-size;
