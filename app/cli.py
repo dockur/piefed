@@ -554,7 +554,7 @@ def register(app):
                     except Exception as e:
                         db.session.rollback()
                         instance.failures += 1
-                        current_app.logger.error(f"Error rechecking dormant instance {instance.domain}: {e}")
+                        current_app.logger.warning(f"Error rechecking dormant instance {instance.domain}: {e}")
 
                 db.session.commit()
 
