@@ -86,7 +86,7 @@ And if you want to add your score to the database to help your fellow Bookworms 
         markdown = "Paragraph with <script>alert('xss')</script> script."
         result = markdown_to_html(markdown)
         self.assertEqual(result, "<p>Paragraph with &lt;script&gt;alert('xss')&lt;/script&gt; script.</p>\n")
-    
+
     def test_double_bold(self):
         """Test a variety of cases where bold markdown has caused problems in the past"""
         markdown = "Two **bold** words in one **bold** sentence."

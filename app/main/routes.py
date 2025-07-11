@@ -648,7 +648,7 @@ def keyboard_shortcuts():
 
 
 def list_files(directory):
-    for root, dirs, files in os.walk(directory):
+    for root, _dirs, files in os.walk(directory):
         for file in files:
             yield os.path.join(root, file)
 

@@ -34,8 +34,8 @@ def log_user_in(input, src):
         except NoResultFound:
             try:
                 user = User.query.filter_by(email=username, ap_id=None, deleted=False).one()
-            except NoResultFound:
-                raise Exception('incorrect_login')
+            except NoResultFound as e:
+                raise Exception('incorrect_login') from e
     else:
         return None
 

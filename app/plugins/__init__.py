@@ -20,34 +20,34 @@ _loaded_plugins: Dict[str, Any] = {}
 def load_plugins(plugins_dir: str = None) -> Dict[str, Any]:
     """
     Load all plugins from the plugins directory
-    
+
     Args:
         plugins_dir: Directory containing plugins (defaults to app/plugins)
-    
+
     Returns:
         Dictionary of loaded plugins
     """
     if plugins_dir is None:
         plugins_dir = os.path.join(os.path.dirname(__file__))
-    
+
     plugins_path = Path(plugins_dir)
     if not plugins_path.exists():
         logger.warning(f"Plugins directory not found: {plugins_dir}")
         return {}
-    
+
     loaded_count = 0
-    
+
     for plugin_dir in plugins_path.iterdir():
         if not plugin_dir.is_dir() or plugin_dir.name.startswith('_'):
             continue
-            
+
         plugin_name = plugin_dir.name
         plugin_file = plugin_dir / "__init__.py"
-        
+
         if not plugin_file.exists():
             logger.warning(f"Plugin {plugin_name} missing __init__.py")
             continue
-        
+
         try:
             # Load the plugin module
             spec = importlib.util.spec_from_file_location(
@@ -57,27 +57,27 @@ def load_plugins(plugins_dir: str = None) -> Dict[str, Any]:
             if spec is None or spec.loader is None:
                 logger.error(f"Could not load plugin spec for {plugin_name}")
                 continue
-                
+
             plugin_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(plugin_module)
-            
+
             # Get plugin info if available
             plugin_info = {}
             if hasattr(plugin_module, 'plugin_info'):
                 plugin_info = plugin_module.plugin_info()
-            
+
             _loaded_plugins[plugin_name] = {
                 'module': plugin_module,
                 'info': plugin_info,
                 'path': str(plugin_dir)
             }
-            
+
             loaded_count += 1
             logger.info(f"Loaded plugin: {plugin_name}")
-            
+
         except Exception as e:
             logger.error(f"Failed to load plugin {plugin_name}: {e}")
-    
+
     logger.info(f"Successfully loaded {loaded_count} plugins")
     return _loaded_plugins
 
@@ -99,15 +99,15 @@ def reload_plugin(plugin_name: str) -> bool:
     """Reload a specific plugin"""
     if plugin_name not in _loaded_plugins:
         return False
-    
+
     try:
         plugin_path = _loaded_plugins[plugin_name]['path']
-        
+
         # Clean up old hooks for this plugin
         from .hooks import _hooks, _plugin_hooks
         if plugin_name in _plugin_hooks:
             # Remove old hook registrations
-            for hook_name, function_names in _plugin_hooks[plugin_name].items():
+            for hook_name, _function_names in _plugin_hooks[plugin_name].items():
                 if hook_name in _hooks:
                     # Remove functions that belong to this plugin
                     _hooks[hook_name] = [
@@ -119,37 +119,37 @@ def reload_plugin(plugin_name: str) -> bool:
                         del _hooks[hook_name]
             # Clear plugin hook registry
             del _plugin_hooks[plugin_name]
-        
+
         # Remove from loaded plugins
         del _loaded_plugins[plugin_name]
-        
+
         # Reload
         plugin_dir = Path(plugin_path)
         plugin_file = plugin_dir / "__init__.py"
-        
+
         spec = importlib.util.spec_from_file_location(
             f"app.plugins.{plugin_name}", 
             plugin_file
         )
         if spec is None or spec.loader is None:
             return False
-            
+
         plugin_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(plugin_module)
-        
+
         plugin_info = {}
         if hasattr(plugin_module, 'plugin_info'):
             plugin_info = plugin_module.plugin_info()
-        
+
         _loaded_plugins[plugin_name] = {
             'module': plugin_module,
             'info': plugin_info,
             'path': str(plugin_dir)
         }
-        
+
         logger.info(f"Reloaded plugin: {plugin_name}")
         return True
-        
+
     except Exception as e:
         logger.error(f"Failed to reload plugin {plugin_name}: {e}")
         return False

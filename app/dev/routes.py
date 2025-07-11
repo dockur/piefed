@@ -47,35 +47,35 @@ def tools():
                                   ap_followers_url='https://' + current_app.config['SERVER_NAME'] + '/c/' + name.lower() + '/followers',
                                   ap_domain=current_app.config['SERVER_NAME'],
                                   subscriptions_count=1, instance_id=1, low_quality='memes' in name)            
-            
+
             # add and commit to db
             db.session.add(community)
             db.session.commit()
-            
+
             # add community membership for current user
             # add to db
             membership = CommunityMember(user_id=current_user.id, community_id=community.id, is_moderator=True,
                                          is_owner=True)
             db.session.add(membership)
-            
+
             # do the cache clearing bits
             cache.delete_memoized(community_membership, current_user, community)
             cache.delete_memoized(joined_communities, current_user.id)
             cache.delete_memoized(moderating_communities, current_user.id)
-        
+
         # redirect browser to communities list page
         return redirect(url_for('main.list_communities'))
-    
+
     # create 10 dev_ topics
     elif topics_form.topics_submit.data and topics_form.validate():
         # get the list of communities in the db
         communities = Community.query.filter_by(banned=False)
-        
+
         # pick 10 random communities from the communities list
         rand_communities = []
-        for c in range(10):
+        for _ in range(10):
             rand_communities.append(random.choice(communities.all()))
-        
+
         # generate new topics
         for n in range(10):
             # generate strings for name, machine_name, and default to 0 communities
@@ -96,7 +96,7 @@ def tools():
 
         # pick 10 random topics from the topics list
         rand_topics = []
-        for t in range(10):
+        for _ in range(10):
             rand_topics.append(random.choice(topics.all()))
 
         # get those topic_ids
@@ -116,7 +116,7 @@ def tools():
             db.session.commit()
             community.topic.num_communities = community.topic.communities.count()
             db.session.commit()
-        
+
         # redirect browser to topics list page
         return redirect(url_for('main.list_topics'))
 
@@ -124,7 +124,7 @@ def tools():
     elif delete_communities_form.delete_communities_submit.data and delete_communities_form.validate():
         # get the list of local communities
         communities = Community.query.filter_by(banned=False, local_only=True)
-        
+
         # sort for ones whose name field starts with "dev_"
         dev_communities = []
         for c in communities.all():
@@ -141,7 +141,7 @@ def tools():
             c.last_active = utcnow()
             db.session.commit()
             unsubscribe_everyone_then_delete(c.id)
-        
+
         # redirect browser to communities list page
         flash(_('%(num_communities)d dev communities deleted', len(dev_communities)))
         return redirect(url_for('main.list_communities'))
@@ -156,13 +156,13 @@ def tools():
         for t in topics.all():
             if t.name.startswith("dev_"):
                 dev_topics.append(t)
-        
+
         # loop through the topics
         # if the topic has communities in it, set it aside and tell the dev
         # else delete it
         topics_with_communities = 0
         deleted_topics = 0
-   
+
         for t in dev_topics:
             topic = Topic.query.filter_by(id=t.id).first()
             topic.num_communities = topic.communities.count()
@@ -185,6 +185,6 @@ def tools():
                                topics_form=topics_form,
                                delete_communities_form=delete_communities_form,
                                delete_topics_form=delete_topics_form,
-                               
+
                                inoculation=inoculation[random.randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
                                )

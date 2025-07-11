@@ -25,14 +25,14 @@ cli.register(app)
 
 @app.context_processor
 def app_context_processor():
-    return dict(getmtime=getmtime, instance_domain=current_app.config['SERVER_NAME'], debug_mode=current_app.debug,
-                arrow=arrow, locale=g.locale if hasattr(g, 'locale') else None, notif_server=current_app.config['NOTIF_SERVER'],
-                site=g.site if hasattr(g, 'site') else None, nonce=g.nonce if hasattr(g, 'nonce') else None,
-                admin_ids=g.admin_ids if hasattr(g, 'admin_ids') else [], low_bandwidth=g.low_bandwidth if hasattr(g, 'low_bandwidth') else None,
-                POST_TYPE_LINK=POST_TYPE_LINK, POST_TYPE_IMAGE=POST_TYPE_IMAGE, notif_id_to_string=notif_id_to_string,
-                POST_TYPE_ARTICLE=POST_TYPE_ARTICLE, POST_TYPE_VIDEO=POST_TYPE_VIDEO, POST_TYPE_POLL=POST_TYPE_POLL,
-                SUBSCRIPTION_MODERATOR=SUBSCRIPTION_MODERATOR, SUBSCRIPTION_MEMBER=SUBSCRIPTION_MEMBER,
-                SUBSCRIPTION_OWNER=SUBSCRIPTION_OWNER, SUBSCRIPTION_PENDING=SUBSCRIPTION_PENDING, VERSION=VERSION)
+    return {'getmtime': getmtime, 'instance_domain': current_app.config['SERVER_NAME'], 'debug_mode': current_app.debug,
+                'arrow': arrow, 'locale': g.locale if hasattr(g, 'locale') else None, 'notif_server': current_app.config['NOTIF_SERVER'],
+                'site': g.site if hasattr(g, 'site') else None, 'nonce': g.nonce if hasattr(g, 'nonce') else None,
+                'admin_ids': g.admin_ids if hasattr(g, 'admin_ids') else [], 'low_bandwidth': g.low_bandwidth if hasattr(g, 'low_bandwidth') else None,
+                'POST_TYPE_LINK': POST_TYPE_LINK, 'POST_TYPE_IMAGE': POST_TYPE_IMAGE, 'notif_id_to_string': notif_id_to_string,
+                'POST_TYPE_ARTICLE': POST_TYPE_ARTICLE, 'POST_TYPE_VIDEO': POST_TYPE_VIDEO, 'POST_TYPE_POLL': POST_TYPE_POLL,
+                'SUBSCRIPTION_MODERATOR': SUBSCRIPTION_MODERATOR, 'SUBSCRIPTION_MEMBER': SUBSCRIPTION_MEMBER,
+                'SUBSCRIPTION_OWNER': SUBSCRIPTION_OWNER, 'SUBSCRIPTION_PENDING': SUBSCRIPTION_PENDING, 'VERSION': VERSION}
 
 
 @app.shell_context_processor
@@ -73,7 +73,7 @@ def before_request():
     # Handle CORS preflight requests for all routes
     if request.method == 'OPTIONS':
         return '', 200
-    
+
     # Store nonce in g (g is per-request, unlike session)
     g.nonce = gibberish()
     g.locale = str(get_locale())
@@ -104,7 +104,7 @@ def after_request(response):
     response.headers['Access-Control-Allow-Origin'] = current_app.config.get('CORS_ALLOW_ORIGIN', '*')
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept'
-    
+
     # Don't set cookies for static resources or ActivityPub responses to make them cachable
     if request.path.startswith('/static/') or request.path.startswith('/bootstrap/static/') or response.content_type == 'application/activity+json':
         # Remove session cookies that mess up caching

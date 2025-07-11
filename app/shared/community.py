@@ -215,9 +215,9 @@ def make_community(input, src, auth=None, uploaded_icon_file=None, uploaded_bann
     try:
         db.session.add(community)
         db.session.commit()
-    except IntegrityError:
+    except IntegrityError as e:
         db.session.rollback()
-        raise Exception('Community with that name already exists')
+        raise Exception('Community with that name already exists') from e
 
     membership = CommunityMember(user_id=user.id, community_id=community.id, is_moderator=True, is_owner=True)
     db.session.add(membership)

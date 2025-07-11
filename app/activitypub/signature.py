@@ -280,7 +280,7 @@ class HttpSignature:
             key_names = " ".join(bits.keys())
             raise VerificationError(
                 f"Missing item from details (have: {key_names}, error: {e})"
-            )
+            ) from e
         return signature_details
 
     @classmethod
@@ -310,8 +310,8 @@ class HttpSignature:
                 padding.PKCS1v15(),
                 hashes.SHA256(),
             )
-        except InvalidSignature:
-            raise VerificationError("Signature mismatch")
+        except InvalidSignature as e:
+            raise VerificationError("Signature mismatch") from e
 
     @classmethod
     def verify_request(cls, request: Request, public_key, skip_date=False):
@@ -469,8 +469,8 @@ class LDSignature:
                 "creator": signature["creator"],
                 "created": signature["created"],
             }
-        except KeyError:
-            raise VerificationFormatError("Invalid signature section")
+        except KeyError as e: 
+            raise VerificationFormatError("Invalid signature section") from e
         if signature["type"].lower() != "rsasignature2017":
             raise VerificationFormatError("Unknown signature type")
         # Get the normalised hash of each document
@@ -487,8 +487,8 @@ class LDSignature:
                 padding.PKCS1v15(),
                 hashes.SHA256(),
             )
-        except InvalidSignature:
-            raise VerificationError("Signature mismatch")
+        except InvalidSignature as e:
+            raise VerificationError("Signature mismatch") from e
 
     @classmethod
     def create_signature(

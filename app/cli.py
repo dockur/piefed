@@ -725,7 +725,7 @@ def register(app):
                                         AND p.community_id = :community_id
                                 ) AS activity
                             '''), {'time_interval': interval,'community_id': community_id}).scalar()
-                    
+
                     # update the community stats in the db
                     try:
                         if interval == day:
@@ -1034,7 +1034,7 @@ def register(app):
                     print(f'{user.id},"{user.ap_id}",{filesize},{num_content}')
 
     def list_files(directory):
-        for root, dirs, files in os.walk(directory):
+        for root, _dirs, files in os.walk(directory):
             for file in files:
                 yield os.path.join(root, file)
 
@@ -1403,7 +1403,7 @@ def register(app):
                     SET path = reply_path.path
                     FROM reply_path
                     WHERE post_reply.id = reply_path.id;
-                    '''
+                    ''' # noqa: W293
             db.session.execute(text(sql))
             db.session.commit()
 

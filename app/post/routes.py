@@ -1239,7 +1239,7 @@ def post_set_flair(post_id):
             curr_url = request.headers.get("HX-Current-Url")
             flair_sent = []
 
-            form_fields = [key for key in request.form]
+            form_fields = list(request.form)
             for field in form_fields:
                 if field.startswith("flair-"):
                     flair_sent.append(int(field.partition("flair-")[2]))

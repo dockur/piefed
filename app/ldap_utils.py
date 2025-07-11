@@ -57,12 +57,12 @@ def _get_ldap_connection() -> Optional[Connection]:
 def sync_user_to_ldap(username: str, email: str, password: str) -> bool:
     """
     Synchronize user data to LDAP server.
-    
+
     Args:
         username: User's username
         email: User's email address
         password: User's plain text password
-        
+
     Returns:
         bool: True if sync was successful or skipped, False if failed
     """
