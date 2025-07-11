@@ -130,7 +130,8 @@ def home_page(sort, view_filter):
     active_communities = active_communities.order_by(desc(Community.last_active)).limit(5).all()
 
     # New Communities
-    new_communities = Community.query.filter_by(banned=False).filter_by(nsfw=False).filter_by(nsfl=False)
+    cutoff = utcnow() - timedelta(days=30)
+    new_communities = Community.query.filter_by(banned=False).filter_by(nsfw=False).filter_by(nsfl=False).filter(Community.created_at > cutoff)
     if current_user.is_authenticated:  # do not show communities current user is banned from
         banned_from = communities_banned_from(current_user.id)
         if banned_from:
