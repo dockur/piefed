@@ -62,12 +62,12 @@ def admin_home():
         disk_usage = f"<span class='blink red'>Storage used: {percent_used:.2f}%</span>"
     else:
         disk_usage = f"Storage used: {percent_used:.2f}%"
-    
+
     # Get plugin information
     from app.plugins import get_loaded_plugins, get_plugin_hooks
     plugins = get_loaded_plugins()
     plugin_hooks = get_plugin_hooks()
-    
+
     return render_template('admin/home.html', title=_('Admin'), load1=load1, load5=load5, load15=load15,
                            num_cores=num_cores,
                            disk_usage=disk_usage,
@@ -866,8 +866,8 @@ def import_bans_task(filename):
                         already_allowed_instances = []
                         already_allowed = AllowedInstances.query.all()
                         if len(already_allowed) > 0:
-                            for already_allowed in already_allowed:
-                                already_allowed_instances.append(already_allowed.domain)
+                            for already_allowed_instance in already_allowed:
+                                already_allowed_instances.append(already_allowed_instance.domain)
 
                         # loop through the instances_allowed
                         for allowed_instance in instances_allowed:
@@ -1653,10 +1653,10 @@ def admin_reports():
     search = request.args.get('search', '')
     local_remote = request.args.get('local_remote', '')
     report_types = request.args.getlist('report_types',  type=int)  # Extract multiple values
-    
+
     if len(report_types) == 0:
         report_types = [-1]
-    
+
     reports = Report.query.filter(or_(Report.status == REPORT_STATE_NEW, Report.status == REPORT_STATE_ESCALATED))
     if local_remote == 'local':
         reports = reports.filter_by(source_instance_id=1)

@@ -290,7 +290,7 @@ def allowlist_html(html: str, a_target='_blank') -> str:
             tag_name = tag_content[1:].split()[0]
         else:
             tag_name = tag_content.split()[0]
-        
+
         # Check if this looks like a valid HTML tag (allowed or not)
         # Valid HTML tags have specific patterns
         html_tags = ['a', 'abbr', 'acronym', 'address', 'area', 'article', 'aside', 'audio', 'b', 'bdi', 'bdo', 'big',
@@ -304,14 +304,14 @@ def allowlist_html(html: str, a_target='_blank') -> str:
                      'source', 'span', 'strike', 'strong', 'style', 'sub', 'summary', 'sup', 'svg', 'table', 'tbody',
                      'tg-spoiler', 'td', 'template', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track',
                      'tt', 'u', 'ul', 'var', 'video', 'wbr']
-        
+
         if tag_name in html_tags:
             # This is a valid HTML tag - let BeautifulSoup handle it (it will remove if not allowed)
             return match.group(0)
         else:
             # This doesn't look like a valid HTML tag - escape it
             return f"&lt;{match.group(1)}&gt;"
-    
+
     html = re.sub(r'<([^<>]+?)>', escape_non_html_brackets, html)
 
     # Parse the HTML using BeautifulSoup
@@ -487,7 +487,7 @@ def markdown_to_html(markdown_text, anchors_new_tab=True) -> str:
         # Escape <...> if it’s not a real HTML tag
         markdown_text = escape_non_html_angle_brackets(
             markdown_text)  # To handle situations like https://ani.social/comment/9666667
-        
+
         markdown_text = handle_double_bolds(markdown_text)  # To handle bold in two places in a sentence
 
         try:
@@ -1677,7 +1677,7 @@ def current_theme():
 def theme_list():
     """ All the themes available, by looking in the templates/themes directory """
     result = [('piefed', 'PieFed')]
-    for root, dirs, files in os.walk('app/templates/themes'):
+    for _root, dirs, _files in os.walk('app/templates/themes'):
         for dir in dirs:
             if os.path.exists(f'app/templates/themes/{dir}/{dir}.json'):
                 theme_settings = json.loads(file_get_contents(f'app/templates/themes/{dir}/{dir}.json'))
@@ -1992,30 +1992,30 @@ def patch_db_session(task_session):
     """Temporarily replace db.session with task_session for functions that use it internally"""
     from app import db
     from flask import has_request_context
-    
+
     # Only patch if we're not in a Flask request context (i.e., in a Celery worker)
     if has_request_context():
         # In Flask request context, don't patch - just use the existing session
         yield
         return
-    
+
     original_session = db.session
-    
+
     # Create a wrapper that makes the task session work with Flask-SQLAlchemy's Model.query
     class SessionWrapper:
         def __init__(self, session):
             self._session = session
-            
+
         def __call__(self):
             return self._session
-            
+
         def __getattr__(self, name):
             # Handle scoped session methods that don't exist on regular Session
             if name == 'remove':
                 # For task sessions, we don't want to remove since we manage the lifecycle
                 return lambda: None
             return getattr(self._session, name)
-    
+
     db.session = SessionWrapper(task_session)
     try:
         yield
@@ -2131,7 +2131,7 @@ def referrer(default: str = None) -> str:
 
 def create_captcha(length=4):
     code = ""
-    for i in range(length):
+    for _i in range(length):
         code += str(random.choice(['2', '3', '4', '5', '6', '8', '9']))
 
     imagedata = ImageCaptcha().generate(code)
@@ -2370,7 +2370,7 @@ def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str) ->
 
 
 def post_ids_to_models(post_ids: List[int], sort: str):
-    posts = Post.query.filter(Post.id.in_([p for p in post_ids]))
+    posts = Post.query.filter(Post.id.in_(list(post_ids)))
     # Final sorting
     if sort == '' or sort == 'hot':
         posts = posts.order_by(desc(Post.ranking)).order_by(desc(Post.posted_at))

@@ -30,7 +30,7 @@ def check_user_application(application_id, send_async=True):
                 for _ in range(3):
                     ip = f"{random.randint(1, 223)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(1, 254)}"
                     fake_ips.append(ip)
-                
+
                 ip_index = random.randint(0, len(fake_ips))
                 ip_list = fake_ips[:]
                 ip_list.insert(ip_index, application.user.ip_address)
@@ -56,7 +56,7 @@ def check_user_application(application_id, send_async=True):
                     username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=random.randint(5, 12)))
                     domain_name = random.choice(domains)
                     fake_emails.append(f"{username}@{domain_name}")
-                
+
                 email_index = random.randint(0, len(fake_emails))
                 email_list = fake_emails[:]
                 email_list.insert(email_index, application.user.email)

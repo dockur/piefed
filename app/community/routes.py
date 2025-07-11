@@ -886,7 +886,7 @@ def add_post(actor, type):
                 'user_id': current_user.id
             }
             plugins.fire_hook('before_post_create', post_data)
-            
+
             uploaded_file = request.files['image_file'] if type == 'image' else None
             post = make_post(form, community, post_type, SRC_WEB, uploaded_file=uploaded_file)
         except Exception as ex:

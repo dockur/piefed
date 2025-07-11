@@ -1329,7 +1329,7 @@ def import_settings_task(user_id, filename):
                     if not blocked_user.is_local():
                         ...  # todo: federate block
 
-        for instance_domain in contents_json['blocked_instances']:
+        for _instance_domain in contents_json['blocked_instances']:
             ...
 
         db.session.commit()
@@ -1891,7 +1891,7 @@ def show_profile_rss(actor):
                 continue
             if post.body_html.strip() and not is_valid_xml_utf8(post.body_html.strip()):
                 continue
-            
+
             fe = fg.add_entry()
             fe.title(post.title.strip())
             fe.link(href=f"https://{current_app.config['SERVER_NAME']}/post/{post.id}")

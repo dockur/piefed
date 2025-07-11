@@ -16,7 +16,7 @@ _plugin_hooks: Dict[str, Dict[str, List[str]]] = {}
 def hook(hook_name: str):
     """
     Decorator to register a function as a hook handler
-    
+
     Usage:
         @hook("before_post_create")
         def my_handler(data):
@@ -26,10 +26,10 @@ def hook(hook_name: str):
     def decorator(func: Callable):
         if hook_name not in _hooks:
             _hooks[hook_name] = []
-        
+
         _hooks[hook_name].append(func)
         logger.info(f"Registered hook '{hook_name}' -> {func.__name__}")
-        
+
         # Try to determine which plugin this hook belongs to from the function's module
         try:
             module_name = func.__module__
@@ -41,7 +41,7 @@ def hook(hook_name: str):
                 logger.info(f"Auto-registered hook {hook_name} -> {func.__name__} for plugin {plugin_name}")
         except Exception as e:
             logger.debug(f"Could not determine plugin for hook {hook_name}: {e}")
-        
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
@@ -52,30 +52,30 @@ def hook(hook_name: str):
 def fire_hook(hook_name: str, data: Any = None, **kwargs) -> Any:
     """
     Fire a hook and call all registered handlers in alphabetical order by function name
-    
+
     Args:
         hook_name: Name of the hook to fire
         data: Data to pass to hook handlers
         **kwargs: Additional keyword arguments
-    
+
     Returns:
         Modified data after all handlers have processed it
     """
     if hook_name not in _hooks:
         return data
-    
+
     # Sort handlers alphabetically by function name
     sorted_handlers = sorted(_hooks[hook_name], key=lambda func: func.__name__)
-    
+
     logger.debug(f"Firing hook '{hook_name}' with {len(sorted_handlers)} handlers")
-    
+
     result = data
     for handler in sorted_handlers:
         try:
             result = handler(result, **kwargs)
         except Exception as e:
             logger.error(f"Error in hook handler {handler.__name__}: {e}")
-    
+
     return result
 
 

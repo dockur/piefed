@@ -206,12 +206,12 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                                 # Skip if reply already exists
                                                 if session.query(PostReply).filter_by(ap_id=reply_data['id']).first():
                                                     continue
-                                                
+
                                                 # Find the author of the reply
                                                 reply_author = find_actor_or_create(reply_data['attributedTo'])
                                                 if not reply_author:
                                                     continue
-                                                
+
                                                 # Extract reply content
                                                 body = body_html = ''
                                                 if 'content' in reply_data:
@@ -225,7 +225,7 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                                         body_html = markdown_to_html(body)
                                                     else:
                                                         body = html_to_text(body_html)
-                                                
+
                                                 # Find parent (post or comment this is replying to)
                                                 in_reply_to = None
                                                 if 'inReplyTo' in reply_data:
@@ -237,7 +237,7 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                                         parent_comment = session.query(PostReply).filter_by(ap_id=reply_data['inReplyTo']).first()
                                                         if parent_comment:
                                                             in_reply_to = parent_comment
-                                                
+
                                                 # Get language
                                                 language_id = None
                                                 if 'language' in reply_data and isinstance(reply_data['language'], dict):
@@ -245,10 +245,10 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                                     language = find_language_or_create(reply_data['language']['identifier'],
                                                                                      reply_data['language']['name'])
                                                     language_id = language.id
-                                                
+
                                                 # Check if distinguished
                                                 distinguished = reply_data.get('distinguished', False)
-                                                
+
                                                 # Create the reply
                                                 try:
                                                     reply_data['object'] = {'id': reply_data['id']}
@@ -286,7 +286,7 @@ def retrieve_mods_and_backfill(community_id: int, server, name, community_json=N
                                   WHERE post.community_id = :community_id;
                                  """), {'community_id': community.id})
             session.commit()
-        except Exception as e:
+        except Exception:
             session.rollback()
             raise
         finally:
@@ -590,7 +590,7 @@ def save_icon_file(icon_file, directory='communities') -> File:
                         width=img_width, height=img_height, thumbnail_width=thumbnail_width,
                         thumbnail_height=thumbnail_height, thumbnail_path=final_place_thumbnail)
             db.session.add(file)
-            
+
             # Move uploaded files to S3 if needed
             if store_files_in_s3():
                 import boto3
@@ -606,16 +606,16 @@ def save_icon_file(icon_file, directory='communities') -> File:
                 s3_path = f'{s3_directory}/{new_filename}{final_ext}'
                 s3.upload_file(final_place, current_app.config['S3_BUCKET'], s3_path, ExtraArgs={'ContentType': guess_mime_type(final_place)})
                 file.file_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_path}"
-                
+
                 # Upload thumbnail
                 s3_thumbnail_path = f'{s3_directory}/{new_filename}_thumbnail{thumbnail_ext}'
                 s3.upload_file(final_place_thumbnail, current_app.config['S3_BUCKET'], s3_thumbnail_path, ExtraArgs={'ContentType': guess_mime_type(final_place_thumbnail)})
                 file.thumbnail_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_thumbnail_path}"
-                
+
                 s3.close()
                 os.unlink(final_place)
                 os.unlink(final_place_thumbnail)
-                
+
             return file
     else:
         abort(400)
@@ -701,7 +701,7 @@ def save_banner_file(banner_file, directory='communities') -> File:
                     width=img_width, height=img_height, thumbnail_path=final_place_thumbnail,
                     thumbnail_width=thumbnail_width, thumbnail_height=thumbnail_height)
         db.session.add(file)
-        
+
         # Move uploaded files to S3 if needed
         if store_files_in_s3():
             import boto3
@@ -717,16 +717,16 @@ def save_banner_file(banner_file, directory='communities') -> File:
             s3_path = f'{s3_directory}/{new_filename}{final_ext}'
             s3.upload_file(final_place, current_app.config['S3_BUCKET'], s3_path, ExtraArgs={'ContentType': guess_mime_type(final_place)})
             file.file_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_path}"
-            
+
             # Upload thumbnail
             s3_thumbnail_path = f'{s3_directory}/{new_filename}_thumbnail{thumbnail_ext}'
             s3.upload_file(final_place_thumbnail, current_app.config['S3_BUCKET'], s3_thumbnail_path, ExtraArgs={'ContentType': guess_mime_type(final_place_thumbnail)})
             file.thumbnail_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_thumbnail_path}"
-            
+
             s3.close()
             os.unlink(final_place)
             os.unlink(final_place_thumbnail)
-            
+
         return file
     else:
         abort(400)
@@ -789,7 +789,7 @@ def hashtags_used_in_community(community_id: int, content_filters):
     LIMIT 30;"""), {'community_id': community_id}).mappings().all()
 
     def tag_blocked(tag):
-        for name, keywords in content_filters.items() if content_filters else {}:
+        for _name, keywords in content_filters.items() if content_filters else {}:
             for keyword in keywords:
                 if keyword in tag['name'].lower():
                     return True

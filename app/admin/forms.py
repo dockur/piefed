@@ -316,7 +316,7 @@ class CmsPageForm(FlaskForm):
     def validate_url(self, url):
         if not url.data.startswith('/'):
             url.data = '/' + url.data
-        
+
         # Check if another page already uses this URL (excluding the current page if editing)
         existing_page = CmsPage.query.filter_by(url=url.data).first()
         if existing_page and (not self.original_page or existing_page.id != self.original_page.id):
