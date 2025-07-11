@@ -2152,7 +2152,7 @@ class PostReply(db.Model):
     def new(cls, user: User, post: Post, in_reply_to, body, body_html, notify_author, language_id, distinguished,
             request_json: dict = None, announce_id=None, session=None):
         from app.utils import shorten_string, blocked_phrases, recently_upvoted_post_replies, reply_already_exists, \
-            reply_is_just_link_to_gif_reaction, reply_is_stupid
+            reply_is_just_link_to_gif_reaction, reply_is_stupid, wilson_confidence_lower_bound
         from app.activitypub.util import notify_about_post_reply
 
         if session is None:
@@ -2238,7 +2238,7 @@ class PostReply(db.Model):
         # upvote own reply
         reply.score = 1
         reply.up_votes = 1
-        reply.ranking = PostReply.confidence(1, 0)
+        reply.ranking = wilson_confidence_lower_bound(1, 0)
         vote = PostReplyVote(user_id=user.id, post_reply_id=reply.id, author_id=user.id, effect=1)
         session.add(vote)
         if user.is_local():
@@ -2356,36 +2356,9 @@ class PostReply(db.Model):
                                                                       NotificationSubscription.type == NOTIF_REPLY).first()
         return existing_notification is not None
 
-    # used for ranking comments
-    @classmethod
-    def _confidence(cls, ups, downs):
-        n = ups + downs
-
-        if n == 0:
-            return 0.0
-
-        z = 1.281551565545
-        p = float(ups) / n
-
-        left = p + 1 / (2 * n) * z * z
-        right = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
-        under = 1 + 1 / n * z * z
-
-        return (left - right) / under
-
-    @classmethod
-    def confidence(cls, ups, downs) -> float:
-        if ups is None or ups < 0:
-            ups = 0
-        if downs is None or downs < 0:
-            downs = 0
-        if ups + downs == 0:
-            return 0.0
-        else:
-            return cls._confidence(ups, downs)
-
     def vote(self, user: User, vote_direction: str):
         from app import redis_client
+        from app.utils import wilson_confidence_lower_bound
         existing_vote = PostReplyVote.query.filter_by(user_id=user.id, post_reply_id=self.id).first()
         if existing_vote and vote_direction == 'reversal':  # api sends '1' for upvote, '-1' for downvote, and '0' for reversal
             if existing_vote.effect == 1:
@@ -2447,7 +2420,7 @@ class PostReply(db.Model):
         db.session.commit()
 
         # Calculate the new ranking value
-        new_ranking = PostReply.confidence(self.up_votes, self.down_votes)
+        new_ranking = wilson_confidence_lower_bound(self.up_votes, self.down_votes)
 
         with redis_client.lock(f"lock:post_reply:{self.id}", timeout=10, blocking_timeout=6):
             db.session.execute(text("UPDATE post_reply SET ranking=:ranking WHERE id=:post_reply_id"),

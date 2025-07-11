@@ -4,6 +4,7 @@ import base64
 import bisect
 import hashlib
 import mimetypes
+import math
 import random
 import urllib
 import warnings
@@ -2188,6 +2189,21 @@ class CaptchaField(StringField):
 
 
 user2_cache = {}
+
+
+def wilson_confidence_lower_bound(ups, downs, z = 1.281551565545) -> float:
+    if ups is None or ups < 0:
+        ups = 0
+    if downs is None or downs < 0:
+        downs = 0
+    n = ups + downs
+    if n == 0:
+        return 0.0
+    p = float(ups) / n
+    left = p + 1 / (2 * n) * z * z
+    right = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    under = 1 + 1 / n * z * z
+    return (left - right) / under
 
 
 def jaccard_similarity(user1_upvoted: set, user2_id: int):
