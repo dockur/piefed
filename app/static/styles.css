@@ -237,7 +237,7 @@
 }
 
 .fe-chevron-right::before {
-  content: "";
+  content: "\e930";
 }
 
 .fe-feather::before {
