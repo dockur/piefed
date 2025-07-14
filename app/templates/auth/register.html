@@ -45,6 +45,11 @@
                                     <a href="#" class="hidePassword" title="{{ _('Show password') }}"><img src="/static/images/eye-password-show.svg" alt="{{ _('Show password') }}"></a>
                                     <a href="#" class="showPassword" title="{{ _('Hide password') }}"><img src="/static/images/eye-password-hide.svg" alt="{{ _('Hide password') }}"></a>
                                 </div>
+                                <div class="mb-3 required">
+                                    <label class="form-label" for="password" data-bs-toggle="tooltip" title="Min 8, Max 128">Password</label>
+                                        <span class="fe fe-alert-circle" data-bs-toggle="tooltip" title="Min 8, Max 128"></span>
+                                    <input id="password" class="form-control" autocomplete="new-password" maxlength="129" minlength="8" name="password" required="" type="password" value="">
+                                </div>
                                 {{ render_field(form.password2) }}
                                 {% if form.question -%}
                                     <div class="mb-3 required">{{ form.question.label.text | safe }}
