@@ -394,7 +394,7 @@ def delete_community(community_id: int, src, auth=None):
         user = current_user.id
 
     community = Community.query.filter_by(id=community_id).one()
-    if not (community.is_owner(user) or community.is_moderator(user) or community.is_instance_admin(user)):
+    if not (community.is_owner(user) or community.is_moderator(user) or user.is_admin_or_staff()):
         raise Exception('incorrect_login')
     if not community.is_local():
         raise Exception('Only local communities can be deleted')
@@ -423,7 +423,7 @@ def restore_community(community_id: int, src, auth=None):
         user = current_user
 
     community = Community.query.filter_by(id=community_id).one()
-    if not (community.is_owner(user) or community.is_moderator(user) or community.is_instance_admin(user)):
+    if not (community.is_owner(user) or community.is_moderator(user) or user.is_admin_or_staff()):
         raise Exception('incorrect_login')
     if not community.is_local():
         raise Exception('Only local communities can be restored')

@@ -42,11 +42,11 @@ class Person(DefaultSchema):
     instance_id = fields.Integer(required=True)
     local = fields.Boolean(required=True)
     user_name = fields.String(required=True)
-    about = fields.String()
+    about = fields.String(metadata={"format": "markdown"})
     avatar = fields.Url(allow_none=True)
     banner = fields.Url(allow_none=True)
     flair = fields.String()
-    published = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     title = fields.String(allow_none=True)
 
 
@@ -92,16 +92,16 @@ class Community(DefaultSchema):
     local = fields.Boolean(required=True)
     name = fields.String(required=True)
     nsfw = fields.Boolean(required=True)
-    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     removed = fields.Boolean(required=True)
     restricted_to_mods = fields.Boolean(required=True)
     title = fields.String(required=True)
     banned = fields.Boolean()
     banner = fields.Url(allow_none=True)
-    description = fields.String()
+    description = fields.String(metadata={"format": "markdown"})
     icon = fields.Url(allow_none=True)
     posting_warning = fields.String(allow_none=True)
-    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
 
 
 class CommunityBlockView(DefaultSchema):
@@ -117,9 +117,9 @@ class CommunityFollowerView(DefaultSchema):
 class Instance(DefaultSchema):
     domain = fields.String(required=True, metadata={"example": "piefed.social"})
     id = fields.Integer(required=True)
-    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     software = fields.String()
-    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     version = fields.String()
 
 
@@ -200,25 +200,25 @@ class Post(DefaultSchema):
     local = fields.Boolean(required=True)
     locked = fields.Boolean(required=True)
     nsfw = fields.Boolean(required=True)
-    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     removed = fields.Boolean(required=True)
     sticky = fields.Boolean(required=True)
     title = fields.String(required=True)
     user_id = fields.Integer(required=True)
     alt_text = fields.String()
-    body = fields.String()
+    body = fields.String(metadata={"format": "markdown"})
     small_thumbnail_url = fields.Url()
     thumbnail_url = fields.Url()
-    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     url = fields.Url()   
 
 
 class PostAggregates(DefaultSchema):
     comments = fields.Integer(required=True)
     downvotes = fields.Integer(required=True)
-    newest_comment_time = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    newest_comment_time = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     post_id = fields.Integer(required=True)
-    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     score = fields.Integer(required=True)
     upvotes = fields.Integer(required=True)
 
@@ -264,25 +264,25 @@ class CommunityView(DefaultSchema):
 
 class Comment(DefaultSchema):
     ap_id = fields.Url(required=True)
-    body = fields.String(required=True)
+    body = fields.String(required=True, metadata={"format": "markdown"})
     deleted = fields.Boolean(required=True)
     id = fields.Integer(required=True)
     language_id = fields.Integer(required=True)
     local = fields.Boolean(required=True)
     path = fields.String(required=True)
     post_id = fields.Integer(required=True)
-    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     removed = fields.Boolean(required=True)
     user_id = fields.Integer(required=True)
     distinguished = fields.Boolean()
-    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
 
 
 class CommentAggregates(DefaultSchema):
     child_count = fields.Integer(required=True)
     comment_id = fields.Integer(required=True)
     downvotes = fields.Integer(required=True)
-    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     score = fields.Integer(required=True)
     upvotes = fields.Integer(required=True)
 
@@ -327,9 +327,9 @@ class ResolveObjectResponse(DefaultSchema):
 class InstanceWithoutFederationState(DefaultSchema):
     domain = fields.String(required=True)
     id = fields.Integer(required=True)
-    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     software = fields.String()
-    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})
+    updated = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     version = fields.String()
 
 
@@ -359,7 +359,7 @@ class CreateCommunityRequest(DefaultSchema):
     name = fields.String(required=True)
     title = fields.String(required=True)
     banner_url = fields.Url(allow_none=True)
-    description = fields.String()
+    description = fields.String(metadata={"format": "markdown"})
     discussion_languages = fields.List(fields.Integer())
     icon_url = fields.Url(allow_none=True)
     local_only = fields.Boolean()
@@ -374,10 +374,10 @@ class CommunityResponse(DefaultSchema):
 
 
 class EditCommunityRequest(DefaultSchema):
-    community_id = fields.Integer(required=True)  # this is proper name, old swagger wrong
+    community_id = fields.Integer(required=True)
     title = fields.String(required=True)
     banner_url = fields.Url(allow_none=True)
-    description = fields.String()
+    description = fields.String(metadata={"format": "markdown"})
     discussion_languages = fields.List(fields.Integer())
     icon_url = fields.Url(allow_none=True)
     local_only = fields.Boolean()
@@ -440,24 +440,25 @@ class CommunityModerationBansListRequest(DefaultSchema):
 
 
 class CommunityModerationBanItem(DefaultSchema):
-    banned_by = fields.Nested(Person)  # being changed to snake case
-    banned_user = fields.Nested(Person)  # being changed to snake case
-    community = fields.Nested(CommunityView)
+    banned_by = fields.Nested(Person)
+    banned_user = fields.Nested(Person)
+    community = fields.Nested(Community)
     expired = fields.Boolean()
-    expired_at = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})  # confirm datetime formatting, being changed to snake case
+    expired_at = fields.String(required=True, allow_none=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z, null=permanent ban", "format": "datetime"})
     reason = fields.String()
 
 
 class CommunityModerationBansListResponse(DefaultSchema):
     items = fields.List(fields.Nested(CommunityModerationBanItem))
-    next_page = fields.String()
+    next_page = fields.String(allow_none=True)
 
 
 class CommunityModerationBanRequest(DefaultSchema):
     community_id = fields.Integer(required=True)
-    expired_at = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z"})  # confirm datetime formatting, being changed to snake case
     reason = fields.String(required=True)
     user_id = fields.Integer(required=True)
+    expires = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    permanent = fields.Boolean()
 
 
 class CommunityModerationUnbanRequest(DefaultSchema):

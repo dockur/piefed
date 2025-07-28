@@ -209,104 +209,135 @@ def post_alpha_community(data):
         return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community', methods=['PUT'])
-def put_alpha_community():
+@comm_bp.route("/community", methods=["PUT"])
+@comm_bp.doc(summary="Edit community.")
+@comm_bp.arguments(EditCommunityRequest)
+@comm_bp.response(200, CommunityResponse)
+@comm_bp.alt_response(400, schema=DefaultError)
+def put_alpha_community(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = request.get_json(force=True) or {}
-        return jsonify(put_community(auth, data))
+        resp = put_community(auth, data)
+        return CommunityResponse().load(resp)
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community/subscribe', methods=['PUT'])
-def put_alpha_community_subscribe():
+@comm_bp.route("/community/subscribe", methods=["PUT"])
+@comm_bp.doc(summary="Subscribe to activities in a community.")
+@comm_bp.arguments(SubscribeCommunityRequest)
+@comm_bp.response(200, CommunityResponse)
+@comm_bp.alt_response(400, schema=DefaultError)
+def put_alpha_community_subscribe(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = request.get_json(force=True) or {}
-        return jsonify(put_community_subscribe(auth, data))
+        resp = put_community_subscribe(auth, data)
+        return CommunityResponse().load(resp)
     except NoResultFound:
-        return jsonify({"error": "Community not found"}), 400
+        return abort(400, message="Community not found")
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community/delete', methods=['POST'])
-def post_alpha_community_delete():
+@comm_bp.route("/community/delete", methods=["POST"])
+@comm_bp.doc(summary="Delete a community.")
+@comm_bp.arguments(DeleteCommunityRequest)
+@comm_bp.response(200, CommunityResponse)
+@comm_bp.alt_response(400, schema=DefaultError)
+def post_alpha_community_delete(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = request.get_json(force=True) or {}
-        return jsonify(post_community_delete(auth, data))
+        resp = post_community_delete(auth, data)
+        return CommunityResponse().load(resp)
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community/mod', methods=['POST'])
-def post_alpha_community_mod():
+@comm_bp.route('/community/mod', methods=['POST'])
+@comm_bp.doc(summary="Add or remove a moderator for your community.")
+@comm_bp.arguments(ModCommunityRequest)
+@comm_bp.response(200, ModCommunityResponse)
+@comm_bp.alt_response(400, schema=DefaultError)
+def post_alpha_community_mod(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = request.get_json(force=True) or {}
-        return jsonify(post_community_mod(auth, data))
+        resp = post_community_mod(auth, data)
+        return ModCommunityResponse().load(resp)
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community/moderate/bans', methods=['GET'])
-def get_alpha_community_moderate_bans():
+@comm_bp.route('/community/moderate/bans', methods=['GET'])
+@comm_bp.doc(summary="Get the list of banned users for a community.")
+@comm_bp.arguments(CommunityModerationBansListRequest, location="query")
+@comm_bp.response(200, CommunityModerationBansListResponse)
+@comm_bp.alt_response(400, schema=DefaultError)
+def get_alpha_community_moderate_bans(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = {}
-        data['community_id'] = request.args.get('community_id')
-        data['page'] = request.args.get('page', '1')
-        return jsonify(get_community_moderate_bans(auth, data))
+        resp = get_community_moderate_bans(auth, data)
+        return CommunityModerationBansListResponse().load(resp)
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community/moderate/unban', methods=['PUT'])
-def put_alpha_community_moderate_unban():
+@comm_bp.route('/community/moderate/unban', methods=['PUT'])
+@comm_bp.doc(summary="Unban a user from a community.")
+@comm_bp.arguments(CommunityModerationUnbanRequest)
+@comm_bp.response(200, CommunityModerationBanItem)
+@comm_bp.alt_response(400, schema=DefaultError)
+def put_alpha_community_moderate_unban(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = request.get_json(force=True) or {}
-        return jsonify(put_community_moderate_unban(auth, data))
+        resp = put_community_moderate_unban(auth, data)
+        print(resp)
+        return CommunityModerationBanItem().load(resp)
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community/moderate/ban', methods=['POST'])
-def post_alpha_community_moderate_ban():
+@comm_bp.route('/community/moderate/ban', methods=['POST'])
+@comm_bp.doc(summary="Ban a user from a community.")
+@comm_bp.arguments(CommunityModerationBanRequest)
+@comm_bp.response(200, CommunityModerationBanItem)
+@comm_bp.alt_response(400, schema=DefaultError)
+def post_alpha_community_moderate_ban(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = request.get_json(force=True) or {}
-        return jsonify(post_community_moderate_ban(auth, data))
+        resp = post_community_moderate_ban(auth, data)
+        return CommunityModerationBanItem().load(resp)
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
-@bp.route('/api/alpha/community/moderate/post/nsfw', methods=['POST'])
-def post_alpha_community_moderate_post_nsfw():
+@comm_bp.route('/community/moderate/post/nsfw', methods=['POST'])
+@comm_bp.doc(summary="Mark or unmark a post as NSFW.")
+@comm_bp.arguments(CommunityModerationNsfwRequest)
+@comm_bp.response(200, PostView)
+@comm_bp.alt_response(400, schema=DefaultError)
+def post_alpha_community_moderate_post_nsfw(data):
     if not enable_api():
-        return jsonify({'error': 'alpha api is not enabled'}), 400
+        return abort(400, message="alpha api is not enabled")
     try:
         auth = request.headers.get('Authorization')
-        data = request.get_json(force=True) or {}
-        return jsonify(post_community_moderate_post_nsfw(auth, data))
+        resp = post_community_moderate_post_nsfw(auth, data)
+        return PostView().load(resp)
     except Exception as ex:
-        return jsonify({"error": str(ex)}), 400
+        return abort(400, message=str(ex))
 
 
 # Feed

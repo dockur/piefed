@@ -75,12 +75,53 @@ def create_app(config_class=Config):
 
     app.config["API_TITLE"] = "PieFed Alpha API"
     app.config["API_VERSION"] = "alpha"
-    app.config["OPENAPI_VERSION"] = "3.0.2"
+    app.config["OPENAPI_VERSION"] = "3.1.1"
     if app.config["SERVE_API_DOCS"]:
         app.config["OPENAPI_URL_PREFIX"] = "/api/alpha"
         app.config["OPENAPI_JSON_PATH"] = "/swagger.json"
         app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger"
         app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+        app.config["API_SPEC_OPTIONS"] = {
+            "security": [{"bearerAuth": []}],
+            "components": {
+                "securitySchemes": {
+                    "bearerAuth": {
+                        "type": "http",
+                        "scheme": "bearer",
+                        "bearerFormat": "JWT"
+                    }
+                }
+            },
+            "servers": [
+                {
+                    "url": f"{app.config['HTTP_PROTOCOL']}://{app.config['SERVER_NAME']}",
+                    "description": "This instance"
+                },
+                {
+                    "url": "https://piefed.social",
+                },
+                {
+                    "url": "https://preferred.social"
+                },
+                {
+                    "url": "https://feddit.online"
+                },
+                {
+                    "url": "https://piefed.world"
+                }
+            ],
+            "info": {
+                "title": "PieFed Alpha API docs",
+                "contact": {
+                    "name": "Developer",
+                    "url": "https://codeberg.org/rimu/pyfedi"
+                },
+                "license": {
+                    "name": "AGPLv3",
+                    "url": "https://www.gnu.org/licenses/agpl-3.0.en.html#license-text"
+                }
+            }
+        }
     rest_api.init_app(app)
     rest_api.DEFAULT_ERROR_RESPONSE_NAME = None  # Don't include default errors, define them ourselves
 
