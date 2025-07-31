@@ -22,7 +22,7 @@ def not_found_error(error):
     if cms_page:
         return render_template('cms_page.html', page=cms_page)
 
-    # Fall back to standard 404 page
+    # Same 404 page for general missing items errors
     return render_template('errors/404.html'), 404
 
 
