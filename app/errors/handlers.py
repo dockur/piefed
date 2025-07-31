@@ -23,7 +23,7 @@ def not_found_error(error):
         return render_template('cms_page.html', page=cms_page)
 
     # Fall back to standard 404 page
-    return 'not found', 404
+    return render_template('errors/404.html'), 404
 
 
 @bp.app_errorhandler(500)

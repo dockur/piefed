@@ -1,4 +1,17 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
 {% block app_content %}
-<h3 class="card-title">{{ _('Ooops, something is broken!') }}</h3>
-<p>{{ _('The page your browser tried to load could not be found.') }}</p>
+<div class="row">
+    <div class="col mx-auto">
+        <div class="card mt-5">
+            <div class="card-body p-6">
+                <div class="card-title">{{ _('Ooops, something is broken!') }}</div>
+                <p>{{ _('The page your browser tried to load could not be found.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
