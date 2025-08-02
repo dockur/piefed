@@ -5,67 +5,413 @@
 {% endif -%}
 {% from 'bootstrap5/form.html' import render_form -%}
 {% from "_macros.html" import render_username -%}
+
+{%- macro render_modlog_user(user, show_details=False) -%}
+    {%- if user -%}
+        <div class="d-inline-flex align-items-center">
+            {%- if show_details and user.avatar_id -%}
+                <img src="{{ user.avatar_thumbnail() }}" alt="{{ _('User avatar') }}" class="rounded-circle me-2" style="width: 24px; height: 24px;">
+            {%- endif -%}
+            {%- if user.deleted -%}
+                <span>
+                    {%- if user.is_local() -%}
+                        <a href="/u/{{ user.user_name }}" class="text-muted text-decoration-none">{{ user.user_name }}</a>
+                    {%- else -%}
+                        <a href="/u/{{ user.ap_id }}" class="text-muted text-decoration-none">{{ user.user_name }}</a>
+                        <span class="text-muted">@{{ user.instance.domain }}</span>
+                    {%- endif -%}
+                </span>
+            {%- else -%}
+                {{ render_username(user) }}
+            {%- endif -%}
+            {%- if show_details -%}
+                {%- if user.deleted -%}
+                    <span class="badge bg-secondary ms-2" title="{{ _('User account deleted') }}">{{ _('Deleted') }}</span>
+                {%- endif -%}
+                {%- if user.banned -%}
+                    <span class="badge bg-danger ms-2" title="{{ _('User is banned') }}">{{ _('Banned') }}</span>
+                {%- endif -%}
+                {%- if user.bot -%}
+                    <span class="badge bg-info ms-2" title="{{ _('Bot account') }}">{{ _('Bot') }}</span>
+                {%- endif -%}
+            {%- endif -%}
+        </div>
+    {%- else -%}
+        <span class="text-muted">[{{ _('unknown') }}]</span>
+    {%- endif -%}
+{%- endmacro -%}
 {% set active_child = 'modlog' -%}
-{% from "_macros.html" import render_username %}
+
+{% block head -%}
+    {{ super() }}
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+{% endblock -%}
 
 {% block app_content -%}
-    <h1>{{ _('Moderation log') }}</h1>
-    <div class="table-responsive-md mt-4">
+    <link rel="stylesheet" href="/static/css/modlog.css">
+    <link rel="stylesheet" href="/static/css/modlog-communities.css">
+    
+    <div class="modlog-container">
+        {% set has_active_filters = has_query_params %}
+        
+        <div class="modlog-header d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">{{ _('Moderation Log') }}</h1>
+            <div>
+                {% if can_see_names %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statsModal">
+                    <span class="fe fe-bar-chart"></span> {{ _('Statistics') }}
+                </button>
+                {% endif %}
+                <button type="button" class="btn btn-outline-secondary ms-2" id="toggle-filters-btn">
+                    <span class="fe fe-filter"></span> {{ _('Filters') }}
+                    {% if has_active_filters %}
+                        <span class="badge bg-primary ms-1"><span class="fe fe-check"></span> {{ _('Active') }}</span>
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+
+        <div class="filters-section mb-4 {% if not has_active_filters %}collapsed{% endif %}" id="filtersSection">
+            <form method="get" class="d-flex gap-2 flex-wrap">
+                <div class="flex-grow-1" style="min-width: 200px;">
+                    <div class="input-group">
+                        <span class="input-group-text"><span class="fe fe-search"></span></span>
+                        <input type="search" name="search" class="form-control" 
+                               placeholder="{{ _('Search actions, users, or reasons...') }}" value="{{ search }}">
+                    </div>
+                </div>
+                
+                <select name="action_type" class="form-select" style="width: auto;">
+                    <option value="all" {% if action_type == 'all' or not action_type %}selected{% endif %}>{{ _('All Actions') }}</option>
+                    <option value="add_mod" {% if action_type == 'add_mod' %}selected{% endif %}>{{ _('Add Moderator') }}</option>
+                    <option value="remove_mod" {% if action_type == 'remove_mod' %}selected{% endif %}>{{ _('Remove Moderator') }}</option>
+                    <option value="ban_user" {% if action_type == 'ban_user' %}selected{% endif %}>{{ _('Ban User') }}</option>
+                    <option value="unban_user" {% if action_type == 'unban_user' %}selected{% endif %}>{{ _('Unban User') }}</option>
+                    <option value="delete_post" {% if action_type == 'delete_post' %}selected{% endif %}>{{ _('Delete Post') }}</option>
+                    <option value="restore_post" {% if action_type == 'restore_post' %}selected{% endif %}>{{ _('Restore Post') }}</option>
+                    <option value="delete_post_reply" {% if action_type == 'delete_post_reply' %}selected{% endif %}>{{ _('Delete Comment') }}</option>
+                    <option value="restore_post_reply" {% if action_type == 'restore_post_reply' %}selected{% endif %}>{{ _('Restore Comment') }}</option>
+                    <option value="lock_post" {% if action_type == 'lock_post' %}selected{% endif %}>{{ _('Lock Post') }}</option>
+                    <option value="unlock_post" {% if action_type == 'unlock_post' %}selected{% endif %}>{{ _('Unlock Post') }}</option>
+                    <option value="featured_post" {% if action_type == 'featured_post' %}selected{% endif %}>{{ _('Feature Post') }}</option>
+                    <option value="unfeatured_post" {% if action_type == 'unfeatured_post' %}selected{% endif %}>{{ _('Unfeature Post') }}</option>
+                </select>
+                
+                <select name="mod_type" class="form-select" style="width: auto;">
+                    <option value="all" {% if mod_type == 'all' or not mod_type %}selected{% endif %}>{{ _('All Types') }}</option>
+                    <option value="mod" {% if mod_type == 'mod' %}selected{% endif %}>{{ _('Community Mods') }}</option>
+                    <option value="admin" {% if mod_type == 'admin' %}selected{% endif %}>{{ _('Administrators') }}</option>
+                </select>
+                
+                <select name="local_remote" class="form-select" style="width: auto;">
+                    <option value="all" {% if local_remote == 'all' %}selected{% endif %}>{{ _('All Origins') }}</option>
+                    <option value="local" {% if local_remote == 'local' or not local_remote %}selected{% endif %}>{{ _('Local') }}</option>
+                    <option value="remote" {% if local_remote == 'remote' %}selected{% endif %}>{{ _('Remote') }}</option>
+                </select>
+                
+                <select name="date_range" class="form-select" style="width: auto;">
+                    <option value="week" {% if date_range == 'week' or not date_range %}selected{% endif %}>{{ _('This Week') }}</option>
+                    <option value="today" {% if date_range == 'today' %}selected{% endif %}>{{ _('Today') }}</option>
+                    <option value="month" {% if date_range == 'month' %}selected{% endif %}>{{ _('This Month') }}</option>
+                    <option value="3months" {% if date_range == '3months' %}selected{% endif %}>{{ _('Past 3 Months') }}</option>
+                    <option value="year" {% if date_range == 'year' %}selected{% endif %}>{{ _('Past Year') }}</option>
+                    <option value="all" {% if date_range == 'all' %}selected{% endif %}>{{ _('All Time') }}</option>
+                </select>
+                
+                {% if can_see_names %}
+                <div class="community-selector" style="min-width: 200px;">
+                    <input type="text" 
+                           id="community-select" 
+                           name="community_ids"
+                           class="form-control"
+                           placeholder="{{ _('Select communities...') }}"
+                           value="{{ community_ids }}"
+                           autocomplete="off">
+                </div>
+                {% endif %}
+                
+                <button type="submit" class="btn btn-primary">
+                    <span class="fe fe-search"></span> {{ _('Search') }}
+                </button>
+                
+                {% if has_active_filters %}
+                    <a href="{{ url_for('main.modlog') }}" class="btn btn-outline-secondary">
+                        <span class="fe fe-x"></span> {{ _('Clear') }}
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+
         {% if modlog_entries.items %}
-        <table class="table table-responsive">
-            <thead>
-                <tr>
-                    <th>{{ _('When') }}</th>
-                    <th>{{ _('Moderator') }}</th>
-                    <th>{{ _('Action') }}</th>
-                </tr>
-            </thead>
-            <tbody>
+            <div class="modlog-list">
                 {% for modlog_entry in modlog_entries.items %}
-                    <tr>
-                        <td>{{ arrow.get(modlog_entry.created_at).humanize(locale=locale) }}</td>
-                        <td>
-                            {% if can_see_names %}
-                                {{ render_username(modlog_entry.author) }}
-                            {% else %}
-                                {% if modlog_entry.community_id %}
-                                    {{ instances[modlog_entry.community.instance_id] }} mod
-                                {% else %}
-                                    {{ instances[modlog_entry.author.instance_id] }} admin
-                                {% endif %}
-                            {% endif %}
-                        </td>
-                        <td>{{ modlog_entry.action_to_str() }}
-                            {% if modlog_entry.link and modlog_entry.link_text -%}
-                                <a href="/{{ modlog_entry.get_correct_link() }}">{{ modlog_entry.link_text}}</a>
-                            {% elif modlog_entry.link_text -%}
-                                {{ modlog_entry.link_text }}
-                            {% endif -%}
-                            {% if modlog_entry.community_id -%}
-                                <a href="/c/{{ modlog_entry.community.link() }}">{{ _(' in %(community_name)s', community_name='' + modlog_entry.community.display_name()) }}</a>
-                            {% endif -%}
-                            {% if modlog_entry.reason -%}
-                                <br>{{ _('Reason:') }} {{ modlog_entry.reason }}
-                            {% endif -%}
-                        </td>
-                    </tr>
+                    <div class="modlog-item" id="modlog_{{ modlog_entry.id }}">
+                        <div class="row g-0">
+                            <div class="col-md-3 modlog-metadata">
+                                <div class="metadata-content">
+                                    <div class="mb-2">
+                                        <span class="badge action-badge bg-{{ get_action_class(modlog_entry.action) }}">
+                                            {{ modlog_entry.action_to_str() }}
+                                        </span>
+                                        {% if modlog_entry.type == 'admin' %}
+                                            <span class="badge bg-danger">{{ _('Admin') }}</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">{{ _('Mod') }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('When:') }}</span>
+                                        <span class="value">{{ arrow.get(modlog_entry.created_at).humanize(locale=locale) }}</span>
+                                    </div>
+                                    
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Date:') }}</span>
+                                        <span class="value">{{ arrow.get(modlog_entry.created_at).format('MMM DD, YYYY - h:mm A') }}</span>
+                                    </div>
+                                    {% if can_see_names %}
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Moderator:') }}</span>
+                                        <span class="value">
+                                            {{ render_modlog_user(modlog_entry.author, show_details=False) }}
+                                        </span>
+                                    </div>
+                                    {% else %}
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Moderator:') }}</span>
+                                        <span class="value text-muted">
+                                            {% if modlog_entry.community_id %}
+                                                {{ instances[modlog_entry.community.instance_id] }} mod
+                                            {% else %}
+                                                {{ instances[modlog_entry.author.instance_id] }} admin
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    {% if modlog_entry.community_id %}
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Community:') }}</span>
+                                        <a href="/c/{{ modlog_entry.community.link() }}" class="value">
+                                            {{ modlog_entry.community.display_name() }}
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Instance:') }}</span>
+                                        <span class="value">{{ instances[modlog_entry.author.instance_id] }}</span>
+                                    </div>
+                                    {% if modlog_entry.reason and modlog_entry.reason|length < 50 %}
+                                    <div class="reason-sidebar mt-3 pt-2 border-top">
+                                        <h6 class="text-muted small mb-1">{{ _('Reason') }}</h6>
+                                        <p class="small mb-0">{{ modlog_entry.reason }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-9 modlog-content">
+                                <div class="content-wrapper">
+                                    {% if modlog_entry.link and modlog_entry.link_text %}
+                                        <h5 class="mb-3">
+                                            <a href="/{{ modlog_entry.link }}" class="text-decoration-none text-body">
+                                                {{ modlog_entry.link_text }}
+                                                <i class="fe fe-external-link small"></i>
+                                            </a>
+                                        </h5>
+                                    {% elif modlog_entry.link_text %}
+                                        <h5 class="mb-3 text-muted">{{ modlog_entry.link_text }}</h5>
+                                    {% endif %}
+                                    {% if modlog_entry.target_user or modlog_entry.target_user_id %}
+                                        <div class="mb-3">
+                                            <strong>{{ _('Target User:') }}</strong>
+                                            {% if modlog_entry.target_user %}
+                                                {{ render_modlog_user(modlog_entry.target_user, show_details=True) }}
+                                            {% else %}
+                                                {#- target_user_id exists but relationship couldn't be loaded -#}
+                                                <span class="text-muted">
+                                                    <small class="text-warning">[{{ _('user data unavailable') }} - ID: {{ modlog_entry.target_user_id }}]</small>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    {% elif modlog_entry.link and modlog_entry.link.startswith('u/') %}
+                                        {#- Fallback: try to extract username from link -#}
+                                        <div class="mb-3">
+                                            <strong>{{ _('Target User:') }}</strong>
+                                            <span class="text-muted">
+                                                <a href="/{{ modlog_entry.link }}" class="text-muted text-decoration-none">{{ modlog_entry.link[2:] }}</a>
+                                                <small class="text-warning ms-1">[{{ _('user data unavailable') }}]</small>
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                    {% if modlog_entry.reason and modlog_entry.reason|length >= 50 %}
+                                    <div class="reason-content mt-3 p-3 rounded bg-light">
+                                        <h6 class="mb-2">
+                                            <i class="fe fe-message-circle"></i> {{ _('Moderator Reason') }}
+                                        </h6>
+                                        <p class="mb-0">{{ modlog_entry.reason }}</p>
+                                    </div>
+                                    {% endif %}
+                                    {% if modlog_entry.action in ['delete_post', 'delete_post_reply'] and (can_see_names or modlog_entry.public) %}
+                                        <div class="removed-content-section mt-3">
+                                            <button type="button" class="btn btn-sm btn-outline-warning toggle-content-btn" 
+                                                    data-modlog-id="{{ modlog_entry.id }}"
+                                                    id="toggle-content-{{ modlog_entry.id }}">
+                                                <span class="fe fe-eye"></span> 
+                                                <span class="button-text" data-view-text="{{ _('View Removed Content') }}" data-hide-text="{{ _('Hide Removed Content') }}">{{ _('View Removed Content') }}</span>
+                                            </button>
+                                            
+                                            <div id="removed-content-{{ modlog_entry.id }}" class="removed-content-container mt-3" style="display: none;">
+                                                <div class="text-center py-3">
+                                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                        <span class="visually-hidden">{{ _('Loading...') }}</span>
+                                                    </div>
+                                                    <p class="text-muted mt-2">{{ _('Loading content...') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <div class="modlog-context mt-3 text-muted small">
+                                        {% if modlog_entry.action in ['delete_post', 'restore_post', 'lock_post', 'unlock_post', 'featured_post', 'unfeatured_post'] %}
+                                            <i class="fe fe-file-text"></i> {{ _('Post moderation action') }}
+                                        {% elif modlog_entry.action in ['delete_post_reply', 'restore_post_reply'] %}
+                                            <i class="fe fe-message-square"></i> {{ _('Comment moderation action') }}
+                                        {% elif modlog_entry.action in ['ban_user', 'unban_user', 'ban_from_site', 'unban_from_site'] %}
+                                            <i class="fe fe-user-x"></i> {{ _('User moderation action') }}
+                                        {% elif modlog_entry.action in ['add_mod', 'remove_mod'] %}
+                                            <i class="fe fe-shield"></i> {{ _('Moderator management action') }}
+                                        {% elif modlog_entry.action in ['delete_community', 'restore_community'] %}
+                                            <i class="fe fe-users"></i> {{ _('Community moderation action') }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="action-details mt-3">
+                                        {% if can_see_names and modlog_entry.author %}
+                                            <a href="{{ url_for('main.modlog', moderator_name=modlog_entry.author.user_name if modlog_entry.author.is_local() else modlog_entry.author.ap_id) }}" 
+                                               class="btn btn-sm btn-outline-secondary">
+                                                <span class="fe fe-clock"></span> {{ _('View All Actions by This Mod') }}
+                                            </a>
+                                        {% endif %}
+                                        
+                                        {% if modlog_entry.target_user %}
+                                            <a href="{{ url_for('main.modlog', target_user=modlog_entry.target_user.user_name if modlog_entry.target_user.is_local() else modlog_entry.target_user.ap_id) }}" 
+                                               class="btn btn-sm btn-outline-secondary">
+                                                <span class="fe fe-user"></span> {{ _('View All Actions on This User') }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
-        {% else -%}
-            <p>{{ _('There are no moderation actions to show.') }}</p>
-        {% endif -%}
+            </div>
+        {% else %}
+            <div class="empty-state text-center py-5">
+                <i class="fe fe-shield fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">{{ _('No moderation actions found') }}</h4>
+                <p class="text-muted">{{ _('No entries match your current filters.') }}</p>
+                <a href="{{ url_for('main.modlog') }}" class="btn btn-outline-primary">
+                    <span class="fe fe-x"></span> {{ _('Clear Filters') }}
+                </a>
+            </div>
+        {% endif %}
+
+        {% if modlog_entries.pages > 1 %}
+        <nav aria-label="Pagination" class="mt-4" role="navigation">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    {% set end_num = modlog_entries.page * modlog_entries.per_page %}
+                    {% if end_num > modlog_entries.total %}
+                        {% set end_num = modlog_entries.total %}
+                    {% endif %}
+                    {{ _('Showing %(start)d-%(end)d of %(total)d entries', 
+                        start=((modlog_entries.page - 1) * modlog_entries.per_page + 1),
+                        end=end_num,
+                        total=modlog_entries.total) }}
+                </div>
+                <div>
+                    {% if prev_url %}
+                        <a href="{{ prev_url }}" class="btn btn-outline-primary" rel='nofollow'>
+                            <span aria-hidden="true">&larr;</span> {{ _('Previous') }}
+                        </a>
+                    {% endif %}
+                    {% if next_url %}
+                        <a href="{{ next_url }}" class="btn btn-outline-primary ms-2" rel='nofollow'>
+                            {{ _('Next') }} <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        {% endif %}
     </div>
-    <nav aria-label="Pagination" class="mt-4" role="navigation">
-            {% if prev_url -%}
-                <a href="{{ prev_url }}" class="btn btn-primary" rel='nofollow'>
-                    <span aria-hidden="true">&larr;</span> {{ _('Previous page') }}
-                </a>
-            {% endif -%}
-            {% if next_url -%}
-                <a href="{{ next_url }}" class="btn btn-primary" rel='nofollow'>
-                    {{ _('Next page') }} <span aria-hidden="true">&rarr;</span>
-                </a>
-            {% endif -%}
-    </nav>
-{% endblock -%}
+
+    {% if can_see_names %}
+    <div class="modal fade" id="statsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ _('Moderation Statistics') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% if action_counts %}
+                        <h6>{{ _('Action Breakdown') }}</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>{{ _('Action') }}</th>
+                                        <th class="text-end">{{ _('Count') }}</th>
+                                        <th class="text-end">{{ _('Percentage') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for action, count in action_counts|dictsort(by='value', reverse=True) %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-{{ get_action_class(action) }}">
+                                                    {{ action }}
+                                                </span>
+                                            </td>
+                                            <td class="text-end">{{ count }}</td>
+                                            <td class="text-end">
+                                                {% if total_entries > 0 %}
+                                                    {{ "%.1f"|format(count / total_entries * 100) }}%
+                                                {% else %}
+                                                    0.0%
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">{{ _('No statistics available') }}</p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="/static/js/modlog.js"></script>
+    <script src="/static/js/modlog-communities.js"></script>
+{% endblock %}
+
+{# Helper functions #}
+{% macro get_action_class(action) -%}
+    {%- if action in ['delete_post', 'delete_post_reply', 'delete_community', 'ban_user', 'ban_from_site'] -%}
+        danger
+    {%- elif action in ['restore_post', 'restore_post_reply', 'restore_community', 'unban_user', 'unban_from_site'] -%}
+        success
+    {%- elif action in ['lock_post', 'lock_post_reply', 'featured_post'] -%}
+        warning
+    {%- elif action in ['add_mod', 'remove_mod'] -%}
+        info
+    {%- else -%}
+        secondary
+    {%- endif -%}
+{%- endmacro %}

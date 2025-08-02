@@ -1,0 +1,18 @@
+<!-- Conversation Report Content -->
+<div class="conversation-content">
+    <div class="report-context-bg p-4 text-center">
+        <span class="fe fe-lock text-muted mb-3" style="font-size: 3rem;"></span>
+        <h6 class="mb-2">{{ _('Private conversation - requires elevated privileges') }}</h6>
+        {% if report.targets.conversation_participants %}
+            <p class="text-muted mb-3">
+                {{ _('Participants:') }} 
+                {% for participant in report.targets.conversation_participants %}
+                    <span class="badge bg-secondary">{{ participant }}</span>
+                {% endfor %}
+            </p>
+        {% endif %}
+        <button type="button" class="btn btn-primary btn-sm" data-action="view-conversation" data-report-id="{{ report.id }}">
+            <span class="fe fe-unlock me-1"></span>{{ _('View Private Content') }}
+        </button>
+    </div>
+</div>

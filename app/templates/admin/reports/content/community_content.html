@@ -1,0 +1,24 @@
+<!-- Community Report Content -->
+<div class="community-content">
+    <div class="mb-3">
+        <h5 class="mb-1">
+            <span class="fe fe-users"></span>
+            <a href="/c/{{ report.targets.community_name }}" target="_blank" class="text-decoration-none">
+                {{ report.targets.community_name }}
+            </a>
+        </h5>
+        <small class="text-muted">
+            {% if report.targets.source_instance_domain %}
+                <span class="fe fe-globe"></span> {{ _('Instance:') }} {{ report.targets.source_instance_domain }}
+            {% else %}
+                <span class="fe fe-home"></span> {{ _('Local community') }}
+            {% endif %}
+        </small>
+    </div>
+    
+    {% if report.targets.community_description %}
+        <div class="community-description mb-3">
+            <p class="mb-0">{{ report.targets.community_description|truncate(300)|safe }}</p>
+        </div>
+    {% endif %}
+</div>

@@ -12,31 +12,33 @@ from app import db, cache
 from app.activitypub.util import users_total, active_month, local_posts, local_communities, \
     lemmy_site_data, is_activitypub_request
 from app.activitypub.signature import default_context, LDSignature
-from app.community.util import retrieve_mods_and_backfill
 from app.constants import SUBSCRIPTION_PENDING, SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, SUBSCRIPTION_MODERATOR, \
-    POST_STATUS_REVIEWING, POST_TYPE_LINK
+    POST_STATUS_REVIEWING
 from app.email import send_email, send_registration_approved_email
 from app.inoculation import inoculation
 from app.main import bp
 from flask import g, flash, request, current_app, url_for, redirect, make_response, jsonify, send_file
 from flask_login import current_user
-from flask_babel import _, get_locale
+from flask_babel import _
 from sqlalchemy import desc, text
 
 from app.main.forms import ShareLinkForm
 from app.utils import render_template, get_setting, request_etag_matches, return_304, blocked_domains, \
-    ap_datetime, shorten_string, user_filters_home, \
-    joined_communities, moderating_communities, markdown_to_html, allowlist_html, \
+    ap_datetime, shorten_string, user_filters_home, joined_communities, moderating_communities, markdown_to_html, \
     blocked_instances, communities_banned_from, topic_tree, recently_upvoted_posts, recently_downvoted_posts, \
-    menu_topics, blocked_communities, \
-    permission_required, debug_mode_only, ip_address, menu_instance_feeds, menu_my_feeds, menu_subscribed_feeds, \
-    feed_tree_public, gibberish, get_deduped_post_ids, paginate_post_ids, post_ids_to_models, html_to_text, \
-    get_redis_connection, subscribed_feeds, joined_or_modding_communities, login_required_if_private_instance, \
-    pending_communities, retrieve_image_hash, possible_communities, remove_tracking_from_link, reported_posts, \
-    moderating_communities_ids, user_notes, login_required, safe_order_by, filtered_out_communities, archive_post
+    menu_topics, blocked_communities, permission_required, debug_mode_only, ip_address, menu_instance_feeds, \
+    menu_my_feeds, menu_subscribed_feeds, feed_tree_public, gibberish, get_deduped_post_ids, paginate_post_ids, \
+    post_ids_to_models, html_to_text, get_redis_connection, subscribed_feeds, joined_or_modding_communities, \
+    login_required_if_private_instance, pending_communities, retrieve_image_hash, possible_communities, \
+    remove_tracking_from_link, reported_posts, moderating_communities_ids, user_notes, login_required, safe_order_by, \
+    filtered_out_communities, archive_post
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
-    Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage
+    Notification, Language, community_language, Feed, FeedItem, CmsPage
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap
+
+# Setup modlog routes
+import app.main.modlog_api
+import app.main.modlog
 
 
 @bp.route('/', methods=['HEAD', 'GET', 'POST'])
@@ -560,37 +562,6 @@ def list_not_subscribed_communities():
                            feed_id=feed_id, server_has_feeds=server_has_feeds, public_feeds=public_feeds)
 
 
-@bp.route('/modlog', methods=['GET'])
-def modlog():
-    page = request.args.get('page', 1, type=int)
-    low_bandwidth = request.cookies.get('low_bandwidth', '0') == '1'
-    can_see_names = False
-
-    # Admins can see all of the modlog, everyone else can only see public entries
-    if current_user.is_authenticated:
-        if current_user.is_admin() or current_user.is_staff():
-            modlog_entries = ModLog.query.order_by(desc(ModLog.created_at))
-            can_see_names = True
-        else:
-            modlog_entries = ModLog.query.filter(ModLog.public == True).order_by(desc(ModLog.created_at))
-    else:
-        modlog_entries = ModLog.query.filter(ModLog.public == True).order_by(desc(ModLog.created_at))
-
-    # Pagination
-    modlog_entries = modlog_entries.paginate(page=page, per_page=100 if not low_bandwidth else 50, error_out=False)
-    next_url = url_for('main.modlog', page=modlog_entries.next_num) if modlog_entries.has_next else None
-    prev_url = url_for('main.modlog', page=modlog_entries.prev_num) if modlog_entries.has_prev and page != 1 else None
-
-    instances = {}
-    for instance in Instance.query.all():
-        instances[instance.id] = instance.domain
-
-    return render_template('modlog.html',
-                           title=_('Moderation Log'), modlog_entries=modlog_entries, can_see_names=can_see_names,
-                           next_url=next_url, prev_url=prev_url, low_bandwidth=low_bandwidth,
-                           instances=instances,
-                           inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
-                           )
 
 
 @bp.route('/about')

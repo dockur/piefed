@@ -1,0 +1,221 @@
+/**
+ * Community multi-select chip box styles
+ */
+
+.community-multiselect-container {
+    position: relative;
+    width: 100%;
+    min-width: 200px;
+}
+
+/* Main chip box container */
+.community-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    min-height: 38px;
+    padding: 0.375rem;
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    cursor: text;
+}
+
+.community-chips:focus-within {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Individual chip */
+.community-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #0d6efd;
+    color: #ffffff;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.chip-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chip-remove {
+    background: none;
+    border: none;
+    color: #ffffff;
+    opacity: 0.8;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    transition: opacity 0.2s;
+}
+
+.chip-remove:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chip-remove {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Search input inside chip box */
+.community-search-input {
+    flex: 1;
+    min-width: 150px;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    font-size: 0.875rem;
+    color: #212529;
+}
+
+.community-search-input::placeholder {
+    color: #6c757d;
+}
+
+/* Search wrapper for dropdown positioning */
+.community-search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Dropdown */
+.community-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: -0.375rem;
+    min-width: 300px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #ffffff;
+    color: #212529;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+}
+
+.community-dropdown-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #e9ecef;
+    color: #212529;
+    background-color: transparent;
+}
+
+.community-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.community-dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.community-dropdown-item.no-results {
+    color: #6c757d;
+    font-style: italic;
+    cursor: default;
+}
+
+.community-dropdown-item.no-results:hover {
+    background-color: transparent;
+}
+
+.community-name {
+    font-weight: 500;
+    color: #212529;
+}
+
+.community-instance {
+    font-size: 0.875rem;
+    margin-left: 0.25rem;
+    color: #6c757d;
+}
+
+.community-stats {
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+    color: #6c757d;
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .community-chips {
+    background-color: #212529;
+    border-color: #495057;
+}
+
+[data-bs-theme="dark"] .community-search-input {
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .community-search-input::placeholder {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .community-dropdown {
+    background-color: #343a40;
+    border-color: #495057;
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .community-dropdown-item {
+    border-color: #495057;
+    color: #f8f9fa;
+    background-color: transparent;
+}
+
+[data-bs-theme="dark"] .community-dropdown-item:hover {
+    background-color: #495057;
+}
+
+[data-bs-theme="dark"] .community-dropdown-item.no-results {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .community-name {
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .community-instance {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .community-stats {
+    color: #adb5bd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .community-multiselect-container {
+        width: 100%;
+    }
+    
+    .chip-text {
+        max-width: 150px;
+    }
+    
+    .community-dropdown {
+        left: 0;
+        right: 0;
+        min-width: unset;
+    }
+}

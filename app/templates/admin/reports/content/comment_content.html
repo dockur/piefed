@@ -1,0 +1,160 @@
+<!-- Comment Report Content -->
+<div class="comment-content">
+    {% if report.comment_thread_context %}
+        <!-- Original Post Context -->
+        <div class="report-context-bg mb-2">
+            <small class="text-muted d-block mb-1">
+                {{ _('Original post by') }} 
+                {% if report.comment_thread_context.post.author.ap_id %}
+                    <a href="/u/{{ report.comment_thread_context.post.author.ap_id }}">
+                        {{ report.comment_thread_context.post.author.user_name }}
+                    </a>
+                {% else %}
+                    <a href="/u/{{ report.comment_thread_context.post.author.user_name }}">
+                        {{ report.comment_thread_context.post.author.user_name }}
+                    </a>
+                {% endif %}
+            </small>
+            <h6 class="mb-1">
+                <a href="/post/{{ report.comment_thread_context.post.id }}" target="_blank" class="text-decoration-none">
+                    {{ report.comment_thread_context.post.title }}
+                </a>
+            </h6>
+            <small class="text-muted text-truncate d-block">
+                {{ report.comment_thread_context.post.body|truncate(100)|safe if report.comment_thread_context.post.body }}
+            </small>
+        </div>
+        
+        <!-- Comment Thread -->
+        <div class="comment-thread">
+            {% if report.comment_thread_context.parent_comment %}
+                <!-- Parent Comment -->
+                <div class="border-start border-2 ps-3 mb-2">
+                    <small class="text-muted d-block mb-1">
+                        {{ _('Parent comment by') }} 
+                        {% if report.comment_thread_context.parent_comment.author.ap_id %}
+                            <a href="/u/{{ report.comment_thread_context.parent_comment.author.ap_id }}">
+                                {{ report.comment_thread_context.parent_comment.author.user_name }}
+                            </a>
+                        {% else %}
+                            <a href="/u/{{ report.comment_thread_context.parent_comment.author.user_name }}">
+                                {{ report.comment_thread_context.parent_comment.author.user_name }}
+                            </a>
+                        {% endif %}
+                    </small>
+                    {% set parent_body = report.comment_thread_context.parent_comment.body %}
+                    {% if parent_body|length > 200 %}
+                        <div class="comment-body-wrapper">
+                            <p class="small mb-0 comment-body-collapsed">{{ parent_body|truncate(200)|safe }}</p>
+                            <p class="small mb-0 comment-body-full d-none">{{ parent_body|safe }}</p>
+                            <button type="button" class="btn btn-link btn-sm p-0 expand-comment mt-0">
+                                <span class="fe fe-chevron-down"></span> <span>{{ _('Show more') }}</span>
+                            </button>
+                        </div>
+                    {% else %}
+                        <p class="small mb-0">{{ parent_body|safe }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            <!-- Reported Comment -->
+            <div class="reported-content-highlight p-2 rounded-end{% if report.comment_thread_context.comment.deleted %} deleted-content{% endif %}">
+                <div class="d-flex align-items-start">
+                    {% if report.comment_thread_context.comment.author.avatar_id %}
+                        <img src="{{ report.comment_thread_context.comment.author.avatar_thumbnail() }}" 
+                             alt="{{ _('Author avatar') }}" class="rounded-circle avatar-32 me-2">
+                    {% else %}
+                        <div class="rounded-circle avatar-32 avatar-generic me-2">
+                            <span class="fe fe-user"></span>
+                        </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-1">
+                            {% if report.comment_thread_context.comment.author.ap_id %}
+                                <a href="/u/{{ report.comment_thread_context.comment.author.ap_id }}" class="text-decoration-none fw-semibold">
+                                    {{ report.comment_thread_context.comment.author.user_name }}
+                                </a>
+                            {% else %}
+                                <a href="/u/{{ report.comment_thread_context.comment.author.user_name }}" class="text-decoration-none fw-semibold">
+                                    {{ report.comment_thread_context.comment.author.user_name }}
+                                </a>
+                            {% endif %}
+                            {% if report.comment_thread_context.comment.author.instance %}
+                                <span class="text-muted small ms-1">@{{ report.comment_thread_context.comment.author.instance.domain }}</span>
+                            {% endif %}
+                            {% if report.comment_thread_context.comment.author.banned %}
+                                <span class="badge bg-danger ms-2" title="{{ _('User is banned') }}">
+                                    <span class="fe fe-slash"></span> {{ _('Banned') }}
+                                </span>
+                            {% endif %}
+                            {% if report.comment_thread_context.comment.author.deleted %}
+                                <span class="badge bg-secondary ms-2" title="{{ _('User account deleted') }}">
+                                    <span class="fe fe-user-x"></span> {{ _('Deleted') }}
+                                </span>
+                            {% endif %}
+                            {% if report.comment_thread_context.comment.deleted %}
+                                <span class="badge bg-warning text-dark ms-2" title="{{ _('Comment has been deleted') }}">
+                                    <span class="fe fe-trash-2"></span> {{ _('Comment Deleted') }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% set comment_body = report.comment_thread_context.comment.body %}
+                        {% if comment_body|length > 500 %}
+                            <div class="comment-body-wrapper">
+                                <p class="mb-0 comment-body-collapsed">{{ comment_body|truncate(500)|safe }}</p>
+                                <p class="mb-0 comment-body-full d-none">{{ comment_body }}</p>
+                                <button type="button" class="btn btn-link btn-sm p-0 expand-comment mb-3">
+                                    <span class="fe fe-chevron-down"></span> <span>{{ _('Show more') }}</span>
+                                </button>
+                            </div>
+                        {% else %}
+                            <p class="mb-2">{{ comment_body }}</p>
+                        {% endif %}
+                        <div class="small text-muted">
+                            <a href="/post/{{ report.comment_thread_context.post.id }}#comment_{{ report.comment_thread_context.comment.id }}" 
+                               target="_blank" class="text-decoration-none me-3">
+                                <span class="fe fe-external-link me-1"></span>{{ _('View comment') }}
+                            </a>
+                            <span class="me-3">
+                                <span class="fe fe-clock me-1"></span>
+                                {{ arrow.get(report.comment_thread_context.comment.created_at).humanize(locale=locale) }}
+                            </span>
+                            <span>
+                                <span class="fe fe-thumbs-down me-1"></span>
+                                {{ report.comment_thread_context.comment.score|default(0) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Fallback if no thread context -->
+        <div class="reported-content-highlight p-2{% if report.suspect_post_reply_id and report.targets.get('deleted') %} deleted-content{% endif %}">
+            <div class="text-muted">
+                <p class="mb-1">{{ _('[Comment author information not available]') }}</p>
+            </div>
+            {% set comment_body = report.targets.orig_comment_body %}
+            {% if comment_body and comment_body|length > 500 %}
+                <div class="comment-body-wrapper">
+                    <p class="mb-0 comment-body-collapsed">{{ comment_body|truncate(500)|safe }}</p>
+                    <p class="mb-0 comment-body-full d-none">{{ comment_body }}</p>
+                    <button type="button" class="btn btn-link btn-sm p-0 expand-comment mb-3">
+                        <span class="fe fe-chevron-down"></span> <span>{{ _('Show more') }}</span>
+                    </button>
+                </div>
+            {% else %}
+                <p class="mb-2">{{ comment_body|default(_('No comment body available'))|safe }}</p>
+            {% endif %}
+            <small class="text-muted">
+                {% if report.targets.post_id %}
+                    <a href="/post/{{ report.targets.post_id }}#comment_{{ report.targets.suspect_comment_id }}" target="_blank" class="text-decoration-none">
+                        <span class="fe fe-external-link me-1"></span>{{ _('View full comment') }}
+                    </a>
+                {% else %}
+                    <span class="text-muted">{{ _('Comment link not available') }}</span>
+                {% endif %}
+            </small>
+        </div>
+    {% endif %}
+</div>

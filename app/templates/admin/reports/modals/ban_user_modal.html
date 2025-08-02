@@ -1,0 +1,82 @@
+<!-- Ban User Modal -->
+<div class="modal fade" id="banUserModal" tabindex="-1" aria-labelledby="banUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="banUserModalLabel"><span class="fe fe-user-x"></span> {{ _('Ban User') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{{ url_for('admin.admin_report_action') }}" id="banUserForm">
+                {{ action_form.hidden_tag() if action_form }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><span class="fe fe-user"></span> {{ _('Username') }}</label>
+                        <div class="d-flex align-items-center bg-light p-2 rounded">
+                            <img id="banUserAvatar" src="" alt="{{ _('User avatar') }}" class="rounded-circle me-2" style="width: 24px; height: 24px;">
+                            <span id="banUserName"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="banDuration" class="form-label"><span class="fe fe-clock"></span> {{ _('Ban Duration') }}</label>
+                        <select class="form-select" id="banDuration" name="ban_duration">
+                            <option value="24">{{ _('24 hours') }}</option>
+                            <option value="72">{{ _('3 days') }}</option>
+                            <option value="168">{{ _('7 days') }}</option>
+                            <option value="720">{{ _('30 days') }}</option>
+                            <option value="0">{{ _('Permanent') }}</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label"><span class="fe fe-target"></span> {{ _('Ban Scope') }}</label>
+                        <div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="ban_scope" id="banCommunity" value="community" checked>
+                                <label class="form-check-label" for="banCommunity">
+                                    {{ _('Community only') }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="ban_scope" id="banSitewide" value="site">
+                                <label class="form-check-label" for="banSitewide">
+                                    {{ _('Site-wide') }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="banReason" class="form-label"><span class="fe fe-edit-3"></span> {{ _('Ban Reason (will be shown to user)') }}</label>
+                        <textarea class="form-control" id="banReason" name="reason" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="deleteContent" name="delete_content">
+                            <label class="form-check-label" for="deleteContent">
+                                <span class="fe fe-trash-2"></span> {{ _('Delete all content from this user') }}
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifyUser" name="notify_reporter" checked>
+                            <label class="form-check-label" for="notifyUser">
+                                <span class="fe fe-bell"></span> {{ _('Notify reporter of action taken') }}
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="report_id" id="banReportId">
+                    <input type="hidden" name="action" value="ban_user">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><span class="fe fe-x"></span> {{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-danger"><span class="fe fe-user-x"></span> {{ _('Ban User') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

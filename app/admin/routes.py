@@ -16,10 +16,9 @@ from urllib.parse import urlparse
 from furl import furl
 
 from app import db, celery, cache
-from app.activitypub.routes import process_inbox_request, process_delete_request, replay_inbox_request
-from app.activitypub.signature import post_request, default_context, RsaKeys
+from app.activitypub.routes import replay_inbox_request
+from app.activitypub.signature import RsaKeys
 from app.activitypub.util import instance_allowed, extract_domain_and_actor
-from app.admin.constants import ReportTypes
 from app.admin.forms import FederationForm, SiteMiscForm, SiteProfileForm, EditCommunityForm, EditUserForm, \
     EditTopicForm, SendNewsletterForm, AddUserForm, PreLoadCommunitiesForm, ImportExportBannedListsForm, \
     EditInstanceForm, RemoteInstanceScanForm, MoveCommunityForm, EditBlockedImageForm, AddBlockedImageForm, \
@@ -29,11 +28,11 @@ from app.admin.util import unsubscribe_from_everything_then_delete, unsubscribe_
     topics_for_form, move_community_images_to_here
 from app.community.util import save_icon_file, save_banner_file, search_for_community
 from app.community.routes import do_subscribe
-from app.constants import REPORT_STATE_NEW, REPORT_STATE_ESCALATED, POST_STATUS_REVIEWING
+from app.constants import POST_STATUS_REVIEWING
 from app.email import send_registration_approved_email
 from app.models import AllowedInstances, BannedInstances, ActivityPubLog, utcnow, Site, Community, CommunityMember, \
-    User, Instance, File, Report, Topic, UserRegistration, Role, Post, PostReply, Language, RolePermission, Domain, \
-    Tag, DefederationSubscription, BlockedImage, CmsPage, Notification
+    User, Instance, File, Topic, UserRegistration, Role, Post, PostReply, Language, RolePermission, Domain, Tag, \
+    DefederationSubscription, BlockedImage, CmsPage, Notification
 from app.shared.tasks import task_selector
 from app.utils import render_template, permission_required, set_setting, get_setting, gibberish, markdown_to_html, \
     moderating_communities, joined_communities, finalize_user_setup, theme_list, blocked_phrases, blocked_referrers, \
@@ -42,6 +41,9 @@ from app.utils import render_template, permission_required, set_setting, get_set
     community_membership, retrieve_image_hash, posts_with_blocked_images, user_access, reported_posts, user_notes, \
     safe_order_by, get_task_session, patch_db_session, low_value_reposters, moderating_communities_ids
 from app.admin import bp
+
+# Setup reports routes
+import app.admin.reports_api
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -1656,33 +1658,6 @@ def admin_user_delete(user_id):
     return redirect(referrer())
 
 
-
-@bp.route('/reports', methods=['GET'])
-@permission_required('administer all users')
-@login_required
-def admin_reports():
-    page = request.args.get('page', 1, type=int)
-    search = request.args.get('search', '')
-    local_remote = request.args.get('local_remote', '')
-    report_types = request.args.getlist('report_types',  type=int)  # Extract multiple values
-    
-    if len(report_types) == 0:
-        report_types = [-1]
-    
-    reports = Report.query.filter(or_(Report.status == REPORT_STATE_NEW, Report.status == REPORT_STATE_ESCALATED))
-    if local_remote == 'local':
-        reports = reports.filter_by(source_instance_id=1)
-    if local_remote == 'remote':
-        reports = reports.filter(Report.source_instance_id != 1)
-    if len(report_types) > 0 and -1 not in report_types:
-        reports = reports.filter(Report.type.in_(report_types))
-    reports = reports.order_by(desc(Report.created_at)).paginate(page=page, per_page=1000, error_out=False)
-
-    next_url = url_for('admin.admin_reports', page=reports.next_num) if reports.has_next else None
-    prev_url = url_for('admin.admin_reports', page=reports.prev_num) if reports.has_prev and page != 1 else None
-
-    return render_template('admin/reports.html', title=_('Reports'), next_url=next_url, prev_url=prev_url,
-                           reports=reports, local_remote=local_remote, search=search, report_types=report_types, report_types_list=ReportTypes.get_choices())
 
 
 @bp.route('/newsletter', methods=['GET', 'POST'])

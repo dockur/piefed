@@ -1,0 +1,87 @@
+<!-- User Report Content -->
+<div class="user-content">
+    <div class="d-flex align-items-start reported-content-highlight">
+        {% if report.suspect_user and report.suspect_user.avatar_id %}
+            <img src="{{ report.suspect_user.avatar_thumbnail() }}" 
+                 alt="{{ _('User avatar') }}" class="rounded-circle avatar-64 me-3">
+        {% else %}
+            <div class="rounded-circle avatar-64 avatar-generic me-3">
+                <span class="fe fe-user"></span>
+            </div>
+        {% endif %}
+        <div class="flex-grow-1">
+            <div class="mb-2">
+                <h5 class="mb-1">
+                    {% if report.targets.suspect_username %}
+                        {% if report.suspect_user and report.suspect_user.ap_id %}
+                            <a href="/u/{{ report.suspect_user.ap_id }}" target="_blank" class="text-decoration-none">
+                                {{ report.targets.suspect_username }}
+                            </a>
+                        {% else %}
+                            <a href="/u/{{ report.targets.suspect_username }}" target="_blank" class="text-decoration-none">
+                                {{ report.targets.suspect_username }}
+                            </a>
+                        {% endif %}
+                        {% if report.suspect_user and report.suspect_user.banned %}
+                            <span class="badge bg-danger ms-2" title="{{ _('User is banned') }}">
+                                <span class="fe fe-slash"></span> {{ _('Banned') }}
+                            </span>
+                        {% endif %}
+                        {% if report.suspect_user and report.suspect_user.deleted %}
+                            <span class="badge bg-secondary ms-2" title="{{ _('User account deleted') }}">
+                                <span class="fe fe-user-x"></span> {{ _('Deleted') }}
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">{{ _('[Unknown user]') }}</span>
+                    {% endif %}
+                </h5>
+                <small class="text-muted">
+                    {% if report.targets.source_instance_domain %}
+                        <span class="fe fe-globe"></span> {{ _('Home instance:') }} {{ report.targets.source_instance_domain }}
+                    {% else %}
+                        <span class="fe fe-home"></span> {{ _('Local user') }}
+                    {% endif %}
+                </small>
+            </div>
+            
+            {% if report.targets.user_bio %}
+                <div class="user-bio mb-3">
+                    <p class="mb-0">{{ report.targets.user_bio|truncate(300)|safe }}</p>
+                </div>
+            {% endif %}
+            
+            <!-- User Statistics -->
+            <div class="row g-2 text-center">
+                {% if report.suspect_user %}
+                <div class="col-3">
+                    <div class="user-stat-card p-2 rounded">
+                        <div class="fw-semibold"><span class="fe fe-file-text"></span> {{ report.suspect_user.post_count|default(0) }}</div>
+                        <small class="text-muted">{{ _('Posts') }}</small>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="user-stat-card p-2 rounded">
+                        <div class="fw-semibold"><span class="fe fe-message-square"></span> {{ report.suspect_user.post_reply_count|default(0) }}</div>
+                        <small class="text-muted">{{ _('Comments') }}</small>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="user-stat-card p-2 rounded">
+                        <div class="fw-semibold"><span class="fe fe-star"></span> {{ report.suspect_user.reputation|default(0) }}</div>
+                        <small class="text-muted">{{ _('Reputation') }}</small>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="user-stat-card p-2 rounded">
+                        <div class="fw-semibold">
+                            <span class="fe fe-clock"></span> {{ arrow.get(report.suspect_user.created).humanize(locale=locale, only_distance=True) }}
+                        </div>
+                        <small class="text-muted">{{ _('Account Age') }}</small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

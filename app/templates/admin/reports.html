@@ -7,54 +7,455 @@
 {% set active_child = 'admin_reports' %}
 
 {% block app_content %}
-    <script src="/static/js/tomselect/tom-select.complete.min.js"></script>
+    <link rel="stylesheet" href="/static/css/admin-reports.css">
+    <link rel="stylesheet" href="/static/css/feather-icons-complete.css?t=1754021560">
+    <link rel="stylesheet" href="/static/css/reports-communities.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     {% include 'admin/_tabbed_nav.html' %}
     <br>
-    <div class="row">
-        <div class="col">
-            <h1>{{ _('Reports') }}</h1>
-            <form method="get" class="mb-3 d-flex gap-3 align-items-center">
-                <input type="search" name="search" placeholder="{{ _('Query') }}" value="{{ search }}">
-                <label for="local_remote_local">
-                    <input type="radio" name="local_remote" value="local"
-                           id="local_remote_local" {{ 'checked' if local_remote == 'local' }} /> Local</label>
-                <label for="local_remote_remote">
-                    <input type="radio" name="local_remote" value="remote"
-                           id="local_remote_remote" {{ 'checked' if local_remote == 'remote' }} /> Remote</label>
-                <select name="report_types" id="report_types" class="form-select" style="width: 200px">
-                    {% for value, label in report_types_list %}
-                        <option value="{{ value }}" {% if value in report_types %}selected{% endif %}>
-                            {{ label }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <input type="submit" name="submit" value="Search" class="btn btn-primary"/>
-            </form>
-            <table class="table table-striped">
-                {% for report in reports.items %}
-                    {% include "admin/reports/" + str(report.type_text()).lower() + "_report.html" %}
-                {% endfor %}
-            </table>
-            <nav aria-label="Pagination" class="mt-4" role="navigation">
-                {% if prev_url %}
-                    <a href="{{ prev_url }}" class="btn btn-primary">
-                        <span aria-hidden="true">&larr;</span> {{ _('Previous page') }}
-                    </a>
-                {% endif %}
-                {% if next_url %}
-                    <a href="{{ next_url }}" class="btn btn-primary">
-                        {{ _('Next page') }} <span aria-hidden="true">&rarr;</span>
-                    </a>
-                {% endif %}
-            </nav>
+    
+    <div class="admin-reports-container">
+        {% set has_active_filters = has_query_params %}
+        
+        <div class="reports-header d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">{{ _('Moderation Reports') }}</h1>
+            <div>
+                <button type="button" class="btn btn-primary" data-action="toggle-bulk-mode">
+                    <span class="fe fe-layers"></span> {{ _('Bulk Actions') }}
+                </button>
+                <button type="button" class="btn btn-outline-secondary ms-2" data-action="toggle-filters">
+                    <span class="fe fe-sliders"></span> {{ _('Filters') }}
+                    {% if has_active_filters %}
+                        <span class="badge bg-primary ms-1"><span class="fe fe-check"></span> {{ _('Active') }}</span>
+                    {% endif %}
+                </button>
+            </div>
         </div>
+
+        <div class="filters-section mb-4 {% if not has_active_filters %}collapsed{% endif %}" id="filtersSection">
+            <form method="get" class="d-flex gap-2 flex-wrap">
+                <div class="flex-grow-1" style="min-width: 200px;">
+                    <div class="input-group">
+                        <span class="input-group-text"><span class="fe fe-search"></span></span>
+                        <input type="search" name="search" class="form-control" 
+                               placeholder="{{ _('Search reports...') }}" value="{{ search }}">
+                    </div>
+                </div>
+                
+                <select name="local_remote" class="form-select" style="width: auto;">
+                    <option value="all" {% if local_remote == 'all' or not local_remote %}selected{% endif %}>{{ _('All Origins') }}</option>
+                    <option value="local" {% if local_remote == 'local' %}selected{% endif %}>{{ _('Local') }}</option>
+                    <option value="remote" {% if local_remote == 'remote' %}selected{% endif %}>{{ _('Remote') }}</option>
+                </select>
+                
+                <select name="filter_status" class="form-select" style="width: auto;">
+                    <option value="all" {% if filter_status == 'all' %}selected{% endif %}>{{ _('All Statuses') }}</option>
+                    <option value="unresolved" {% if filter_status == 'unresolved' %}selected{% endif %}>{{ _('Unresolved') }}</option>
+                    <option value="new" {% if filter_status == 'new' %}selected{% endif %}>{{ _('New') }}</option>
+                    <option value="escalated" {% if filter_status == 'escalated' %}selected{% endif %}>{{ _('Escalated') }}</option>
+                    <option value="appealed" {% if filter_status == 'appealed' %}selected{% endif %}>{{ _('Appealed') }}</option>
+                    <option value="resolved" {% if filter_status == 'resolved' %}selected{% endif %}>{{ _('Resolved') }}</option>
+                    <option value="dismissed" {% if filter_status == 'dismissed' %}selected{% endif %}>{{ _('Dismissed') }}</option>
+                </select>
+                
+                
+                <select name="filter_type" class="form-select" style="width: auto;">
+                    <option value="all" {% if filter_type == 'all' or not filter_type %}selected{% endif %}>{{ _('All Types') }}</option>
+                    <option value="0" {% if filter_type == '0' %}selected{% endif %}><span class="fe fe-user"></span> {{ _('User') }}</option>
+                    <option value="1" {% if filter_type == '1' %}selected{% endif %}><span class="fe fe-file-text"></span> {{ _('Post') }}</option>
+                    <option value="2" {% if filter_type == '2' %}selected{% endif %}><span class="fe fe-message-square"></span> {{ _('Comment') }}</option>
+                    <option value="3" {% if filter_type == '3' %}selected{% endif %}><span class="fe fe-users"></span> {{ _('Community') }}</option>
+                    <option value="4" {% if filter_type == '4' %}selected{% endif %}><span class="fe fe-mail"></span> {{ _('Conversation') }}</option>
+                </select>
+                
+                <select name="date_range" class="form-select" style="width: auto;">
+                    <option value="week" {% if date_range == 'week' or not date_range %}selected{% endif %}>{{ _('Past 7 Days') }}</option>
+                    <option value="today" {% if date_range == 'today' %}selected{% endif %}>{{ _('Past 24 Hours') }}</option>
+                    <option value="month" {% if date_range == 'month' %}selected{% endif %}>{{ _('Past 30 Days') }}</option>
+                    <option value="3months" {% if date_range == '3months' %}selected{% endif %}>{{ _('Past 3 Months') }}</option>
+                    <option value="year" {% if date_range == 'year' %}selected{% endif %}>{{ _('Past Year') }}</option>
+                    <option value="all" {% if date_range == 'all' %}selected{% endif %}>{{ _('All Time') }}</option>
+                </select>
+                
+                <div class="community-selector" style="min-width: 200px;">
+                    <input type="text" 
+                           id="community-select" 
+                           name="community_ids"
+                           class="form-control"
+                           placeholder="{{ _('Select communities...') }}"
+                           value="{{ community_ids }}"
+                           autocomplete="off">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span class="fe fe-check"></span> {{ _('Apply') }}
+                </button>
+                
+                {% if has_active_filters %}
+                    <a href="{{ url_for('admin.admin_reports') }}" class="btn btn-outline-secondary">
+                        <span class="fe fe-x"></span> {{ _('Clear') }}
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div id="bulkActionsBar" class="bulk-actions-bar mb-3" style="display: none;">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" class="form-check-input" id="select-all-reports">
+                    <label class="form-check-label" for="select-all-reports">
+                        {{ _('Select All') }}
+                    </label>
+                </div>
+                <span class="selected-count fw-bold">0 selected</span>
+                <select id="bulkActionSelect" class="form-select form-select-sm" style="width: auto;">
+                    <option value="">{{ _('Choose action...') }}</option>
+                    <option value="resolve">{{ _('Resolve') }}</option>
+                    <option value="dismiss">{{ _('Dismiss') }}</option>
+                    <option value="ban_user">{{ _('Ban User') }}</option>
+                    <option value="remove_content">{{ _('Remove Content') }}</option>
+                </select>
+                <button type="button" class="btn btn-warning btn-sm" id="bulkActionButton">{{ _('Apply') }}</button>
+            </div>
+        </div>
+
+        {% if reports.items %}
+            <div class="reports-list">
+                {% for report in reports.items %}
+                    {% set report_index = loop.index %}
+                    <div class="report-item {% if loop.index is even %}report-item-striped{% endif %}" data-report-id="{{ report.id }}">
+                        <div class="row g-0">
+                            <div class="col-md-3 report-metadata">
+                                <div class="metadata-content">
+                                    <div class="mb-2 report-select-container" style="display: none;">
+                                        <input type="checkbox" class="form-check-input report-select" value="{{ report.id }}" id="report-select-{{ report.id }}">
+                                        <label class="form-check-label ms-1" for="report-select-{{ report.id }}">
+                                            {{ _('Select') }}
+                                        </label>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge type-badge">
+                                            {% if report.type == 0 %}
+                                                <span class="fe fe-user me-1"></span>
+                                            {% elif report.type == 1 %}
+                                                <span class="fe fe-file-text me-1"></span>
+                                            {% elif report.type == 2 %}
+                                                <span class="fe fe-message-square me-1"></span>
+                                            {% elif report.type == 3 %}
+                                                <span class="fe fe-users me-1"></span>
+                                            {% elif report.type == 4 %}
+                                                <span class="fe fe-mail me-1"></span>
+                                            {% endif %}
+                                            {{ report.type_text()|title }}
+                                        </span>
+                                        {% if report.status == 0 %}
+                                            <span class="badge bg-warning text-dark"><span class="fe fe-alert-circle"></span> {{ _('New') }}</span>
+                                        {% elif report.status == 1 %}
+                                            <span class="badge bg-danger"><span class="fe fe-alert-triangle"></span> {{ _('Escalated') }}</span>
+                                        {% elif report.status == 2 %}
+                                            <span class="badge bg-info"><span class="fe fe-refresh-cw"></span> {{ _('Appealed') }}</span>
+                                        {% elif report.status == 3 %}
+                                            <span class="badge bg-success"><span class="fe fe-check-circle"></span> {{ _('Resolved') }}</span>
+                                        {% elif report.status == -1 %}
+                                            <span class="badge bg-secondary"><span class="fe fe-x-circle"></span> {{ _('Dismissed') }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Report ID:') }}</span>
+                                        <span class="value">#{{ report.id }}</span>
+                                    </div>
+                                    {% if report.in_community_id %}
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Community:') }}</span>
+                                        <a href="/c/{{ report.targets.community_link }}" class="value">
+                                            {{ report.targets.community_title }}
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Reported by:') }}</span>
+                                        {% if report.targets.reporter_ap_id %}
+                                            <a href="/u/{{ report.targets.reporter_ap_id }}" class="value">
+                                                {{ report.targets.reporter_user_name }}
+                                            </a>
+                                        {% else %}
+                                            <a href="/u/{{ report.targets.reporter_user_name }}" class="value">
+                                                {{ report.targets.reporter_user_name }}
+                                            </a>
+                                        {% endif %}
+                                        {% if report.reporter_report_count > 1 %}
+                                            <span class="badge bg-info ms-1" title="{{ _('Total reports by this user') }}">
+                                                <span class="fe fe-flag"></span> {{ report.reporter_report_count }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Reason:') }}</span>
+                                        <span class="value">{{ report.reasons }}</span>
+                                    </div>
+                                    
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Status:') }}</span>
+                                        <span class="value status-{{ report.status }}">
+                                            {{ {0: _('New'), 1: _('Escalated'), 3: _('Resolved'), -1: _('Dismissed')}[report.status] }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="metadata-item">
+                                        <span class="label">{{ _('Created:') }}</span>
+                                        <span class="value">
+                                            {{ arrow.get(report.created_at).format('MMM DD, YYYY - h:mm A') }}
+                                            <span class="text-muted">({{ arrow.get(report.created_at).humanize(locale=locale) }})</span>
+                                        </span>
+                                    </div>
+                                    
+                                    {% if report.related_reports_count > 0 %}
+                                    <div class="metadata-item bg-warning bg-opacity-10 p-1 rounded">
+                                        <span class="label">{{ _('Total reports:') }}</span>
+                                        <span class="value fw-bold">{{ report.related_reports_count + 1 }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if report.description %}
+                                    <div class="reporter-description-sidebar mt-3 pt-2 border-top">
+                                        <h6 class="text-muted small mb-1">{{ _("Reporter's description") }}</h6>
+                                        <p class="small mb-0">{{ report.description }}</p>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="bulk-checkbox" style="display: none;">
+                                        <input type="checkbox" class="form-check-input report-checkbox" 
+                                               value="{{ report.id }}">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-9 report-content">
+                                <div class="content-wrapper">
+                                    {% if report.type == 0 %}
+                                        {% include 'admin/reports/content/user_content.html' %}
+                                    {% elif report.type == 1 %}
+                                        {% include 'admin/reports/content/post_content.html' %}
+                                    {% elif report.type == 2 %}
+                                        {% include 'admin/reports/content/comment_content.html' %}
+                                    {% elif report.type == 3 %}
+                                        {% include 'admin/reports/content/community_content.html' %}
+                                    {% elif report.type == 4 %}
+                                        {% include 'admin/reports/content/conversation_content.html' %}
+                                    {% endif %}
+                                    
+                                    <div class="report-actions mt-3">
+                                        <button class="btn btn-sm btn-success{% if report.status == 3 %} disabled{% endif %}" 
+                                                data-action="quick-report-action" data-report-id="{{ report.id }}" data-action-type="resolve"
+                                                {% if report.status == 3 %}disabled title="{{ _('Already resolved') }}"{% endif %}>
+                                            <span class="fe fe-check-circle"></span> {{ _('Resolve') }}
+                                        </button>
+                                        
+                                        {% if report.type == 1 %}
+                                        <button class="btn btn-sm btn-outline-danger{% if report.targets.post_deleted %} disabled{% endif %}" 
+                                                data-action="quick-report-action" data-report-id="{{ report.id }}" data-action-type="remove_content" data-report-type="{{ report.type }}"
+                                                {% if report.targets.post_deleted %}disabled title="{{ _('Post already deleted') }}"{% endif %}>
+                                            <span class="fe fe-trash-2"></span> {{ _('Remove Post') }}
+                                        </button>
+                                        {% elif report.type == 2 %}
+                                        <button class="btn btn-sm btn-outline-danger{% if report.targets.comment_deleted %} disabled{% endif %}" 
+                                                data-action="quick-report-action" data-report-id="{{ report.id }}" data-action-type="remove_content" data-report-type="{{ report.type }}"
+                                                {% if report.targets.comment_deleted %}disabled title="{{ _('Comment already deleted') }}"{% endif %}>
+                                            <span class="fe fe-trash-2"></span> {{ _('Remove Comment') }}
+                                        </button>
+                                        {% endif %}
+                                        
+                                        <button class="btn btn-sm btn-outline-danger{% if report.targets.user_banned or report.targets.author_banned %} disabled{% endif %}" 
+                                                data-action="open-ban-modal" data-report-id="{{ report.id }}" data-username="{{ report.targets.suspect_username }}"
+                                                {% if report.targets.user_banned or report.targets.author_banned %}disabled title="{{ _('User already banned') }}"{% endif %}>
+                                            <span class="fe fe-user-x"></span> {{ _('Ban User') }}
+                                        </button>
+                                        
+                                        <button class="btn btn-sm btn-outline-secondary{% if report.status == -1 %} disabled{% endif %}" 
+                                                data-action="quick-report-action" data-report-id="{{ report.id }}" data-action-type="dismiss"
+                                                {% if report.status == -1 %}disabled title="{{ _('Already dismissed') }}"{% endif %}>
+                                            <span class="fe fe-x-circle"></span> {{ _('Dismiss') }}
+                                        </button>
+                                        
+                                        {% if report.type == 1 and report.targets.suspect_post_id %}
+                                            <a href="{{ url_for('main.modlog', post_id=report.targets.suspect_post_id, target_user=report.suspect_user.ap_id if report.suspect_user and report.suspect_user.ap_id else report.targets.suspect_username if report.targets.suspect_username else None) }}" 
+                                               class="btn btn-sm btn-outline-info" target="_blank">
+                                                <span class="fe fe-activity"></span> {{ _('Post Modlog') }}
+                                            </a>
+                                        {% elif report.type == 2 and report.targets.suspect_comment_id %}
+                                            {% if report.comment_thread_context and report.comment_thread_context.comment.author %}
+                                                {% set author = report.comment_thread_context.comment.author %}
+                                                <a href="{{ url_for('main.modlog', reply_id=report.targets.suspect_comment_id, target_user=author.ap_id if author.ap_id else author.user_name) }}" 
+                                                   class="btn btn-sm btn-outline-info" target="_blank">
+                                                    <span class="fe fe-activity"></span> {{ _('Comment Modlog') }}
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ url_for('main.modlog', reply_id=report.targets.suspect_comment_id) }}" 
+                                                   class="btn btn-sm btn-outline-info" target="_blank">
+                                                    <span class="fe fe-activity"></span> {{ _('Comment Modlog') }}
+                                                </a>
+                                            {% endif %}
+                                        {% elif report.type == 0 and report.targets.suspect_username %}
+                                            <a href="{{ url_for('main.modlog', target_user=report.suspect_user.ap_id if report.suspect_user and report.suspect_user.ap_id else report.targets.suspect_username) }}" 
+                                               class="btn btn-sm btn-outline-info" target="_blank">
+                                                <span class="fe fe-activity"></span> {{ _('User Modlog') }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if reports.has_prev or reports.has_next %}
+                <nav aria-label="{{ _('Report pagination') }}" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if reports.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.admin_reports', page=reports.prev_num, filter_type=filter_type, filter_status=filter_status, filter_reporter=filter_reporter, filter_community=filter_community, sort_by=sort_by) }}">
+                                    {{ _('Previous') }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">{{ _('Previous') }}</span>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in reports.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                            {% if page_num %}
+                                {% if page_num != reports.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.admin_reports', page=page_num, filter_type=filter_type, filter_status=filter_status, filter_reporter=filter_reporter, filter_community=filter_community, sort_by=sort_by) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if reports.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.admin_reports', page=reports.next_num, filter_type=filter_type, filter_status=filter_status, filter_reporter=filter_reporter, filter_community=filter_community, sort_by=sort_by) }}">
+                                    {{ _('Next') }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">{{ _('Next') }}</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="no-reports text-center py-5">
+                <span class="fe fe-inbox text-muted mb-3" style="font-size: 3rem;"></span>
+                <h4 class="text-muted">{{ _('No reports found') }}</h4>
+                <p class="text-muted">{{ _('No reports match your current filters.') }}</p>
+                <a href="{{ url_for('admin.admin_reports') }}" class="btn btn-outline-primary">
+                    <span class="fe fe-x"></span> {{ _('Clear Filters') }}
+                </a>
+            </div>
+        {% endif %}
+
+        {% if reports.pages > 1 %}
+            <nav class="mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted">
+                        {% set end_num = reports.page * reports.per_page %}
+                        {% if end_num > reports.total %}
+                            {% set end_num = reports.total %}
+                        {% endif %}
+                        {{ _('Showing %(start)d to %(end)d of %(total)d reports', 
+                            start=((reports.page - 1) * reports.per_page + 1),
+                            end=end_num,
+                            total=reports.total) }}
+                    </div>
+                    <div>
+                        {% if prev_url %}
+                            <a href="{{ prev_url }}" class="btn btn-outline-secondary">
+                                <span class="fe fe-arrow-left"></span> {{ _('Previous') }}
+                            </a>
+                        {% endif %}
+                        {% if next_url %}
+                            <a href="{{ next_url }}" class="btn btn-outline-secondary ms-2">
+                                {{ _('Next') }} <span class="fe fe-arrow-right"></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+        {% endif %}
     </div>
+
+    {% include 'admin/reports/modals/ban_user_modal.html' %}
+    
     <hr/>
     <div class="row">
         <div class="col">
             {% include 'admin/_nav.html' %}
         </div>
     </div>
-    <hr/>
+    <script src="/static/js/tomselect/tom-select.complete.min.js"></script>
+    <script>
+        // Pass translations to JavaScript
+        window.reportTranslations = {
+            banUser: "{{ _('Ban User') }}",
+            removeContent: "{{ _('Remove Content') }}",
+            removePost: "{{ _('Remove Post') }}",
+            removeComment: "{{ _('Remove Comment') }}",
+            banUsers: "{{ _('Ban Users') }}",
+            resolveReport: "{{ _('Resolve Report') }}",
+            dismissReport: "{{ _('Dismiss Report') }}",
+            resolveReports: "{{ _('Resolve Reports') }}",
+            dismissReports: "{{ _('Dismiss Reports') }}",
+            confirm: "{{ _('Confirm') }}",
+            cancel: "{{ _('Cancel') }}",
+            user: "{{ _('User:') }}",
+            banDuration: "{{ _('Ban Duration:') }}",
+            permanent: "{{ _('Permanent') }}",
+            hours24: "{{ _('24 hours') }}",
+            week1: "{{ _('1 week') }}",
+            days30: "{{ _('30 days') }}",
+            banScope: "{{ _('Ban Scope:') }}",
+            communityOnly: "{{ _('Community only') }}",
+            siteWide: "{{ _('Site-wide') }}",
+            deleteAllContent: "{{ _('Delete all content from this user') }}",
+            reasonRequired: "{{ _('Reason (required):') }}",
+            reasonOptional: "{{ _('Reason (optional):') }}",
+            resolveSimilarReports: "{{ _('Resolve similar reports on the same content/user') }}",
+            banningUserNote: "{{ _('Banning a user will automatically resolve all reports against them.') }}",
+            removingContentNote: "{{ _('Removing content will automatically resolve all reports for that content.') }}",
+            confirmResolve: "{{ _('Are you sure you want to resolve this report?') }}",
+            confirmDismiss: "{{ _('Are you sure you want to dismiss this report?') }}",
+            reportCount: "{{ _('%s reports') }}",
+            processing: "{{ _('Processing...') }}",
+            resolve: "{{ _('Resolve') }}",
+            dismiss: "{{ _('Dismiss') }}",
+            remove: "{{ _('Remove') }}",
+            showMore: "{{ _('Show more') }}",
+            showLess: "{{ _('Show less') }}",
+            bulkActions: "{{ _('Bulk Actions') }}",
+            selectAll: "{{ _('Select All') }}",
+            selected: "{{ _('selected') }}",
+            selectedCount: "{{ _('%s selected') }}",
+            applyToSelected: "{{ _('Apply to %s Selected') }}"
+        };
+    </script>
+    <script src="/static/js/admin-reports-helpers.js"></script>
+    <script src="/static/js/admin-reports.js"></script>
+    <script src="/static/js/reports-communities.js"></script>
 {% endblock %}

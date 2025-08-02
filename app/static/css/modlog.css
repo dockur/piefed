@@ -1,0 +1,293 @@
+/**
+ * Modlog Redesigned Styling
+ * Matches the split card design of admin reports
+ */
+
+/* Container */
+.modlog-container {
+    max-width: 100%;
+}
+
+/* Header */
+.modlog-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+/* Filters Section */
+.filters-section {
+    background-color: var(--bs-gray-100);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.filters-section.collapsed {
+    display: none;
+}
+
+.filters-section .form-select,
+.filters-section .form-control {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-gray-300);
+}
+
+/* Modlog Items */
+.modlog-list {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-gray-300);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.modlog-item {
+    border-bottom: 1px solid var(--bs-gray-200);
+    transition: background-color 0.2s ease;
+}
+
+.modlog-item:last-child {
+    border-bottom: none;
+}
+
+.modlog-item:hover {
+    background-color: var(--bs-gray-100);
+}
+
+/* Metadata Column */
+.modlog-metadata {
+    background-color: var(--bs-gray-50, rgba(0,0,0,0.02));
+    padding: 1.25rem;
+    border-right: 1px solid var(--bs-gray-200);
+}
+
+.metadata-content {
+    font-size: 0.875rem;
+}
+
+.metadata-item {
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.metadata-item .label {
+    color: var(--bs-gray-600);
+    font-weight: 500;
+}
+
+.metadata-item .value {
+    color: var(--bs-body-color);
+}
+
+.metadata-item a.value {
+    color: var(--bs-link-color);
+    text-decoration: none;
+}
+
+.metadata-item a.value:hover {
+    text-decoration: underline;
+}
+
+/* Action Badge */
+.action-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Content Column */
+.modlog-content {
+    padding: 1.25rem;
+}
+
+.content-wrapper {
+    max-width: 800px;
+}
+
+.modlog-content h5 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.modlog-content h5 a {
+    color: var(--bs-body-color);
+}
+
+.modlog-content h5 a:hover {
+    color: var(--bs-link-color);
+}
+
+/* Reason display */
+.reason-sidebar {
+    font-size: 0.875rem;
+}
+
+.reason-sidebar p {
+    color: var(--bs-gray-700);
+    line-height: 1.4;
+}
+
+.reason-content {
+    background-color: var(--bs-gray-100);
+    border: 1px solid var(--bs-border-color);
+}
+
+.reason-content h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Context Information */
+.modlog-context {
+    font-size: 0.875rem;
+    color: var(--bs-gray-600);
+}
+
+/* Action Details */
+.action-details {
+    padding-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.action-details .btn {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Empty State */
+.empty-state {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-gray-300);
+    border-radius: 0.5rem;
+    padding: 3rem;
+}
+
+.empty-state i {
+    opacity: 0.3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modlog-metadata {
+        border-right: none;
+        border-bottom: 1px solid var(--bs-gray-200);
+    }
+    
+    .filters-section form {
+        flex-direction: column;
+    }
+    
+    .filters-section .form-select {
+        width: 100% !important;
+    }
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .filters-section {
+    background-color: rgba(255,255,255,0.05);
+}
+
+[data-bs-theme="dark"] .modlog-metadata {
+    background-color: rgba(255,255,255,0.02);
+}
+
+[data-bs-theme="dark"] .modlog-item:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+[data-bs-theme="dark"] .metadata-item .label {
+    color: var(--bs-gray-500);
+}
+
+[data-bs-theme="dark"] .reason-content {
+    background-color: rgba(255,255,255,0.05);
+}
+
+[data-bs-theme="dark"] .reason-sidebar p {
+    color: var(--bs-gray-300);
+}
+
+/* Badge color variations */
+.bg-danger {
+    background-color: var(--bs-danger) !important;
+}
+
+.bg-success {
+    background-color: var(--bs-success) !important;
+}
+
+.bg-warning {
+    background-color: var(--bs-warning) !important;
+}
+
+.bg-info {
+    background-color: var(--bs-info) !important;
+}
+
+.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+}
+
+/* Removed Content Display */
+.removed-content-section {
+    border-top: 1px solid var(--bs-gray-200);
+    padding-top: 1rem;
+}
+
+.removed-content-container {
+    margin-top: 1rem;
+}
+
+.removed-content-display {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+    border-color: var(--bs-warning) !important;
+}
+
+.removed-content-display h6 {
+    color: var(--bs-danger);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.removed-content-body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border-color: var(--bs-border-color);
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Dark mode adjustments for removed content */
+[data-bs-theme="dark"] .removed-content-display {
+    background-color: rgba(255, 193, 7, 0.05) !important;
+}
+
+/* Print styles */
+@media print {
+    .btn,
+    .action-details,
+    .filters-section,
+    .removed-content-section {
+        display: none !important;
+    }
+    
+    .modlog-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
