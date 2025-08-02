@@ -9,10 +9,10 @@
 {%- macro render_modlog_user(user, show_details=False) -%}
     {%- if user -%}
         <div class="d-inline-flex align-items-center">
-            {%- if show_details and user.avatar_id -%}
-                <img src="{{ user.avatar_thumbnail() }}" alt="{{ _('User avatar') }}" class="rounded-circle me-2" style="width: 24px; height: 24px;">
-            {%- endif -%}
             {%- if user.deleted -%}
+                {%- if show_details and user.avatar_id -%}
+                    <img src="{{ user.avatar_thumbnail() }}" alt="{{ _('User avatar') }}" class="rounded-circle me-2" style="width: 24px; height: 24px;">
+                {%- endif -%}
                 <span>
                     {%- if user.is_local() -%}
                         <a href="/u/{{ user.user_name }}" class="text-muted text-decoration-none">{{ user.user_name }}</a>
