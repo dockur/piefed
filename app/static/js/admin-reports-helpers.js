@@ -273,7 +273,6 @@ function getOrCreateToastContainer() {
 
 // Export functions for use in main script
 window.reportHelpers = {
-    getCSRFToken,
     setButtonLoadingState,
     createActionModal,
     buildReportActionModalBody,

@@ -1,4 +1,3 @@
-
 let bulkMode = false;
 let selectedReports = [];
 
@@ -154,9 +153,6 @@ function initializeReportsInterface() {
     initializeCollapsibles();
 }
 
-
-
-
 function updateBulkActionButton() {
     const bulkActionButton = document.getElementById('bulkActionButton');
     if (bulkActionButton) {
@@ -172,8 +168,6 @@ document.addEventListener('change', function(e) {
         updateSelectedCount();
     }
 });
-
-
 
 function toggleActionFields(action) {
     const banFields = document.getElementById('banFields');
@@ -194,7 +188,6 @@ function quickReportAction(reportId, action, reportType) {
         submitQuickAction(reportId, action, '');
     }
 }
-
 
 function submitQuickAction(reportId, action, reason, additionalData = {}) {
     const requestData = {
@@ -240,8 +233,6 @@ function submitQuickAction(reportId, action, reason, additionalData = {}) {
             });
         });
 }
-
-
 
 function confirmBulkAction() {
     if (selectedReports.length === 0) {
@@ -469,10 +460,6 @@ function updateSelectAllState() {
     }
 }
 
-
-
-
-
 function initializeCollapsibles() {
     document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(element) {
         element.addEventListener('click', function() {
@@ -532,7 +519,6 @@ function toggleBulkMode() {
         }
     }
 }
-
 
 function viewPrivateConversation(reportId) {
     if (confirm('This is a private conversation. Only view if necessary for moderation. Continue?')) {
@@ -748,4 +734,3 @@ function executeBulkAction(reportIdsStr, action) {
             showNotification('error', 'An error occurred while processing bulk action');
         });
 }
-

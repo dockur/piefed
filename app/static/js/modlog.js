@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const toggleFiltersBtn = document.getElementById('toggle-filters-btn');
     if (toggleFiltersBtn) {
