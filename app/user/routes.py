@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
+from typing import Optional
 
 from feedgen.feed import FeedGenerator
 from flask import redirect, url_for, flash, request, make_response, session, current_app, abort, json, g, send_file
@@ -30,6 +31,9 @@ from app.user import bp
 from app.user.forms import ProfileForm, SettingsForm, DeleteAccountForm, ReportUserForm, \
     FilterForm, KeywordFilterEditForm, RemoteFollowForm, ImportExportForm, UserNoteForm, BanUserForm
 from app.user.utils import purge_user_then_delete, unsubscribe_from_community, search_for_user
+from app.user.user_settings_import import (
+    process_settings_import, ValidImport, NoFileSubmitted, InvalidFileType, InvalidJson, FileTooLarge
+)
 from app.utils import render_template, markdown_to_html, user_access, markdown_to_text, shorten_string, \
     gibberish, file_get_contents, community_membership, user_filters_home, \
     user_filters_posts, user_filters_replies, theme_list, \
@@ -653,30 +657,26 @@ def user_settings_import_export():
         return send_file(buffer, download_name=f'{user.user_name}_piefed_settings.json', as_attachment=True,
                          mimetype='application/json')
     elif form.validate_on_submit():
-        import_file = request.files['import_file']
-        if import_file and import_file.filename != '':
-            file_ext = os.path.splitext(import_file.filename)[1]
-            if file_ext.lower() != '.json':
-                abort(400)
-            new_filename = gibberish(15) + '.json'
-
-            directory = 'app/static/media/'
-
-            # save the file
-            final_place = os.path.join(directory, new_filename + file_ext)
-            import_file.save(final_place)
-
-            # import settings in background task
-            import_settings(final_place)
-
+        result = process_settings_import(request)
+        
+        if isinstance(result, ValidImport):
+            import_file = request.files['import_file']
+            import_file.save(result.final_place)
+            
+            # Import settings in background task
+            import_settings(result.final_place)
             flash(_('Your subscriptions and blocks are being imported. If you have many it could take a few minutes.'))
+            
+            db.session.commit()
+            flash(_('Your changes have been saved.'), 'success')
+        
+        elif isinstance(result, (NoFileSubmitted, InvalidFileType, InvalidJson, FileTooLarge)):
+            flash(_(result.error_message), 'error')
 
-        db.session.commit()
-
-        flash(_('Your changes have been saved.'), 'success')
         return redirect(url_for('user.user_settings_import_export'))
 
     return render_template('user/import_export.html', title=_('Import & Export'), form=form, user=current_user)
+
 
 
 @bp.route('/user/<int:user_id>/notification', methods=['GET', 'POST'])
