@@ -97,7 +97,7 @@ sudo -iu postgres psql -c "CREATE DATABASE pyfedi WITH OWNER pyfedi;"
 
 For installation environments that use `apt` as a package manager:   
 ```bash
-sudo apt install python3-pip python3-venv python3-dev python3-psycopg2
+sudo apt install python3-pip python3-venv python3-dev python3-psycopg2 python3-flask
 ``` 
 
 
