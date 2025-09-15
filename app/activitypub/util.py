@@ -35,6 +35,7 @@ from app.utils import get_request, allowlist_html, get_setting, ap_datetime, mar
     moderating_communities, get_task_session, is_video_hosting_site, opengraph_parse, mastodon_extra_field_link, \
     blocked_users, piefed_markdown_to_lemmy_markdown, store_files_in_s3, guess_mime_type, get_recipient_language, \
     patch_db_session, to_srgb
+from app.shared.tasks import task_selector
 
 
 def public_key():
@@ -602,15 +603,15 @@ def refresh_user_profile_task(user_id):
         session.close()
 
 
-def refresh_community_profile(community_id, activity_json=None):
+def refresh_community_profile(community_id, activity_json=None, user_id=None):
     if current_app.debug:
-        refresh_community_profile_task(community_id, activity_json)
+        refresh_community_profile_task(community_id, activity_json, user_id)
     else:
-        refresh_community_profile_task.apply_async(args=(community_id, activity_json), countdown=randint(1, 10))
+        refresh_community_profile_task.apply_async(args=(community_id, activity_json, user_id), countdown=randint(1, 10))
 
 
 @celery.task
-def refresh_community_profile_task(community_id, activity_json):
+def refresh_community_profile_task(community_id, activity_json, user_id=None):
     session = get_task_session()
     try:
         with patch_db_session(session):
@@ -792,6 +793,9 @@ def refresh_community_profile_task(community_id, activity_json):
                                     if post:
                                         post.sticky = True
                                         session.commit()
+                    
+                if user_id:
+                    task_selector('edit_community', user_id=user_id, community_id=community.id)
 
     except Exception:
         session.rollback()

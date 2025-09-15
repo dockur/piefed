@@ -1095,7 +1095,7 @@ def process_inbox_request(request_json, store_ap_json):
                             if community.is_local() and not community.is_moderator(user):
                                 log_incoming_ap(id, APLOG_CREATE, APLOG_FAILURE, saved_json, 'Comm edit by non-moderator')
                             else:
-                                refresh_community_profile(community.id, core_activity['object'])
+                                refresh_community_profile(community.id, core_activity['object'], user_id=user.id)
                                 log_incoming_ap(id, APLOG_UPDATE, APLOG_SUCCESS, saved_json)
                         else:
                             log_incoming_ap(id, APLOG_CREATE, APLOG_FAILURE, saved_json, 'Unacceptable type (create): ' + object_type)
