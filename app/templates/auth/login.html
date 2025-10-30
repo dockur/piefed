@@ -7,7 +7,7 @@
 {% from 'bootstrap5/form.html' import render_field -%}
 
 {% block app_content -%}
-<script src="/static/js/simplewebauthn13.umd.min.js" nonce="{{ session.nonce }}"></script>
+<script src="/static/js/simplewebauthn13.umd.min.js" nonce="{{ nonce }}"></script>
     <div class="row">
         <div class="col col-login mx-auto">
             <div class="card mt-5">

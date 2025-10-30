@@ -7,7 +7,7 @@
 {% set active_child = 'passkeys' %}
 
 {% block app_content %}
-<script src="/static/js/simplewebauthn13.umd.min.js" nonce="{{ session.nonce }}"></script>
+<script src="/static/js/simplewebauthn13.umd.min.js" nonce="{{ nonce }}"></script>
 <div class="row">
     <main class="col-12 col-lg-8 position-relative main_pane">
         <nav class="mb-2" aria-label="breadcrumb" id="breadcrumb_nav" title="Navigation">
