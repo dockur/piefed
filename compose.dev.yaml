@@ -2,13 +2,13 @@ services:
 
   db:
     shm_size: 128mb
-    image: postgres:17
+    image: postgres:18
     restart: unless-stopped
     user: "1000:1000"
     env_file:
      - ./.env.docker
     volumes:
-     - ./pgdata:/var/lib/postgresql/data
+     - ./pgdata:/var/lib/postgresql/18/docker
     ports:
       - "5432:5432"
     networks:
