@@ -2673,9 +2673,6 @@ class PostReply(db.Model):
 
 
         # LLM Detection
-        site = Site.query.get(1)
-        if site is None:
-            site = Site()
         if site.enable_em_dash_reply_filter and reply.body and '—' in reply.body and user.created_very_recently():
             # usage of em-dash is highly suspect.
             from app.utils import notify_admin
