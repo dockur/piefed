@@ -252,6 +252,7 @@ def admin_misc():
         site.enable_downvotes = form.enable_downvotes.data
         site.enable_gif_reply_rep_decrease = form.enable_gif_reply_rep_decrease.data
         site.enable_chan_image_filter = form.enable_chan_image_filter.data
+        site.enable_em_dash_reply_filter = form.enable_em_dash_reply_filter.data
         site.enable_this_comment_filter = form.enable_this_comment_filter.data
         site.allow_local_image_posts = form.allow_local_image_posts.data
         site.enable_nsfw = form.enable_nsfw.data
@@ -293,6 +294,7 @@ def admin_misc():
         form.enable_downvotes.data = site.enable_downvotes
         form.enable_gif_reply_rep_decrease.data = site.enable_gif_reply_rep_decrease
         form.enable_chan_image_filter.data = site.enable_chan_image_filter
+        form.enable_em_dash_reply_filter.data = site.enable_em_dash_reply_filter
         form.enable_this_comment_filter.data = site.enable_this_comment_filter
         form.meme_comms_low_quality.data = get_setting('meme_comms_low_quality', False)
         form.allow_local_image_posts.data = site.allow_local_image_posts

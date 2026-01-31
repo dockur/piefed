@@ -2671,8 +2671,12 @@ class PostReply(db.Model):
         session.execute(text('UPDATE "site" SET last_active = NOW()'))
         session.commit()
 
+
         # LLM Detection
-        if reply.body and '—' in reply.body and user.created_very_recently():
+        site = Site.query.get(1)
+        if site is None:
+            site = Site()
+        if site.enable_em_dash_reply_filter and reply.body and '—' in reply.body and user.created_very_recently():
             # usage of em-dash is highly suspect.
             from app.utils import notify_admin
             # notify admin
@@ -3482,6 +3486,7 @@ class Site(db.Model):
     enable_gif_reply_rep_decrease = db.Column(db.Boolean, default=False)
     enable_chan_image_filter = db.Column(db.Boolean, default=False)
     enable_this_comment_filter = db.Column(db.Boolean, default=False)
+    enable_em_dash_reply_filter = db.Column(db.Boolean, default=True)
     allow_local_image_posts = db.Column(db.Boolean, default=True)
     remote_image_cache_days = db.Column(db.Integer, default=30)
     enable_nsfw = db.Column(db.Boolean, default=False)
