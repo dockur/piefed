@@ -30,6 +30,7 @@ class SiteMiscForm(FlaskForm):
     enable_downvotes = BooleanField(_l('Enable downvotes'))
     enable_gif_reply_rep_decrease = BooleanField(_l('Decrease reputation when posting only a gif as a comment'))
     enable_chan_image_filter = BooleanField(_l('Decrease reputation when an image post matches the 4chan filter'))
+    enable_report_em_dash_replies = BooleanField(_l('Report comments containing an em dash (—) from newly created users.'))
     enable_this_comment_filter = BooleanField(_l('Filter out comments that are simply a form of "this"'))
     meme_comms_low_quality = BooleanField(_l('Meme communities = low-quality'))
     allow_local_image_posts = BooleanField(_l('Allow local image posts'))

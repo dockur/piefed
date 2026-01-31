@@ -2718,7 +2718,7 @@ class PostReply(db.Model):
                 session.commit()
 
         # LLM Detection
-        if reply.body and '—' in reply.body and user.created_very_recently():
+        if site.enable_report_em_dash_replies and reply.body and '—' in reply.body and user.created_very_recently():
             # usage of em-dash is highly suspect.
             from app.utils import notify_admin
             # notify admin
@@ -3527,6 +3527,7 @@ class Site(db.Model):
     enable_downvotes = db.Column(db.Boolean, default=True)
     enable_gif_reply_rep_decrease = db.Column(db.Boolean, default=False)
     enable_chan_image_filter = db.Column(db.Boolean, default=False)
+    enable_report_em_dash_replies = db.Column(db.Boolean, default=False)
     enable_this_comment_filter = db.Column(db.Boolean, default=False)
     allow_local_image_posts = db.Column(db.Boolean, default=True)
     remote_image_cache_days = db.Column(db.Integer, default=30)
