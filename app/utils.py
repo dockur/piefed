@@ -249,7 +249,7 @@ def is_local_image_url(url):
 
 
 def is_video_url(url: str) -> bool:
-    common_video_extensions = ['.mp4', '.webm']
+    common_video_extensions = ['.mp4', '.webm', '.mov']
     mime_type = mime_type_using_head(url) if url.startswith('http') else None
     if mime_type:
         mime_type_parts = mime_type.split('/')
@@ -1573,7 +1573,7 @@ def can_upload_video():
         return False
     elif upload_access == 'admins' and not current_user.is_admin_or_staff():
         return False
-    elif upload_access == 'users' and not current_user.is_authenticated():
+    elif upload_access == 'users' and not current_user.is_authenticated:
         return False
     return True
 
