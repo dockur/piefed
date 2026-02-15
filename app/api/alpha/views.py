@@ -637,7 +637,7 @@ def calculate_path(reply):
 # emergency function - shouldn't be called in normal circumstances
 def calculate_child_count(reply):
     child_count = db.session.execute(
-        text('select count(id) as c from post_reply where :id = ANY(path) and id != :id and deleted = false'),
+        text('select count(*) as c from post_reply where :id = ANY(path) and id != :id and deleted = false'),
         {"id": reply.id}).scalar()
     reply.child_count = child_count
     db.session.commit()
@@ -1263,7 +1263,7 @@ def cached_modlist_for_user(user):
 @cache.memoize(timeout=3000)
 def users_total():
     return db.session.execute(text(
-        'SELECT COUNT(id) as c FROM "user" WHERE ap_id is null AND verified is true AND banned is false AND deleted is false')).scalar()
+        'SELECT COUNT(*) as c FROM "user" WHERE ap_id is null AND verified is true AND banned is false AND deleted is false')).scalar()
 
 
 def moderating_communities_view(user):

@@ -534,7 +534,7 @@ def about_page():
 
     admins = Site.admins()
     staff = Site.staff()
-    domains_amount = db.session.execute(text('SELECT COUNT(id) as c FROM "domain" WHERE "banned" IS false')).scalar()
+    domains_amount = db.session.execute(text('SELECT COUNT(*) as c FROM "domain" WHERE "banned" IS false')).scalar()
     community_amount = local_communities()
     instance = Instance.query.filter_by(id=1).first()
 

@@ -94,9 +94,9 @@ def list_instances():
     next_url = url_for('instance.list_instances', page=instances.next_num, filters=filters, search=search) if instances.has_next else None
     prev_url = url_for('instance.list_instances', page=instances.prev_num, filters=filters, search=search) if instances.has_prev and page != 1 else None
 
-    allowed = db.session.execute(text('SELECT COUNT(id) FROM "allowed_instances"')).scalar() > 0
-    blocked = db.session.execute(text('SELECT COUNT(id) FROM "banned_instances"')).scalar() > 0
-    trusted = db.session.execute(text('SELECT COUNT(id) FROM "instance" WHERE trusted IS TRUE')).scalar() > 0
+    allowed = db.session.execute(text('SELECT COUNT(*) FROM "allowed_instances"')).scalar() > 0
+    blocked = db.session.execute(text('SELECT COUNT(*) FROM "banned_instances"')).scalar() > 0
+    trusted = db.session.execute(text('SELECT COUNT(*) FROM "instance" WHERE trusted IS TRUE')).scalar() > 0
 
     return render_template('instance/list_instances.html', instances=instances, title=title, search=search,
                            filters=filters, next_url=next_url, prev_url=prev_url, low_bandwidth=low_bandwidth,

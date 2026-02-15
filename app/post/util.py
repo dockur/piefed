@@ -243,7 +243,7 @@ def get_comment_branch(post: Post, comment_id: int, sort_by: str, viewer: User) 
 # The number of replies a post has
 def get_post_reply_count(post_id) -> int:
     return db.session.execute(
-        text('SELECT COUNT(id) as c FROM "post_reply" WHERE post_id = :post_id AND deleted is false'),
+        text('SELECT COUNT(*) as c FROM "post_reply" WHERE post_id = :post_id AND deleted is false'),
         {'post_id': post_id}).scalar()
 
 

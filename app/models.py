@@ -113,19 +113,19 @@ class Instance(db.Model):
         return self.software.lower() == 'lemmy' or self.software.lower() == 'mbin' or self.software.lower() == 'kbin' or self.software.lower() == 'guppe groups'
 
     def post_count(self):
-        return db.session.execute(text('SELECT COUNT(id) as c FROM "post" WHERE instance_id = :instance_id'),
+        return db.session.execute(text('SELECT COUNT(*) as c FROM "post" WHERE instance_id = :instance_id'),
                                   {'instance_id': self.id}).scalar()
 
     def post_replies_count(self):
-        return db.session.execute(text('SELECT COUNT(id) as c FROM "post_reply" WHERE instance_id = :instance_id'),
+        return db.session.execute(text('SELECT COUNT(*) as c FROM "post_reply" WHERE instance_id = :instance_id'),
                                   {'instance_id': self.id}).scalar()
 
     def known_communities_count(self):
-        return db.session.execute(text('SELECT COUNT(id) as c FROM "community" WHERE instance_id = :instance_id'),
+        return db.session.execute(text('SELECT COUNT(*) as c FROM "community" WHERE instance_id = :instance_id'),
                                   {'instance_id': self.id}).scalar()
 
     def known_users_count(self):
-        return db.session.execute(text('SELECT COUNT(id) as c FROM "user" WHERE instance_id = :instance_id'),
+        return db.session.execute(text('SELECT COUNT(*) as c FROM "user" WHERE instance_id = :instance_id'),
                                   {'instance_id': self.id}).scalar()
 
     def update_dormant_gone(self):
@@ -1140,9 +1140,9 @@ class User(UserMixin, db.Model):
 
     def num_content(self):
         content = 0
-        content += db.session.execute(text('SELECT COUNT(id) as c FROM "post" WHERE user_id = :user_id'),
+        content += db.session.execute(text('SELECT COUNT(*) as c FROM "post" WHERE user_id = :user_id'),
                                       {'user_id': self.id}).scalar()
-        content += db.session.execute(text('SELECT COUNT(id) as c FROM "post_reply" WHERE user_id = :user_id'),
+        content += db.session.execute(text('SELECT COUNT(*) as c FROM "post_reply" WHERE user_id = :user_id'),
                                       {'user_id': self.id}).scalar()
         return content
 
@@ -1323,11 +1323,11 @@ class User(UserMixin, db.Model):
     def recalculate_post_stats(self, posts=True, replies=True):
         if posts:
             self.post_count = db.session.execute(
-                text('SELECT COUNT(id) as c FROM "post" WHERE user_id = :user_id AND deleted = false'),
+                text('SELECT COUNT(*) as c FROM "post" WHERE user_id = :user_id AND deleted = false'),
                 {'user_id': self.id}).scalar()
         if replies:
             self.post_reply_count = db.session.execute(
-                text('SELECT COUNT(id) as c FROM "post_reply" WHERE user_id = :user_id AND deleted = false'),
+                text('SELECT COUNT(*) as c FROM "post_reply" WHERE user_id = :user_id AND deleted = false'),
                 {'user_id': self.id}).scalar()
 
     def subscribed(self, community_id: int) -> int:
@@ -2356,7 +2356,7 @@ class Post(db.Model):
 
     def post_reply_count_recalculate(self):
         self.post_reply_count = db.session.execute(
-            text('SELECT COUNT(id) as c FROM "post_reply" WHERE post_id = :post_id AND deleted is false'),
+            text('SELECT COUNT(*) as c FROM "post_reply" WHERE post_id = :post_id AND deleted is false'),
             {'post_id': self.id}).scalar()
 
     # All the following post/comment ranking math is explained at https://medium.com/hacking-and-gonzo/how-reddit-ranking-algorithms-work-ef111e33d0d9
@@ -2498,7 +2498,7 @@ class Post(db.Model):
                            {'community_id': community.id, 'instance_id': community.instance_id, 'post_id': self.id})
 
     def update_reaction_cache(self):
-        count = func.count(PostVote.id).label("count")
+        count = func.count().label("count")
         # Use LEFT JOIN so unicode emojis (not in Emoji table) are included
         rows = db.session.query(PostVote.emoji, Emoji.url, count,
                                 func.array_agg(User.user_name).label("authors")).\
@@ -3000,7 +3000,7 @@ class PostReply(db.Model):
         return undo
 
     def update_reaction_cache(self):
-        count = func.count(PostReplyVote.id).label("count")
+        count = func.count().label("count")
         # Use LEFT JOIN so unicode emojis (not in Emoji table) are included
         rows = db.session.query(PostReplyVote.emoji, Emoji.url, count,
                                 func.array_agg(User.user_name).label("authors")).\
@@ -3586,7 +3586,7 @@ class Site(db.Model):
 
     def active_now(self):
         return db.session.execute(text(
-            "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '5 minutes' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
+            "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '5 minutes' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
 
     def active_daily(self):
         from app.activitypub.util import active_day
@@ -3606,19 +3606,19 @@ class Site(db.Model):
 
     def all_active_6monthly(self):
         return db.session.execute(text(
-            "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '6 months' AND banned is false AND deleted is false")).scalar()
+            "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '6 months' AND banned is false AND deleted is false")).scalar()
 
     def all_active_monthly(self):
         return db.session.execute(text(
-            "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 month' AND banned is false AND deleted is false")).scalar()
+            "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 month' AND banned is false AND deleted is false")).scalar()
 
     def all_active_weekly(self):
         return db.session.execute(text(
-            "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 week' AND banned is false AND deleted is false")).scalar()
+            "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 week' AND banned is false AND deleted is false")).scalar()
 
     def all_active_daily(self):
         return db.session.execute(text(
-            "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 day' AND banned is false AND deleted is false")).scalar()
+            "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 day' AND banned is false AND deleted is false")).scalar()
 
 
 # class IngressQueue(db.Model):

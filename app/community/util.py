@@ -835,7 +835,7 @@ def find_potential_moderators(search: str) -> List[User]:
 
 
 def hashtags_used_in_community(community_id: int, content_filters):
-    tags = db.session.execute(text("""SELECT t.*, COUNT(post.id) AS pc
+    tags = db.session.execute(text("""SELECT t.*, COUNT(*) AS pc
     FROM "tag" AS t
     INNER JOIN post_tag pt ON t.id = pt.tag_id
     INNER JOIN "post" ON pt.post_id = post.id
@@ -858,7 +858,7 @@ def hashtags_used_in_community(community_id: int, content_filters):
 def hashtags_used_in_communities(community_ids: List[int], content_filters):
     if community_ids is None or len(list(community_ids)) == 0:
         return None
-    tags = db.session.execute(text("""SELECT t.*, COUNT(post.id) AS pc
+    tags = db.session.execute(text("""SELECT t.*, COUNT(*) AS pc
     FROM "tag" AS t
     INNER JOIN post_tag pt ON t.id = pt.tag_id
     INNER JOIN "post" ON pt.post_id = post.id
