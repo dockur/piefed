@@ -524,7 +524,7 @@ def show_community(community: Community):
                                                  ORDER BY e.start LIMIT 5"""),
                                          {'community_id': community.id, 'reviewing': POST_STATUS_REVIEWING}).all()
 
-    has_events = db.session.execute(text("""SELECT COUNT(p.id) as c FROM "event" e
+    has_events = db.session.execute(text("""SELECT COUNT(*) as c FROM "event" e
                                             INNER JOIN post p on e.post_id = p.id
                                             WHERE p.deleted is false AND p.community_id = :community_id
                                             AND p.status > :reviewing"""),

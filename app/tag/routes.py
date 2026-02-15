@@ -276,7 +276,7 @@ def tag_cloud(type, category_id: int):
                 community_ids.append(item.community_id)
 
     # Get tags with post counts
-    tags_query = db.session.query(Tag, db.func.count(Post.id).label('num_posts')). \
+    tags_query = db.session.query(Tag, db.func.count().label('num_posts')). \
         filter(Tag.banned == False). \
         join(post_tag, post_tag.c.tag_id == Tag.id). \
         join(Post, Post.id == post_tag.c.post_id). \

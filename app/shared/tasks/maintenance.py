@@ -192,7 +192,7 @@ def update_hashtag_counts():
         session.execute(text('''
             UPDATE tag 
             SET post_count = (
-                SELECT COUNT(post_tag.post_id)
+                SELECT COUNT(*)
                 FROM post_tag 
                 WHERE post_tag.tag_id = tag.id
             )
@@ -289,11 +289,11 @@ def update_community_stats():
                 community.total_subscriptions_count = community.subscriptions_count
 
             community.post_count = session.execute(text(
-                'SELECT COUNT(id) as c FROM post WHERE deleted is false and community_id = :community_id'
+                'SELECT COUNT(*) as c FROM post WHERE deleted is false and community_id = :community_id'
             ), {'community_id': community.id}).scalar()
 
             community.post_reply_count = session.execute(text(
-                'SELECT COUNT(id) as c FROM post_reply WHERE deleted is false and community_id = :community_id'
+                'SELECT COUNT(*) as c FROM post_reply WHERE deleted is false and community_id = :community_id'
             ), {'community_id': community.id}).scalar()
 
             session.commit()

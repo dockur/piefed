@@ -51,7 +51,7 @@ def public_key():
 
 
 def community_members(community_id):
-    sql = 'SELECT COUNT(id) as c FROM "user" as u '
+    sql = 'SELECT COUNT(*) as c FROM "user" as u '
     sql += 'INNER JOIN community_member cm on u.id = cm.user_id '
     sql += 'WHERE u.banned is false AND u.deleted is false AND cm.is_banned is false and cm.community_id = :community_id'
     return db.session.execute(text(sql), {'community_id': community_id}).scalar()
@@ -59,41 +59,41 @@ def community_members(community_id):
 
 def users_total():
     return db.session.execute(text(
-        'SELECT COUNT(id) as c FROM "user" WHERE ap_id is null AND verified is true AND banned is false AND deleted is false')).scalar()
+        'SELECT COUNT(*) as c FROM "user" WHERE ap_id is null AND verified is true AND banned is false AND deleted is false')).scalar()
 
 
 def active_half_year():
     return db.session.execute(text(
-        "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '6 months' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
+        "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '6 months' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
 
 
 def active_month():
     return db.session.execute(text(
-        "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 month' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
+        "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 month' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
 
 
 def active_week():
     return db.session.execute(text(
-        "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 week' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
+        "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 week' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
 
 
 def active_day():
     return db.session.execute(text(
-        "SELECT COUNT(id) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 day' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
+        "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '1 day' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
 
 
 def local_posts():
     return db.session.execute(
-        text('SELECT COUNT(id) as c FROM "post" WHERE instance_id = 1 AND deleted is false')).scalar()
+        text('SELECT COUNT(*) as c FROM "post" WHERE instance_id = 1 AND deleted is false')).scalar()
 
 
 def local_comments():
     return db.session.execute(
-        text('SELECT COUNT(id) as c FROM "post_reply" WHERE instance_id = 1 and deleted is false')).scalar()
+        text('SELECT COUNT(*) as c FROM "post_reply" WHERE instance_id = 1 and deleted is false')).scalar()
 
 
 def local_communities():
-    return db.session.execute(text('SELECT COUNT(id) as c FROM "community" WHERE instance_id = 1')).scalar()
+    return db.session.execute(text('SELECT COUNT(*) as c FROM "community" WHERE instance_id = 1')).scalar()
 
 
 def post_to_activity(post: Post, community: Community):
