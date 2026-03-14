@@ -2,14 +2,14 @@
         {% if can_upvote(current_user, post.community, communities_banned_from_list) %}
                 <div class="upvote_button {{ 'voted_up' if in_sorted_list(recently_upvoted, post.id) }}" role="button" aria-label="{{ _('UpVote') }}" aria-live="assertive"
                  hx-post="/post/{{ post.id }}/upvote/default?style=masonry" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_masonry" tabindex="0" title="{{ post.up_votes }} upvotes">
-                        <span class="fe fe-arrow-up"></span>
+                        <span class="fe {{ 'fe-arrow-up-circle' if in_sorted_list(recently_upvoted, post.id) else 'fe-arrow-up' }}"></span>
                         <img class="htmx-indicator" src="/static/images/spinner.svg" alt="" style="opacity: 0;">
                 </div>
         {% endif %}
         {% if can_downvote(current_user, post.community, communities_banned_from_list) %}
                 <div class="downvote_button {{ 'voted_down' if in_sorted_list(recently_downvoted, post.id) }}" role="button" aria-label="{{ _('DownVote') }}" aria-live="assertive"
                  hx-post="/post/{{ post.id }}/downvote/default?style=masonry" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_masonry" tabindex="0" title="{{ post.down_votes }} downvotes">
-                        <span class="fe fe-arrow-down"></span>
+                        <span class="fe {{ 'fe-arrow-down-circle' if in_sorted_list(recently_downvoted, post.id) else 'fe-arrow-down' }}"></span>
                         <img class="htmx-indicator" src="/static/images/spinner.svg" alt="" style="opacity: 0;">
                 </div>
         {% endif %}
