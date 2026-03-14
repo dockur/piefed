@@ -655,10 +655,6 @@ fieldset legend {
   font-size: 1em;
 }
 
-.rating_form {
-  /* highlight selected stars */
-  /* highlight on hover */
-}
 .rating_form .rating {
   direction: rtl; /* Highest value on the left */
   unicode-bidi: bidi-override;
@@ -673,8 +669,14 @@ fieldset legend {
   cursor: pointer;
   transition: color 0.2s;
 }
+.rating_form {
+  /* highlight selected stars */
+}
 .rating_form .rating > input:checked ~ label {
   color: gold;
+}
+.rating_form {
+  /* highlight on hover */
 }
 .rating_form .rating > label:hover,
 .rating_form .rating > label:hover ~ label {
@@ -826,14 +828,14 @@ div.navbar {
   outline-style: none;
 }
 
-.navbar .dropdown-menu .dropdown-item {
-  white-space: break-spaces;
-  break-inside: avoid;
-}
 @media (min-width: 992px) {
   .navbar .dropdown-menu .dropdown-item {
     width: 200px;
   }
+}
+.navbar .dropdown-menu .dropdown-item {
+  white-space: break-spaces;
+  break-inside: avoid;
 }
 
 @media (min-width: 992px) {
@@ -1179,12 +1181,14 @@ form .mb-3.required > label:after {
   background-color: rgba(0, 0, 0, 0.6);
   display: inline-block;
   padding: 5px 10px;
-  margin-bottom: 0;
 }
 @media (min-width: 992px) {
   .community_header #breadcrumb_nav .breadcrumb, .event_banner #breadcrumb_nav .breadcrumb {
     border-radius: 6px;
   }
+}
+.community_header #breadcrumb_nav .breadcrumb, .event_banner #breadcrumb_nav .breadcrumb {
+  margin-bottom: 0;
 }
 .community_header #breadcrumb_nav .breadcrumb .breadcrumb-item, .event_banner #breadcrumb_nav .breadcrumb .breadcrumb-item {
   color: white;
@@ -1657,13 +1661,15 @@ time {
   display: inline;
   color: white;
   padding-top: 10px;
-  width: 50%;
-  position: relative;
 }
 @media (min-width: 1280px) {
   #masonry .item .masonry_info .row .col .upvote_button, #masonry .item .masonry_info .row .col .downvote_button {
     padding-top: 5px;
   }
+}
+#masonry .item .masonry_info .row .col .upvote_button, #masonry .item .masonry_info .row .col .downvote_button {
+  width: 50%;
+  position: relative;
 }
 #masonry .item .masonry_info .row .col .upvote_button .htmx-indicator, #masonry .item .masonry_info .row .col .downvote_button .htmx-indicator {
   position: absolute;
@@ -2442,14 +2448,16 @@ h1 .warning_badge {
 }
 .conversation .message {
   width: 90%;
-  max-width: 100%;
-  margin-bottom: 15px;
-  clear: both;
 }
 @media (min-width: 992px) {
   .conversation .message {
     width: 70%;
   }
+}
+.conversation .message {
+  max-width: 100%;
+  margin-bottom: 15px;
+  clear: both;
 }
 .conversation .message.from_other_party {
   float: right;
@@ -2800,7 +2808,6 @@ form h5 {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
 }
 .post_flair_sidepane .post_flair {
   font-size: 90%;
@@ -2810,6 +2817,9 @@ form h5 {
   border-radius: 4px;
   white-space: nowrap;
   text-align: center;
+}
+.post_flair_sidepane {
+  margin-top: 12px;
 }
 
 .user_flair, .user_note {
@@ -3563,12 +3573,12 @@ body.compact-min .ts-wrapper {
   padding: 0;
 }
 
+body.compact-max .post_teaser .post_teaser_image_preview {
+  display: none;
+}
 body.compact-max .post_teaser {
   border-bottom-width: 1px;
   padding-top: 4px;
-}
-body.compact-max .post_teaser .post_teaser_image_preview {
-  display: none;
 }
 body.compact-max .post_teaser img, body.compact-max .post_teaser .thumbnail {
   display: none;
