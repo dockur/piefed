@@ -1190,13 +1190,20 @@ def notifications():
     notification_list = notification_list.order_by(desc(Notification.created_at)).limit(50)
 
     # move the unread notifications to the top of the list
-    nl0 = notification_list.copy()
+    nlc = notification_list.copy()
+    print(f'len nlc before: {len(nlc)}')
     nlur = []
-    for n in nl0:
+    print(f'len nlur before: {len(nlur)}')
+    for n in nlc:
         if not n.read:
             nlur.append(n)
-            nl0.remove(n)
-    notification_list = nlur + nl0 
+            nlc.remove(n)
+    print(f'len nlc after: {len(nlc)}')
+    print(f'len nlur after: {len(nlur)}')
+    print(f'nlur before sort: {nlur}')
+    nlur.sort(key=lambda x: x.created_at)
+    print(f'nlur after sort: {nlur}')
+    notification_list = nlur + nlc 
 
     return render_template('user/notifications.html', title=_('Notifications'), notifications=notification_list,
                            notification_types=notification_types, has_notifications=has_notifications, unread=unread,
