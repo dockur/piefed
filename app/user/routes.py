@@ -1192,14 +1192,14 @@ def notifications():
     # move the unread notifications to the top of the list
     nlc = notification_list.copy()
     nlur = []
+    # get the unread ones in their own list
     for n in nlc:
         if not n.read:
             nlur.append(n)
+    # remove the unread ones from the list copy
     for n in nlur:
         nlc.remove(n)
-    # nlur.sort(key=lambda x: x.created_at, reverse=True)
-    # print(f'nlur: {nlur}')
-    # print(f'nlc: {nlc}')
+    # concat the two temp lists back together as the full list, just with the unread ones in front
     notification_list = nlur + nlc 
 
     return render_template('user/notifications.html', title=_('Notifications'), notifications=notification_list,
