@@ -1195,10 +1195,11 @@ def notifications():
     for n in nlc:
         if not n.read:
             nlur.append(n)
-            nlc.remove(n)
-    nlur.sort(key=lambda x: x.created_at, reverse=True)
-    print(f'nlur: {nlur}')
-    print(f'nlc: {nlc}')
+    for n in nlur:
+        nlc.remove(n)
+    # nlur.sort(key=lambda x: x.created_at, reverse=True)
+    # print(f'nlur: {nlur}')
+    # print(f'nlc: {nlc}')
     notification_list = nlur + nlc 
 
     return render_template('user/notifications.html', title=_('Notifications'), notifications=notification_list,
