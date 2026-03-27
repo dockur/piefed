@@ -1205,6 +1205,7 @@ def community_edit(community_id: int):
             community.title = form.title.data
             community.description = piefed_markdown_to_lemmy_markdown(form.description.data)
             community.description_html = markdown_to_html(form.description.data, anchors_new_tab=False)
+            community.additional_css = form.additional_css.data
             community.posting_warning = form.posting_warning.data
             community.nsfw = form.nsfw.data
             community.ai_generated = form.ai_generated.data
@@ -1265,6 +1266,7 @@ def community_edit(community_id: int):
         else:
             form.title.data = community.title
             form.description.data = community.description
+            form.additional_css.data = community.additional_css
             form.posting_warning.data = community.posting_warning
             form.nsfw.data = community.nsfw
             form.ai_generated.data = community.ai_generated

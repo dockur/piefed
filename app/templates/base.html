@@ -99,6 +99,11 @@
           {{ current_user.additional_css | safe}}
       </style>
       {% endif -%}
+      {% if community and community.additional_css -%}
+      <style>
+          {{ community.additional_css | safe }}
+      </style>
+      {% endif %}
     {% endblock -%}
     <script src="{{ url_for('static', filename='js/set_theme.js', changed=getmtime('js/set_theme.js')) }}" type="text/javascript" nonce="{{ nonce }}"></script>
     {% if current_user.is_authenticated and current_user.theme == 'hlt-fruits' -%}
