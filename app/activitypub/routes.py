@@ -504,6 +504,8 @@ def community_profile(actor):
             if community.description_html:
                 actor_data["summary"] = community.description_html
                 actor_data['source'] = {'content': community.description, 'mediaType': 'text/markdown'}
+            if community.additional_css:
+                actor_data["additional_css"] = community.additional_css
             if community.icon_id is not None:
                 icon_image = community.icon_image()
                 if icon_image.startswith('http'):
