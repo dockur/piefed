@@ -136,6 +136,10 @@ class EditCommunityForm(FlaskForm):
                                 validators=[Optional()], render_kw={'class': 'form-select'})
     submit = SubmitField(_l('Save'))
 
+    def validate_additional_css(form, field):
+        if '</' in field.data or '<script>' in field.data:
+            raise ValidationError(_l('This CSS seems to have injected JavaScript'))
+
 
 class EditCommunityWikiPageForm(FlaskForm):
     title = StringField(_l('Title'), validators=[DataRequired()])
