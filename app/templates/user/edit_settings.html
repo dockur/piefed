@@ -55,6 +55,7 @@
                     </td>
                 </tr>
             </table>
+            {{ render_field(form.allow_community_css) }}
             {{ render_field(form.additional_css) }}
             <small class="field_hint">{{ _('Do not blindly copy and paste CSS from random strangers on the internet.') }}</small>
             <hr>

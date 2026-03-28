@@ -674,6 +674,8 @@ def user_settings():
         form.accept_private_messages.data = current_user.accept_private_messages
         form.font.data = current_user.font
         form.code_style.data = current_user.code_style or 'fruity'
+        form.allow_community_css.data = current_user.allow_community_css
+        print(current_user.allow_community_css)
         form.additional_css.data = current_user.additional_css
         form.show_subscribed_communities.data = current_user.show_subscribed_communities
         form.max_hours_per_day.data = request.cookies.get('max_hours_per_day', '')

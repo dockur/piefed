@@ -134,6 +134,7 @@ class SettingsForm(FlaskForm):
                                                ],
                                                coerce=str,
                                                render_kw={'class': 'form-select'})
+    allow_community_css = BooleanField(_l('Allow custom CSS by communities'))
     additional_css = TextAreaField(_l('Additional CSS'))
     submit = SubmitField(_l('Save settings'))
 
