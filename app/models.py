@@ -1011,7 +1011,7 @@ class User(UserMixin, db.Model):
     google_oauth_id = db.Column(db.String(64), unique=True, index=True)
     hide_low_quality = db.Column(db.Boolean, default=False)
     show_subscribed_communities = db.Column(db.Boolean, default=False)
-    allow_community_css = db.Column(db.Boolean, default=True,  server_default=True, unique=False)
+    allow_community_css = db.Column(db.Boolean, default=True,  server_default=text('TRUE'), unique=False)
     additional_css = db.Column(db.Text)
     mastodon_oauth_id = db.Column(db.String(64), unique=True, index=True)
     discord_oauth_id = db.Column(db.String(64), unique=True, index=True)
