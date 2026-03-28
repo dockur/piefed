@@ -99,7 +99,7 @@
           {{ current_user.additional_css | safe}}
       </style>
       {% endif -%}
-      {% if community and community.additional_css -%}
+      {% if community and current_user.allow_community_css and community.additional_css -%}
       <style>
           {{ community.additional_css | safe }}
       </style>

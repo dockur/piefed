@@ -585,6 +585,7 @@ def user_settings():
         current_user.accept_private_messages = form.accept_private_messages.data
         current_user.font = form.font.data
         current_user.code_style = form.code_style.data
+        current_user.allow_community_css = form.allow_community_css.data
         current_user.additional_css = form.additional_css.data
         session['ui_language'] = form.interface_language.data
         current_user.vote_privately = not form.federate_votes.data
