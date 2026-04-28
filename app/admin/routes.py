@@ -1672,7 +1672,7 @@ def admin_user_edit(user_id):
             db.session.delete(file)
 
         # Update user roles. The UI only lets the user choose 1 role but the DB structure allows for multiple roles per user.
-        if user_access('change user roles'):
+        if user_access('change user roles', current_user.get_id()):
             db.session.execute(text('DELETE FROM user_role WHERE user_id = :user_id'), {'user_id': user.id})
             user.roles.append(Role.query.get(form.role.data))
             if form.role.data == 4:
