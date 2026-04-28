@@ -607,6 +607,8 @@ def register(app):
                         scheduled_post.edited_at = None
                         scheduled_post.status = POST_STATUS_PUBLISHED
                         scheduled_post.title = render_from_tpl(scheduled_post.title)
+                        scheduled_post.flair = post.flair
+                        scheduled_post.tags = post.tags
                         db.session.add(scheduled_post)
                         db.session.commit()
 
