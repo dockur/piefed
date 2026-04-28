@@ -24,20 +24,32 @@ from flask import current_app, json
 def vote_for_post(send_async, user_id, post_id, vote_to_undo, vote_direction, federate: bool=True, emoji: str=None):
     with current_app.app_context():
         session = get_task_session()
-        with patch_db_session(session):
-            post = session.query(Post).get(post_id)
-            if federate:
-                send_vote(user_id, post, vote_to_undo, vote_direction, emoji)
+        try:
+            with patch_db_session(session):
+                post = session.query(Post).get(post_id)
+                if federate:
+                    send_vote(user_id, post, vote_to_undo, vote_direction, emoji)
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
 
 @celery.task
 def vote_for_reply(send_async, user_id, reply_id, vote_to_undo, vote_direction, federate: bool=True, emoji: str=None):
     with current_app.app_context():
         session = get_task_session()
-        with patch_db_session(session):
-            reply = session.query(PostReply).filter_by(id=reply_id).one()
-            if federate:
-                send_vote(user_id, reply, vote_to_undo, vote_direction, emoji)
+        try:
+            with patch_db_session(session):
+                reply = session.query(PostReply).filter_by(id=reply_id).one()
+                if federate:
+                    send_vote(user_id, reply, vote_to_undo, vote_direction, emoji)
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
 
 def send_vote(user_id, object, vote_to_undo, vote_direction, emoji):
