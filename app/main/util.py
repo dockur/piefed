@@ -16,8 +16,8 @@ from app.utils import blocked_communities, communities_banned_from, blocked_or_b
 @cache.memoize(timeout=10)
 def sidebar_active_communities(user_id: int) -> List:
     if user_id == 0:
-        return Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False).order_by(desc(Community.last_active)).limit(5).all()
-    q = Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False)
+        return Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False, show_all=True).order_by(desc(Community.last_active)).limit(5).all()
+    q = Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False, show_all=True)
     banned = communities_banned_from(user_id)
     if banned:
         q = q.filter(Community.id.not_in(banned))
@@ -34,8 +34,8 @@ def sidebar_active_communities(user_id: int) -> List:
 def sidebar_new_communities(user_id: int) -> List:
     cutoff = utcnow() - timedelta(days=30)
     if user_id == 0:
-        return Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False).filter(Community.created_at > cutoff).order_by(desc(Community.first_federated_at)).order_by(desc(Community.created_at)).limit(5).all()
-    q = Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False).filter(Community.created_at > cutoff)
+        return Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False, show_all=True).filter(Community.created_at > cutoff).order_by(desc(Community.first_federated_at)).order_by(desc(Community.created_at)).limit(5).all()
+    q = Community.query.filter_by(banned=False, nsfw=False, nsfl=False, private=False, show_all=True).filter(Community.created_at > cutoff)
     banned = communities_banned_from(user_id)
     if banned:
         q = q.filter(Community.id.not_in(banned))
