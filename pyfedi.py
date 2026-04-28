@@ -143,7 +143,7 @@ def after_request(response):
             if hasattr(g, 'nonce') and "api/alpha/swagger" not in request.path:
                 # Don't set CSP header for htmx fragment requests - they use parent page's CSP
                 is_htmx = request.headers.get('HX-Request') == 'true'
-                if not is_htmx:
+                if not is_htmx and response.status_code != 304:
                     # strict-dynamic allows scripts dynamically added by nonce-validated scripts (needed for htmx)
                     if current_user.is_authenticated:
                         response.headers['Content-Security-Policy'] = f"script-src 'self' 'nonce-{g.nonce}' 'strict-dynamic'; object-src 'none'; base-uri 'none';"
@@ -167,6 +167,8 @@ def after_request(response):
             response.headers.setdefault('Vary', 'Accept-Language, Cookie')
         else:
             response.headers.setdefault('Vary', 'Accept-Language')
+            # Don't let flask set a session cookie for logged out users
+            flask.session.modified = False
     return response
 
 
