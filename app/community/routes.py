@@ -2596,10 +2596,9 @@ def check_url_already_posted():
     url = request.args.get('link_url')
     if url:
         url = remove_tracking_from_link(url.strip())
-        communities = Community.query.filter_by(banned=False).join(Post).filter(Post.url == url, Post.deleted == False,
-                                                                                Post.status > POST_STATUS_REVIEWING).all()
+        posts = Post.query.filter(Post.url == url, Post.deleted == False, Post.status > POST_STATUS_REVIEWING).all()
         title, description = retrieve_metadata_of_url(url)
-        return flask.render_template('community/check_url_posted.html', communities=communities,
+        return flask.render_template('community/check_url_posted.html', posts=posts,
                                      title=title, description=description)
     else:
         abort(404)
