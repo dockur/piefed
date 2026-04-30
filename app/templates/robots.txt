@@ -47,6 +47,9 @@ Disallow: /
 User-agent: ClaudeBot
 Disallow: /
 
+User-agent: Turnitin
+Disallow: /
+
 User-agent: Amazonbot
 Disallow: /
 
