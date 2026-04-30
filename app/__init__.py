@@ -125,43 +125,35 @@ def create_app(config_class=Config):
                     "bearerAuth": {
                         "type": "http",
                         "scheme": "bearer",
-                        "bearerFormat": "JWT"
+                        "bearerFormat": "JWT",
                     }
                 }
             },
             "servers": [
                 {
                     "url": f"{app.config['HTTP_PROTOCOL']}://{app.config['SERVER_NAME']}",
-                    "description": "This instance"
-                },
-                {
-                    "url": "https://crust.piefed.social",
-                    "description": "Development instance",
+                    "description": "This instance",
                 },
                 {
                     "url": "https://piefed.social",
+                    "description": "Flagship instance, stable branch",
                 },
                 {
-                    "url": "https://preferred.social"
+                    "url": "https://crust.piefed.social",
+                    "description": "Official development instance",
                 },
-                {
-                    "url": "https://feddit.online"
-                },
-                {
-                    "url": "https://piefed.world"
-                }
             ],
             "info": {
                 "title": "PieFed 1.7 Alpha API",
                 "contact": {
                     "name": "Developer",
-                    "url": "https://codeberg.org/rimu/pyfedi"
+                    "url": "https://codeberg.org/rimu/pyfedi",
                 },
                 "license": {
                     "name": "AGPLv3",
-                    "url": "https://www.gnu.org/licenses/agpl-3.0.en.html#license-text"
-                }
-            }
+                    "url": "https://www.gnu.org/licenses/agpl-3.0.en.html#license-text",
+                },
+            },
         }
     rest_api.init_app(app)
     rest_api.DEFAULT_ERROR_RESPONSE_NAME = None  # Don't include default errors, define them ourselves
