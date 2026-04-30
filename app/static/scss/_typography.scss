@@ -73,6 +73,10 @@ $fs150pc: 150%; // .fe
   padding-right: var(--spacing-4);
 }
 
+.fe-link-diagonal::before {
+  content: "\e982";
+}
+
 .fe-subscription::before {
   content: "\e9b9";
 }

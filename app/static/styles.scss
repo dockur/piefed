@@ -1003,39 +1003,55 @@ time {
   }
 }
 
-.post_full .post_utilities_bar {
-  container-type: inline-size;
-
-  .voting_buttons_new {
-    margin-left: calc(-1 * var(--spacing-16));
+.post_full {
+  p .post_link {
+    background-color: var(--bs-secondary-bg);
+    border-radius: var(--spacing-4);
+    padding: var(--spacing-2) var(--spacing-4);
+    line-height: var(--spacing-24);
+    max-width: 100%;
+    display: inline-block;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
-  .post_reply_count {
-    justify-content: left;
-    margin-right: var(--spacing-8);
-  }
+  .post_utilities_bar {
+    container-type: inline-size;
 
-  @container (width < 400px) {
-    .flair_dropdown {
-      display: none;
+    .voting_buttons_new {
+      margin-left: calc(-1 * var(--spacing-16));
     }
-  }
 
-  @container (width < 350px) {
-    .voting_buttons_new .upvote_button, .voting_buttons_new .downvote_button {
-      min-width: 34px;
+    .post_reply_count {
+      justify-content: left;
+      margin-right: var(--spacing-8);
     }
-    .voting_buttons_new .score {
-      display: none;
-    }
-  }
 
-  @container (width < 300px) {
-    .post_reply_count_text {
-      display: none;
+    @container (width < 400px) {
+      .flair_dropdown {
+        display: none;
+      }
+    }
+
+    @container (width < 350px) {
+      .voting_buttons_new .upvote_button, .voting_buttons_new .downvote_button {
+        min-width: 34px;
+      }
+      .voting_buttons_new .score {
+        display: none;
+      }
+    }
+
+    @container (width < 300px) {
+      .post_reply_count_text {
+        display: none;
+      }
     }
   }
 }
+
+
 
  .d-xl-none {
       margin-top: var(--spacing-4); // add spacing to button bar above #masonry
@@ -1180,7 +1196,7 @@ time {
 
 .url_thumbnail {
   float: right;
-  margin-top: calc(-1 * var(--spacing-8));
+  margin-top: var(--spacing-8);
 }
 
 .post_image {

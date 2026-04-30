@@ -3,6 +3,14 @@
         {% if post.type != POST_TYPE_EVENT or (post.type == POST_TYPE_EVENT and post.image_id is none) -%}
             {% include "post/_breadcrumb_nav.html" %}
         {% endif %}
+        {% if post.type == POST_TYPE_LINK and post.image_id and not (post.url and 'youtube.com' in post.url) and not post.deleted -%}
+            <div class="url_thumbnail">
+                <a href="{{ post.url }}" target="_blank" rel="nofollow ugc" class="post_link">
+                    <img src="{{ post.image.thumbnail_url() }}" alt="{{ post.image.alt_text if post.image.alt_text else '' }}"
+                            width="{{ post.image.thumbnail_width }}" height="{{ post.image.thumbnail_height }}" loading="lazy" />
+                </a>
+            </div>
+        {% endif -%}
         <h1 class="mt-2 post_title" lang="{{ post.language_code() }}">
             {{ post.title }}
             {% if post.nsfw -%}
@@ -21,14 +29,7 @@
                 </span>
             {% endif -%}
         </h1>
-        {% if post.type == POST_TYPE_LINK and post.image_id and not (post.url and 'youtube.com' in post.url) and not post.deleted -%}
-            <div class="url_thumbnail">
-                <a href="{{ post.url }}" target="_blank" rel="nofollow ugc" class="post_link">
-                    <img src="{{ post.image.thumbnail_url() }}" alt="{{ post.image.alt_text if post.image.alt_text else '' }}"
-                            width="{{ post.image.thumbnail_width }}" height="{{ post.image.thumbnail_height }}" loading="lazy" />
-                </a>
-            </div>
-        {% endif -%}
+
         <div class="mb-2">
             {% if post.has_been_reported() -%}
             <a href="{{ url_for('community.community_moderate', actor=post.community.link()) }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
@@ -49,19 +50,6 @@
             {% endif -%}
         </div>
         {% if post.type == POST_TYPE_IMAGE and not post.deleted -%}
-            <p class="mt-2">
-                {% if post.url and post.url.startswith('https://pixelfed.social/') -%}
-                    <a href="{{ post.url }}" rel="nofollow ugc" target="_blank" aria-label="Go to image">
-                        {{ post.url|shorten_url }}
-                        <span class="fe fe-external"></span>
-                    </a>
-                {% else -%}
-                    <a href="{{ post.image.view_url() if post.image_id else post.url }}" rel="nofollow ugc" target="_blank" aria-label="Go to image">
-                        {{ post.image.view_url() if post.image_id else post.url|shorten_url }}
-                        <span class="fe fe-external"></span>
-                    </a>
-                {% endif -%}
-            </p>
             <div class="post_image">
                 {% if post.image_id -%}
                     {% if low_bandwidth -%}
@@ -97,8 +85,8 @@
         {% elif post.type == POST_TYPE_LINK and post.url and not post.deleted -%}
             <p class="mt-2">
                 <a href="{{ post.url }}" rel="nofollow ugc" target="_blank" class="post_link" aria-label="Go to post url">
-                    {{ post.url|shorten_url }}
-                    <span class="fe fe-external"></span>
+                    <span class="fe fe-link-diagonal"></span>
+                    {{ post.url }}
                 </a>
                 {% if post.domain.post_warning -%}
                     <span class="fe fe-warning red" title="{{ post.domain.post_warning }}"></span>
@@ -138,8 +126,8 @@
         {% elif post.type == POST_TYPE_VIDEO and post.url and not post.deleted -%}
             <p>
                 <a href="{{ post.url }}" rel="nofollow ugc" target="_blank" class="post_link" aria-label="Go to post url">
-                    {{ post.url|shorten_url }}
-                    <span class="fe fe-external"></span>
+                    <span class="fe fe-link-diagonal"></span>
+                    {{ post.url }}
                 </a>
             </p>
             {% if post.url.endswith('.mp4') or post.url.endswith('.webm') or '.mp4?' in post.url or '.webm?' in post.url -%}
@@ -244,7 +232,7 @@
             {% if archive_link -%}
                 <p>
                     <a href="{{ archive_link }}" rel="nofollow ucg noindex" target="_blank">
-                        {{ _('Archive.ph link') }} <span class="fe fe-external"></span>
+                        {{ _('No paywall link') }} <span class="fe fe-external"></span>
                     </a>
                 </p>
             {% endif -%}

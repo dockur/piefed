@@ -165,6 +165,10 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
   padding-right: var(--spacing-4);
 }
 
+.fe-link-diagonal::before {
+  content: "\e982";
+}
+
 .fe-subscription::before {
   content: "\e9b9";
 }
@@ -1681,6 +1685,17 @@ time {
   line-height: var(--spacing-24);
 }
 
+.post_full p .post_link {
+  background-color: var(--bs-secondary-bg);
+  border-radius: var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-4);
+  line-height: var(--spacing-24);
+  max-width: 100%;
+  display: inline-block;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 .post_full .post_utilities_bar {
   container-type: inline-size;
 }
@@ -1845,7 +1860,7 @@ time {
 
 .url_thumbnail {
   float: right;
-  margin-top: calc(-1 * var(--spacing-8));
+  margin-top: var(--spacing-8);
 }
 
 .post_image img {

@@ -261,7 +261,7 @@ def flair_to_string(post: Post) -> str:
 
 def body_has_no_archive_link(body):
     if body:
-        return 'https://archive.' not in body and 'https://12ft.io' not in body
+        return 'https://archive.' not in body and 'https://12ft.io' not in body and 'https://removepaywalls.com' not in body
     else:
         return True
 
@@ -286,7 +286,7 @@ def url_needs_archive(url) -> bool:
 
 
 def generate_archive_link(url) -> bool:
-    return 'https://archive.ph/' + url
+    return 'https://removepaywalls.com/' + url
 
 
 # Forms like the cross post form need the type for the url
