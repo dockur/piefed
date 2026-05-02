@@ -574,7 +574,7 @@ def community_profile_subscribe(actor):
 def shared_inbox():
     from app import redis_client
     try:
-        request_json = request.get_json(force=True)
+        request_json = request.get_json(force=True, cache=False)
     except werkzeug.exceptions.BadRequest as e:
         log_incoming_ap('', APLOG_NOTYPE, APLOG_FAILURE, None, 'Unable to parse json body: ' + e.description +  str(request.user_agent))
         return '', 400
