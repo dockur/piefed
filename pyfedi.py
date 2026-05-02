@@ -166,7 +166,7 @@ def after_request(response):
             )
             response.headers.setdefault('Vary', 'Accept-Language, Cookie')
         else:
-            response.headers.setdefault('Vary', 'Accept-Language')
+            response.headers.setdefault('Vary', 'Accept-Language, Cookie')
             # Don't let flask set a session cookie for logged out users
             flask.session.modified = False
     return response
