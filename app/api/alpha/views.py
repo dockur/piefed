@@ -523,7 +523,7 @@ def community_view(community: Community | int | str, variant, stub=False, user_i
                    'removed': False,
                    'actor_id': community.public_url(),
                    'local': community.is_local(),
-                   'hidden': not community.show_all,
+                   'hidden': community.private,
                    'instance_id': community.instance_id if community.instance_id else 1,
                    'ap_domain': community.ap_domain,
                    'ai_generated': bool(v1['ai_generated'])})
