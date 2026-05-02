@@ -392,6 +392,8 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
             post.type = POST_TYPE_VIDEO
         elif is_video_url(post.url):
             post.type = POST_TYPE_VIDEO
+        elif is_image_url(post.url):
+            post.type = POST_TYPE_IMAGE
 
     if scheduled_for:
         date_with_tz = post.scheduled_for.replace(tzinfo=ZoneInfo(post.timezone))
