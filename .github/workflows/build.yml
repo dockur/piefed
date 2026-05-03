@@ -30,11 +30,12 @@ jobs:
           set -eu
           sudo apt install libxml2-utils
           latest_tag=$(curl -s https://codeberg.org/rimu/pyfedi/releases.rss | xmllint --xpath 'string(//item[1]/title)' -)
-          echo "Found tag: \"${latest_tag}\"" 
-          latest_version="${latest_tag%-*}"
-          major="${latest_version%%.*}"
+          latest_tag="${latest_tag:1}"
+          echo "Found tag: v\"${latest_tag}\"" 
+          latest_version="${latest_tag:2}"
+          major="1.${latest_version%%.*}"
           minor="${latest_version#*.}"
-          minor="${minor%%.*}"
+          minor="1.${minor%%.*}"
           echo "latest_tag=$latest_tag" >> $GITHUB_ENV
           echo "latest_version=$latest_version" >> $GITHUB_ENV
           echo "latest_minor=$major.$minor" >> $GITHUB_ENV
