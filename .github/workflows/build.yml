@@ -28,6 +28,7 @@ jobs:
         run: |
           #!/bin/bash
           set -eu
+          sudo apt install libxml2-utils
           latest_tag=$(curl -s https://codeberg.org/rimu/pyfedi/releases.rss | xmllint --xpath 'string(//item[1]/title)' -)
           echo "Found tag: \"${latest_tag}\"" 
           latest_version="${latest_tag%-*}"
