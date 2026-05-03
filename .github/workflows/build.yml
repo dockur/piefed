@@ -28,28 +28,26 @@ jobs:
         run: |
           #!/bin/bash
           set -eu
-          echo "exists=true" >> $GITHUB_ENV
-          if git ls-remote --tags https://codeberg.org/rimu/pyfedi.git >/dev/null; then
-            echo "exists=false" >> $GITHUB_ENV
-            latest_branch=$(git ls-remote --tags --refs --sort="v:refname" https://codeberg.org/rimu/pyfedi.git | tail -n1 )
-            latest_tag="${latest_branch%%.*}"
-            echo "Found tag: \"${latest_tag}\"" 
-            echo "latest_tag=$latest_tag" >> $GITHUB_ENV
-            echo "latest_branch=$latest_branch" >> $GITHUB_ENV
-          fi
+          latest_tag=$(curl -s https://codeberg.org/rimu/pyfedi/releases.rss | xmllint --xpath 'string(//item[1]/title)' -)
+          echo "Found tag: \"${latest_tag}\"" 
+          latest_version="${latest_tag%-*}"
+          major="${latest_version%%.*}"
+          minor="${latest_version#*.}"
+          minor="${minor%%.*}"
+          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          echo "latest_version=$latest_version" >> $GITHUB_ENV
+          echo "latest_minor=$major.$minor" >> $GITHUB_ENV
+          echo "latest_major=$major" >> $GITHUB_ENV
       - 
         name: Check if the tag exists locally
-        if: env.exists == 'false'
         uses: action-pack/tag-exists@v1
         id: checkTag
         with: 
-          tag: 'v${{ env.latest_tag }}'
+          tag: 'v${{ env.latest_tag }}'         
       -
         name: Finish when found
-        if: env.exists == 'false'
         run: |
           #!/bin/bash
-          set -eu
           val="${{ steps.checkTag.outputs.exists }}"
           echo "exists=${val}" >> $GITHUB_ENV
       -
