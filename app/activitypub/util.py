@@ -3249,7 +3249,7 @@ def process_report(user, reported, request_json, session):
     if isinstance(reported, User):
         if reported.reports == -1:
             return
-        type = 0
+        type = REPORT_TYPE_USER
         source_instance = session.query(Instance).get(user.instance_id)
         targets_data = {'gen': '0',
                         'suspect_user_id': reported.id,
@@ -3281,7 +3281,7 @@ def process_report(user, reported, request_json, session):
     elif isinstance(reported, Post):
         if reported.reports == -1:
             return
-        type = 1
+        type = REPORT_TYPE_POST
         suspect_author = session.query(User).get(reported.author.id)
         source_instance = session.query(Instance).get(user.instance_id)
         targets_data = {'gen': '0',
@@ -3315,7 +3315,7 @@ def process_report(user, reported, request_json, session):
     elif isinstance(reported, PostReply):
         if reported.reports == -1:
             return
-        type = 2
+        type = REPORT_TYPE_REPLY
         post = session.query(Post).get(reported.post_id)
         suspect_author = session.query(User).get(reported.author.id)
         source_instance = session.query(Instance).get(user.instance_id)

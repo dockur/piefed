@@ -349,7 +349,7 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
             v1['extra_fields'] = []
             try:
                 extra_fields = user.extra_fields
-            except DetachedInstanceError as e:  # when loading archived posts and their replies, temporary detatched users are created. See convert_archived_replies_to_tree()
+            except DetachedInstanceError:  # when loading archived posts and their replies, temporary detatched users are created. See convert_archived_replies_to_tree()
                 extra_fields = User.query.get(user.id).extra_fields
             num_extra_fields = 0
             for field in extra_fields:
@@ -847,7 +847,7 @@ def reply_view(reply: PostReply | int, variant: int, user_id=None,
         return v6
 
 
-def reply_report_view(report, reply_id, user_id) -> dict:
+def reply_report_view(report, reply_id, user_id, variant=1) -> dict:
     # /comment/report api endpoint
     # similar to a reply_view in many ways, except that the 'creator' is the report creator,
     # not the reported comment's creator.
@@ -872,14 +872,20 @@ def reply_report_view(report, reply_id, user_id) -> dict:
         'resolved': report.status == 3,
         'published': report.created_at.isoformat(timespec="microseconds") + 'Z'
     }
+
+    if report.description:
+        report_json['comment_report']['description'] = report.description
     # TODO when it's easy to get a report's resolver
     # - add resolver_id to 'comment_report'
     # - add resolver{} user_view
 
-    v1 = {
-        'comment_report_view': report_json
-    }
-    return v1
+    if variant == 1:
+        v1 = {'comment_report_view': report_json}
+        return v1
+    
+    if variant == 2:
+        # GET /comment/report/list - just return the bare json to be appended onto a list by another function
+        return report_json
 
 
 def post_report_view(report, post_id, user_id) -> dict:

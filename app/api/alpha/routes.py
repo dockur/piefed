@@ -23,8 +23,7 @@ from app.api.alpha.utils.private_message import get_private_message_list, post_p
     post_private_message_report, post_leave_conversation
 from app.api.alpha.utils.reply import get_reply_list, post_reply_like, put_reply_save, put_reply_subscribe, post_reply, \
     put_reply, post_reply_delete, post_reply_report, post_reply_remove, post_reply_mark_as_read, get_reply, \
-    post_reply_lock, \
-    get_reply_like_list, post_reply_mark_as_answer
+    post_reply_lock, get_reply_like_list, post_reply_mark_as_answer, get_reply_report_list
 from app.api.alpha.utils.site import get_site, post_site_block, get_federated_instances, get_site_instance_chooser, \
     get_site_instance_chooser_search, get_site_version, get_site_metadata
 from app.api.alpha.utils.topic import get_topic_list
@@ -877,6 +876,19 @@ def post_alpha_comment_report(data):
     return GetCommentReportResponse().load(resp)
 
 
+@reply_bp.route('/comment/report/list', methods=['GET'])
+@reply_bp.doc(summary="Get list of comment reports.")
+@reply_bp.arguments(GetCommentReportListRequest)
+@reply_bp.response(200, GetCommentReportListResponse)
+@reply_bp.alt_response(400, schema=DefaultError)
+def get_alpha_comment_report_list(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_reply_report_list(auth, data)
+    return GetCommentReportListResponse().load(resp)
+
+
 @reply_bp.route('/comment/remove', methods=['POST'])
 @reply_bp.doc(summary="Remove a comment as a moderator.")
 @reply_bp.arguments(RemoveCommentRequest)
@@ -1509,7 +1521,6 @@ def alpha_post():
 # Reply - not yet implemented
 @bp.route('/api/alpha/comment/distinguish', methods=['POST'])  # Not really used
 @bp.route('/api/alpha/comment/report/resolve', methods=['PUT'])  # Stage 2
-@bp.route('/api/alpha/comment/report/list', methods=['GET'])  # Stage 2
 def alpha_reply():
     return jsonify({"error": "not_yet_implemented"}), 400
 
