@@ -1,1 +1,102 @@
+name: Build
 
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 0 * * *'
+    
+concurrency:
+  group: build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      packages: write
+      contents: read
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - 
+        name: Retrieve latest tag
+        run: |
+          #!/bin/bash
+          set -eu
+          echo "exists=true" >> $GITHUB_ENV
+          if git ls-remote --tags https://codeberg.org/rimu/pyfedi.git >/dev/null; then
+            echo "exists=false" >> $GITHUB_ENV
+            latest_branch=$(git ls-remote --tags --refs --sort="v:refname" https://codeberg.org/rimu/pyfedi.git | tail -n1 | sed 's/.*\///' )
+            latest_tag="${latest_branch%%.*}"
+            echo "Found tag: \"${latest_tag}\"" 
+            echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+            echo "latest_branch=$latest_branch" >> $GITHUB_ENV
+          fi
+      - 
+        name: Check if the tag exists locally
+        if: env.exists == 'false'
+        uses: action-pack/tag-exists@v1
+        id: checkTag
+        with: 
+          tag: 'v${{ env.latest_tag }}'
+      -
+        name: Finish when found
+        if: env.exists == 'false'
+        run: |
+          #!/bin/bash
+          set -eu
+          val="${{ steps.checkTag.outputs.exists }}"
+          echo "exists=${val}" >> $GITHUB_ENV
+      -
+        name: Checkout
+        if: env.exists == 'false'
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - 
+        name: Lint Dockerfile
+        if: env.exists == 'false'
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3003,DL3008,DL3059
+          failure-threshold: warning          
+      -
+        name: Docker metadata
+        if: env.exists == 'false'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          context: git
+          images: |
+            ${{ secrets.DOCKERHUB_REPO }}
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,priority=100
+            type=raw,value=${{ env.latest_tag }}
+          labels: |
+            org.opencontainers.image.title=${{ vars.NAME }}
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+      - 
+        name: Set up Docker Buildx
+        if: env.exists == 'false'
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Send mail
+        if: env.exists == 'false'
+        uses: action-pack/send-mail@v1
+        with:
+          to: ${{secrets.MAILTO}}
+          from: Github Actions <${{secrets.MAILTO}}>
+          connection_url: ${{secrets.MAIL_CONNECTION}}
+          subject: Build of ${{ github.event.repository.name }} v${{ steps.meta.outputs.version }} completed
+          body: |
+              The build job of ${{ github.event.repository.name }} v${{ steps.meta.outputs.version }} was completed successfully! 
+              
+              See https://github.com/${{ github.repository }}/actions for more information.
