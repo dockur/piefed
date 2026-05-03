@@ -878,7 +878,7 @@ def post_alpha_comment_report(data):
 
 @reply_bp.route('/comment/report/list', methods=['GET'])
 @reply_bp.doc(summary="Get list of comment reports.")
-@reply_bp.arguments(GetCommentReportListRequest)
+@reply_bp.arguments(GetCommentReportListRequest, location="query")
 @reply_bp.response(200, GetCommentReportListResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
 def get_alpha_comment_report_list(data):
