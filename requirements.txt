@@ -16,7 +16,7 @@ httpx[http2]~=0.28.0
 pyjwt==2.8.0
 SQLAlchemy-Searchable==2.1.0
 SQLAlchemy-Utils==0.41.1
-cryptography==44.0.2
+cryptography==46.0.7
 Bootstrap-Flask==2.5.0
 pyld==2.0.4
 boto3~=1.39.0
