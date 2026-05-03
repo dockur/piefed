@@ -51,17 +51,18 @@ jobs:
           val="${{ steps.checkTag.outputs.exists }}"
           echo "exists=${val}" >> $GITHUB_ENV
       -
-        name: Checkout
+        name: Download code
         if: env.exists == 'false'
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+        run:
+          #!/bin/bash
+          wget "https://codeberg.org/rimu/pyfedi/archive/v${{ env.latest_tag }}.zip"
+          unzip "v${{ env.latest_tag }}.zip"
       - 
         name: Lint Dockerfile
         if: env.exists == 'false'
         uses: hadolint/hadolint-action@v3.3.0
         with:
-          dockerfile: Dockerfile
+          dockerfile: pyfedi/Dockerfile
           ignore: DL3003,DL3008,DL3059,DL3013,Dl3018
           failure-threshold: warning          
       -
@@ -76,7 +77,8 @@ jobs:
             ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=latest,priority=100
-            type=raw,value=${{ env.latest_tag }}
+            type=raw,value=${{ env.latest_major }},priority=350
+            type=raw,value=${{ env.latest_minor }},priority=250
           labels: |
             org.opencontainers.image.title=${{ vars.NAME }}
         env:
