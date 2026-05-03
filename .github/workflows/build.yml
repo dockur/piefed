@@ -53,11 +53,11 @@ jobs:
       -
         name: Download code
         if: env.exists == 'false'
-        run:
+        run: |
           #!/bin/bash
-          wget "https://codeberg.org/rimu/pyfedi/archive/v${{ env.latest_tag }}.zip"
+          wget "https://codeberg.org/rimu/pyfedi/archive/v${{ env.latest_tag }}.zip";
           unzip "v${{ env.latest_tag }}.zip"
-      - 
+      -
         name: Lint Dockerfile
         if: env.exists == 'false'
         uses: hadolint/hadolint-action@v3.3.0
