@@ -32,12 +32,10 @@ jobs:
           latest_tag=$(curl -s https://codeberg.org/rimu/pyfedi/releases.rss | xmllint --xpath 'string(//item[1]/title)' -)
           latest_tag="${latest_tag:1}"
           echo "Found tag: v\"${latest_tag}\"" 
+          major=${latest_tag:0:1}
           latest_version="${latest_tag:2}"
-          major="1.${latest_version%%.*}"
-          minor="${latest_version#*.}"
-          minor="1.${minor%%.*}"
+          minor="$major.${latest_version%%.*}"
           echo "latest_tag=$latest_tag" >> $GITHUB_ENV
-          echo "latest_version=$latest_version" >> $GITHUB_ENV
           echo "latest_minor=$major.$minor" >> $GITHUB_ENV
           echo "latest_major=$major" >> $GITHUB_ENV
       - 
