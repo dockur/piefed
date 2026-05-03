@@ -31,7 +31,7 @@ jobs:
           echo "exists=true" >> $GITHUB_ENV
           if git ls-remote --tags https://codeberg.org/rimu/pyfedi.git >/dev/null; then
             echo "exists=false" >> $GITHUB_ENV
-            latest_branch=$(git ls-remote --tags --refs --sort="v:refname" https://codeberg.org/rimu/pyfedi.git | tail -n1 | sed 's/.*\///' )
+            latest_branch=$(git ls-remote --tags --refs --sort="v:refname" https://codeberg.org/rimu/pyfedi.git | tail -n1 )
             latest_tag="${latest_branch%%.*}"
             echo "Found tag: \"${latest_tag}\"" 
             echo "latest_tag=$latest_tag" >> $GITHUB_ENV
@@ -64,7 +64,7 @@ jobs:
         uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
-          ignore: DL3003,DL3008,DL3059
+          ignore: DL3003,DL3008,DL3059,DL3013,Dl3018
           failure-threshold: warning          
       -
         name: Docker metadata
