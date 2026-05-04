@@ -12,7 +12,7 @@
 
 </div></h1>
 
-Docker container of [PieFed](https://codeberg.org/rimu/pyfedi), a Lemmy/Mbin alternative written in Python with Flask.
+Docker container of [PieFed](https://join.piefed.social/), a Lemmy/Mbin alternative written in Python with Flask.
 
  - Clean, simple code that is easy to understand and contribute to. No fancy design patterns or algorithms.
  - Easy setup, easy to manage - few dependencies and extra software required.
