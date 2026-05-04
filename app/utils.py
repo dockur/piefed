@@ -4420,3 +4420,15 @@ def log_cron_task_to_db(task_name: str):
         session.rollback()
     finally:
         session.close()
+
+
+def display_back_button():
+    return 'display_back_button'
+    ua = request.user_agent.string or ""
+    if "iPhone" in ua or "iPad" in ua or "iPod" in ua:
+        if request.referrer and request.referrer.startswith(current_app.config['SERVER_URL']):
+            return 'display_back_button'
+        else:
+            return ''
+    else:
+        return ''

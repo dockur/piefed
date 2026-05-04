@@ -2844,7 +2844,6 @@ h1 .warning_badge {
 @media (min-width: 768px) {
   .community_icon_big {
     width: 100%;
-    height: auto;
     margin-top: calc(var(--bs-gutter-x) * 0.5);
   }
 }

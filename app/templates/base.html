@@ -109,7 +109,7 @@
     {% block schema_org %}
     {% endblock %}
   </head>
-  <body class="d-flex flex-column{{ ' low_bandwidth' if low_bandwidth }} {{ compaction_level() }}" hx-headers='{"x-csrftoken": "{{ cs }}"}'>
+  <body class="d-flex flex-column{{ ' low_bandwidth' if low_bandwidth }} {{ compaction_level() }} {{ display_back_button() }}" hx-headers='{"x-csrftoken": "{{ cs }}"}'>
     {%- include "translation.html" -%}
     {%- include "svg_sprites.html" -%}
     {% if 'fontSize' in request.cookies -%}
