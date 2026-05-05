@@ -313,9 +313,15 @@ def report_reply(reply, input, src, auth=None):
         'orig_comment_body': reply.body
     }
     # report.type 2 = 'reply'
-    report = Report(reasons=reason, description=description, type=2, reporter_id=reporter_user.id, suspect_post_id=reply.post_id,
+    report = Report(reasons=reason,
+                    description=description,
+                    type=REPORT_TYPE_REPLY,
+                    reporter_id=reporter_user.id,
+                    suspect_post_id=reply.post_id,
                     suspect_community_id=reply.community_id,
-                    suspect_user_id=reply.user_id, suspect_post_reply_id=reply.id, in_community_id=reply.community_id,
+                    suspect_user_id=reply.user_id,
+                    suspect_post_reply_id=reply.id,
+                    in_community_id=reply.community_id,
                     source_instance_id=reporter_user.instance_id,
                     targets=targets_data)
     db.session.add(report)

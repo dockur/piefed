@@ -895,9 +895,13 @@ def report_profile(actor):
                             'reporter_id': current_user.id,
                             'reporter_user_name': current_user.user_name
                             }
-            report = Report(reasons=form.reasons_to_string(form.reasons.data), description=form.description.data,
-                            type=0, reporter_id=current_user.id, suspect_user_id=user.id, 
-                            source_instance_id=1, targets=targets_data)
+            report = Report(reasons=form.reasons_to_string(form.reasons.data),
+                            description=form.description.data,
+                            type=REPORT_TYPE_USER,
+                            reporter_id=current_user.id,
+                            suspect_user_id=user.id, 
+                            source_instance_id=1,
+                            targets=targets_data)
             db.session.add(report)
 
             # Notify site admin
