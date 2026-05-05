@@ -654,6 +654,32 @@ def post_reply_mark_as_answer(auth, data):
     return {'comment_reply_view': reply_json}
 
 
+def post_reply_distinguish(auth, data):
+    reply_id = data['comment_reply_id']
+    distinguished = data['distinguished']
+
+    user_id = authorise_api_user(auth)
+
+    reply = PostReply.query.get(reply_id)
+    author = reply.author
+
+    if not author.id == user_id:
+        raise Exception('incorrect login')
+    
+    mods = reply.community.moderators()
+    mod_ids = [mod.user_id for mod in mods]
+
+    if not (user_id in mod_ids or user_access("administer all communities", user_id)):
+        raise Exception('insufficient permission')
+    
+    reply.distinguished = distinguished
+    db.session.commit()
+
+    reply_json = reply_view(reply=reply, variant=4, user_id=user_id)
+    
+    return reply_json
+
+
 def post_reply_lock(auth, data):
     comment_id = data['comment_id']
     locked = data['locked']

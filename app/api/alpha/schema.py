@@ -954,6 +954,7 @@ class CommentReplyView(DefaultSchema):
     creator_blocked = fields.Boolean(required=True)
     creator_is_admin = fields.Boolean(required=True)
     creator_is_moderator = fields.Boolean(required=True)
+    distinguished = fields.Boolean()
     my_vote = fields.Integer(required=True)
     post = fields.Nested(Post, required=True)
     recipient = fields.Nested(Person, required=True)
@@ -1271,6 +1272,11 @@ class MarkCommentAsReadRequest(DefaultSchema):
 class MarkCommentAsAnswerRequest(DefaultSchema):
     comment_reply_id = fields.Integer(required=True)
     answer = fields.Boolean(required=True)
+
+
+class MarkCommentAsDistinguishedRequest(DefaultSchema):
+    comment_reply_id = fields.Integer(required=True)
+    distinguished = fields.Boolean(required=True)
 
 
 class GetCommentReplyResponse(DefaultSchema):
