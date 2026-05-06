@@ -68,8 +68,6 @@
         {% endif -%}
         {% if description -%}
             <meta name="description" content="{{ description }}" />
-        {% else -%}
-            <meta name="description" content="{{ html_to_text(g.site.sidebar) }}" />
         {% endif -%}
         {% if og_image -%}
             <meta property="og:image" content="{{ og_image }}" />
