@@ -33,8 +33,8 @@ import base64
 import hashlib
 import json
 import time
-from datetime import datetime, timedelta
-from email.utils import formatdate
+from datetime import datetime, timedelta, timezone
+from email.utils import formatdate, parsedate_to_datetime
 from typing import Literal, TypedDict, cast
 from urllib.parse import urlparse
 
@@ -71,8 +71,7 @@ def format_ld_date(value: datetime) -> str:
 
 
 def parse_http_date(http_date_str):
-    parsed_date = pendulum.from_format(http_date_str, 'ddd, DD MMM YYYY HH:mm:ss Z')
-    return parsed_date.datetime
+    return parsedate_to_datetime(http_date_str)
 
 
 def parse_ld_date(value: str | None) -> datetime | None:
@@ -393,7 +392,7 @@ class HttpSignature:
         if "date" not in request.headers:
             raise VerificationFormatError("No date header present")
         header_date = parse_http_date(request.headers["date"])
-        if abs((pendulum.now('UTC') - header_date).seconds) > 3600:
+        if abs((datetime.now(timezone.utc) - header_date).total_seconds()) > 3600:
             raise VerificationFormatError("Date is too far away")
 
     @classmethod
@@ -410,7 +409,7 @@ class HttpSignature:
         # Verify date header
         if "date" in request.headers and not skip_date:
             header_date = parse_http_date(request.headers["date"])
-            if abs((pendulum.now('UTC') - header_date).seconds) > 3600:
+            if abs((datetime.now(timezone.utc) - header_date).total_seconds()) > 3600:
                 raise VerificationFormatError("Date is too far away")
 
         # Get the signature details
