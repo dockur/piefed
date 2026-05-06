@@ -298,7 +298,7 @@ def create_app(config_class=Config):
             mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
             fromaddr=(app.config['MAIL_FROM']),
             toaddrs=app.config['ERRORS_TO'], subject='PieFed error',
-            credentials=auth, secure=secure)
+            credentials=auth, secure=secure, timeout=5.0)
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
 
