@@ -34,7 +34,7 @@ from app.constants import SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, POST_TYPE_LIN
     SUBSCRIPTION_PENDING, SUBSCRIPTION_MODERATOR, REPORT_STATE_NEW, REPORT_STATE_ESCALATED, REPORT_STATE_RESOLVED, \
     REPORT_STATE_DISCARDED, POST_TYPE_VIDEO, NOTIF_COMMUNITY, NOTIF_POST, POST_TYPE_POLL, MICROBLOG_APPS, SRC_WEB, \
     NOTIF_REPORT, NOTIF_NEW_MOD, NOTIF_BAN, NOTIF_UNBAN, NOTIF_REPORT_ESCALATION, NOTIF_MENTION, POST_STATUS_REVIEWING, \
-    POST_TYPE_EVENT, INVITE_MEMBERS_ONLY, INVITE_MODS_ONLY, INVITE_OWNER_ONLY
+    POST_TYPE_EVENT, INVITE_MEMBERS_ONLY, INVITE_MODS_ONLY, INVITE_OWNER_ONLY, REPORT_TYPE_COMMUNITY
 from app.email import send_email
 from app.inoculation import inoculation
 from app.models import User, Community, CommunityMember, CommunityJoinRequest, CommunityBan, Post, Site, \
@@ -1155,8 +1155,12 @@ def community_report(community_id: int):
     form = ReportCommunityForm()
     if form.validate_on_submit():
         targets_data = {'gen': '0', 'suspect_community_id': community.id, 'reporter_id': current_user.id}
-        report = Report(reasons=form.reasons_to_string(form.reasons.data), description=form.description.data,
-                        type=1, reporter_id=current_user.id, suspect_community_id=community.id, source_instance_id=1,
+        report = Report(reasons=form.reasons_to_string(form.reasons.data),
+                        description=form.description.data,
+                        type=REPORT_TYPE_COMMUNITY,
+                        reporter_id=current_user.id,
+                        suspect_community_id=community.id,
+                        source_instance_id=1,
                         targets=targets_data)
         db.session.add(report)
 

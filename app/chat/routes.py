@@ -7,7 +7,7 @@ from app import db
 from app.chat import bp
 from app.chat.forms import AddReply, ReportConversationForm
 from app.chat.util import send_message
-from app.constants import NOTIF_REPORT, SRC_WEB
+from app.constants import NOTIF_REPORT, SRC_WEB, REPORT_TYPE_MESSAGE
 from app.models import Site, User, Report, ChatMessage, Notification, Conversation, conversation_member, CommunityBan, \
     ModLog
 from app.shared.site import block_remote_instance
@@ -198,9 +198,13 @@ def chat_report(conversation_id):
 
         if form.validate_on_submit():
             targets_data = {'gen': '0', 'suspect_conversation_id': conversation.id, 'reporter_id': current_user.id}
-            report = Report(reasons=form.reasons_to_string(form.reasons.data), description=form.description.data,
-                            type=4, reporter_id=current_user.id, suspect_conversation_id=conversation_id,
-                            source_instance_id=1,targets=targets_data)
+            report = Report(reasons=form.reasons_to_string(form.reasons.data),
+                            description=form.description.data,
+                            type=REPORT_TYPE_MESSAGE,
+                            reporter_id=current_user.id,
+                            suspect_conversation_id=conversation_id,
+                            source_instance_id=1,
+                            targets=targets_data)
             db.session.add(report)
 
             # Notify site admin

@@ -2,7 +2,7 @@ from sqlalchemy import desc, or_, text
 
 from app import db, current_app
 from app.api.alpha.views import private_message_view
-from app.constants import NOTIF_MESSAGE, NOTIF_REPORT
+from app.constants import NOTIF_MESSAGE, NOTIF_REPORT, REPORT_TYPE_MESSAGE
 from app.chat.util import send_message, update_message
 from app.models import ChatMessage, Conversation, User, Notification, Report, Site
 from app.utils import authorise_api_user, markdown_to_html
@@ -211,9 +211,13 @@ def post_private_message_report(auth, data):
             "reporter_id": user_id,
             "suspect_message_id": chat_message_id
     }
-    report = Report(reasons=reason, description='',
-                    type=4, reporter_id=user_id, suspect_conversation_id=private_message.conversation_id,
-                    source_instance_id=1,targets=targets_data)
+    report = Report(reasons=reason,
+                    description='',
+                    type=REPORT_TYPE_MESSAGE,
+                    reporter_id=user_id,
+                    suspect_conversation_id=private_message.conversation_id,
+                    source_instance_id=1,
+                    targets=targets_data)
     db.session.add(report)
 
     already_notified = set()

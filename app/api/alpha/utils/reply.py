@@ -8,13 +8,13 @@ from sqlalchemy_searchable import search
 from app import db
 from app.api.alpha.views import reply_view, reply_report_view, post_view, community_view, user_view
 from app.constants import *
-from app.models import Notification, PostReply, Post, User, PostReplyVote, utcnow
+from app.models import Notification, PostReply, Post, User, PostReplyVote, Report, Community, utcnow
 from app.shared.reply import vote_for_reply, bookmark_reply, remove_bookmark_reply, subscribe_reply, make_reply, \
     edit_reply, \
     delete_reply, restore_reply, report_reply, mod_remove_reply, mod_restore_reply, lock_post_reply, choose_answer, \
     unchoose_answer
 from app.utils import authorise_api_user, blocked_users, blocked_or_banned_instances, site_language_id, \
-    communities_banned_from, in_sorted_list, moderating_communities_ids, joined_communities
+    communities_banned_from, in_sorted_list, moderating_communities_ids, joined_communities, user_access
 
 
 def get_reply_list(auth, data, user_details=None):
@@ -498,6 +498,68 @@ def post_reply_report(auth, data):
     return reply_json
 
 
+def get_reply_report_list(auth, data):
+    user = authorise_api_user(auth, return_type="model")
+
+    if not user:
+        raise Exception("incorrect login")
+
+    comment_id = data['comment_id'] if 'comment_id' in data else None
+    community_id = data['community_id'] if 'community_id' in data else None
+    limit = data['limit'] if 'limit' in data else 20
+    page = data['page'] if 'page' in data else 1
+    unresolved_only = data['unresolved_only'] if 'unresolved_only' in data else True
+
+    if comment_id:
+        # Just get reports for a single comment
+        reply = PostReply.query.get(comment_id)
+        mods = reply.community.moderators()
+        mod_ids = [mod.user_id for mod in mods]
+
+        if user.id in mod_ids or user_access('administer all communities', user.id):
+            reports = Report.query.filter(Report.suspect_post_reply_id == comment_id)
+            # report_list = [reply_report_view(report=report, reply_id=comment_id, user_id=user.id) for report in reports]
+        else:
+            raise Exception('incorrect login')
+    elif community_id:
+        # Just get reports for a single community
+        community = Community.query.get(community_id)
+        mods = community.moderators()
+        mod_ids = [mod.user_id for mod in mods]
+
+        if user.id in mod_ids or user_access("administer all communities", user.id):
+            reports = Report.query.filter(Report.in_community_id == community_id, Report.suspect_post_reply_id != None)
+        else:
+            raise Exception('incorrect login')
+    else:
+        # Don't restrict reports to single comment or community
+        if user_access('administer all communities', user.id):
+            # Privileged user, don't filter by community
+            reports = Report.query.filter(Report.suspect_post_reply_id != None)
+        else:
+            modded_comm_ids = moderating_communities_ids(user.id)
+            reports = Report.query.filter(Report.suspect_post_reply_id != None,
+                                          Report.in_community_id.in_(modded_comm_ids))
+    
+    if unresolved_only:
+        reports = reports.filter(Report.status < REPORT_STATE_RESOLVED)
+    
+    reports = reports.paginate(page=page, per_page=limit, error_out=False)
+
+    report_list = []
+    for report in reports.items:
+        report_list.append(reply_report_view(report=report,
+                                             reply_id=report.suspect_post_reply_id,
+                                             user_id=user.id,
+                                             variant=2))
+    
+    reply_json = dict()
+    reply_json['comment_reports'] = report_list
+    reply_json['next_page'] = str(reports.next_num) if reports.next_num else None
+
+    return reply_json
+
+
 def post_reply_remove(auth, data):
     reply_id = data['comment_id']
     removed = data['removed']
@@ -590,6 +652,32 @@ def post_reply_mark_as_answer(auth, data):
     reply_json['comment_reply'] = reply_view(reply=reply, variant=6, user_id=user_id, read_comment_ids=[reply_id])
     reply_json['recipient'] = recipient
     return {'comment_reply_view': reply_json}
+
+
+def post_reply_distinguish(auth, data):
+    reply_id = data['comment_reply_id']
+    distinguished = data['distinguished']
+
+    user_id = authorise_api_user(auth)
+
+    reply = PostReply.query.get(reply_id)
+    author = reply.author
+
+    if not author.id == user_id:
+        raise Exception('incorrect login')
+    
+    mods = reply.community.moderators()
+    mod_ids = [mod.user_id for mod in mods]
+
+    if not (user_id in mod_ids or user_access("administer all communities", user_id)):
+        raise Exception('insufficient permission')
+    
+    reply.distinguished = distinguished
+    db.session.commit()
+
+    reply_json = reply_view(reply=reply, variant=4, user_id=user_id)
+    
+    return reply_json
 
 
 def post_reply_lock(auth, data):
