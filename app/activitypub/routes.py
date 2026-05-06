@@ -8,7 +8,7 @@ from sqlalchemy import desc, or_, text, func
 
 from app import db, cache, celery, limiter
 from app.activitypub import bp
-from app.activitypub.signature import HttpSignature, VerificationError, default_context, LDSignature, \
+from app.activitypub.signature import HttpSignature, VerificationError, VerificationFormatError, default_context, LDSignature, \
     send_post_request
 from app.activitypub.util import users_total, active_half_year, active_month, local_posts, local_comments, \
     post_to_activity, find_actor_or_create_cached, find_liked_object, \
@@ -574,7 +574,7 @@ def community_profile_subscribe(actor):
 def shared_inbox():
     from app import redis_client
     try:
-        request_json = request.get_json(force=True, cache=False)
+        request_json = request.get_json(force=True)
     except werkzeug.exceptions.BadRequest as e:
         log_incoming_ap('', APLOG_NOTYPE, APLOG_FAILURE, None, 'Unable to parse json body: ' + e.description +  str(request.user_agent))
         return '', 400
@@ -629,6 +629,11 @@ def shared_inbox():
     if isinstance(request_json['actor'], str) and request_json['actor'].endswith('accounts/peertube'):
         log_incoming_ap(id, APLOG_PT_VIEW, APLOG_IGNORED, saved_json, 'PeerTube View or CacheFile activity')
         return ''
+
+    try:
+        HttpSignature.precheck(request)
+    except VerificationFormatError as e:
+        log_incoming_ap(id, APLOG_NOTYPE, APLOG_FAILURE, saved_json, 'Precheck failed: ' + str(e))
 
     # Ignore account deletion requests from users that do not already exist here
     account_deletion = False

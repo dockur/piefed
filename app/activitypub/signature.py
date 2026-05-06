@@ -379,6 +379,24 @@ class HttpSignature:
             raise VerificationError("Signature mismatch")
 
     @classmethod
+    def precheck(cls, request: Request):
+        """
+        Checks digest and date headers before signature verification.
+        Digest is required and must match the body. Date must be within 1 hour.
+        """
+        if "digest" not in request.headers:
+            raise VerificationFormatError("No digest header present")
+        expected_digest = HttpSignature.calculate_digest(request.data)
+        if request.headers["digest"] != expected_digest:
+            raise VerificationFormatError("Digest is incorrect")
+
+        if "date" not in request.headers:
+            raise VerificationFormatError("No date header present")
+        header_date = parse_http_date(request.headers["date"])
+        if abs((pendulum.now('UTC') - header_date).seconds) > 3600:
+            raise VerificationFormatError("Date is too far away")
+
+    @classmethod
     def verify_request(cls, request: Request, public_key, skip_date=False):
         """
         Verifies that the request has a valid signature for its body
