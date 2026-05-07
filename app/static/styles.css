@@ -3097,6 +3097,25 @@ form h5 {
   filter: grayscale(100%) blur(var(--spacing-4)) !important;
 }
 
+#loading_animation {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(2px);
+}
+#loading_animation.hidden {
+  display: none;
+}
+#loading_animation img {
+  width: 30px;
+  height: 30px;
+}
+
 .dropdown-header {
   color: black;
 }

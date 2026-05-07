@@ -99,7 +99,7 @@
                                             {{ _('Warning: You are writing in a language that isn\'t the same as the user you are replying to uses! (%(language)s)', language=recipient_language_name) }}
                                         </div>
                                     {% endif -%}
-                                    <form method="post" role="form">
+                                    <form method="post" role="form" class="show_loading">
                                         {{ form.csrf_token() }}
                                         {{ render_field(form.body) }}
                                         <fieldset id="post_reply_more_options" class="mt-2 coolfieldset {{ 'collapsed' if request.cookies.get('fieldset_post_reply_more_options_state', 'collapsed') == 'collapsed' }}">
