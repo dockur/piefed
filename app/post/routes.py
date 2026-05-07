@@ -709,12 +709,14 @@ def continue_discussion(post_id, comment_id):
     for u_flair in UserFlair.query.filter(UserFlair.community_id == post.community_id):
         user_flair[u_flair.user_id] = u_flair.flair
 
+    description = shorten_string(markdown_to_text(comment.body), 200) if comment.body else None
+    og_image = post.image.source_url if post.image_id else None
 
     response = render_template('post/continue_discussion.html', title=_('Discussing %(title)s', title=post.title),
                                post=post, mods=mod_list, has_voted=has_voted, poll_results=poll_results,
                                poll_data=poll_data,
                                poll_choices=poll_choices, poll_total_votes=poll_total_votes,
-                               event=event,
+                               event=event, description=description, og_image=og_image,
                                is_moderator=is_moderator, comment=comment, replies=replies,
                                markdown_editor=current_user.is_authenticated and current_user.markdown_editor,
                                recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted,

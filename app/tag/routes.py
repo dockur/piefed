@@ -27,7 +27,7 @@ from app.utils import render_template, permission_required, user_filters_posts, 
 def show_tag(tag):
     page = request.args.get('page', 1, type=int)
     category = request.args.get('category', '')
-    category_id = request.args.get('category_id', '')
+    category_id = request.args.get('category_id', type=int)
 
     tag = Tag.query.filter(Tag.name == tag.lower()).first()
     if tag:
