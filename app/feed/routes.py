@@ -435,6 +435,8 @@ def show_feed(feed):
     low_bandwidth = request.cookies.get('low_bandwidth', '0') == '1'
     tag = request.args.get('tag', '')
     page_length = 20 if low_bandwidth else current_app.config['PAGE_LENGTH']
+    if current_user.is_authenticated and current_user.page_length and current_user.page_length < page_length:
+        page_length = current_user.page_length
     post_layout = request.args.get('layout', 'list' if not low_bandwidth else None)
     if post_layout == 'masonry':
         page_length = 200

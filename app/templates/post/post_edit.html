@@ -123,7 +123,7 @@
 <div class="row">
     <main class="col-12 col-lg-8 position-relative main_pane">
         {% block title %}<h1>{{ _('Edit post') }}</h1>{% endblock %}
-        <form method="post" enctype="multipart/form-data" role="form">
+        <form method="post" enctype="multipart/form-data" role="form" class="show_loading">
             {{ form.csrf_token() }}
             {% block post_type %}{% endblock %}
             {% if post_type == POST_TYPE_LINK %}

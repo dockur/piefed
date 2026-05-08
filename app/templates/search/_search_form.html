@@ -1,4 +1,4 @@
-<form action="" method="get" class="form pb-4" role="form">
+<form action="" method="get" class="form pb-4 show_loading" role="form">
     <div class="sort_methods btn-group mt-0 mb-4" aria-label="{{ _('What to search for: ') }}">
         <input type="radio" name="search_for" class="btn-check" id="btncheck1" autocomplete="off" value="posts" {{ 'checked' if search_for | default('posts') == 'posts' else '' }}>
         <label class="btn btn-outline-primary" for="btncheck1">{{ _('Posts') }}</label>

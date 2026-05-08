@@ -65,7 +65,8 @@ document.addEventListener("DOMContentLoaded", function () {
         setupEmojiAutoSubmit,
         setupReactionDialog,
         setupScrollChat,
-        setupCodeBlockCopy
+        setupCodeBlockCopy,
+        setupLoadingAnimation
     ];
     
     // Run critical setups immediately
@@ -2531,6 +2532,21 @@ function setupShareIcons() {
                 }
                 shareAnchor.dataset.shareIconSetup = 'true';
             });
+        }
+    });
+}
+
+function setupLoadingAnimation() {
+    document.querySelectorAll('form.show_loading').forEach(form => {
+        if (!form.dataset.loadingAnimationSetup) {
+            form.addEventListener('submit', function(event) {
+                // Browser validation failed, don't show the spinner
+                if (!form.checkValidity()) {
+                    return;
+                }
+                document.getElementById('loading_animation').classList.remove('hidden');
+            });
+            form.dataset.loadingAnimationSetup = 'true';
         }
     });
 }

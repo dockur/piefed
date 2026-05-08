@@ -493,6 +493,7 @@ def user_settings():
         current_user.font = form.font.data
         current_user.code_style = form.code_style.data
         current_user.additional_css = form.additional_css.data
+        current_user.page_length = form.page_length.data
         session['ui_language'] = form.interface_language.data
         current_user.vote_privately = not form.federate_votes.data
         current_user.show_subscribed_communities = form.show_subscribed_communities.data
@@ -500,6 +501,9 @@ def user_settings():
             db.session.execute(text('UPDATE "post" set indexable = :indexable WHERE user_id = :user_id'),
                                {'user_id': current_user.id,
                                 'indexable': current_user.indexable})
+
+        if current_user.page_length and current_user.page_length > current_app.config['PAGE_LENGTH']:
+            current_user.page_length = current_app.config['PAGE_LENGTH']
 
         db.session.commit()
         from app.api.alpha.views import user_view
@@ -577,6 +581,7 @@ def user_settings():
         form.feed_auto_follow.data = current_user.feed_auto_follow
         form.feed_auto_leave.data = current_user.feed_auto_leave
         form.read_languages.data = current_user.read_language_ids
+        form.page_length.data = current_user.page_length
         if request.cookies.get('compact_level', None) is None and current_app.config['HTTP_PROTOCOL'] == 'mixed':
             form.compaction.data = 'compact-min compact-max'
         else:

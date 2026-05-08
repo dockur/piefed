@@ -88,6 +88,9 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
 
     page_length = 20 if low_bandwidth else current_app.config['PAGE_LENGTH']
 
+    if current_user.is_authenticated and current_user.page_length and current_user.page_length < page_length:
+        page_length = current_user.page_length
+
     # view filter - subscribed/local/all
     community_ids = [-1]
     low_quality_filter = 'AND c.low_quality is false' if current_user.is_authenticated and current_user.hide_low_quality else ''

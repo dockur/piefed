@@ -37,7 +37,7 @@
                     </div>
                   {% endif -%}
                 </div>
-                <form method="get" action="/search">
+                <form method="get" action="/search" class="show_loading">
                     <input type="search" id="search_community" name="q" class="form-control" placeholder="{{ _('Search this community') }}" />
                     <input type="hidden" name="community" value="{{ community.link() }}">
                 </form>
