@@ -93,6 +93,7 @@ class Instance(db.Model):
     gone_forever = db.Column(db.Boolean, default=False)  # True once this instance is considered offline forever - never start trying again (12 days offline)
     ip_address = db.Column(db.String(50))
     trusted = db.Column(db.Boolean, default=False, index=True)
+    silenced = db.Column(db.Boolean, default=False, index=True)
     posting_warning = db.Column(db.String(512))
     nodeinfo_href = db.Column(db.String(100))
     admin_note = db.Column(db.Text)

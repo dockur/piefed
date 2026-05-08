@@ -27,7 +27,7 @@ from app.admin.forms import FederationForm, SiteMiscForm, SiteProfileForm, EditC
     CmsPageForm, CreateOfflineInstanceForm, InstanceChooserForm, CloseInstanceForm, EmojiForm
 from flask_wtf import FlaskForm
 from app.admin.util import unsubscribe_from_everything_then_delete, unsubscribe_from_community, send_newsletter, \
-    topics_for_form, move_community_images_to_here
+    topics_for_form, move_community_images_to_here, switch_to_unsilenced, switch_to_silenced
 from app.auth.util import send_email_verification, random_token
 from app.community.util import save_icon_file, save_banner_file, search_for_community, is_bad_name
 from app.community.routes import do_subscribe
@@ -1912,6 +1912,9 @@ def admin_instances():
         if filter == 'trusted':
             instances = instances.filter(Instance.trusted == True)
             title = 'Trusted instances'
+        elif filter == 'silenced':
+            instances = instances.filter(Instance.silenced == True)
+            title = 'Silenced instances'
         elif filter == 'online':
             instances = instances.filter(Instance.dormant == False, Instance.gone_forever == False)
             title = 'Online instances'
@@ -1948,9 +1951,14 @@ def admin_instance_edit(instance_id):
     if instance.software != 'piefed':
         del form.hide
     if form.validate_on_submit():
+        if form.silenced.data and not instance.silenced:
+            switch_to_silenced(instance_id)
+        if not form.silenced.data and instance.silenced:
+            switch_to_unsilenced(instance_id, form.trusted.data)
         instance.dormant = form.dormant.data
         instance.gone_forever = form.gone_forever.data
         instance.trusted = form.trusted.data
+        instance.silenced = form.silenced.data
         instance.posting_warning = form.posting_warning.data
         instance.popular = form.popular.data
         instance.admin_note = form.admin_note.data
@@ -1970,6 +1978,7 @@ def admin_instance_edit(instance_id):
         form.dormant.data = instance.dormant
         form.gone_forever.data = instance.gone_forever
         form.trusted.data = instance.trusted
+        form.silenced.data = instance.silenced
         form.posting_warning.data = instance.posting_warning
         form.popular.data = instance.popular
         form.admin_note.data = instance.admin_note
