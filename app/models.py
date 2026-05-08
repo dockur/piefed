@@ -788,6 +788,15 @@ class Community(db.Model):
 
         return humanize_number(subscribers)
 
+    def has_poster(self, user) -> bool:
+        post_reply_count = 0
+        post_count = db.session.execute(text('SELECT count(*) as c FROM "post" WHERE community_id = :community_id AND user_id = :user_id'),
+                                        {'community_id': self.id, 'user_id': user.id}).scalar_one_or_none()
+        if not post_count:
+            post_reply_count = db.session.execute(text('SELECT count(*) as c FROM "post_reply" WHERE community_id = :community_id AND user_id = :user_id'),
+                                                  {'community_id': self.id, 'user_id': user.id}).scalar_one_or_none()
+        return post_count or post_reply_count
+
     def notify_new_posts(self, user_id: int) -> bool:
         existing_notification = db.session.query(NotificationSubscription).\
             filter(NotificationSubscription.entity_id == self.id,
