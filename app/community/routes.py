@@ -462,6 +462,8 @@ def show_community(community: Community):
             posts = posts.filter(Post.reply_count > 0)
             posts = posts.order_by(desc(Post.sticky)).order_by(desc(Post.last_active))
         per_page = 20 if low_bandwidth else current_app.config['PAGE_LENGTH']
+        if current_user.is_authenticated and current_user.page_length and current_user.page_length < per_page:
+            per_page = current_user.page_length
         if post_layout == 'masonry':
             per_page = 200
         elif post_layout == 'masonry_wide':

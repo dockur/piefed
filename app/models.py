@@ -1015,6 +1015,7 @@ class User(UserMixin, db.Model):
     password_updated_at = db.Column(db.DateTime, default=utcnow)
     code_style = db.Column(db.String(25), default='fruity')
     admin_note = db.Column(db.Text)
+    page_length = db.Column(db.Integer)
 
     avatar = db.relationship('File', lazy='joined', foreign_keys=[avatar_id], single_parent=True, cascade="all, delete-orphan")
     cover = db.relationship('File', lazy='joined', foreign_keys=[cover_id], single_parent=True, cascade="all, delete-orphan")

@@ -40,6 +40,8 @@ def show_topic(topic_path):
     content_type = request.args.get('content_type', 'posts')
     tag = request.args.get('tag', '')
     page_length = 20 if low_bandwidth else current_app.config['PAGE_LENGTH']
+    if current_user.is_authenticated and current_user.page_length and current_user.page_length < page_length:
+        page_length = current_user.page_length
     if post_layout == 'masonry':
         page_length = 200
     elif post_layout == 'masonry_wide':
