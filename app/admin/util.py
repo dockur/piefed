@@ -306,3 +306,14 @@ def move_community_images_to_here(community_id):
             raise
         finally:
             session.close()
+
+
+def switch_to_silenced(instance_id):
+    db.session.execute(text('UPDATE "community" SET show_all = false, show_popular = false, topic_id = null WHERE instance_id = :instance_id'),
+                       {'instance_id': instance_id})
+
+
+def switch_to_unsilenced(instance_id, trusted: bool):
+    db.session.execute(
+        text('UPDATE "community" SET show_all = true, show_popular = :show_popular WHERE instance_id = :instance_id'),
+        {'show_popular': trusted, 'instance_id': instance_id})

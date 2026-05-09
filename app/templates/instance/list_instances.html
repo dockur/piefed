@@ -82,6 +82,13 @@
                             </a>
                         </li>
                     {% endif -%}
+                    {% if silenced -%}
+                        <li>
+                            <a class="dropdown-item{{ " active" if ("silenced" in filters) }}{{ " disabled" if allowed_or_blocked }}" href="{{ url_for('instance.list_instances', filters=filters + ['silenced'], search=search, page=page) }}" aria-label="{{ _('Silenced instances') }}" rel="nofollow noindex">
+                                {{ _('Silenced') }}
+                            </a>
+                        </li>
+                    {% endif -%}
                 </ul>
             </div>
         </div>
@@ -114,6 +121,11 @@
                 {% if trusted -%}
                     <a class="btn btn-outline-primary{{ " active" if ("trusted" in filters) }}{{ " disabled" if allowed_or_blocked }}" href="{{ url_for('instance.list_instances', filters=filters + ['trusted'], search=search, page=page) }}" rel="nofollow noindex">
                         {{ _('Trusted') }}
+                    </a>
+                {% endif -%}
+                {% if silenced -%}
+                    <a class="btn btn-outline-primary{{ " active" if ("silenced" in filters) }}{{ " disabled" if allowed_or_blocked }}" href="{{ url_for('instance.list_instances', filters=filters + ['silenced'], search=search, page=page) }}" rel="nofollow noindex">
+                        {{ _('Silenced') }}
                     </a>
                 {% endif -%}
             </div>

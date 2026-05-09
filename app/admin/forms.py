@@ -207,6 +207,7 @@ class EditInstanceForm(FlaskForm):
     dormant = BooleanField(_l('Dormant'))
     gone_forever = BooleanField(_l('Gone forever'))
     trusted = BooleanField(_l('Trusted'))
+    silenced = BooleanField(_l('Silenced'))
     hide = BooleanField(_l('Hide from instance chooser'))
     popular = BooleanField(_l('Communities become popular when added'))
     posting_warning = TextAreaField(_l('Posting warning'))

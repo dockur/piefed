@@ -41,7 +41,7 @@ def list_instances():
         allowed_or_blocked = True
     else:
         allowed_or_blocked = False
-    filters_to_remove = ['online', 'trusted', 'dormant', 'gone_forever', 'federated']
+    filters_to_remove = ['online', 'trusted', 'silenced', 'dormant', 'gone_forever', 'federated']
     
     if allowed_or_blocked:
         # Remove filters that don't work when filtering this way and redirect
@@ -80,6 +80,8 @@ def list_instances():
     if filters and not allowed_or_blocked:
         if 'trusted' in filters:
             instances = instances.filter(Instance.trusted == True)
+        if 'silenced' in filters:
+            instances = instances.filter(Instance.silenced == True)
         if 'online' in filters:
             instances = instances.filter(Instance.dormant == False, Instance.gone_forever == False)
         if 'dormant' in filters:
@@ -97,10 +99,12 @@ def list_instances():
     allowed = db.session.execute(text('SELECT COUNT(*) FROM "allowed_instances"')).scalar() > 0
     blocked = db.session.execute(text('SELECT COUNT(*) FROM "banned_instances"')).scalar() > 0
     trusted = db.session.execute(text('SELECT COUNT(*) FROM "instance" WHERE trusted IS TRUE')).scalar() > 0
+    silenced = db.session.execute(text('SELECT COUNT(*) FROM "instance" WHERE silenced IS TRUE')).scalar() > 0
 
     return render_template('instance/list_instances.html', instances=instances, title=title, search=search,
                            filters=filters, next_url=next_url, prev_url=prev_url, low_bandwidth=low_bandwidth,
-                           allowed=allowed, blocked=blocked, trusted=trusted, allowed_or_blocked=allowed_or_blocked)
+                           allowed=allowed, blocked=blocked, trusted=trusted, silenced=silenced,
+                           allowed_or_blocked=allowed_or_blocked)
 
 
 @bp.route('/instance/<instance_domain>', methods=['GET'])
