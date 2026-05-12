@@ -1925,7 +1925,7 @@ def reply_is_just_link_to_gif_reaction(body) -> bool:
         return False
 
 
-def reply_is_stupid(body) -> bool:
+def reply_is_low_effort(body) -> bool:
     lower_body = body.lower().strip()
     if lower_body == 'this' or lower_body == 'this.' or lower_body == 'this!':
         return True

@@ -2689,7 +2689,7 @@ class PostReply(db.Model):
     def new(cls, user: User, post: Post, in_reply_to, body, body_html, notify_author, language_id, distinguished, answer,
             request_json: dict = None, announce_id=None, session=None):
         from app.utils import shorten_string, blocked_phrases, recently_upvoted_post_replies, reply_already_exists, \
-            reply_is_just_link_to_gif_reaction, reply_is_stupid, wilson_confidence_lower_bound, get_setting
+            reply_is_just_link_to_gif_reaction, reply_is_low_effort, wilson_confidence_lower_bound, get_setting
         from app.activitypub.util import notify_about_post_reply
         from app import redis_client
 
@@ -2751,7 +2751,7 @@ class PostReply(db.Model):
             user.reputation -= 1
             raise PostReplyValidationError(_('Gif comment ignored'))
 
-        if reply_is_stupid(reply.body) and site.enable_this_comment_filter:
+        if reply_is_low_effort(reply.body) and site.enable_this_comment_filter:
             raise PostReplyValidationError(_('Low quality reply'))
 
         try:
