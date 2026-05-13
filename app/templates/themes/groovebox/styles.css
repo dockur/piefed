@@ -1,0 +1,766 @@
+/*
+ * Groovebox — retro groove for PieFed
+ * Palette by morhetz: https://github.com/morhetz/gruvbox-contrib/blob/master/color.table
+ * Light mode: Groovebox Light Medium (faded accents)
+ * Dark mode:  Groovebox Dark  Medium (bright accents)
+ */
+
+/* =========================================================
+ * LIGHT MODE — Groovebox Light Medium
+ * =======================================================*/
+:root {
+    /* Backgrounds (lightN) */
+    --gb-bg0-h:   #f9f5d7;   /* hard   */
+    --gb-bg0:     #fbf1c7;   /* default */
+    --gb-bg0-s:   #f2e5bc;   /* soft   */
+    --gb-bg1:     #ebdbb2;
+    --gb-bg2:     #d5c4a1;
+    --gb-bg3:     #bdae93;
+    --gb-bg4:     #a89984;
+
+    /* Foregrounds (darkN, inverted role in light mode) */
+    --gb-fg0:     #282828;
+    --gb-fg1:     #3c3836;
+    --gb-fg2:     #504945;
+    --gb-fg3:     #665c54;
+    --gb-fg4:     #7c6f64;
+    --gb-gray:    #7c6f64;
+
+    /* Faded accents (light-mode aliases) */
+    --gb-red:     #9d0006;
+    --gb-green:   #79740e;
+    --gb-yellow:  #b57614;
+    --gb-blue:    #076678;
+    --gb-purple:  #8f3f71;
+    --gb-aqua:    #427b58;
+    --gb-orange:  #af3a03;
+
+    /* Accent (links, buttons, focus rings) */
+    --accent-color:           var(--gb-blue);
+    --accent-color-hovered:   var(--gb-orange);
+    --accent-color-active:    var(--gb-aqua);
+    --accent-color-rgb:           7, 102, 120;   /* faded blue */
+    --accent-color-hovered-rgb: 175,  58,   3;   /* faded orange */
+
+    /* Bootstrap surfaces */
+    --bs-body-bg:        var(--gb-bg0);
+    --bs-body-bg-rgb:    251, 241, 199;
+    --bs-body-color:     var(--gb-fg1);
+    --bs-body-color-rgb: 60, 56, 54;
+
+    --bs-secondary-bg:        var(--gb-bg1);
+    --bs-secondary-bg-rgb:    235, 219, 178;
+    --bs-secondary-color:     var(--gb-fg3);
+    --bs-secondary-color-rgb: 102, 92, 84;
+
+    --bs-tertiary-bg:        var(--gb-bg0-s);
+    --bs-tertiary-bg-rgb:    242, 229, 188;
+    --bs-tertiary-color:     var(--gb-fg4);
+    --bs-tertiary-color-rgb: 124, 111, 100;
+
+    --bs-emphasis-color:     var(--gb-fg0);
+    --bs-emphasis-color-rgb: 40, 40, 40;
+    --bs-heading-color:      var(--gb-fg0);
+
+    --bs-border-color:             var(--gb-bg2);
+    --bs-border-color-translucent: rgba(60, 56, 54, 0.15);
+
+    /* Links */
+    --bs-link-color:           var(--accent-color);
+    --bs-link-hover-color:     var(--accent-color-hovered);
+    --bs-link-color-rgb:       var(--accent-color-rgb);
+    --bs-link-hover-color-rgb: var(--accent-color-hovered-rgb);
+
+    /* Code */
+    --bs-code-color: var(--gb-purple);
+
+    /* Semantic colours (faded) */
+    --bs-primary:        var(--gb-blue);
+    --bs-primary-rgb:    7, 102, 120;
+    --bs-success:        var(--gb-green);
+    --bs-success-rgb:    121, 116, 14;
+    --bs-info:           var(--gb-aqua);
+    --bs-info-rgb:       66, 123, 88;
+    --bs-warning:        var(--gb-yellow);
+    --bs-warning-rgb:    181, 118, 20;
+    --bs-danger:         var(--gb-red);
+    --bs-danger-rgb:     157, 0, 6;
+
+    --bs-primary-text-emphasis: var(--gb-blue);
+    --bs-success-text-emphasis: var(--gb-green);
+    --bs-info-text-emphasis:    var(--gb-aqua);
+    --bs-warning-text-emphasis: var(--gb-yellow);
+    --bs-danger-text-emphasis:  var(--gb-red);
+
+    --bs-primary-bg-subtle: #d8e3e5;
+    --bs-success-bg-subtle: #e3e0b5;
+    --bs-info-bg-subtle:    #cee0d3;
+    --bs-warning-bg-subtle: #f3dfb1;
+    --bs-danger-bg-subtle:  #f0d2cc;
+
+    --bs-primary-border-subtle: #a8c4ca;
+    --bs-success-border-subtle: #c3c388;
+    --bs-info-border-subtle:    #a3c4af;
+    --bs-warning-border-subtle: #e2c382;
+    --bs-danger-border-subtle:  #d9a59f;
+
+    --bs-form-valid-color:          var(--gb-green);
+    --bs-form-valid-border-color:   var(--gb-green);
+    --bs-form-invalid-color:        var(--gb-red);
+    --bs-form-invalid-border-color: var(--gb-red);
+}
+
+/* =========================================================
+ * DARK MODE — Groovebox Dark Medium
+ * =======================================================*/
+[data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    /* Backgrounds (darkN) */
+    --gb-bg0-h:   #1d2021;
+    --gb-bg0:     #282828;
+    --gb-bg0-s:   #32302f;
+    --gb-bg1:     #3c3836;
+    --gb-bg2:     #504945;
+    --gb-bg3:     #665c54;
+    --gb-bg4:     #7c6f64;
+
+    /* Foregrounds (lightN, inverted) */
+    --gb-fg0:     #fbf1c7;
+    --gb-fg1:     #ebdbb2;
+    --gb-fg2:     #d5c4a1;
+    --gb-fg3:     #bdae93;
+    --gb-fg4:     #a89984;
+    --gb-gray:    #928374;
+
+    /* Bright accents (dark-mode aliases) */
+    --gb-red:     #fb4934;
+    --gb-green:   #b8bb26;
+    --gb-yellow:  #fabd2f;
+    --gb-blue:    #83a598;
+    --gb-purple:  #d3869b;
+    --gb-aqua:    #8ec07c;
+    --gb-orange:  #fe8019;
+
+    /* Accent */
+    --accent-color:           var(--gb-blue);
+    --accent-color-hovered:   var(--gb-orange);
+    --accent-color-active:    var(--gb-aqua);
+    --accent-color-rgb:          131, 165, 152;  /* bright blue */
+    --accent-color-hovered-rgb: 254, 128,  25;   /* bright orange */
+
+    /* Bootstrap surfaces */
+    --bs-body-bg:        var(--gb-bg0);
+    --bs-body-bg-rgb:    40, 40, 40;
+    --bs-body-color:     var(--gb-fg1);
+    --bs-body-color-rgb: 235, 219, 178;
+
+    --bs-secondary-bg:        var(--gb-bg1);
+    --bs-secondary-bg-rgb:    60, 56, 54;
+    --bs-secondary-color:     var(--gb-fg3);
+    --bs-secondary-color-rgb: 189, 174, 147;
+
+    --bs-tertiary-bg:        var(--gb-bg2);
+    --bs-tertiary-bg-rgb:    80, 73, 69;
+    --bs-tertiary-color:     var(--gb-fg4);
+    --bs-tertiary-color-rgb: 168, 153, 132;
+
+    --bs-emphasis-color:     var(--gb-fg0);
+    --bs-emphasis-color-rgb: 251, 241, 199;
+    --bs-heading-color:      var(--gb-fg0);
+
+    --bs-border-color:             var(--gb-bg3);
+    --bs-border-color-translucent: rgba(235, 219, 178, 0.12);
+
+    --bs-link-color:           var(--accent-color);
+    --bs-link-hover-color:     var(--accent-color-hovered);
+    --bs-link-color-rgb:       var(--accent-color-rgb);
+    --bs-link-hover-color-rgb: var(--accent-color-hovered-rgb);
+
+    --bs-code-color: var(--gb-purple);
+
+    /* Semantic colours (bright) */
+    --bs-primary:        var(--gb-blue);
+    --bs-primary-rgb:    131, 165, 152;
+    --bs-success:        var(--gb-green);
+    --bs-success-rgb:    184, 187, 38;
+    --bs-info:           var(--gb-aqua);
+    --bs-info-rgb:       142, 192, 124;
+    --bs-warning:        var(--gb-yellow);
+    --bs-warning-rgb:    250, 189, 47;
+    --bs-danger:         var(--gb-red);
+    --bs-danger-rgb:     251, 73, 52;
+
+    --bs-primary-text-emphasis: var(--gb-blue);
+    --bs-success-text-emphasis: var(--gb-green);
+    --bs-info-text-emphasis:    var(--gb-aqua);
+    --bs-warning-text-emphasis: var(--gb-yellow);
+    --bs-danger-text-emphasis:  var(--gb-red);
+
+    --bs-primary-bg-subtle: #1f2c33;
+    --bs-success-bg-subtle: #2f3018;
+    --bs-info-bg-subtle:    #283120;
+    --bs-warning-bg-subtle: #3a2f15;
+    --bs-danger-bg-subtle:  #3a201c;
+
+    --bs-primary-border-subtle: #2c4858;
+    --bs-success-border-subtle: #4a4d1f;
+    --bs-info-border-subtle:    #3d5a32;
+    --bs-warning-border-subtle: #5a4a20;
+    --bs-danger-border-subtle:  #5a2f24;
+
+    --bs-form-valid-color:          var(--gb-green);
+    --bs-form-valid-border-color:   var(--gb-green);
+    --bs-form-invalid-color:        var(--gb-red);
+    --bs-form-invalid-border-color: var(--gb-red);
+}
+
+/* =========================================================
+ * BUTTONS
+ * =======================================================*/
+.btn-primary {
+    --bs-btn-color:                 #ffffff;
+    --bs-btn-bg:                    var(--accent-color);
+    --bs-btn-border-color:          var(--accent-color);
+    --bs-btn-hover-color:           #ffffff;
+    --bs-btn-hover-bg:              var(--accent-color-hovered);
+    --bs-btn-hover-border-color:    var(--accent-color-hovered);
+    --bs-btn-active-color:          #ffffff;
+    --bs-btn-active-bg:             var(--accent-color-active);
+    --bs-btn-active-border-color:   var(--accent-color-active);
+    --bs-btn-disabled-color:        #ffffff;
+    --bs-btn-disabled-bg:           var(--accent-color);
+    --bs-btn-disabled-border-color: var(--accent-color);
+}
+
+[data-bs-theme="dark"] .btn-primary {
+    /* bright_blue is light enough that dark text reads better */
+    --bs-btn-color:           var(--gb-bg0);
+    --bs-btn-hover-color:     var(--gb-bg0);
+    --bs-btn-active-color:    var(--gb-bg0);
+    --bs-btn-disabled-color:  var(--gb-bg0);
+}
+
+.btn-outline-primary {
+    --bs-btn-color:                 var(--accent-color);
+    --bs-btn-border-color:          var(--accent-color);
+    --bs-btn-hover-color:           #ffffff;
+    --bs-btn-hover-bg:              var(--accent-color);
+    --bs-btn-hover-border-color:    var(--accent-color);
+    --bs-btn-active-color:          #ffffff;
+    --bs-btn-active-bg:             var(--accent-color-active);
+    --bs-btn-active-border-color:   var(--accent-color-active);
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+    --bs-btn-hover-color:  var(--gb-bg0);
+    --bs-btn-active-color: var(--gb-bg0);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color:               var(--gb-fg3);
+    --bs-btn-border-color:        var(--bs-border-color);
+    --bs-btn-hover-color:         var(--gb-fg0);
+    --bs-btn-hover-bg:            var(--gb-bg1);
+    --bs-btn-hover-border-color:  var(--gb-bg2);
+    --bs-btn-active-color:        var(--gb-fg0);
+    --bs-btn-active-bg:           var(--gb-bg2);
+    --bs-btn-active-border-color: var(--gb-bg3);
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    --bs-btn-hover-color:  var(--gb-fg0);
+    --bs-btn-active-color: var(--gb-fg0);
+}
+
+.btn-danger {
+    --bs-btn-bg:                  var(--gb-red);
+    --bs-btn-border-color:        var(--gb-red);
+    --bs-btn-hover-bg:            var(--gb-orange);
+    --bs-btn-hover-border-color:  var(--gb-orange);
+    --bs-btn-active-bg:           var(--gb-orange);
+    --bs-btn-active-border-color: var(--gb-orange);
+}
+
+.btn-warning {
+    --bs-btn-color:               #ffffff;
+    --bs-btn-bg:                  var(--gb-yellow);
+    --bs-btn-border-color:        var(--gb-yellow);
+    --bs-btn-hover-color:         #ffffff;
+    --bs-btn-hover-bg:            var(--gb-orange);
+    --bs-btn-hover-border-color:  var(--gb-orange);
+}
+
+[data-bs-theme="dark"] .btn-warning {
+    --bs-btn-color:        var(--gb-bg0);
+    --bs-btn-hover-color:  var(--gb-bg0);
+}
+
+.btn-success {
+    --bs-btn-bg:                  var(--gb-green);
+    --bs-btn-border-color:        var(--gb-green);
+    --bs-btn-hover-bg:            var(--gb-aqua);
+    --bs-btn-hover-border-color:  var(--gb-aqua);
+}
+
+[data-bs-theme="dark"] .btn-success {
+    --bs-btn-color:        var(--gb-bg0);
+    --bs-btn-hover-color:  var(--gb-bg0);
+}
+
+/* Form check */
+.form-check-input:checked {
+    background-color: var(--accent-color);
+    border-color:     var(--accent-color);
+}
+
+.form-check-input:focus {
+    border-color: var(--accent-color);
+    box-shadow:   0 0 0 0.25rem rgba(var(--accent-color-rgb), 0.25);
+}
+
+/* =========================================================
+ * NAVIGATION
+ * =======================================================*/
+div.navbar {
+    background-color: var(--gb-bg0-h) !important;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] div.navbar {
+    background-color: var(--gb-bg1) !important;
+}
+
+.nav-link {
+    color: var(--bs-body-color);
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: var(--accent-color-hovered);
+}
+
+.nav-pills {
+    --bs-nav-pills-link-active-color: #ffffff;
+    --bs-nav-pills-link-active-bg:    var(--accent-color);
+}
+
+[data-bs-theme="dark"] .nav-pills {
+    --bs-nav-pills-link-active-color: var(--gb-bg0);
+}
+
+/* Dropdown */
+.dropdown-menu {
+    --bs-dropdown-bg:                var(--gb-bg0-h);
+    --bs-dropdown-border-color:      var(--bs-border-color);
+    --bs-dropdown-link-color:        var(--bs-body-color);
+    --bs-dropdown-link-hover-bg:     var(--gb-bg1);
+    --bs-dropdown-link-hover-color:  var(--gb-fg0);
+    --bs-dropdown-link-active-bg:    var(--accent-color);
+    --bs-dropdown-link-active-color: #ffffff;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+    --bs-dropdown-bg:                var(--gb-bg1);
+    --bs-dropdown-link-hover-bg:     var(--gb-bg2);
+    --bs-dropdown-link-active-color: var(--gb-bg0);
+}
+
+.mobilenav {
+    background-color: var(--gb-bg0-h);
+    border-top: 1px solid var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .mobilenav {
+    background-color: var(--gb-bg1);
+}
+
+/* =========================================================
+ * SURFACES
+ * =======================================================*/
+body {
+    background-color: var(--bs-body-bg);
+}
+
+.main_pane {
+    background-color: var(--gb-bg0-h);
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+}
+
+[data-bs-theme="dark"] .main_pane {
+    background-color: var(--gb-bg1);
+}
+
+.card {
+    --bs-card-bg:           var(--gb-bg0-h);
+    --bs-card-border-color: var(--bs-border-color);
+    --bs-card-cap-bg:       var(--gb-bg1);
+}
+
+[data-bs-theme="dark"] .card {
+    --bs-card-bg:           var(--gb-bg1);
+    --bs-card-cap-bg:       var(--gb-bg2);
+}
+
+.list-group {
+    --bs-list-group-bg:                  var(--gb-bg0-h);
+    --bs-list-group-border-color:        var(--bs-border-color);
+    --bs-list-group-color:               var(--bs-body-color);
+    --bs-list-group-action-hover-bg:     var(--gb-bg1);
+    --bs-list-group-active-bg:           var(--accent-color);
+    --bs-list-group-active-border-color: var(--accent-color);
+}
+
+[data-bs-theme="dark"] .list-group {
+    --bs-list-group-bg:               var(--gb-bg1);
+    --bs-list-group-action-hover-bg:  var(--gb-bg2);
+    --bs-list-group-active-color:     var(--gb-bg0);
+}
+
+.table {
+    --bs-table-bg:           transparent;
+    --bs-table-color:        var(--bs-body-color);
+    --bs-table-border-color: var(--bs-border-color);
+    --bs-table-striped-bg:   var(--gb-bg0-s);
+    --bs-table-hover-bg:     var(--gb-bg1);
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-striped-bg: var(--gb-bg0-s);
+    --bs-table-hover-bg:   var(--gb-bg2);
+}
+
+/* =========================================================
+ * POSTS, COMMENTS, VOTING
+ * =======================================================*/
+.post_list .post_teaser {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .post_list .post_teaser {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.post_teaser_image_preview img,
+.post_image img,
+.masonry_thumb img,
+.url_thumbnail img {
+    border-radius: 6px;
+}
+
+.post_teaser_title_a {
+    color: var(--bs-heading-color);
+}
+
+.post_teaser_title_a:visited {
+    color: color-mix(in srgb, var(--bs-heading-color) 60%, var(--gb-gray));
+}
+
+[data-bs-theme="dark"] .post_teaser_title_a:visited {
+    color: color-mix(in srgb, var(--bs-heading-color) 60%, var(--gb-gray));
+}
+
+.post_teaser_clickable {
+    color: var(--gb-fg3);
+}
+
+.voting_buttons div,
+.voting_buttons_new .upvote_button,
+.voting_buttons_new .downvote_button {
+    color: inherit;
+}
+
+/* Iconography — leans on Groovebox accent palette */
+.fe-arrow-up-circle {
+    color: var(--gb-orange);
+}
+
+.fe-arrow-down-circle,
+.orangered {
+    color: var(--gb-purple);
+}
+
+.fe-warning {
+    color: var(--gb-yellow);
+}
+
+.fe-delete {
+    color: var(--gb-red);
+}
+
+.fe-distinguished {
+    color: var(--gb-aqua);
+}
+
+.fe-circle {
+    color: var(--gb-gray);
+}
+
+.fe-read {
+    color: var(--accent-color);
+}
+
+div.unread::before {
+    background-color: var(--gb-orange);
+}
+
+/* Comments */
+.comments > .comment {
+    border-color: var(--bs-border-color);
+}
+
+.comment .replies {
+    border-left-color: var(--bs-border-color);
+}
+
+.comment.distinguished > .row:first-child {
+    background-color: var(--gb-bg1);
+    border-radius: var(--bs-border-radius);
+}
+
+[data-bs-theme="dark"] .comment.distinguished > .row:first-child {
+    background-color: var(--gb-bg2);
+}
+
+/* =========================================================
+ * FORMS
+ * =======================================================*/
+.form-control,
+.form-select {
+    background-color: var(--gb-bg0-h);
+    color:            var(--bs-body-color);
+    border-color:     var(--bs-border-color);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--gb-bg0-h);
+    color:            var(--bs-body-color);
+    border-color:     var(--accent-color);
+    box-shadow:       0 0 0 0.25rem rgba(var(--accent-color-rgb), 0.20);
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--gb-bg0-s);
+    color:            var(--bs-body-color);
+    border-color:     var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: var(--gb-bg0-s);
+    color:            var(--bs-body-color);
+}
+
+.form-control::placeholder {
+    color: var(--gb-gray);
+    opacity: 1;
+}
+
+/* DownArea markdown editor */
+.downarea-toolbar,
+.downarea-bottom {
+    background-color: var(--gb-bg1) !important;
+    border-color:     var(--bs-border-color);
+}
+
+.downarea-toolbar-tool {
+    background-color: var(--gb-bg1) !important;
+    color:            var(--bs-body-color);
+}
+
+.downarea-toolbar-tool:hover {
+    background-color: var(--gb-bg2) !important;
+}
+
+[data-bs-theme="dark"] .downarea-toolbar,
+[data-bs-theme="dark"] .downarea-bottom,
+[data-bs-theme="dark"] .downarea-toolbar-tool {
+    background-color: var(--gb-bg2) !important;
+}
+
+[data-bs-theme="dark"] .downarea-textarea .form-control {
+    background-color: var(--gb-bg0-s);
+}
+
+/* Tom Select */
+.ts-control,
+.ts-dropdown {
+    background-color: var(--gb-bg0-h) !important;
+    color:            var(--bs-body-color) !important;
+    border-color:     var(--bs-border-color) !important;
+}
+
+[data-bs-theme="dark"] .ts-control,
+[data-bs-theme="dark"] .ts-dropdown {
+    background-color: var(--gb-bg1) !important;
+}
+
+.ts-dropdown .active {
+    background-color: var(--accent-color) !important;
+    color:            #ffffff !important;
+}
+
+[data-bs-theme="dark"] .ts-dropdown .active {
+    color: var(--gb-bg0) !important;
+}
+
+.ts-dropdown .optgroup-header {
+    background-color: var(--gb-bg1) !important;
+    color:            var(--gb-fg3) !important;
+}
+
+[data-bs-theme="dark"] .ts-dropdown .optgroup-header {
+    background-color: var(--gb-bg2) !important;
+}
+
+/* =========================================================
+ * ALERTS
+ * =======================================================*/
+.alert-message {
+    background-color: var(--gb-bg1);
+    border-color:     var(--accent-color);
+    color:            var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .alert-message {
+    background-color: var(--gb-bg2);
+    border-color:     var(--accent-color);
+    color:            var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .alert {
+    background-color: var(--gb-bg2);
+    color:            var(--bs-body-color);
+}
+
+/* =========================================================
+ * MESSAGES (chat)
+ * =======================================================*/
+.from_me,
+.from_me a {
+    background-color: var(--gb-blue);
+    color: #ffffff;
+    border: 0;
+}
+
+.from_other_party,
+.from_other_party a {
+    background-color: var(--gb-aqua);
+    color: #ffffff;
+    border: 0;
+}
+
+[data-bs-theme="dark"] .from_me,
+[data-bs-theme="dark"] .from_me a {
+    background-color: var(--gb-blue);
+    color: var(--gb-bg0);
+}
+
+[data-bs-theme="dark"] .from_other_party,
+[data-bs-theme="dark"] .from_other_party a {
+    background-color: var(--gb-aqua);
+    color: var(--gb-bg0);
+}
+
+.message_created_at {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-bs-theme="dark"] .message_created_at {
+    color: rgba(40, 40, 40, 0.7) !important;
+}
+
+/* =========================================================
+ * COOLFIELDSET
+ * =======================================================*/
+.coolfieldset {
+    border: 1px solid var(--bs-border-color) !important;
+    border-radius: var(--bs-border-radius) !important;
+    background-color: var(--gb-bg0-h) !important;
+}
+
+[data-bs-theme="dark"] .coolfieldset {
+    background-color: var(--gb-bg1) !important;
+}
+
+.coolfieldset legend,
+.coolfieldset.collapsed legend,
+.coolfieldset.expanded legend {
+    background-color: var(--gb-bg1) !important;
+    color: var(--bs-heading-color) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    border-radius: var(--bs-border-radius) !important;
+    padding: 2px 8px;
+}
+
+[data-bs-theme="dark"] .coolfieldset legend,
+[data-bs-theme="dark"] .coolfieldset.collapsed legend,
+[data-bs-theme="dark"] .coolfieldset.expanded legend {
+    background-color: var(--gb-bg2) !important;
+}
+
+/* =========================================================
+ * USER FLAIR / BADGES
+ * =======================================================*/
+.user_flair.original_poster {
+    background-color: var(--gb-red);
+    color: #ffffff;
+    border-radius: 3px;
+    padding: 0 4px;
+    font-size: 87%;
+}
+
+.user_note {
+    background-color: var(--gb-purple);
+    color: #ffffff;
+    border-radius: 3px;
+    padding: 0 4px;
+    font-size: 87%;
+}
+
+[data-bs-theme="dark"] .user_flair.original_poster {
+    color: var(--gb-bg0);
+}
+
+[data-bs-theme="dark"] .user_note {
+    color: var(--gb-bg0);
+}
+
+/* =========================================================
+ * MISC
+ * =======================================================*/
+.community_header {
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.4));
+}
+
+/* Scrollbar (Firefox) */
+* {
+    scrollbar-color: var(--gb-bg2) transparent;
+}
+
+[data-bs-theme="dark"] * {
+    scrollbar-color: var(--gb-bg3) transparent;
+}
+
+/* Scrollbar (WebKit) */
+::-webkit-scrollbar-thumb {
+    background-color: var(--gb-bg2);
+    border-radius: 4px;
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
+    background-color: var(--gb-bg3);
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Selection */
+::selection {
+    background-color: rgba(var(--accent-color-rgb), 0.35);
+    color: var(--bs-body-color);
+}
