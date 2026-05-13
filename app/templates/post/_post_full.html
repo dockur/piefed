@@ -475,7 +475,7 @@
                 </div>
             </div>
         {% endif -%}
-        {% if current_user.is_authenticated and post.type == POST_TYPE_LINK or post.type == POST_TYPE_VIDEO -%}
+        {% if current_user.is_authenticated and post.type in [POST_TYPE_LINK, POST_TYPE_VIDEO, POST_TYPE_IMAGE] -%}
             <div class="post_cross_post_link">
                 <a rel="nofollow" aria-label="{{ _('Cross-post') }}" title="{{ _('Cross-post') }}" href="{{ url_for('post.post_cross_post', post_id=post.id) }}">
                     <span class="fe fe-cross-post"></span>
