@@ -1533,7 +1533,6 @@ def alpha_post():
 
 
 # Reply - not yet implemented
-@bp.route('/api/alpha/comment/distinguish', methods=['POST'])  # Not really used
 @bp.route('/api/alpha/comment/report/resolve', methods=['PUT'])  # Stage 2
 def alpha_reply():
     return jsonify({"error": "not_yet_implemented"}), 400
