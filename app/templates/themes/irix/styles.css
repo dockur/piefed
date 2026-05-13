@@ -236,3 +236,7 @@ footer a {
 .post_list .post_teaser .thumbnail img, .post_teaser_image_preview img {
   border-radius: 0;
 }
+
+.topics_list {
+  background-color: #aebfd6;
+}
