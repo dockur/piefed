@@ -11,7 +11,7 @@ from app.api.alpha.views import post_view, post_report_view, reply_view, communi
 from app.constants import *
 from app.feed.routes import get_all_child_feed_ids
 from app.models import Post, Community, CommunityMember, utcnow, User, Feed, FeedItem, Topic, PostReply, PostVote, \
-    CommunityFlair, read_posts, Poll
+    CommunityFlair, read_posts, Poll, Report
 from app.shared.post import vote_for_post, bookmark_post, remove_bookmark_post, subscribe_post, make_post, edit_post, \
     delete_post, restore_post, report_post, lock_post, sticky_post, mod_remove_post, mod_restore_post, mark_post_read, \
     vote_for_poll, hide_post
@@ -22,7 +22,7 @@ from app.utils import authorise_api_user, blocked_users, blocked_communities, bl
     site_language_id, filtered_out_communities, joined_or_modding_communities, \
     user_filters_home, user_filters_posts, in_sorted_list, instance_sticky_posts, instance_sticky_post_ids, \
     communities_banned_from_all_users, moderating_communities_ids_all_users, blocked_domains, SqlKeysetPagination, \
-    community_membership_private, paginate_post_ids, post_ids_to_models
+    community_membership_private, paginate_post_ids, post_ids_to_models, user_access, moderating_communities_ids
 from app.shared.tasks import task_selector
 
 
@@ -122,7 +122,7 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
     #post_query_criteria.append(f'deleted is false AND status > {POST_STATUS_REVIEWING}')
 
     if blocked_person_ids:
-        post_query_criteria.append(f'p.user_id NOT IN :blocked_person_ids')
+        post_query_criteria.append('p.user_id NOT IN :blocked_person_ids')
         post_query_parameters['blocked_person_ids'] = tuple(blocked_person_ids)
 
     if blocked_community_ids:
@@ -154,7 +154,7 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
                                                                       Community.instance_id.not_in(
                                                                           blocked_instance_ids))
         
-        post_query_criteria.append(f'score > 100')
+        post_query_criteria.append('score > 100')
         post_query_criteria.append('show_popular is true')
 
     elif type == "Subscribed" and user_id is not None:
@@ -1497,6 +1497,72 @@ def post_post_report(auth, data):
 
     post_json = post_report_view(report=report, post_id=post_id, user_id=user_id)
     return post_json
+
+
+def get_post_report_list(auth, data):
+    user = authorise_api_user(auth, return_type="model")
+
+    if not user:
+        raise Exception("incorrect login")
+
+    post_id = data['post_id'] if 'post_id' in data else None
+    community_id = data['community_id'] if 'community_id' in data else None
+    limit = data['limit'] if 'limit' in data else 20
+    page = data['page'] if 'page' in data else 1
+    unresolved_only = data['unresolved_only'] if 'unresolved_only' in data else True
+
+    if post_id:
+        # Just get reports for a single post
+        post = Post.query.get(post_id)
+        mods = post.community.moderators()
+        mod_ids = [mod.user_id for mod in mods]
+
+        if user.id in mod_ids or user_access('administer all communities', user.id):
+            reports = Report.query.filter(Report.suspect_post_id == post_id,
+                                          Report.suspect_post_reply_id == None)
+        else:
+            raise Exception('incorrect login')
+    elif community_id:
+        # Just get reports for a single community
+        community = Community.query.get(community_id)
+        mods = community.moderators()
+        mod_ids = [mod.user_id for mod in mods]
+
+        if user.id in mod_ids or user_access("administer all communities", user.id):
+            reports = Report.query.filter(Report.in_community_id == community_id,
+                                          Report.suspect_post_id != None,
+                                          Report.suspect_post_reply_id == None)
+        else:
+            raise Exception('incorrect login')
+    else:
+        # Don't restrict reports to single post or community
+        if user_access('administer all communities', user.id):
+            # Privileged user, don't filter by community
+            reports = Report.query.filter(Report.suspect_post_id != None,
+                                          Report.suspect_post_reply_id == None)
+        else:
+            modded_comm_ids = moderating_communities_ids(user.id)
+            reports = Report.query.filter(Report.suspect_post_id != None,
+                                          Report.in_community_id.in_(modded_comm_ids),
+                                          Report.suspect_post_reply_id == None)
+    
+    if unresolved_only:
+        reports = reports.filter(Report.status < REPORT_STATE_RESOLVED)
+    
+    reports = reports.paginate(page=page, per_page=limit, error_out=False)
+
+    report_list = []
+    for report in reports.items:
+        report_list.append(post_report_view(report=report,
+                                             post_id=report.suspect_post_id,
+                                             user_id=user.id,
+                                             variant=2))
+    
+    reply_json = dict()
+    reply_json['post_reports'] = report_list
+    reply_json['next_page'] = str(reports.next_num) if reports.next_num else None
+
+    return reply_json
 
 
 def post_post_lock(auth, data):
