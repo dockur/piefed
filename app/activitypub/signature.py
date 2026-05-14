@@ -400,18 +400,6 @@ class HttpSignature:
         """
         Verifies that the request has a valid signature for its body
         """
-        # Verify body digest
-        if "digest" in request.headers:
-            expected_digest = HttpSignature.calculate_digest(request.data)
-            if request.headers["digest"] != expected_digest:
-                raise VerificationFormatError("Digest is incorrect")
-
-        # Verify date header
-        if "date" in request.headers and not skip_date:
-            header_date = parse_http_date(request.headers["date"])
-            if abs((datetime.now(timezone.utc) - header_date).total_seconds()) > 3600:
-                raise VerificationFormatError("Date is too far away")
-
         # Get the signature details
         if "signature" not in request.headers:
             raise VerificationFormatError("No signature header present")

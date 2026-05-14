@@ -134,6 +134,7 @@
     {% block navbar -%}
     <div class="navbar navbar-expand-lg sticky-lg-top">
         <div class="{{ 'container-lg' if post_layout != 'masonry_wide' else 'container-fluid' }} pl-lg-0" role="banner">
+            <a href="#" id="navbar-back-ios"><span class="fe fe-back"></span></a>
             <a class="navbar-brand" href="/" aria-label="{{ _('To home page') }}">
                 {% if not low_bandwidth -%}
                     <img src="{% if g.site.logo and g.site.logo.endswith('.svg') -%}

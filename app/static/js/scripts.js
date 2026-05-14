@@ -393,6 +393,13 @@ function setupMobileNav() {
     if(window.innerWidth < 992) {
         navbarToggler.setAttribute('aria-expanded', 'false');
     }
+
+    // back button for use on iOS devices. See def display_back_button()
+    const back_button = document.getElementById('navbar-back-ios');
+    back_button.addEventListener('click', function(event) {
+        event.preventDefault();
+        history.back();
+    });
 }
 
 function setupLightDark() {

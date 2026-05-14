@@ -2618,6 +2618,18 @@ form {
   }
 }
 
+#navbar-back-ios {
+  display: none;
+}
+
+.display_back_button #navbar-back-ios {
+  display: inline;
+  font-size: 30px;
+  line-height: 30px;
+  position: relative;
+  left: -6px;
+}
+
 #loading_animation {
   display: none;
 
