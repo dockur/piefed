@@ -17,14 +17,13 @@ from app.api.alpha.utils.misc import get_search, get_resolve_object, get_suggest
 from app.api.alpha.utils.post import get_post_list, get_post, post_post_like, put_post_save, put_post_subscribe, \
     post_post, put_post, post_post_delete, post_post_report, post_post_lock, post_post_feature, post_post_remove, \
     post_post_mark_as_read, get_post_replies, get_post_like_list, put_post_set_flair, get_post_list2, post_poll_vote, \
-    post_post_hide
+    post_post_hide, get_post_report_list
 from app.api.alpha.utils.private_message import get_private_message_list, post_private_message, \
     post_private_message_mark_as_read, get_private_message_conversation, put_private_message, post_private_message_delete, \
     post_private_message_report, post_leave_conversation
 from app.api.alpha.utils.reply import get_reply_list, post_reply_like, put_reply_save, put_reply_subscribe, post_reply, \
     put_reply, post_reply_delete, post_reply_report, post_reply_remove, post_reply_mark_as_read, get_reply, \
-    post_reply_lock, get_reply_like_list, post_reply_mark_as_answer, get_reply_report_list, post_reply_distinguish, \
-    put_reply_report_resolve
+    post_reply_lock, get_reply_like_list, post_reply_mark_as_answer, get_reply_report_list, post_reply_distinguish
 from app.api.alpha.utils.site import get_site, post_site_block, get_federated_instances, get_site_instance_chooser, \
     get_site_instance_chooser_search, get_site_version, get_site_metadata
 from app.api.alpha.utils.topic import get_topic_list
@@ -656,6 +655,19 @@ def post_alpha_post_report(data):
     auth = request.headers.get('Authorization')
     resp = post_post_report(auth, data)
     return PostReportResponse().load(resp)
+
+
+@post_bp.route('/post/report/list', methods=['GET'])
+@post_bp.doc(summary="Get list of comment reports.")
+@post_bp.arguments(GetPostReportListRequest, location="query")
+@post_bp.response(200, GetPostReportListResponse)
+@post_bp.alt_response(400, schema=DefaultError)
+def get_alpha_post_report_list(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_post_report_list(auth, data)
+    return GetPostReportListResponse().load(resp)
 
 
 @post_bp.route('/post/lock', methods=['POST'])
@@ -1540,7 +1552,6 @@ def alpha_community():
 
 # Post - not yet implemented
 @bp.route('/api/alpha/post/report/resolve', methods=['PUT'])  # Stage 2
-@bp.route('/api/alpha/post/report/list', methods=['GET'])  # Stage 2
 def alpha_post():
     return jsonify({"error": "not_yet_implemented"}), 400
 

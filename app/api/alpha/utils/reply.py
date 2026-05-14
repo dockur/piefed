@@ -518,7 +518,6 @@ def get_reply_report_list(auth, data):
 
         if user.id in mod_ids or user_access('administer all communities', user.id):
             reports = Report.query.filter(Report.suspect_post_reply_id == comment_id)
-            # report_list = [reply_report_view(report=report, reply_id=comment_id, user_id=user.id) for report in reports]
         else:
             raise Exception('incorrect login')
     elif community_id:
