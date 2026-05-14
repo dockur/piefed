@@ -176,6 +176,19 @@ def get_alpha_suggest_completion(data):
     resp = get_suggestion(data)
     return GetSuggestCompletionResponse().load(resp)
 
+@misc_bp.route('/modlog', methods=['GET'])  # Get Modlog
+@misc_bp.doc(summary="Get modlog.")
+@misc_bp.arguments(GetModLogRequest, location="query")
+@misc_bp.response(200, GetModLogResponse)
+@misc_bp.alt_response(400, schema=DefaultError)
+@misc_bp.alt_response(429, schema=DefaultError)
+def alpha_miscellaneous_modlog(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_modlog(auth, data)
+    return GetModLogResponse().load(resp)
+
 
 # Community
 @comm_bp.route("/community", methods=["GET"])
@@ -1524,29 +1537,10 @@ def alpha_site():
     return jsonify({"error": "not_yet_implemented"}), 400
 
 
-# Miscellaneous
-@misc_bp.route('/modlog', methods=['GET'])  # Get Modlog
-@misc_bp.doc(summary="Get modlog.")
-@misc_bp.arguments(GetModLogRequest, location="query")
-@misc_bp.response(200, GetModLogResponse)
-@misc_bp.alt_response(400, schema=DefaultError)
-@misc_bp.alt_response(429, schema=DefaultError)
-def alpha_miscellaneous_modlog(data):
-    if not enable_api():
-        return abort(400, message="alpha api is not enabled")
-    auth = request.headers.get('Authorization')
-    resp = get_modlog(auth, data)
-    return GetModLogResponse().load(resp)
-
-
 # Community - not yet implemented
-# @bp.route('/api/alpha/community', methods=['POST'])                               # (none
-# @bp.route('/api/alpha/community', methods=['PUT'])                                #  of
-@bp.route('/api/alpha/community/hide', methods=['PUT'])  # these
-# @bp.route('/api/alpha/community/delete', methods=['POST'])                        #  are
-@bp.route('/api/alpha/community/remove', methods=['POST'])  # available
-@bp.route('/api/alpha/community/transfer', methods=['POST'])  # in
-@bp.route('/api/alpha/community/ban_user', methods=['POST'])  # the app)
+@bp.route('/api/alpha/community/hide', methods=['PUT'])
+@bp.route('/api/alpha/community/remove', methods=['POST'])
+@bp.route('/api/alpha/community/transfer', methods=['POST'])
 def alpha_community():
     return jsonify({"error": "not_yet_implemented"}), 400
 
@@ -1554,11 +1548,6 @@ def alpha_community():
 # Post - not yet implemented
 @bp.route('/api/alpha/post/report/resolve', methods=['PUT'])  # Stage 2
 def alpha_post():
-    return jsonify({"error": "not_yet_implemented"}), 400
-
-
-# Reply - not yet implemented
-def alpha_reply():
     return jsonify({"error": "not_yet_implemented"}), 400
 
 
