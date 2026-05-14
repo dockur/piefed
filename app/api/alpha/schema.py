@@ -1450,6 +1450,11 @@ class GetPostReportListResponse(DefaultSchema):
     next_page = fields.String(allow_none=True)
 
 
+class PutPostReportResolveRequest(DefaultSchema):
+    report_id = fields.Integer(required=True)
+    resolved = fields.Boolean(required=True)
+
+
 class LockPostRequest(DefaultSchema):
     post_id = fields.Integer(required=True)
     locked = fields.Boolean(required=True)

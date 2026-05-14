@@ -17,7 +17,7 @@ from app.api.alpha.utils.misc import get_search, get_resolve_object, get_suggest
 from app.api.alpha.utils.post import get_post_list, get_post, post_post_like, put_post_save, put_post_subscribe, \
     post_post, put_post, post_post_delete, post_post_report, post_post_lock, post_post_feature, post_post_remove, \
     post_post_mark_as_read, get_post_replies, get_post_like_list, put_post_set_flair, get_post_list2, post_poll_vote, \
-    post_post_hide, get_post_report_list
+    post_post_hide, get_post_report_list, put_post_report_resolve
 from app.api.alpha.utils.private_message import get_private_message_list, post_private_message, \
     post_private_message_mark_as_read, get_private_message_conversation, put_private_message, post_private_message_delete, \
     post_private_message_report, post_leave_conversation
@@ -682,6 +682,19 @@ def get_alpha_post_report_list(data):
     auth = request.headers.get('Authorization')
     resp = get_post_report_list(auth, data)
     return GetPostReportListResponse().load(resp)
+
+
+@post_bp.route('/post/report/resolve', methods=['PUT'])
+@post_bp.doc(summary="Resolve or unresolve a report")
+@post_bp.arguments(PutPostReportResolveRequest)
+@post_bp.response(200, PostReportResponse)
+@post_bp.alt_response(400, schema=DefaultError)
+def put_alpha_post_report_resolve(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_post_report_resolve(auth, data)
+    return PostReportResponse().load(resp)
 
 
 @post_bp.route('/post/lock', methods=['POST'])
@@ -1546,7 +1559,7 @@ def alpha_community():
 
 
 # Post - not yet implemented
-@bp.route('/api/alpha/post/report/resolve', methods=['PUT'])  # Stage 2
+#@bp.route('/api/alpha/post/report/resolve', methods=['PUT'])  # Stage 2
 def alpha_post():
     return jsonify({"error": "not_yet_implemented"}), 400
 
