@@ -1258,6 +1258,11 @@ class GetCommentReportListResponse(DefaultSchema):
     next_page = fields.String(allow_none=True)
 
 
+class PutCommentReportResolveRequest(DefaultSchema):
+    report_id = fields.Integer(required=True)
+    resolved = fields.Boolean(required=True)
+
+
 class RemoveCommentRequest(DefaultSchema):
     comment_id = fields.Integer(required=True)
     removed = fields.Boolean(required=True)
