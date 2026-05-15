@@ -1090,6 +1090,8 @@ def refresh_feed_profile_task(feed_id):
 def actor_json_to_model(activity_json, address, server):
     if 'type' not in activity_json:  # some Akkoma instances return an empty actor?! e.g. https://donotsta.re/users/april
         return None
+    if server not in activity_json['id']:
+        return None
     if activity_json['type'] == 'Person' or activity_json['type'] == 'Service':
         user = db.session.query(User).filter(User.ap_profile_id == activity_json['id'].lower()).first()
         if user:
