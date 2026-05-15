@@ -888,7 +888,7 @@ def reply_report_view(report, reply_id, user_id, variant=1) -> dict:
         return report_json
 
 
-def post_report_view(report, post_id, user_id) -> dict:
+def post_report_view(report, post_id, user_id, variant=1) -> dict:
     # views/post_report_view.dart - /post/report api endpoint
     post_json = post_view(post=post_id, variant=2, user_id=user_id)
     community_json = community_view(community=post_json['post']['community_id'], variant=1, stub=True)
@@ -906,32 +906,39 @@ def post_report_view(report, post_id, user_id) -> dict:
     creator_is_moderator = True if moderator else False
     creator_is_admin = True if admin else False
 
-    v1 = {
-        'post_report_view': {
-            'post_report': {
-                'id': report.id,
-                'creator_id': report.reporter_id,
-                'post_id': report.suspect_post_id,
-                'original_post_name': post_json['post']['title'],
-                'original_post_body': '',
-                'reason': report.reasons,
-                'resolved': report.status == 3,
-                'published': report.created_at.isoformat(timespec="microseconds") + 'Z'
-            },
-            'post': post_json['post'],
-            'community': community_json,
-            'creator': user_view(user=user_id, variant=1, stub=True, user_id=user_id),
-            'post_creator': user_view(user=report.suspect_user_id, variant=1, stub=True, user_id=user_id),
-            'counts': post_json['counts'],
-            'creator_banned_from_community': creator_banned_from_community,
-            'creator_is_moderator': creator_is_moderator,
-            'creator_is_admin': creator_is_admin,
-            'creator_blocked': False,
-            'subscribed': post_json['subscribed'],
-            'saved': post_json['saved']
-        }
+    report_json = {
+        "post_report": {
+            "id": report.id,
+            "creator_id": report.reporter_id,
+            "post_id": report.suspect_post_id,
+            "original_post_name": post_json["post"]["title"],
+            "original_post_body": "",
+            "reason": report.reasons,
+            "resolved": report.status == 3,
+            "published": report.created_at.isoformat(timespec="microseconds") + "Z",
+        },
+        "post": post_json["post"],
+        "community": community_json,
+        "creator": user_view(user=user_id, variant=1, stub=True, user_id=user_id),
+        "post_creator": user_view(
+            user=report.suspect_user_id, variant=1, stub=True, user_id=user_id
+        ),
+        "counts": post_json["counts"],
+        "creator_banned_from_community": creator_banned_from_community,
+        "creator_is_moderator": creator_is_moderator,
+        "creator_is_admin": creator_is_admin,
+        "creator_blocked": False,
+        "subscribed": post_json["subscribed"],
+        "saved": post_json["saved"],
     }
-    return v1
+
+    if variant == 1:
+        v1 = {'post_report_view': report_json}
+        return v1
+    
+    if variant == 2:
+        # GET /post/report/list - just return the bare json to be appended onto a list by another function
+        return report_json
 
 
 def search_view(type) -> dict:

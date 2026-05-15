@@ -1258,6 +1258,11 @@ class GetCommentReportListResponse(DefaultSchema):
     next_page = fields.String(allow_none=True)
 
 
+class PutCommentReportResolveRequest(DefaultSchema):
+    report_id = fields.Integer(required=True)
+    resolved = fields.Boolean(required=True)
+
+
 class RemoveCommentRequest(DefaultSchema):
     comment_id = fields.Integer(required=True)
     removed = fields.Boolean(required=True)
@@ -1430,6 +1435,19 @@ class PostReportView(DefaultSchema):
 
 class PostReportResponse(DefaultSchema):
     post_report_view = fields.Nested(PostReportView, required=True)
+
+
+class GetPostReportListRequest(DefaultSchema):
+    community_id = fields.Integer(metadata={"description": "Limit reports to within a single community"})
+    limit = fields.Integer(metadata={"default": 20})
+    page = fields.Integer(metadata={"default": 1})
+    post_id = fields.Integer(metadata={"description": "Get the reports for a single post"})
+    unresolved_only = fields.Boolean(metadata={"default": True})
+
+
+class GetPostReportListResponse(DefaultSchema):
+    post_reports = fields.List(fields.Nested(PostReportView), required=True)
+    next_page = fields.String(allow_none=True)
 
 
 class LockPostRequest(DefaultSchema):

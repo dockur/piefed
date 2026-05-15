@@ -518,7 +518,6 @@ def get_reply_report_list(auth, data):
 
         if user.id in mod_ids or user_access('administer all communities', user.id):
             reports = Report.query.filter(Report.suspect_post_reply_id == comment_id)
-            # report_list = [reply_report_view(report=report, reply_id=comment_id, user_id=user.id) for report in reports]
         else:
             raise Exception('incorrect login')
     elif community_id:
@@ -557,6 +556,38 @@ def get_reply_report_list(auth, data):
     reply_json['comment_reports'] = report_list
     reply_json['next_page'] = str(reports.next_num) if reports.next_num else None
 
+    return reply_json
+
+
+def put_reply_report_resolve(auth, data):
+    report_id = data['report_id']
+    resolved = data['resolved']
+
+    user = authorise_api_user(auth, return_type="model")
+
+    if not user:
+        raise Exception("incorrect login")
+    
+    report = Report.query.get(report_id)
+    
+    if not report.suspect_post_reply_id:
+        raise Exception("invalid target of resolution")
+    
+    community = Community.query.get(report.in_community_id)
+    mods = community.moderators()
+    mod_ids = [mod.user_id for mod in mods]
+
+    if user.id in mod_ids or user_access('administer all communities', user.id):
+        if resolved:
+            report.status = REPORT_STATE_RESOLVED
+        else:
+            report.status = REPORT_STATE_NEW
+
+        db.session.commit()
+    else:
+        raise Exception("incorrect login")
+    
+    reply_json = reply_report_view(report=report, reply_id=report.suspect_post_reply_id, user_id=user.id)
     return reply_json
 
 

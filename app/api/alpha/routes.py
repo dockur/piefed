@@ -17,14 +17,14 @@ from app.api.alpha.utils.misc import get_search, get_resolve_object, get_suggest
 from app.api.alpha.utils.post import get_post_list, get_post, post_post_like, put_post_save, put_post_subscribe, \
     post_post, put_post, post_post_delete, post_post_report, post_post_lock, post_post_feature, post_post_remove, \
     post_post_mark_as_read, get_post_replies, get_post_like_list, put_post_set_flair, get_post_list2, post_poll_vote, \
-    post_post_hide
+    post_post_hide, get_post_report_list
 from app.api.alpha.utils.private_message import get_private_message_list, post_private_message, \
     post_private_message_mark_as_read, get_private_message_conversation, put_private_message, post_private_message_delete, \
     post_private_message_report, post_leave_conversation
 from app.api.alpha.utils.reply import get_reply_list, post_reply_like, put_reply_save, put_reply_subscribe, post_reply, \
     put_reply, post_reply_delete, post_reply_report, post_reply_remove, post_reply_mark_as_read, get_reply, \
-    post_reply_lock, get_reply_like_list, post_reply_mark_as_answer, get_reply_report_list, get_reply_like_list, \
-    post_reply_mark_as_answer, post_reply_distinguish
+    post_reply_lock, get_reply_like_list, post_reply_mark_as_answer, get_reply_report_list, post_reply_distinguish, \
+    put_reply_report_resolve
 from app.api.alpha.utils.site import get_site, post_site_block, get_federated_instances, get_site_instance_chooser, \
     get_site_instance_chooser_search, get_site_version, get_site_metadata
 from app.api.alpha.utils.topic import get_topic_list
@@ -175,6 +175,19 @@ def get_alpha_suggest_completion(data):
         return abort(400, message="alpha api is not enabled")
     resp = get_suggestion(data)
     return GetSuggestCompletionResponse().load(resp)
+
+@misc_bp.route('/modlog', methods=['GET'])  # Get Modlog
+@misc_bp.doc(summary="Get modlog.")
+@misc_bp.arguments(GetModLogRequest, location="query")
+@misc_bp.response(200, GetModLogResponse)
+@misc_bp.alt_response(400, schema=DefaultError)
+@misc_bp.alt_response(429, schema=DefaultError)
+def alpha_miscellaneous_modlog(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_modlog(auth, data)
+    return GetModLogResponse().load(resp)
 
 
 # Community
@@ -658,6 +671,19 @@ def post_alpha_post_report(data):
     return PostReportResponse().load(resp)
 
 
+@post_bp.route('/post/report/list', methods=['GET'])
+@post_bp.doc(summary="Get list of comment reports.")
+@post_bp.arguments(GetPostReportListRequest, location="query")
+@post_bp.response(200, GetPostReportListResponse)
+@post_bp.alt_response(400, schema=DefaultError)
+def get_alpha_post_report_list(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_post_report_list(auth, data)
+    return GetPostReportListResponse().load(resp)
+
+
 @post_bp.route('/post/lock', methods=['POST'])
 @post_bp.doc(summary="Lock or unlock a post.")
 @post_bp.arguments(LockPostRequest)
@@ -888,6 +914,19 @@ def get_alpha_comment_report_list(data):
     auth = request.headers.get('Authorization')
     resp = get_reply_report_list(auth, data)
     return GetCommentReportListResponse().load(resp)
+
+
+@reply_bp.route('/comment/report/resolve', methods=['PUT'])
+@reply_bp.doc(summary="Resolve or unresolve a comment report")
+@reply_bp.arguments(PutCommentReportResolveRequest)
+@reply_bp.response(200, GetCommentReportResponse)
+@reply_bp.alt_response(400, schema=DefaultError)
+def put_alpha_comment_report_resolve(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_reply_report_resolve(auth, data)
+    return GetCommentReportResponse().load(resp)
 
 
 @reply_bp.route('/comment/remove', methods=['POST'])
@@ -1498,43 +1537,17 @@ def alpha_site():
     return jsonify({"error": "not_yet_implemented"}), 400
 
 
-# Miscellaneous
-@misc_bp.route('/modlog', methods=['GET'])  # Get Modlog
-@misc_bp.doc(summary="Get modlog.")
-@misc_bp.arguments(GetModLogRequest, location="query")
-@misc_bp.response(200, GetModLogResponse)
-@misc_bp.alt_response(400, schema=DefaultError)
-@misc_bp.alt_response(429, schema=DefaultError)
-def alpha_miscellaneous_modlog(data):
-    if not enable_api():
-        return abort(400, message="alpha api is not enabled")
-    auth = request.headers.get('Authorization')
-    resp = get_modlog(auth, data)
-    return GetModLogResponse().load(resp)
-
-
 # Community - not yet implemented
-# @bp.route('/api/alpha/community', methods=['POST'])                               # (none
-# @bp.route('/api/alpha/community', methods=['PUT'])                                #  of
-@bp.route('/api/alpha/community/hide', methods=['PUT'])  # these
-# @bp.route('/api/alpha/community/delete', methods=['POST'])                        #  are
-@bp.route('/api/alpha/community/remove', methods=['POST'])  # available
-@bp.route('/api/alpha/community/transfer', methods=['POST'])  # in
-@bp.route('/api/alpha/community/ban_user', methods=['POST'])  # the app)
+@bp.route('/api/alpha/community/hide', methods=['PUT'])
+@bp.route('/api/alpha/community/remove', methods=['POST'])
+@bp.route('/api/alpha/community/transfer', methods=['POST'])
 def alpha_community():
     return jsonify({"error": "not_yet_implemented"}), 400
 
 
 # Post - not yet implemented
 @bp.route('/api/alpha/post/report/resolve', methods=['PUT'])  # Stage 2
-@bp.route('/api/alpha/post/report/list', methods=['GET'])  # Stage 2
 def alpha_post():
-    return jsonify({"error": "not_yet_implemented"}), 400
-
-
-# Reply - not yet implemented
-@bp.route('/api/alpha/comment/report/resolve', methods=['PUT'])  # Stage 2
-def alpha_reply():
     return jsonify({"error": "not_yet_implemented"}), 400
 
 
