@@ -1164,7 +1164,7 @@ def conversation_report_view(report: int | Report, variant=1) -> dict:
 
     if variant == 2:
         # ConversationReportView schema
-        # the `message_history`` key is populated separately, back where this function is called
+        # the `message_history` key is populated separately, back where this function is called
         return v2
 
 

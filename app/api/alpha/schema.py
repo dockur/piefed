@@ -1687,6 +1687,16 @@ class GetConversationReportListResponse(DefaultSchema):
     next_page = fields.String(allow_none=True)
 
 
+class PutPrivateMessageReportResolveRequest(DefaultSchema):
+    report_id = fields.Int(required=True)
+    resolved = fields.Boolean(required=True)
+
+
+class PutConversationReportResolveRequest(DefaultSchema):
+    report_id = fields.Int(required=True)
+    resolved = fields.Boolean(required=True)
+
+
 # Upload Schemas
 class ImageUploadRequest(DefaultSchema):
     file = fields.Raw(required=True, metadata={"type": "string", "format": "binary"})

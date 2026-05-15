@@ -2,7 +2,7 @@ from sqlalchemy import desc, or_, text, Integer
 
 from app import db, current_app
 from app.api.alpha.views import private_message_view, conversation_report_view
-from app.constants import NOTIF_MESSAGE, NOTIF_REPORT, REPORT_TYPE_MESSAGE, REPORT_STATE_RESOLVED
+from app.constants import NOTIF_MESSAGE, NOTIF_REPORT, REPORT_TYPE_MESSAGE, REPORT_STATE_RESOLVED, REPORT_STATE_NEW
 from app.chat.util import send_message, update_message
 from app.models import ChatMessage, Conversation, User, Notification, Report, Site
 from app.utils import authorise_api_user, markdown_to_html, user_access
@@ -260,7 +260,7 @@ def post_private_message_conversation_report(auth, data):
         raise Exception("You are not a part of this conversation")
 
     # Create the report
-    targets_data = {'gen': 0, 'suspect_conversation_id': conversation_id, 'reporter_id': user.id}
+    targets_data = {'gen': "0", 'suspect_conversation_id': conversation_id, 'reporter_id': user.id}
     report = Report(
         reasons=reason,
         type=REPORT_TYPE_MESSAGE,
@@ -361,3 +361,52 @@ def get_private_message_conversation_report_list(auth, data):
     reply_json["next_page"] = str(reports.next_num) if reports.next_num else None
 
     return reply_json
+
+def put_private_message_report_resolve(auth, data):
+    report_id = data['report_id']
+    resolved = data['resolved']
+
+    user = authorise_api_user(auth, return_type="model")
+
+    if not user_access("administer all users", user.id):
+        raise Exception("incorrect login")
+    
+    report = Report.query.get(report_id)
+
+    if "suspect_message_id" not in report.targets:
+        raise Exception("invalid target of resolution")
+    
+    if resolved:
+        report.status = REPORT_STATE_RESOLVED
+    else:
+        report.status = REPORT_STATE_NEW
+    
+    db.session.commit()
+
+    private_message = ChatMessage.query.get(report.targets["suspect_message_id"])
+
+    return {"private_message_report_view": private_message_view(private_message, variant=3, report=report)}
+
+
+def put_private_message_conversation_report_resolve(auth, data):
+    report_id = data['report_id']
+    resolved = data['resolved']
+
+    user = authorise_api_user(auth, return_type="model")
+
+    if not user_access("administer all users", user.id):
+        raise Exception("incorrect login")
+    
+    report = Report.query.get(report_id)
+
+    if not report.suspect_conversation_id:
+        raise Exception("invalid target of resolution")
+    
+    if resolved:
+        report.status = REPORT_STATE_RESOLVED
+    else:
+        report.status = REPORT_STATE_NEW
+    
+    db.session.commit()
+
+    return

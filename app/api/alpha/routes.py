@@ -21,7 +21,8 @@ from app.api.alpha.utils.post import get_post_list, get_post, post_post_like, pu
 from app.api.alpha.utils.private_message import get_private_message_list, post_private_message, \
     post_private_message_mark_as_read, get_private_message_conversation, put_private_message, post_private_message_delete, \
     post_private_message_report, post_leave_conversation, get_private_message_report_list, \
-    post_private_message_conversation_report, get_private_message_conversation_report_list
+    post_private_message_conversation_report, get_private_message_conversation_report_list, \
+    put_private_message_report_resolve, put_private_message_conversation_report_resolve
 from app.api.alpha.utils.reply import get_reply_list, post_reply_like, put_reply_save, put_reply_subscribe, post_reply, \
     put_reply, post_reply_delete, post_reply_report, post_reply_remove, post_reply_mark_as_read, get_reply, \
     post_reply_lock, get_reply_like_list, post_reply_mark_as_answer, get_reply_report_list, post_reply_distinguish, \
@@ -1179,6 +1180,31 @@ def get_alpha_private_message_conversation_report_list(data):
     return GetConversationReportListResponse().load(resp)
 
 
+@private_message_bp.route('/private_message/report/resolve', methods=['PUT'])
+@private_message_bp.doc(summary="Resolve or unresolve a private message report")
+@private_message_bp.arguments(PutPrivateMessageReportResolveRequest)
+@private_message_bp.response(200, PrivateMessageReportResponse)
+@private_message_bp.alt_response(400, schema=DefaultError)
+def put_alpha_private_message_report_resolve(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_private_message_report_resolve(auth, data)
+    return PrivateMessageReportResponse().load(resp)
+
+
+@private_message_bp.route('/private_message/conversation/report/resolve', methods=['PUT'])
+@private_message_bp.doc(summary="Resolve or unresolve a reported conversation")
+@private_message_bp.arguments(PutConversationReportResolveRequest)
+@private_message_bp.response(200)
+@private_message_bp.alt_response(400, schema=DefaultError)
+def put_alpha_private_message_conversation_report_resolve(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    put_private_message_conversation_report_resolve(auth, data)
+
+
 # Topic
 @topic_bp.route('/topic/list', methods=["GET"])
 @topic_bp.doc(summary="Get list of topics")
@@ -1594,12 +1620,6 @@ def alpha_site():
 @bp.route('/api/alpha/community/remove', methods=['POST'])
 @bp.route('/api/alpha/community/transfer', methods=['POST'])
 def alpha_community():
-    return jsonify({"error": "not_yet_implemented"}), 400
-
-
-# Chat
-@bp.route('/api/alpha/private_message/report/resolve', methods=['PUT'])  # Stage 2
-def alpha_chat():
     return jsonify({"error": "not_yet_implemented"}), 400
 
 
