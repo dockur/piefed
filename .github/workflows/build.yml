@@ -58,6 +58,8 @@ jobs:
           wget "https://codeberg.org/rimu/pyfedi/archive/v${{ env.latest_tag }}.zip";
           unzip "v${{ env.latest_tag }}.zip"
           cp Dockerfile.custom pyfedi/Dockerfile
+          cp entrypoint_custom.sh pyfedi/entrypoint.sh
+          cp celery_custom.sh pyfedi/entrypoint_celery.sh
       -
         name: Lint Dockerfile
         if: env.exists == 'false'
