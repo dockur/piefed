@@ -5,8 +5,6 @@ RUN adduser -D python
 
 RUN apk add --no-cache pkgconfig gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng postgresql-client bash
 
-# Create and use a virtual environment
-RUN python3 -m venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 RUN --mount=type=cache,target=/root/.cache/pip \
