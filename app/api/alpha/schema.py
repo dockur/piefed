@@ -1553,6 +1553,27 @@ class PrivateMessageResponse(DefaultSchema):
     private_message_view = fields.Nested(PrivateMessageView, required=True)
 
 
+class PrivateMessageReport(DefaultSchema):
+    id = fields.Integer(required=True)
+    creator_id = fields.Integer(required=True, metadata={"description": "User id of the reporter"})
+    private_message_id = fields.Integer(required=True)
+    original_pm_text = fields.String(required=True)
+    reason = fields.String(required=True, allow_none=True)
+    resolved = fields.Boolean(required=True)
+    published = fields.String(validate=validate_datetime_string, required=True, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+
+
+class PrivateMessageReportView(DefaultSchema):
+    private_message_report = fields.Nested(PrivateMessageReport)
+    private_message = fields.Nested(PrivateMessage)
+    private_message_creator = fields.Nested(Person)
+    creator = fields.Nested(Person)
+
+
+class PrivateMessageReportResponse(DefaultSchema):
+    private_message_report_view = fields.Nested(PrivateMessageReportView)
+
+
 class ListPrivateMessagesRequest(DefaultSchema):
     page = fields.Integer()
     limit = fields.Integer()
@@ -1605,7 +1626,65 @@ class DeletePrivateMessageRequest(DefaultSchema):
 
 class ReportPrivateMessageRequest(DefaultSchema):
     private_message_id = fields.Integer(required=True)
-    reason = fields.String(required=True)
+    reason = fields.String(required=True, validate=validate.Length(max=255))
+
+
+class ReportConversationRequest(DefaultSchema):
+    conversation_id = fields.Integer(required=True)
+    reason = fields.String(required=True, validate=validate.Length(max=255))
+
+
+class GetPrivateMessageReportListRequest(DefaultSchema):
+    conversation_id = fields.Integer(metadata={"description": "Restrict reports to within a single conversation"})
+    private_message_id = fields.Integer(metadata={"description": "Restrict reports to a single message"})
+    limit = fields.Integer(metadata={"default": 20})
+    page = fields.Integer(metadata={"default": 1})
+    unresolved_only = fields.Boolean(metadata={"default": True})
+
+
+class ConversationInfoView(DefaultSchema):
+    id = fields.Integer(required=True)
+    members = fields.List(fields.Nested(Person))
+    creator_id = fields.Integer(required=True)
+    published = fields.String(validate=validate_datetime_string, required=True, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    updated = fields.String(validate=validate_datetime_string, required=True, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+
+
+class ConversationReport(DefaultSchema):
+    id = fields.Integer(required=True)
+    creator_id = fields.Integer(required=True, metadata={"description": "User id of the reporter"})
+    conversation_id = fields.Integer(required=True)
+    reason = fields.String(required=True, allow_none=True)
+    description = fields.String(required=True, allow_none=True, metadata={"description": "Any other additional information provided by the reporter"})
+    resolved = fields.Boolean(required=True)
+    published = fields.String(validate=validate_datetime_string, required=True, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+
+
+class ConversationReportView(DefaultSchema):
+    conversation_report = fields.Nested(ConversationReport, required=True)
+    conversation_information = fields.Nested(ConversationInfoView, required=True)
+    message_history = fields.List(fields.Nested(PrivateMessageView))
+    creator = fields.Nested(Person, required=True)
+
+
+class GetPrivateMessageReportListResponse(DefaultSchema):
+    private_message_reports = fields.List(fields.Nested(PrivateMessageReportView), required=True)
+    next_page = fields.String(allow_none=True)
+
+
+class GetConversationReportListRequest(DefaultSchema):
+    conversation_id = fields.Integer(metadata={"description": "Restrict reports to a single conversation"})
+    limit = fields.Integer(metadata={"default": 20})
+    page = fields.Integer(metadata={"default": 1})
+    unresolved_only = fields.Boolean(metadata={"default": True})
+    message_history_limit = fields.Integer(
+        metadata={"description": "Number of most recent messages in the conversation to include in the response",
+                  "default": 5})
+
+
+class GetConversationReportListResponse(DefaultSchema):
+    conversation_reports = fields.List(fields.Nested(ConversationReportView), required=True)
+    next_page = fields.String(allow_none=True)
 
 
 # Upload Schemas
