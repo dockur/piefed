@@ -38,6 +38,7 @@ from app.translation import LibreTranslateAPI
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 import os
+import ipaddress
 from furl import furl
 from flask import current_app, json, redirect, url_for, request, make_response, Response, g, flash, abort
 from flask_babel import _, lazy_gettext as _l
@@ -125,6 +126,9 @@ def getmtime(filename):
 
 # do a GET request to a uri, return the result
 def get_request(uri, params=None, headers=None) -> httpx.Response:
+    if is_invalid_get_request_uri(uri):
+        current_app.logger.info(f"invalid get request {uri}")
+        raise httpx.HTTPError(f"HTTPError: invalid uri") from None
     timeout = 15 if 'washingtonpost.com' in uri else 10  # Washington Post is really slow on og:image for some reason
     if headers is None:
         headers = {'User-Agent': f'PieFed/{current_app.config["VERSION"]}; +https://{current_app.config["SERVER_NAME"]}'}
@@ -135,7 +139,7 @@ def get_request(uri, params=None, headers=None) -> httpx.Response:
     else:
         payload_str = urllib.parse.urlencode(params) if params else None
     try:
-        response = httpx_client.get(uri, params=payload_str, headers=headers, timeout=timeout, follow_redirects=True)
+        response = httpx_client.get(uri, params=payload_str, headers=headers, timeout=timeout, follow_redirects=False)
     except ValueError as ex:
         # Convert to a more generic error we handle
         raise httpx.HTTPError(f"HTTPError: {str(ex)}") from None
@@ -143,7 +147,7 @@ def get_request(uri, params=None, headers=None) -> httpx.Response:
         try:  # retry, this time with a longer timeout
             sleep(random.randint(3, 10))
             response = httpx_client.get(uri, params=payload_str, headers=headers, timeout=timeout * 2,
-                                        follow_redirects=True)
+                                        follow_redirects=False)
         except Exception as e:
             current_app.logger.info(f"{uri} {connection_error}")
             raise httpx_client.ReadError(f"HTTPReadError: {str(e)}") from connection_error
@@ -151,7 +155,7 @@ def get_request(uri, params=None, headers=None) -> httpx.Response:
         try:  # retry, this time with a longer timeout
             sleep(random.randint(3, 10))
             response = httpx_client.get(uri, params=payload_str, headers=headers, timeout=timeout * 2,
-                                        follow_redirects=True)
+                                        follow_redirects=False)
         except Exception as e:
             current_app.logger.info(f"{uri} {read_timeout}")
             raise httpx.HTTPError(f"HTTPError: {str(e)}") from read_timeout
@@ -4431,3 +4435,20 @@ def display_back_button():
             return ''
     else:
         return ''
+
+
+def is_invalid_get_request_uri(uri):
+    if current_app.debug:
+        return False
+    try:
+        ip = ipaddress.ip_address(furl(uri).host)
+    except:
+        ip = None
+
+    if ip:
+        return ip.is_private or ip.is_link_local or ip.is_reserved or ip.is_loopback or ip.is_multicast or ip.is_unspecified
+    return False
+
+
+def is_invalid_post_request_uri(uri):
+    return is_invalid_get_request_uri(uri)

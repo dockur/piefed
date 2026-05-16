@@ -200,7 +200,9 @@ def fetch_actor_from_webfinger(address: str, server: str):
         except Exception:
             return None
 
-    if webfinger_data.status_code == 200:
+    content_type = webfinger_data.headers.get('Content-Type', '').lower()
+
+    if webfinger_data.status_code == 200 and ('application/jrd+json' in content_type or 'application/json' in content_type):
         webfinger_json = webfinger_data.json()
         webfinger_data.close()
 

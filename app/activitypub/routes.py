@@ -674,10 +674,11 @@ def shared_inbox():
                 'type' in request_json['object'] and request_json['object']['type'] == 'ChatMessage'):
             ...
         # no HTTP sig, and no LD sig, so reduce the inner object to just its remote ID, and then fetch it and check it in process_inbox_request()
-        elif ((request_json['type'] == 'Create' or request_json['type'] == 'Update') and
-              isinstance(request_json['object'], dict) and 'id' in request_json['object'] and isinstance(
-                    request_json['object']['id'], str)):
-            request_json['object'] = request_json['object']['id']
+        # Removed due to potential security issues. This will probably break PeerTube federation, unfortunately.
+        #elif ((request_json['type'] == 'Create' or request_json['type'] == 'Update') and
+        #      isinstance(request_json['object'], dict) and 'id' in request_json['object'] and isinstance(
+        #            request_json['object']['id'], str)):
+        #    request_json['object'] = request_json['object']['id']
         else:
             log_incoming_ap(id, APLOG_NOTYPE, APLOG_FAILURE, saved_json, 'Could not verify HTTP signature: ' + str(e))
             return '', 400

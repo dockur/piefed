@@ -2632,7 +2632,7 @@ def retrieve_metadata_of_url(url):
     title = ''
     description = ''
     try:
-        response = httpx_client.get(url, timeout=10, follow_redirects=True)
+        response = httpx_client.get(url, timeout=10, follow_redirects=False)
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'html.parser')
 
