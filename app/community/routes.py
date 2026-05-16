@@ -58,7 +58,7 @@ from app.utils import get_setting, render_template, markdown_to_html, validation
     possible_communities, reported_posts, user_notes, login_required, get_task_session, patch_db_session, \
     approval_required, permission_required, aged_account_required, communities_banned_from_all_users, \
     moderating_communities_ids_all_users, block_honey_pot, user_pronouns, community_membership_private, \
-    show_reason_why_no_federation, can_upload_video, banned_instances
+    show_reason_why_no_federation, can_upload_video, banned_instances, is_invalid_get_request_uri
 from app.shared.post import make_post, sticky_post
 from app.shared.tasks import task_selector
 from app.shared.community import leave_community
@@ -1571,77 +1571,80 @@ def community_ban_user(community_id: int, user_id: int):
     user = User.query.get_or_404(user_id)
     existing = CommunityBan.query.filter_by(community_id=community.id, user_id=user.id).first()
 
-    form = BanUserCommunityForm()
-    if form.validate_on_submit():
-        # Both CommunityBan and CommunityMember need to be updated. CommunityBan is under the control of moderators while
-        # CommunityMember can be cleared by the user by leaving the group and rejoining. CommunityMember.is_banned stops
-        # posts from the community from showing up in the banned person's home feed.
-        if not existing:
-            new_ban = CommunityBan(community_id=community_id, user_id=user.id, banned_by=current_user.id,
-                                   reason=form.reason.data)
-            if form.ban_until.data is not None and form.ban_until.data > utcnow().date():
-                new_ban.ban_until = form.ban_until.data
-            db.session.add(new_ban)
-            db.session.commit()
+    if (community.is_owner() or current_user.is_admin_or_staff()) and community.is_moderator(user):
+        form = BanUserCommunityForm()
+        if form.validate_on_submit():
+            # Both CommunityBan and CommunityMember need to be updated. CommunityBan is under the control of moderators while
+            # CommunityMember can be cleared by the user by leaving the group and rejoining. CommunityMember.is_banned stops
+            # posts from the community from showing up in the banned person's home feed.
+            if not existing:
+                new_ban = CommunityBan(community_id=community_id, user_id=user.id, banned_by=current_user.id,
+                                       reason=form.reason.data)
+                if form.ban_until.data is not None and form.ban_until.data > utcnow().date():
+                    new_ban.ban_until = form.ban_until.data
+                db.session.add(new_ban)
+                db.session.commit()
 
-        community_membership_record = CommunityMember.query.filter_by(community_id=community.id, user_id=user.id).first()
-        if community_membership_record:
-            community_membership_record.is_banned = True
-            db.session.commit()
+            community_membership_record = CommunityMember.query.filter_by(community_id=community.id, user_id=user.id).first()
+            if community_membership_record:
+                community_membership_record.is_banned = True
+                db.session.commit()
 
-        flash(_('%(name)s has been banned.', name=user.display_name()))
+            flash(_('%(name)s has been banned.', name=user.display_name()))
 
-        if form.delete_posts.data:
-            posts = Post.query.filter(Post.user_id == user.id, Post.community_id == community.id).all()
-            for post in posts:
-                delete_post_from_community(post.id)
-            if posts:
-                flash(_('Posts by %(name)s have been deleted.', name=user.display_name()))
-        if form.delete_post_replies.data:
-            post_replies = PostReply.query.filter(PostReply.user_id == user.id, Post.community_id == community.id).all()
-            for post_reply in post_replies:
-                delete_post_reply_from_community(post_reply.id, current_user.id)
-            if post_replies:
-                flash(_('Comments by %(name)s have been deleted.', name=user.display_name()))
+            if form.delete_posts.data:
+                posts = Post.query.filter(Post.user_id == user.id, Post.community_id == community.id).all()
+                for post in posts:
+                    delete_post_from_community(post.id)
+                if posts:
+                    flash(_('Posts by %(name)s have been deleted.', name=user.display_name()))
+            if form.delete_post_replies.data:
+                post_replies = PostReply.query.filter(PostReply.user_id == user.id, Post.community_id == community.id).all()
+                for post_reply in post_replies:
+                    delete_post_reply_from_community(post_reply.id, current_user.id)
+                if post_replies:
+                    flash(_('Comments by %(name)s have been deleted.', name=user.display_name()))
 
-        # federate ban to post author instance
-        task_selector('ban_from_community', user_id=user_id, mod_id=current_user.id, community_id=community.id,
-                      expiry=form.ban_until.data, reason=form.reason.data)
+            # federate ban to post author instance
+            task_selector('ban_from_community', user_id=user_id, mod_id=current_user.id, community_id=community.id,
+                          expiry=form.ban_until.data, reason=form.reason.data)
 
-        # Notify banned person
-        if user.is_local():
+            # Notify banned person
+            if user.is_local():
 
-            cache.delete_memoized(joined_communities, user.id)
-            cache.delete_memoized(moderating_communities, user.id)
-            targets_data = {'gen': '0', 'community_id': community.id}
-            notify = Notification(title=shorten_string('You have been banned from ' + community.title),
-                                  url='/notifications', user_id=user.id,
-                                  author_id=1, notif_type=NOTIF_BAN,
-                                  subtype='user_banned_from_community',
-                                  targets=targets_data)
-            db.session.add(notify)
-            user.unread_notifications += 1
-            db.session.commit()
+                cache.delete_memoized(joined_communities, user.id)
+                cache.delete_memoized(moderating_communities, user.id)
+                targets_data = {'gen': '0', 'community_id': community.id}
+                notify = Notification(title=shorten_string('You have been banned from ' + community.title),
+                                      url='/notifications', user_id=user.id,
+                                      author_id=1, notif_type=NOTIF_BAN,
+                                      subtype='user_banned_from_community',
+                                      targets=targets_data)
+                db.session.add(notify)
+                user.unread_notifications += 1
+                db.session.commit()
+            else:
+                ...
+                # todo: send chatmessage to remote user and federate it
+            cache.delete_memoized(communities_banned_from, user.id)
+            cache.delete_memoized(communities_banned_from_all_users)
+
+            # Remove their notification subscription,  if any
+            db.session.query(NotificationSubscription).filter(NotificationSubscription.entity_id == community.id,
+                                                              NotificationSubscription.user_id == user.id,
+                                                              NotificationSubscription.type == NOTIF_COMMUNITY).delete()
+
+            add_to_modlog('ban_user', actor=current_user, target_user=user, community=community, link_text=user.display_name(), link=user.link())
+
+            return redirect(community.local_url())
         else:
-            ...
-            # todo: send chatmessage to remote user and federate it
-        cache.delete_memoized(communities_banned_from, user.id)
-        cache.delete_memoized(communities_banned_from_all_users)
-
-        # Remove their notification subscription,  if any
-        db.session.query(NotificationSubscription).filter(NotificationSubscription.entity_id == community.id,
-                                                          NotificationSubscription.user_id == user.id,
-                                                          NotificationSubscription.type == NOTIF_COMMUNITY).delete()
-
-        add_to_modlog('ban_user', actor=current_user, target_user=user, community=community, link_text=user.display_name(), link=user.link())
-
-        return redirect(community.local_url())
+            return render_template('community/community_ban_user.html', title=_('Ban from community'), form=form,
+                                   community=community,
+                                   user=user,
+                                   inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
+                                   )
     else:
-        return render_template('community/community_ban_user.html', title=_('Ban from community'), form=form,
-                               community=community,
-                               user=user,
-                               inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
-                               )
+        abort(403)
 
 
 @bp.route('/community/<int:community_id>/<int:user_id>/unban_user_community', methods=['GET', 'POST'])
@@ -1649,45 +1652,49 @@ def community_ban_user(community_id: int, user_id: int):
 def community_unban_user(community_id: int, user_id: int):
     community = Community.query.get_or_404(community_id)
     user = User.query.get_or_404(user_id)
-    existing_ban = CommunityBan.query.filter_by(community_id=community.id, user_id=user.id).first()
-    if existing_ban:
-        db.session.delete(existing_ban)
-        db.session.commit()
 
-    community_membership_record = CommunityMember.query.filter_by(community_id=community.id, user_id=user.id).first()
-    if community_membership_record:
-        community_membership_record.is_banned = False
-        db.session.commit()
+    if (community.is_owner() or current_user.is_admin_or_staff()) and community.is_moderator(user):
+        existing_ban = CommunityBan.query.filter_by(community_id=community.id, user_id=user.id).first()
+        if existing_ban:
+            db.session.delete(existing_ban)
+            db.session.commit()
 
-    flash(_('%(name)s has been unbanned.', name=user.display_name()))
+        community_membership_record = CommunityMember.query.filter_by(community_id=community.id, user_id=user.id).first()
+        if community_membership_record:
+            community_membership_record.is_banned = False
+            db.session.commit()
 
-    # federate ban to post author instance
-    task_selector('unban_from_community', user_id=user_id, mod_id=current_user.id, community_id=community.id,
-                  expiry=utcnow(), reason='Un-banned')
+        flash(_('%(name)s has been unbanned.', name=user.display_name()))
 
-    # notify banned person
-    if user.is_local():
-        cache.delete_memoized(joined_communities, user.id)
-        cache.delete_memoized(moderating_communities, user.id)
-        targets_data = {'gen': '0', 'community_id': community.id}
-        notify = Notification(title=shorten_string('You have been un-banned from ' + community.title),
-                              url='/notifications', user_id=user.id,
-                              author_id=1, notif_type=NOTIF_UNBAN,
-                              subtype='user_unbanned_from_community',
-                              targets=targets_data)
-        db.session.add(notify)
-        user.unread_notifications += 1
-        db.session.commit()
+        # federate ban to post author instance
+        task_selector('unban_from_community', user_id=user_id, mod_id=current_user.id, community_id=community.id,
+                      expiry=utcnow(), reason='Un-banned')
+
+        # notify banned person
+        if user.is_local():
+            cache.delete_memoized(joined_communities, user.id)
+            cache.delete_memoized(moderating_communities, user.id)
+            targets_data = {'gen': '0', 'community_id': community.id}
+            notify = Notification(title=shorten_string('You have been un-banned from ' + community.title),
+                                  url='/notifications', user_id=user.id,
+                                  author_id=1, notif_type=NOTIF_UNBAN,
+                                  subtype='user_unbanned_from_community',
+                                  targets=targets_data)
+            db.session.add(notify)
+            user.unread_notifications += 1
+            db.session.commit()
+        else:
+            ...
+            # todo: send chatmessage to remote user and federate it
+
+        cache.delete_memoized(communities_banned_from, user.id)
+        cache.delete_memoized(communities_banned_from_all_users)
+
+        add_to_modlog('unban_user', actor=current_user, target_user=user, community=community, link_text=user.display_name(), link=user.link())
+
+        return redirect(url_for('community.community_moderate_subscribers', actor=community.link()))
     else:
-        ...
-        # todo: send chatmessage to remote user and federate it
-
-    cache.delete_memoized(communities_banned_from, user.id)
-    cache.delete_memoized(communities_banned_from_all_users)
-
-    add_to_modlog('unban_user', actor=current_user, target_user=user, community=community, link_text=user.display_name(), link=user.link())
-
-    return redirect(url_for('community.community_moderate_subscribers', actor=community.link()))
+        abort(403)
 
 
 @bp.route('/<int:community_id>/notification', methods=['GET', 'POST'])
@@ -2631,6 +2638,8 @@ def get_sidebar(community_id):
 def retrieve_metadata_of_url(url):
     title = ''
     description = ''
+    if is_invalid_get_request_uri(url):
+        return '', ''
     try:
         response = httpx_client.get(url, timeout=10, follow_redirects=False)
         if response.status_code == 200:

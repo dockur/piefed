@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import random
+import string
+import secrets
 from datetime import datetime, timedelta
 from typing import Any
 from unicodedata import normalize
@@ -24,9 +26,12 @@ from app.utils import banned_ip_addresses, blocked_referrers, finalize_user_setu
     ip_address, markdown_to_html, render_template, user_cookie_banned, user_ip_banned, role_access, actor_contains_blocked_words
 
 
+ALPHABET = string.ascii_letters + string.digits
+
+
 # Return a random string of 6 letter/digits.
 def random_token(length=6) -> str:
-    return "".join([random.choice('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') for x in range(length)])
+    return ''.join(secrets.choice(ALPHABET) for _ in range(length))
 
 
 def normalize_utf(username):

@@ -21,6 +21,9 @@ from time import sleep
 from typing import List, Tuple, Optional
 from urllib.parse import urlparse, parse_qs, urlencode
 from zoneinfo import available_timezones
+import socket
+import os
+import ipaddress
 
 import pendulum
 import flask
@@ -37,8 +40,7 @@ from app.markdown_extras import apply_enhanced_image_attributes
 from app.translation import LibreTranslateAPI
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
-import os
-import ipaddress
+
 from furl import furl
 from flask import current_app, json, redirect, url_for, request, make_response, Response, g, flash, abort
 from flask_babel import _, lazy_gettext as _l
@@ -175,21 +177,6 @@ def get_request_instance(uri, instance: Instance, params=None, headers=None) -> 
         instance.update_dormant_gone()
         db.session.commit()
         return httpx.Response(status_code=500)
-
-
-# do a HEAD request to a uri, return the result
-def head_request(uri, params=None, headers=None) -> httpx.Response:
-    if headers is None:
-        headers = {'User-Agent': f'PieFed/{current_app.config["VERSION"]}; +https://{current_app.config["SERVER_NAME"]}'}
-    else:
-        headers.update({'User-Agent': f'PieFed/{current_app.config["VERSION"]}; +https://{current_app.config["SERVER_NAME"]}'})
-    try:
-        response = httpx_client.head(uri, params=params, headers=headers, timeout=5, allow_redirects=True)
-    except httpx.HTTPError as er:
-        current_app.logger.info(f"{uri} {er}")
-        raise httpx.HTTPError(f"HTTPError: {str(er)}") from er
-
-    return response
 
 
 # Saves an arbitrary object into a persistent key-value store. cached.
@@ -2278,6 +2265,8 @@ def opengraph_parse(url):
 
 
 def url_to_thumbnail_file(filename) -> File:
+    if is_invalid_get_request_uri(filename):
+        return None
     try:
         timeout = 15 if 'washingtonpost.com' in filename else 5  # Washington Post is really slow for some reason
         response = httpx_client.get(filename, timeout=timeout)
@@ -4440,14 +4429,39 @@ def display_back_button():
 def is_invalid_get_request_uri(uri):
     if current_app.debug:
         return False
-    try:
-        ip = ipaddress.ip_address(furl(uri).host)
-    except:
-        ip = None
 
-    if ip:
-        return ip.is_private or ip.is_link_local or ip.is_reserved or ip.is_loopback or ip.is_multicast or ip.is_unspecified
-    return False
+    try:
+        f = furl(uri)
+        if not f.host:
+            return True
+
+        if f.host.endswith(".local"):
+            return True
+
+        if f.scheme not in ("http", "https"):
+            return True
+
+        # check if host is an IP literal
+        try:
+            ip = ipaddress.ip_address(f.host)
+            ips = [ip]
+        except ValueError:
+            # otherwise, resolve hostname and check the IP(s) associated with that.
+            infos = socket.getaddrinfo(f.host, None)
+            ips = []
+
+            for info in infos:
+                sockaddr = info[4]
+                ip_str = sockaddr[0]
+                ips.append(ipaddress.ip_address(ip_str))
+
+        if any(not ip.is_global for ip in ips):
+            return True
+
+        return False
+
+    except Exception:
+        return True
 
 
 def is_invalid_post_request_uri(uri):

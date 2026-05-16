@@ -588,6 +588,9 @@ def community_view(community: Community | int | str, variant, stub=False, user_i
     if variant == 3:
         modlist = cached_modlist_for_community(community.id)
 
+        if community.private and community.id not in community_membership_private(user_id):
+            raise Exception('Private community - membership required')
+
         v3 = {'community_view': community_view(community=community, variant=2, stub=False, user_id=user_id),
               'moderators': modlist, 'discussion_languages': []}
         
@@ -611,6 +614,8 @@ def community_view(community: Community | int | str, variant, stub=False, user_i
 
     # Variant 6 - from resolve_object
     if variant == 6:
+        if community.private and community.id not in community_membership_private(user_id):
+            raise Exception('Private community - membership required')
         v6 = {'community': community_view(community=community, variant=2, stub=False, user_id=user_id)}
         return v6
 

@@ -117,7 +117,7 @@ def resend_email():
         if user:
             try:
                 send_email_verification(user)
-                flash(_("Verification email sent!"))
+                flash(_("If an account exists, a link has been sent"))
                 return redirect(url_for('auth.check_email'))
             except Exception:
                 flash(_("Problem sending email, please contact the administrator for support"), 'warning')
@@ -141,10 +141,10 @@ def reset_password_request():
             user = User.query.filter(func.lower(User.email) == func.lower(form.email.data)).filter_by(ap_id=None, deleted=False).first()
             if user:
                 send_password_reset_email(user)
-                flash(_('Check your email for a link to reset your password.'))
+                flash(_('If an account exists, a link has been sent.'))
                 return redirect(url_for('auth.login'))
             else:
-                flash(_('No account with that email address exists'), 'warning')
+                flash(_('If an account exists, a link has been sent'), 'warning')
     return render_template('auth/reset_password_request.html', title=_('Reset Password'), form=form)
 
 
@@ -176,6 +176,7 @@ def verify_email(token):
                 flash(_('Thank you for verifying your email address.'))
                 return redirect(url_for('auth.login'))
             user.verified = True
+            user.verification_token = None
 
             # Update any pending application status from -1 to 0 when email is verified
             application = UserRegistration.query.filter_by(user_id=user.id, status=-1).first()
