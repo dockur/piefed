@@ -24,7 +24,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install gunicorn
 
 COPY --chown=python:python . /app
-COPY docker.cron /etc/cron.d/docker
 
 WORKDIR /app
 
