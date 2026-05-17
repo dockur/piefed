@@ -623,7 +623,7 @@ def shared_inbox():
     if redis_client.exists(id):  # Something is sending same activity multiple times
         log_incoming_ap(id, APLOG_DUPLICATE, APLOG_IGNORED, saved_json, 'Already aware of this activity')
         return '', 200
-    redis_client.set(id, 1, ex=90)  # Save the activity ID into redis, to avoid duplicate activities
+    redis_client.set(id, 1, ex=90, nx=True)  # Save the activity ID into redis, to avoid duplicate activities
 
     # Ignore unutilised PeerTube activity
     if isinstance(request_json['actor'], str) and request_json['actor'].endswith('accounts/peertube'):
@@ -634,6 +634,7 @@ def shared_inbox():
         HttpSignature.precheck(request)
     except VerificationFormatError as e:
         log_incoming_ap(id, APLOG_NOTYPE, APLOG_FAILURE, saved_json, 'Precheck failed: ' + str(e))
+        return '', 400
 
     # Ignore account deletion requests from users that do not already exist here
     account_deletion = False

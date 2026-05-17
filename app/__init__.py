@@ -113,6 +113,8 @@ def create_app(config_class=Config):
     app.config["API_TITLE"] = "PieFed 1.7 Alpha API"
     app.config["API_VERSION"] = "alpha 1.7"
     app.config["OPENAPI_VERSION"] = "3.1.1"
+    if not app.config["SECRET_KEY"]:
+        raise Exception('You must set SECRET_KEY to a random sequence of numbers and letters.')
     if app.config["SERVE_API_DOCS"]:
         app.config["OPENAPI_URL_PREFIX"] = "/api/alpha"
         app.config["OPENAPI_JSON_PATH"] = "/swagger.json"

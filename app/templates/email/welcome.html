@@ -1,4 +1,6 @@
 <p style="margin-bottom: 0;"><a href="https://{{ domain }}/"><img src="https://{{ domain }}{{ site.logo if site.logo else '/static/images/piefed_logo_icon_t_75.png' }}" style="max-width: 100%;" width="50" height="50"></a></p>
 {{ email_body | safe }}
 <p>&nbsp;</p>
+{% if user.verification_token %}
 <p><small><a href="{{ url_for('user.user_newsletter_unsubscribe', user_id=user.id, token=user.verification_token, _external=True) }}">Unsubscribe from PieFed newsletter</a></small></p>
+{% endif %}

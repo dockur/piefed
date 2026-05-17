@@ -1,4 +1,6 @@
 {{ email_body | safe }}
 
 
+{% if user.verification_token %}
 Unsubscribe from PieFed newsletter at {{ url_for('user.user_newsletter_unsubscribe', user_id=user.id, token=user.verification_token, _external=True) }}.
+{% endif %}

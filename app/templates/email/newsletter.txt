@@ -3,4 +3,6 @@ Hello {{ recipient.display_name() }},</p>
 {{ content }}
 
 
+{% if recipient.verification_token %}
 Unsubscribe from PieFed newsletter at {{ url_for('user.user_newsletter_unsubscribe', user_id=recipient.id, token=recipient.verification_token, _external=True) }}.
+{% endif %}
