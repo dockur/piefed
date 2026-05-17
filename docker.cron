@@ -1,4 +1,4 @@
-5 2 * * * /bin/su -c 'cd /app && ./daily.sh &> /var/log/daily.log' - python
-*/1 * * * * /bin/su -c 'cd /app && ./send_queue.sh &> /var/log/send_queue.log' - python
-*/30 * * * * /bin/su -c 'cd /app && ./email_notifs.sh &> /var/log/email_notifs.sh.log' - python
-5 4 * * 1 /bin/su -c 'cd /app && ./remove_orphan_files.sh &> /var/log/remove_orphan_files.log' - python
+5 2 * * * cd /app && ./daily.sh &> /tmp/daily.log
+*/1 * * * * cd /app && ./send_queue.sh &> /tmp/send_queue.log
+*/30 * * * * cd /app && ./email_notifs.sh &> /tmp/email_notifs.sh.log
+5 4 * * 1 cd /app && ./remove_orphan_files.sh &> /tmp/remove_orphan_files.log
