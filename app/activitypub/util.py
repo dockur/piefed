@@ -870,6 +870,8 @@ def refresh_community_profile_task(community_id, activity_json):
                                     member_user = session.query(User).get(member.user_id)
                                     is_mod = False
                                     for actor in mods_data['orderedItems']:
+                                        if isinstance(actor, dict):
+                                            actor = actor['id']
                                         if actor.lower() == member_user.profile_id().lower():
                                             is_mod = True
                                             break
