@@ -8,7 +8,7 @@ echo "Running database migrations..."
 flask db upgrade
 flask populate_community_search
 
-crond -b &
+supercronic /app/docker.cron
 
 if [ "${FLASK_DEBUG:-}" = "1" ] && [ "${FLASK_ENV:-}" = "development" ]; then
   export FLASK_RUN_EXTRA_FILES=$(find app/templates app/static -type f | tr '\n' ':')
