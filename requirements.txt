@@ -54,3 +54,4 @@ fastapi~=0.118.0
 sqlakeyset~=2.0.0
 rich
 pendulum~=3.2.0
+py-svg-hush~=0.3.0
