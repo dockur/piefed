@@ -57,6 +57,7 @@ jobs:
           #!/bin/bash
           wget "https://codeberg.org/rimu/pyfedi/archive/v${{ env.latest_tag }}.zip";
           unzip "v${{ env.latest_tag }}.zip"
+          cp docker.cron pyfedi/
           cp Dockerfile.custom pyfedi/Dockerfile
           cp entrypoint_custom.sh pyfedi/entrypoint.sh
           cp celery_custom.sh pyfedi/entrypoint_celery.sh
