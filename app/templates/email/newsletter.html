@@ -1,5 +1,7 @@
 <p><a href="https://{{ domain }}/"><img src="https://{{ domain }}{{ g.site.logo if g.site.logo else '/static/images/piefed_logo_icon_t_75.png' }}" style="max-width: 100%; margin-bottom: 20px;" width="50" height="50" alt="PieFed logo" /></a></p><p>Hello {{ recipient.display_name() }},</p>
 {{ content|safe }}
 <p>&nbsp;</p>
+{% if recipient.verification_token %}
 <p><small><a href="{{ url_for('user.user_newsletter_unsubscribe', user_id=recipient.id, token=recipient.verification_token, _external=True) }}">Unsubscribe from PieFed newsletter</a></small></p>
+{% endif %}
 

@@ -176,7 +176,7 @@ def verify_email(token):
                 flash(_('Thank you for verifying your email address.'))
                 return redirect(url_for('auth.login'))
             user.verified = True
-            user.verification_token = None
+            user.verification_token = random_token(16)
 
             # Update any pending application status from -1 to 0 when email is verified
             application = UserRegistration.query.filter_by(user_id=user.id, status=-1).first()
