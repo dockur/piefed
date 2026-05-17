@@ -98,19 +98,6 @@ on port 443 to 8030, or a Cloudflare tunnel going to 8030, or wireguard, etc.
 You will have an easier time if Nginx runs on the host (if using Nginx) rather than in a container, so it can pass the client IP address through to PieFed
 more easily. Once everything else is set up, go to https://your-instance/test_ip and make sure it's detecting your IP address correctly.
 
-#### SETUP CRON (AUTOMATED) JOBS
-```bash
-sudo nano /etc/cron.d/piefed
-```
-- Copy & Paste the text below
-- Replace `<USERNAME>` with account username
-```
-5 2 * * * <USERNAME> docker exec piefed_app1 bash -c "cd /app && ./daily.sh"
-5 4 * * 1 <USERNAME> docker exec piefed_app1 bash -c "cd /app && ./remove_orphan_files.sh"
-1 */6 * * * <USERNAME> docker exec piefed_app1 bash -c "cd /app && ./email_notifs.sh"
-*/1 * * * * <USERNAME> docker exec piefed_app1 bash -c "cd /app && ./send_queue.sh"
-```
-
 #### UPDATING & RESTARTING PIEFED
 Manually:
 ```bash
