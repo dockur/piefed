@@ -4,7 +4,7 @@ FROM python:3.13-alpine AS builder
 RUN adduser -D python
 
 RUN apk add --no-cache \
-    pkgconfig gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng postgresql-client bash tini supercronic \
+    pkgconfig gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng postgresql-client bash tini curl supercronic \
     rm -rf /tmp/* /var/cache/apk/*
 
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -25,4 +25,8 @@ RUN chmod u+x ./entrypoint_celery.sh
 RUN chmod u+x ./entrypoint_async.sh
 
 USER python
+EXPOSE 5000
+
+HEALTHCHECK --interval=60s --retries=2 --timeout=10s CMD curl -ILfSs http://localhost:5000/nodeinfo/2.0 > /dev/null || exit 1
+
 ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
