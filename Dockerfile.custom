@@ -4,7 +4,7 @@ FROM python:3.13-alpine AS builder
 RUN adduser -D python
 
 RUN apk add --no-cache \
-    pkgconfig gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng postgresql-client bash tini curl supercronic \
+    pkgconfig gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng postgresql-client bash tini curl supercronic \ &&
     rm -rf /tmp/* /var/cache/apk/*
 
 RUN --mount=type=cache,target=/root/.cache/pip \
