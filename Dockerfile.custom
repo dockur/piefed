@@ -37,6 +37,6 @@ RUN chmod u+x ./entrypoint_async.sh
 USER python
 EXPOSE 5000
 
-HEALTHCHECK --interval=60s --retries=2 --timeout=10s CMD curl -ILfSs http://localhost:5000/nodeinfo/2.0 > /dev/null || exit 1
+HEALTHCHECK --interval=60s --retries=2 --timeout=10s CMD curl -ILfSs http://localhost:5000/nodeinfo/2.1 >/dev/null || exit 1
 
 ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
