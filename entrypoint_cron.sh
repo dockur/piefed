@@ -3,4 +3,4 @@ set -e
 
 echo "Starting cron jobs..."
 
-exec supercronic /etc/cron.d/docker
+exec supercronic /app/docker.cron
