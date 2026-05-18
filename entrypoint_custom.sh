@@ -2,13 +2,15 @@
 set -e
 
 export FLASK_APP=pyfedi.py
-
 echo "Running database migrations..."
 
 flask db upgrade
 flask populate_community_search
 
-supercronic /etc/cron.d/docker &
+# Optional: run cron jobs
+if [[ "${CRON:-}" == [Yy1]* ]]; then
+  supercronic /app/docker.cron >/dev/null &
+fi
 
 if [ "${FLASK_DEBUG:-}" = "1" ] && [ "${FLASK_ENV:-}" = "development" ]; then
   export FLASK_RUN_EXTRA_FILES=$(find app/templates app/static -type f | tr '\n' ':')
