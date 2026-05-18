@@ -2,10 +2,11 @@
 FROM python:3.13-alpine AS builder
 
 RUN apk add --no-cache \
-    pkgconfig \
     gcc \
-    python3-dev \
-    musl-dev
+    bash \
+    musl-dev \
+    pkgconfig \
+    python3-dev
 
 RUN python -m venv /venv
 ENV PATH="/venv/bin:$PATH"
@@ -21,12 +22,12 @@ FROM python:3.13-alpine
 RUN adduser -D python
 
 RUN apk add --no-cache \
-    tesseract-ocr \
-    tesseract-ocr-data-eng \
-    postgresql-client \
     bash \
     tini \
     curl \
+    postgresql-client \
+    tesseract-ocr \
+    tesseract-ocr-data-eng \
     supercronic && \
     rm -rf /tmp/* /var/cache/apk/*
 
