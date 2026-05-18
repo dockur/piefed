@@ -1,27 +1,38 @@
 # syntax=docker/dockerfile:1.4
 FROM python:3.13-alpine AS builder
 
-RUN adduser -D python
-
 RUN apk add --no-cache \
-    pkgconfig \
     gcc \
-    python3-dev \
-    musl-dev \
-    tesseract-ocr \
-    tesseract-ocr-data-eng \
-    postgresql-client \
     bash \
-    tini \
-    curl \
-    supercronic && \
-    rm -rf /tmp/* /var/cache/apk/*
+    musl-dev \
+    pkgconfig \
+    python3-dev
+
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=source=requirements.txt,target=/tmp/requirements.txt \
-    pip3 install -r /tmp/requirements.txt
+    pip install -r /tmp/requirements.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip3 install gunicorn
+    pip install gunicorn
+
+FROM python:3.13-alpine
+
+RUN adduser -D python
+
+RUN apk add --no-cache \
+    bash \
+    tini \
+    curl \
+    postgresql-client \
+    tesseract-ocr \
+    tesseract-ocr-data-eng \
+    supercronic && \
+    rm -rf /tmp/* /var/cache/apk/*
+
+COPY --from=builder /venv /venv
+ENV PATH="/venv/bin:$PATH"
 
 COPY --chown=python:python . /app
 
