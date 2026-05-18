@@ -35,18 +35,19 @@ COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 COPY --chown=python:python . /app
-COPY docker.cron /etc/cron.d/docker
 
 WORKDIR /app
 
 RUN pybabel compile -d app/translations || true
 
 RUN chmod u+x ./entrypoint.sh
+RUN chmod u+x ./entrypoint_cron.sh
 RUN chmod u+x ./entrypoint_celery.sh
 RUN chmod u+x ./entrypoint_async.sh
 
 USER python
 EXPOSE 5000
+ENV CRON="N"
 
 LABEL org.opencontainers.image.authors="rimu"
 LABEL org.opencontainers.image.source="https://codeberg.org/rimu/pyfedi"
