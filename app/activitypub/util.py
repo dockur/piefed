@@ -35,7 +35,7 @@ from app.utils import get_request, allowlist_html, get_setting, ap_datetime, mar
     moderating_communities, get_task_session, is_video_hosting_site, opengraph_parse, mastodon_extra_field_link, \
     blocked_users, piefed_markdown_to_lemmy_markdown, store_files_in_s3, guess_mime_type, get_recipient_language, \
     patch_db_session, to_srgb, communities_banned_from_all_users, blocked_communities, blocked_or_banned_instances, \
-    instance_community_ids, banned_instances, instance_banned
+    instance_community_ids, banned_instances, instance_banned, sanitize_svg_bytes
 
 
 def public_key():
@@ -870,6 +870,8 @@ def refresh_community_profile_task(community_id, activity_json):
                                     member_user = session.query(User).get(member.user_id)
                                     is_mod = False
                                     for actor in mods_data['orderedItems']:
+                                        if isinstance(actor, dict):
+                                            actor = actor['id']
                                         if actor.lower() == member_user.profile_id().lower():
                                             is_mod = True
                                             break

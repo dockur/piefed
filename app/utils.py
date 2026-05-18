@@ -58,6 +58,7 @@ from app import db, cache, httpx_client, celery, plugins
 from app.constants import *
 import re
 from PIL import Image, ImageOps, ImageCms
+from py_svg_hush import filter_svg
 
 from captcha.audio import AudioCaptcha
 from captcha.image import ImageCaptcha
@@ -2276,8 +2277,10 @@ def url_to_thumbnail_file(filename) -> File:
     if response.status_code == 200:
         content_type = response.headers.get('content-type')
         if content_type and content_type.startswith('image'):
-            # Don't need to generate thumbnail for svg image
+            # Sanitize SVG files to remove potentially dangerous elements
+            response_content = response.content
             if "svg" in content_type:
+                response_content = sanitize_svg_bytes(response_content)
                 file_extension = final_ext = ".svg"
             else:
                 # Generate file extension from mime type
@@ -2295,6 +2298,10 @@ def url_to_thumbnail_file(filename) -> File:
                     if '?' in file_extension:
                         file_extension = file_extension.split('?')[0]
 
+            # Also sanitize if file extension is .svg (regardless of content-type)
+            if file_extension == '.svg' and "svg" not in content_type:
+                response_content = sanitize_svg_bytes(response_content)
+
             new_filename = gibberish(15)
             if store_files_in_s3():
                 directory = 'app/static/tmp'
@@ -2304,7 +2311,7 @@ def url_to_thumbnail_file(filename) -> File:
             temp_file_path = os.path.join(directory, new_filename + file_extension)
 
             with open(temp_file_path, 'wb') as f:
-                f.write(response.content)
+                f.write(response_content)
             response.close()
 
             if file_extension != ".svg":
@@ -4466,3 +4473,39 @@ def is_invalid_get_request_uri(uri):
 
 def is_invalid_post_request_uri(uri):
     return is_invalid_get_request_uri(uri)
+
+
+def sanitize_svg_bytes(svg_bytes: bytes) -> bytes:
+    # Sanitize SVGs to remove potentially dangerous elements.
+
+    try:
+        # Allow common image MIME types in data URLs
+        keep_data_url_mime_types = {
+            "image": ["jpeg", "png", "gif", "webp", "avif"],
+        }
+
+        return filter_svg(svg_bytes, keep_data_url_mime_types)
+    except Exception as e:
+        current_app.logger.error(f"Error sanitizing SVG: {e}")
+        return svg_bytes
+
+
+def sanitize_svg(filepath: str) -> bool:
+    """
+    Sanitize an SVG file using py-svg-hush to remove potentially dangerous elements.
+    Returns True if sanitization was successful, False otherwise.
+    """
+    try:
+
+        with open(filepath, 'rb') as f:
+            svg_bytes = f.read()
+
+        sanitized_svg = sanitize_svg_bytes(svg_bytes)
+
+        if sanitized_svg != svg_bytes:
+            with open(filepath, 'wb') as f:
+                f.write(sanitized_svg)
+        return True
+    except Exception as e:
+        current_app.logger.error(f"Error sanitizing SVG: {e}")
+        return False

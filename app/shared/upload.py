@@ -8,7 +8,7 @@ from sqlalchemy import text
 
 from app import db
 from app.models import File, user_file
-from app.utils import gibberish, ensure_directory_exists, store_files_in_s3, guess_mime_type
+from app.utils import gibberish, ensure_directory_exists, store_files_in_s3, guess_mime_type, sanitize_svg
 
 
 def process_upload(image_file, destination='posts', user_id=None):
@@ -36,6 +36,10 @@ def process_upload(image_file, destination='posts', user_id=None):
     file_size = os.path.getsize(final_place)
 
     final_ext = file_ext.lower()  # track file extension for conversion
+
+    # Sanitize SVG files to remove potentially dangerous elements
+    if final_ext == '.svg':
+        sanitize_svg(final_place)
 
     if file_ext.lower() == '.heic':
         register_heif_opener()
