@@ -7,7 +7,7 @@ echo "Running database migrations..."
 flask db upgrade
 flask populate_community_search
 
-# Optional: run cron jobs
+# Schedule cron jobs in background
 if [[ "${CRON:-}" == [Yy1]* ]]; then
   supercronic /app/docker.cron >/dev/null &
 fi
