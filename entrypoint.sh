@@ -8,7 +8,7 @@ flask db upgrade
 flask populate_community_search
 
 # Schedule cron jobs in background
-if [[ "${CRON:-}" == [Yy1]* ]]; then
+if [[ "${CRON:-}" == [YyTt1]* ]]; then
   supercronic /app/docker.cron >/dev/null &
 fi
 
