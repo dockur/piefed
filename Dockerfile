@@ -47,7 +47,7 @@ RUN chmod u+x ./entrypoint_async.sh
 
 USER python
 EXPOSE 5000
-ENV CRON="N"
+ENV CRON="false"
 
 LABEL org.opencontainers.image.authors="rimu"
 LABEL org.opencontainers.image.source="https://codeberg.org/rimu/pyfedi"
