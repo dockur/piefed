@@ -104,7 +104,7 @@ Either set the `CRON` variable in your compose file like this:
 
 ```yaml
 environment:
-  - CRON=Y
+  - CRON=true
 ```
 
 or otherwise schedule the tasks on your host machine:
