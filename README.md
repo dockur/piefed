@@ -21,6 +21,6 @@ much of the fediverse as possible.
   - Development branch: [https://crust.piefed.social/api/alpha/swagger](https://crust.piefed.social/api/alpha/swagger) or [https://piefed.wjs018.xyz/api/alpha/swagger](https://piefed.wjs018.xyz/api/alpha/swagger)
 - see [INSTALL.md](INSTALL.md) or [INSTALL-docker.md](INSTALL-docker.md)
 - Asking questions about the project:
-	- Open a new thread in our [Piefed Devellopers community](https://piefed.social/c/piefed_dev)
-	- Chat in realtime with piefed developers in our [Matrix room](https://matrix.to/#/#piefed-developers:matrix.org)
+	- Open a new thread in our [Piefed developers community](https://piefed.social/c/piefed_dev)
+	- Chat in realtime with PieFed developers in our [Matrix room](https://matrix.to/#/#piefed-developers:matrix.org)
 - see docs/project_management/* for a project roadmap, contributing guide and much more.
