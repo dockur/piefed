@@ -44,6 +44,11 @@ configuration. While it is quicker and easier, it's not to everyone's taste.
 
 [DOCKER INSTRUCTIONS ARE HERE](https://codeberg.org/rimu/pyfedi/src/branch/main/INSTALL-docker.md)
 
+### Managed way: YunoHost
+
+PieFed is available as an app for YunoHost, which offers an easy installation in a couple of clicks without any other setup hassle.
+
+[PIEFED IN THE YUNOHOST APP STORE](https://apps.yunohost.org/app/piefed)
 
 ### Hard way: bare metal
 
