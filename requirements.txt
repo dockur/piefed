@@ -33,7 +33,7 @@ Werkzeug==3.1.3
 pytesseract==0.3.13
 sentry-sdk==2.27.0
 python-slugify==8.0.4
-furl==2.1.3
+furl==2.1.4
 ua-parser[regex]
 captcha
 pytest
