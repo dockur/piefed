@@ -20,22 +20,7 @@
 <div class="row">
     <div class="col">
         <h4>{{ _('Import / Export Bans') }}</h4>
-        <p>{{ _('Use this to import or export banned instances, domains, tags, and / or users.') }}</p>
-        <p>{{ _('JSON format') }}:</p>
-        <pre><code>
-            {
-                "banned_instances": ["banned1.social", "banned2.social"], 
-                "allowed_instances": ["allowed1.social", "allowed2.social"], 
-                "banned_domains": ["banned3.social"], 
-                "banned_tags": [{"name":"badtag","display_as":"BaDtAg"},{...}], 
-                "banned_users": ["baduser@banned4.social"] 
-            }</code>
-        </pre>
-        <p>{{ _('Note: only one of "banned_instances" or "allowed_instances" will be populated.') }}</p>
-
-        <!-- {{ render_field(ban_lists_form.import_submit) }} -->
-        <!-- {{ render_field(ban_lists_form.export_submit) }} -->
-        {{ render_form(ban_lists_form) }}
+        <p>Moved to <a href="{{ url_for('admin.admin_federation_ban_lists') }}">{{ _('Import / Export Bans') }}</a></p>
     </div>
 </div>
 <hr />
@@ -43,25 +28,14 @@
     <legend class="tweak-top">{{ _('Bulk community import') }}</legend>
         <div class="row">
             <div class="column">
-                <h4>{{ _('Remote server scan') }}</h4>
-                <p>{{ _('Use this to scan a remote PieFed or Lemmy server and "pre-load" its communities, as ranked by posts and activity. NSFW communities and communities from banned instances are excluded.') }}</p>
-                <p>{{ _('Input should be in the form of <strong>https://server-name.tld</strong>') }}</p>
-                {% if current_app_debug %}
-                <p>*** {{ _('This instance is in development mode. This function could cause timeouts depending on how your networking is setup.') }} ***</p>
-                {% endif %}
-                {{ render_form(remote_scan_form) }}
+                <p><a href="{{ url_for('admin.admin_federation_remote_scan') }}">{{ _('Remote server scan') }}</a></p>
             </div>
         </div>
         <hr />
 
         <div class="row">
             <div class="column">
-                <h4>{{ _('Load communities from Lemmyverse data') }}</h4>
-                <p>{{ _('Use this to "pre-load" known threadiverse communities, as ranked by posts and activity. The list of communities pulls from the same list as <a href="https://lemmyverse.net/communities">LemmyVerse</a>. NSFW communities and communities from banned instances are excluded. Communities with less than 100 posts and less than 500 active users in the past week are excluded.') }}</p>
-                {% if current_app_debug %}
-                <p>*** {{ _('This instance is in development mode. This function could cause timeouts depending on how your networking is setup.') }} ***</p>
-                {% endif %}
-                {{ render_form(preload_form) }}
+                <p><a href="{{ url_for('admin.admin_federation_preload') }}">{{ _('Load communities from Lemmyverse data') }}</a></p>
             </div>
         </div>
 </fieldset>

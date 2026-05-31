@@ -58,6 +58,10 @@
   color: purple;
 }
 
+.green {
+  color: green;
+}
+
 /*
 --bs-gutter-x: var(--bs-gutter-x); // var(--spacing-24)
 --bs-border-radius: var(--bs-border-radius); // 0.375rem, voting_dialog, communitySidebar
@@ -358,6 +362,14 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 
 .fe-warning::before {
   content: "\e904";
+}
+
+.fe-context::before {
+  content: "\e97c";
+}
+
+.fe-recommended::before {
+  content: "\e977";
 }
 
 .fe-arrow-up::before {
@@ -3661,6 +3673,10 @@ form h5 {
 
 .purple {
   color: purple;
+}
+
+.green {
+  color: green;
 }
 
 /*

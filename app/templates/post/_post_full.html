@@ -89,7 +89,7 @@
                     {{ post.url }}
                 </a>
                 {% if post.domain.post_warning -%}
-                    <span class="fe fe-warning red" title="{{ post.domain.post_warning }}"></span>
+                    <span class="fe {{ post.domain.type_to_class() }}" title="{{ post.domain.post_warning }}"></span>
                 {% endif -%}
             </p>
             {% if post.url.endswith('.mp3') -%}

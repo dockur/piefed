@@ -6,9 +6,10 @@ from app import db, cache
 from app.activitypub.signature import send_post_request
 from app.auth import bp
 from app.auth.forms import ChooseTopicsForm, FilterSetupForm
+from app.auth.util import get_country
 from app.constants import SUBSCRIPTION_NONMEMBER
 from app.models import User, Topic, Community, CommunityJoinRequest, CommunityMember, Filter, InstanceChooser, Language
-from app.utils import render_template, joined_communities, community_membership, get_setting, num_topics
+from app.utils import render_template, joined_communities, community_membership, get_setting, num_topics, ip_address
 
 
 @bp.route('/instance_chooser')
@@ -55,7 +56,8 @@ def choose_topics():
     mark_onboarding_as_finished()
     if get_setting('choose_topics', True) and num_topics() > 0:
         form = ChooseTopicsForm()
-        form.chosen_topics.choices = topics_for_form()
+        choices, selections = topics_for_form()
+        form.chosen_topics.choices = choices
         if form.validate_on_submit():
             if form.chosen_topics.data:
                 for topic_id in form.chosen_topics.data:
@@ -67,6 +69,7 @@ def choose_topics():
                 flash(_('You did not choose any topics. Would you like to choose individual communities instead?'))
                 return redirect(url_for('main.list_communities'))
         else:
+            form.chosen_topics.data = selections    # topics that match the user's country are ticked by default
             return render_template('auth/choose_topics.html', form=form,
                                    )
     else:
@@ -97,13 +100,19 @@ def join_topic(topic_id):
 
 def topics_for_form():
     topics = Topic.query.filter_by(parent_id=None).order_by(Topic.name).all()
-    result = []
+    result = []         # topics, arranged into a hierarchy
+    selections = []     # topic ids that match the user's country
+    user_country = get_country(ip_address())
     for topic in topics:
         result.append((topic.id, topic.name))
+        if user_country and user_country in topic.countries:
+            selections.append(topic.id)
         sub_topics = Topic.query.filter_by(parent_id=topic.id).order_by(Topic.name).all()
         for sub_topic in sub_topics:
             result.append((sub_topic.id, ' --- ' + sub_topic.name))
-    return result
+            if user_country and user_country in sub_topic.countries:
+                selections.append(sub_topic.id)
+    return result, selections
 
 
 def send_community_follow(community_id: int, join_request_id: int, user_id: int):

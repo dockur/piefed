@@ -467,7 +467,8 @@ def find_flair_or_create(flair: dict, community_id: int, session=None) -> Commun
 
         return existing_flair
     else:
-        flair_text = text_color = background_color = blur_images = ''
+        flair_text = text_color = background_color = ''
+        blur_images = False
         if "text_color" in flair:
             text_color = flair['text_color']
         elif "textColor" in flair:

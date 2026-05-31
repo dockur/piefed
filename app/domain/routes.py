@@ -39,9 +39,11 @@ def show_domain(domain_id):
                 form = PostWarningForm()
                 if form.validate_on_submit():
                     domain.post_warning = form.post_warning.data
+                    domain.warning_type = form.warning_type.data
                     db.session.commit()
                     flash(_('Saved'))
                 form.post_warning.data = domain.post_warning
+                form.warning_type.data = str(domain.warning_type)
             else:
                 form = None
             if current_user.is_anonymous or current_user.ignore_bots == 1:

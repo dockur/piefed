@@ -1,0 +1,30 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_form, render_field %}
+{% set active_child = 'admin_federation' %}
+
+{% block app_content %}
+{% include 'admin/_tabbed_nav.html' %}
+<br>
+
+<div class="row">
+    <div class="col">
+        <h1>{{ _('Bulk community import - from lemmyverse') }}</h1>
+        <p>{{ _('Use this to "pre-load" known threadiverse communities, as ranked by posts and activity. The list of communities pulls from the same list as <a href="https://lemmyverse.net/communities">LemmyVerse</a>. NSFW communities and communities from banned instances are excluded. Communities with less than 100 posts and less than 500 active users in the past week are excluded.') }}</p>
+                {% if current_app_debug %}
+                <p>*** {{ _('This instance is in development mode. This function could cause timeouts depending on how your networking is setup.') }} ***</p>
+                {% endif %}
+                {{ render_form(preload_form) }}
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        {% include 'admin/_nav.html' %}
+    </div>
+</div>
+<hr />
+{% endblock %}

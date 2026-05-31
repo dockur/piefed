@@ -1,0 +1,31 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_form, render_field %}
+{% set active_child = 'admin_federation' %}
+
+{% block app_content %}
+{% include 'admin/_tabbed_nav.html' %}
+<br>
+
+<div class="row">
+    <div class="col">
+        <h1>{{ _('Federation - Remote server scan') }}</h1>
+        <p>{{ _('Use this to scan a remote PieFed or Lemmy server and "pre-load" its communities, as ranked by posts and activity. NSFW communities and communities from banned instances are excluded.') }}</p>
+                <p>{{ _('Input should be in the form of <strong>https://server-name.tld</strong>') }}</p>
+                {% if current_app_debug %}
+                <p>*** {{ _('This instance is in development mode. This function could cause timeouts depending on how your networking is setup.') }} ***</p>
+                {% endif %}
+                {{ render_form(remote_scan_form) }}
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        {% include 'admin/_nav.html' %}
+    </div>
+</div>
+<hr />
+{% endblock %}

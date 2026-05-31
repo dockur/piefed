@@ -379,9 +379,66 @@ def admin_instance_chooser():
 @login_required
 def admin_federation():
     form = FederationForm()
+
+    if form.validate_on_submit():
+        set_setting('use_allowlist', form.federation_mode.data == 'allowlist')
+        db.session.execute(text('DELETE FROM allowed_instances'))
+        for allow in form.allowlist.data.split('\n'):
+            if allow.strip():
+                db.session.add(AllowedInstances(domain=allow.strip().lower()))
+                cache.delete_memoized(instance_allowed, allow.strip())
+        db.session.execute(text('DELETE FROM banned_instances WHERE subscription_id is null'))
+        for banned in form.blocklist.data.split('\n'):
+            if banned.strip():
+                db.session.add(BannedInstances(domain=banned.strip().lower()))
+                cache.delete_memoized(instance_banned, banned.strip())
+
+        # update and sync defederation subscriptions
+        db.session.execute(text('DELETE FROM banned_instances WHERE subscription_id is not null'))
+        db.session.query(DefederationSubscription).delete()
+        db.session.commit()
+        for defed_subscription in form.defederation_subscription.data.split('\n'):
+            if defed_subscription.strip():
+                db.session.add(DefederationSubscription(domain=defed_subscription.strip().lower()))
+        db.session.commit()
+        for defederation_sub in DefederationSubscription.query.all():
+            download_defeds(defederation_sub.id, defederation_sub.domain)
+
+        site = Site.query.get(1)    # g.site.* is read only so we need a local copy of the model to save into.
+        site.blocked_phrases = form.blocked_phrases.data
+        site.allowlist_mode = int(form.allowlist_mode.data)
+        set_setting('actor_blocked_words', form.blocked_actors.data)
+        set_setting('actor_bio_blocked_words', form.blocked_bio.data)
+        set_setting('auto_add_remote_communities', form.auto_add_remote_communities.data)
+        cache.delete_memoized(blocked_phrases)
+        cache.delete_memoized(get_setting, 'actor_blocked_words')
+        db.session.commit()
+
+        flash(_('Admin settings saved'))
+
+    elif request.method == 'GET':
+        use_allowlist = get_setting('use_allowlist', False)
+        form.federation_mode.data = 'allowlist' if use_allowlist else 'blocklist'
+        instances = BannedInstances.query.filter(BannedInstances.subscription_id == None).all()
+        form.blocklist.data = '\n'.join([instance.domain for instance in instances])
+        instances = AllowedInstances.query.all()
+        form.allowlist.data = '\n'.join([instance.domain for instance in instances])
+        form.allowlist_mode.data = str(g.site.allowlist_mode)
+        form.defederation_subscription.data = '\n'.join([instance.domain for instance in DefederationSubscription.query.all()])
+        form.blocked_phrases.data = g.site.blocked_phrases
+        form.blocked_actors.data = get_setting('actor_blocked_words', '')
+        form.blocked_bio.data = get_setting('actor_bio_blocked_words', '')
+        form.auto_add_remote_communities.data = get_setting('auto_add_remote_communities', False)
+
+    return render_template('admin/federation.html', title=_('Federation settings'),
+                           form=form, current_app_debug=current_app.debug)
+
+
+@bp.route('/federation/preload', methods=['GET', 'POST'])
+@permission_required('change instance settings')
+@login_required
+def admin_federation_preload():
     preload_form = PreLoadCommunitiesForm()
-    ban_lists_form = ImportExportBannedListsForm()
-    remote_scan_form = RemoteInstanceScanForm()
 
     # this is the pre-load communities button
     if preload_form.pre_load_submit.data and preload_form.validate():
@@ -497,10 +554,20 @@ def admin_federation():
                   len(parsed_communities_sorted),
                   communities_to_add=communities_to_add, parsed_communities_sorted=len(parsed_communities_sorted)))
 
-        return redirect(url_for('admin.admin_federation'))
+        return redirect(url_for('admin.admin_federation_preload'))
+
+    return render_template('admin/federation_preload.html', title=_('Federation settings - preload'),
+                           preload_form=preload_form, current_app_debug=current_app.debug)
+
+
+@bp.route('/federation/remote_scan', methods=['GET', 'POST'])
+@permission_required('change instance settings')
+@login_required
+def admin_federation_remote_scan():
+    remote_scan_form = RemoteInstanceScanForm()
 
     # this is the remote server scan
-    elif remote_scan_form.remote_scan_submit.data and remote_scan_form.validate():
+    if remote_scan_form.remote_scan_submit.data and remote_scan_form.validate():
         # filters to be used later
         already_known = list(db.session.execute(text('SELECT ap_public_url FROM "community"')).scalars())
         banned_urls = list(db.session.execute(text('SELECT domain FROM "banned_instances"')).scalars())
@@ -516,7 +583,7 @@ def admin_federation():
         result = re.match(regex_pattern, remote_url)
         if result is None:
             flash(_(f'{remote_url} does not appear to be a valid url. Make sure input is in the form "https://server-name.tld" without trailing slashes or paths.'))
-            return redirect(url_for('admin.admin_federation'))
+            return redirect(url_for('admin.admin_federation_remote_scan'))
 
         # check if it's a banned instance
         # Parse the URL
@@ -525,7 +592,7 @@ def admin_federation():
         server_domain = parsed_url.netloc
         if server_domain in banned_urls:
             flash(_(f'{remote_url} is a banned instance.'))
-            return redirect(url_for('admin.admin_federation'))
+            return redirect(url_for('admin.admin_federation_remote_scan'))
 
         # get dry run
         dry_run = remote_scan_form.dry_run.data
@@ -556,7 +623,7 @@ def admin_federation():
         instance_software_name = instanceinfo_dict['software']['name']
         # instance_software_version = instanceinfo_dict['software']['version']
 
-        # if the instance is not running lemmy or mbin break for now as 
+        # if the instance is not running lemmy or mbin break for now as
         # we dont yet support others for scanning
         if instance_software_name == "lemmy":
             is_lemmy = True
@@ -579,7 +646,7 @@ def admin_federation():
                 params = {"sort": "Active", "type_": "Local", "limit": "50", "page": f"{page}", "show_nsfw": "false"}
                 resp = get_request(f"{remote_url}/api/v3/community/list", params=params)
                 page_dict = json.loads(resp.text)
-                # get the individual communities out of the communities[] list in the response and 
+                # get the individual communities out of the communities[] list in the response and
                 # add them to a holding list[] of our own
                 for c in page_dict["communities"]:
                     comms_list.append(c)
@@ -637,7 +704,7 @@ def admin_federation():
                             Communities to join request: {communities_requested}, \
                             Communities to join based on current filters: {len(community_urls_to_join)}."
                 flash(_(message))
-                return redirect(url_for('admin.admin_federation'))
+                return redirect(url_for('admin.admin_federation_remote_scan'))
 
         if is_piefed:
             # loop through and send off requests to the remote endpoint for 50 communities at a time
@@ -648,7 +715,7 @@ def admin_federation():
                 params = {"sort": "Active", "type_": "Local", "limit": "50", "page": f"{page}", "show_nsfw": "false"}
                 resp = get_request(f"{remote_url}/api/alpha/community/list", params=params)
                 page_dict = json.loads(resp.text)
-                # get the individual communities out of the communities[] list in the response and 
+                # get the individual communities out of the communities[] list in the response and
                 # add them to a holding list[] of our own
                 for c in page_dict["communities"]:
                     comms_list.append(c)
@@ -708,11 +775,11 @@ def admin_federation():
                             Communities to join request: {communities_requested}, \
                             Communities to join based on current filters: {len(community_urls_to_join)}."
                 flash(_(message))
-                return redirect(url_for('admin.admin_federation'))
+                return redirect(url_for('admin.admin_federation_remote_scan'))
 
         if is_mbin:
             # loop through and send the right number of requests to the remote endpoint for mbin
-            # mbin does not have the hard-coded limit, but lets stick with 50 to match lemmy 
+            # mbin does not have the hard-coded limit, but lets stick with 50 to match lemmy
             mags_list = []
             page = 1
             get_more_magazines = True
@@ -721,7 +788,7 @@ def admin_federation():
                           "hide_adult": "hide"}
                 resp = get_request(f"{remote_url}/api/magazines", params=params)
                 page_dict = json.loads(resp.text)
-                # get the individual magazines out of the items[] list in the response and 
+                # get the individual magazines out of the items[] list in the response and
                 # add them to a holding list[] of our own
                 for m in page_dict['items']:
                     mags_list.append(m)
@@ -780,7 +847,7 @@ def admin_federation():
                             Magazines to join request: {communities_requested}, \
                             Magazines to join based on current filters: {len(community_urls_to_join)}."
                 flash(_(message))
-                return redirect(url_for('admin.admin_federation'))
+                return redirect(url_for('admin.admin_federation_remote_scan'))
 
         user = User.query.get(1)
         remote_scan_messages = []
@@ -810,10 +877,20 @@ def admin_federation():
                   len(candidate_communities),
                   communities_to_join=len(community_urls_to_join), candidate_communities=len(candidate_communities)))
 
-        return redirect(url_for('admin.admin_federation'))
+        return redirect(url_for('admin.admin_federation_remote_scan'))
+
+    return render_template('admin/federation_remote_scan.html', title=_('Federation settings - remote scan'),
+                           remote_scan_form=remote_scan_form, current_app_debug=current_app.debug)
+
+
+@bp.route('/federation/ban_lists', methods=['GET', 'POST'])
+@permission_required('change instance settings')
+@login_required
+def admin_federation_ban_lists():
+    ban_lists_form = ImportExportBannedListsForm()
 
     # this is the import bans button
-    elif ban_lists_form.import_submit.data and ban_lists_form.validate():
+    if ban_lists_form.import_submit.data and ban_lists_form.validate():
         import_file = request.files['import_file']
         if import_file and import_file.filename != '':
             file_ext = os.path.splitext(import_file.filename)[1]
@@ -830,14 +907,14 @@ def admin_federation():
             # import bans in background task
             if current_app.debug:
                 import_bans_task(final_place)
-                return redirect(url_for('admin.admin_federation'))
+                return redirect(url_for('admin.admin_federation_ban_lists'))
             else:
                 import_bans_task.delay(final_place)
                 flash(_('Ban imports started in a background process.'))
-                return redirect(url_for('admin.admin_federation'))
+                return redirect(url_for('admin.admin_federation_ban_lists'))
         else:
             flash(_('Ban imports requested, but no json provided.'))
-            return redirect(url_for('admin.admin_federation'))
+            return redirect(url_for('admin.admin_federation_ban_lists'))
 
     # this is the export bans button
     elif ban_lists_form.export_submit.data and ban_lists_form.validate():
@@ -900,58 +977,8 @@ def admin_federation():
         return send_file(buffer, download_name=f'{current_app.config["SERVER_NAME"]}_bans.json', as_attachment=True,
                          mimetype='application/json')
 
-    # this is the main settings form
-    elif form.validate_on_submit():
-        set_setting('use_allowlist', form.federation_mode.data == 'allowlist')
-        db.session.execute(text('DELETE FROM allowed_instances'))
-        for allow in form.allowlist.data.split('\n'):
-            if allow.strip():
-                db.session.add(AllowedInstances(domain=allow.strip().lower()))
-                cache.delete_memoized(instance_allowed, allow.strip())
-        db.session.execute(text('DELETE FROM banned_instances WHERE subscription_id is null'))
-        for banned in form.blocklist.data.split('\n'):
-            if banned.strip():
-                db.session.add(BannedInstances(domain=banned.strip().lower()))
-                cache.delete_memoized(instance_banned, banned.strip())
-
-        # update and sync defederation subscriptions
-        db.session.execute(text('DELETE FROM banned_instances WHERE subscription_id is not null'))
-        db.session.query(DefederationSubscription).delete()
-        db.session.commit()
-        for defed_subscription in form.defederation_subscription.data.split('\n'):
-            if defed_subscription.strip():
-                db.session.add(DefederationSubscription(domain=defed_subscription.strip().lower()))
-        db.session.commit()
-        for defederation_sub in DefederationSubscription.query.all():
-            download_defeds(defederation_sub.id, defederation_sub.domain)
-
-        g.site.blocked_phrases = form.blocked_phrases.data
-        set_setting('actor_blocked_words', form.blocked_actors.data)
-        set_setting('actor_bio_blocked_words', form.blocked_bio.data)
-        set_setting('auto_add_remote_communities', form.auto_add_remote_communities.data)
-        cache.delete_memoized(blocked_phrases)
-        cache.delete_memoized(get_setting, 'actor_blocked_words')
-        db.session.commit()
-
-        flash(_('Admin settings saved'))
-
-    # this is just the regular page load
-    elif request.method == 'GET':
-        use_allowlist = get_setting('use_allowlist', False)
-        form.federation_mode.data = 'allowlist' if use_allowlist else 'blocklist'
-        instances = BannedInstances.query.filter(BannedInstances.subscription_id == None).all()
-        form.blocklist.data = '\n'.join([instance.domain for instance in instances])
-        instances = AllowedInstances.query.all()
-        form.allowlist.data = '\n'.join([instance.domain for instance in instances])
-        form.defederation_subscription.data = '\n'.join([instance.domain for instance in DefederationSubscription.query.all()])
-        form.blocked_phrases.data = g.site.blocked_phrases
-        form.blocked_actors.data = get_setting('actor_blocked_words', '')
-        form.blocked_bio.data = get_setting('actor_bio_blocked_words', '')
-        form.auto_add_remote_communities.data = get_setting('auto_add_remote_communities', False)
-
-    return render_template('admin/federation.html', title=_('Federation settings'),
-                           form=form, preload_form=preload_form, ban_lists_form=ban_lists_form,
-                           remote_scan_form=remote_scan_form, current_app_debug=current_app.debug)
+    return render_template('admin/federation_ban_lists.html', title=_('Federation settings - ban lists'),
+                           ban_lists_form=ban_lists_form, current_app_debug=current_app.debug)
 
 
 @celery.task
@@ -1385,8 +1412,10 @@ def admin_topic_add():
     form = EditTopicForm()
     form.parent_id.choices = topics_for_form(0)
     if form.validate_on_submit():
+        countries = form.countries.data.split('\n')
+        countries = [c.strip() for c in countries if c.strip()]
         topic = Topic(name=form.name.data, machine_name=slugify(form.machine_name.data.strip()), num_communities=0,
-                      show_posts_in_children=form.show_posts_in_children.data)
+                      show_posts_in_children=form.show_posts_in_children.data, countries=countries)
         if form.parent_id.data and form.parent_id.data != -1:
             topic.parent_id = form.parent_id.data
         else:
@@ -1409,10 +1438,13 @@ def admin_topic_edit(topic_id):
     topic = Topic.query.get_or_404(topic_id)
     form.parent_id.choices = topics_for_form(topic_id)
     if form.validate_on_submit():
+        countries = form.countries.data.split('\n')
+        countries = [c.strip() for c in countries if c.strip()]
         topic.name = form.name.data
         topic.num_communities = topic.communities.count()
         topic.machine_name = slugify(form.machine_name.data.strip())
         topic.show_posts_in_children = form.show_posts_in_children.data
+        topic.countries = countries
         if form.parent_id.data > 0:
             topic.parent_id = form.parent_id.data
         else:
@@ -1426,6 +1458,8 @@ def admin_topic_edit(topic_id):
         form.machine_name.data = topic.machine_name
         form.parent_id.data = topic.parent_id
         form.show_posts_in_children.data = topic.show_posts_in_children
+        if topic.countries and len(topic.countries):
+            form.countries.data = "\n".join(topic.countries)
     return render_template('admin/edit_topic.html', title=_('Edit topic'), form=form, topic=topic)
 
 
