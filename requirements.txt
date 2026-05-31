@@ -38,7 +38,7 @@ ua-parser[regex]
 captcha
 pytest
 stripe~=12.0.0
-Authlib~=1.5.0
+Authlib~=1.7.2
 webauthn~=2.5.0
 ldap3~=2.9.0
 sqlalchemy~=2.0.0
