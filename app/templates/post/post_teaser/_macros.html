@@ -31,7 +31,7 @@
         {% if post.type == POST_TYPE_LINK and not embed -%}
             <span class="domain_link" aria-hidden="true">(<a href="/d/{{ post.domain_id }}">{{ post.domain.name }}</a>)
             {% if post.domain.post_warning -%}
-                    <span class="fe fe-warning red" title="{{ post.domain.post_warning }}"></span>
+                    <span class="fe {{ post.domain.type_to_class() }}" title="{{ post.domain.post_warning }}"></span>
             {% endif -%}
             </span>
         {% endif -%}

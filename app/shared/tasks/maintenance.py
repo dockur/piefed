@@ -14,7 +14,7 @@ from app.activitypub.util import find_actor_or_create, find_language_or_create, 
 from app.constants import NOTIF_UNBAN, SRC_WEB
 from app.models import Notification, SendQueue, CommunityBan, CommunityMember, User, Community, Post, PostReply, \
     DefederationSubscription, Instance, ActivityPubLog, InstanceRole, utcnow, InstanceChooser, \
-    InstanceBan, Emoji
+    InstanceBan, Emoji, RevokedToken
 from app.shared.post import delete_post
 from app.utils import get_task_session, download_defeds, instance_banned, get_request_instance, get_request, \
     shorten_string, patch_db_session, archive_post, get_setting, set_setting, communities_banned_from_all_users, \
@@ -28,6 +28,11 @@ def cleanup_old_notifications():
     try:
         cutoff = utcnow() - timedelta(days=90)
         session.query(Notification).filter(Notification.created_at < cutoff).delete()
+
+        # Also remove old revoked API tokens
+        cutoff2 = utcnow() - timedelta(days=365)
+        session.query(RevokedToken).filter(RevokedToken.revoked_at < cutoff2).delete()
+
         session.commit()
     except Exception:
         session.rollback()

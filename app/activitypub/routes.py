@@ -36,7 +36,7 @@ from app.utils import gibberish, get_setting, community_membership, ap_datetime,
     community_moderators, html_to_text, add_to_modlog, instance_banned, get_redis_connection, \
     feed_membership, get_task_session, patch_db_session, \
     blocked_phrases, orjson_response, moderating_communities, joined_communities, moderating_communities_ids, \
-    moderating_communities_ids_all_users, publish_sse_event, blocked_users, block_honey_pot
+    moderating_communities_ids_all_users, publish_sse_event, blocked_users, block_honey_pot, instance_allowed
 
 
 @bp.route('/testredis')
@@ -619,6 +619,9 @@ def shared_inbox():
 
         id = object['id']
 
+    if g.site.allowlist_mode >= ALLOWLIST_STRONG and 'actor' in request_json:
+        if not instance_allowed(furl(request_json['actor']).host):
+            return '', 403
 
     if redis_client.exists(id):  # Something is sending same activity multiple times
         log_incoming_ap(id, APLOG_DUPLICATE, APLOG_IGNORED, saved_json, 'Already aware of this activity')

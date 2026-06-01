@@ -3,6 +3,8 @@ from flask_login import current_user
 from furl import furl
 from sqlalchemy import text, desc, func, asc
 from sqlalchemy.orm.exc import NoResultFound
+import jwt
+from datetime import datetime
 
 from app import db, cache
 from app.activitypub.util import make_image_sizes
@@ -11,7 +13,7 @@ from app.api.alpha.utils.reply import get_reply_list
 from app.api.alpha.views import user_view, reply_view, post_view, community_view
 from app.constants import *
 from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community, File, UserFlair, \
-    user_file, UserExtraField, UserNote
+    user_file, UserExtraField, UserNote, RevokedToken
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user
 from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes
 
@@ -976,6 +978,32 @@ def post_user_unban(auth, data):
         abort(403)
 
     return user_view(user=target_user_id, variant=5, user_id=user.id)
+
+
+def post_user_logout(auth):
+    """Revoke the current JWT token by adding its jti to RevokedToken table."""
+    if not auth:
+        raise Exception('incorrect_login')
+    
+    if not auth.startswith('Bearer '):
+        raise Exception('incorrect_login')
+    
+    token = auth[7:]  # remove 'Bearer '
+    
+    try:
+        decoded = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+    except Exception:
+        raise Exception('incorrect_login')
+    
+    jti = decoded.get('jti')
+    if jti:
+        # Check if already revoked
+        if not RevokedToken.query.filter_by(jti=jti).first():
+            revoked_token = RevokedToken(jti=jti)
+            db.session.add(revoked_token)
+            db.session.commit()
+    
+    return {'success': True}
 
 
 def post_user_register(data):
