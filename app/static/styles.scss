@@ -2566,7 +2566,7 @@ form {
 }
 
 @include breakpoint(tablet) {
-  .alert {
+  #outer_container > .alert {
     /* To match .row */
     margin-left: calc(-1 * var(--spacing-12));
   }
