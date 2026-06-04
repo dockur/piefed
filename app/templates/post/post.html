@@ -75,12 +75,12 @@
                         <div class="col">
                             <div class="reply_form_inner position-relative">
                                 {% if post.archived -%}
-                                    <div id="post_archived_notice" class="alert alert-message mb-0">
+                                    <div id="post_archived_notice" class="alert alert-message">
                                         {{ _('This post is old so votes and comments are disabled.') }}
                                     </div>
                                 {% else -%}
                                     {% if author_banned -%}
-                                        <div id="author_banned_notice" class="alert alert-message mb-0">
+                                        <div id="author_banned_notice" class="alert alert-message">
                                             {{ _('The author of this post has been banned/deleted so they might not see your reply.') }}
                                         </div>
                                     {% endif -%}

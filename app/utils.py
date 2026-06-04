@@ -471,7 +471,7 @@ def allowlist_html(html: str, a_target='_blank', test_env=False) -> str:
             if tag.name == 'span' and 'class' in tag.attrs and 'invisible' in tag.attrs['class']:
                 tag.extract()
             # Add nofollow and target=_blank to anchors
-            if tag.name == 'a':
+            if tag.name == 'a' and tag.attrs.get('href') is not None:
                 if not tag.attrs.get('href', "").startswith("#"):
                     tag.attrs['rel'] = 'nofollow ugc'
                     tag.attrs['target'] = a_target
