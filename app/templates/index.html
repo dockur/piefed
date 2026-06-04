@@ -8,13 +8,15 @@
 {% set active_child = 'home' %}
 
 {% block app_content %}
+
+{% if current_user.is_anonymous -%}
+    <div class="alert alert-info" role="alert">{{ _('Create an account to tailor this feed to your interests.') }}</div>
+{% endif -%}
+
 <div class="row home">
     <main class="col-12 col-lg-8 position-relative main_pane">
         {% if announcement -%}
             <div id="home_announcement">{{ announcement|safe }}</div>
-        {% endif -%}
-        {% if current_user.is_anonymous -%}
-            <div class="alert alert-info ml-3" role="alert">{{ _('Create an account to tailor this feed to your interests.') }}</div>
         {% endif -%}
         <div class="row">
             <div class="col-6 pe-1">
