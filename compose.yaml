@@ -134,7 +134,7 @@ services:
     image: adminer
     restart: unless-stopped
     ports:
-      - 8888:8080
+      - 127.0.0.1:8888:8080
     depends_on:
       - db
     networks:
