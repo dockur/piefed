@@ -1,0 +1,20 @@
+/* LIBERTATIA — Danger // Blood red on near-black // libertatia.org // AGPL */
+@import url("../hacker_bbs_shared/base.css?v=4");
+:root {
+  --lt-bg: #0d0000; --lt-bg-raised: #120000; --lt-bg-sunken: #080000;
+  --lt-bg-header: #060000; --lt-bg-hover: #1e0000; --lt-bg-active: #180000;
+  --lt-primary: #e03030; --lt-primary-rgb: 224, 48, 48;
+  --lt-primary-hi: #ff6666; --lt-primary-lo: #802020;
+  --lt-primary-dim: #3a0a0a; --lt-primary-deep: #1a0000;
+  --lt-muted: #5a1818; --lt-border: #2a0808; --lt-border-hi: #3a1010;
+  --lt-text: #e03030; --lt-text-hi: #ff6666; --lt-text-lo: #902828; --lt-text-dim: #4a1010;
+  --lt-on-primary: #0d0000;
+  --lt-danger: #5a0000; --lt-danger-hi: #7a0000; --lt-danger-text: #ff9966;
+  --lt-success-bg: #001a00; --lt-success-border: #4a8a00; --lt-success-text: #7aaa30;
+  --lt-glow: rgba(224,48,48,.45); --lt-glow-soft: rgba(224,48,48,.15); --lt-glow-faint: rgba(224,48,48,.07);
+  --lt-scan-color: rgba(0,0,0,.09);
+  --lt-thumbnail-filter: sepia(60%) hue-rotate(310deg) saturate(80%);
+  --lt-depth-0: #9d2222; --lt-depth-1: #9d5f22; --lt-depth-2: #868116; --lt-depth-3: #38812d; --lt-depth-4: #226586; --lt-depth-5: #4e388c; --lt-depth-6: #863865;
+  --lt-title-border: #3090c0;
+  --lt-title-bg: #1a0000;
+}
