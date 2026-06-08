@@ -117,7 +117,7 @@ body {
       var(--lt-scan-color) 4px
     ),
     linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
-    url('/static/themes/libertatia_shared/matrix-bg-tile.svg');
+    url('/static/themes/hacker_bbs_shared/matrix-bg-tile.svg');
   background-size: auto, auto, auto;
   background-position: top left, top left, top left;
   background-attachment: local, local, local;
