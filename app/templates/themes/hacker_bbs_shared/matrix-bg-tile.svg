@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+  <rect width="200" height="300" fill="#0a0e0a"/>
+  
+  <!-- Column 1 -->
+  <text x="12" y="20"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.9">1</text>
+  <text x="12" y="40"  font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.7">0</text>
+  <text x="12" y="60"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.8">1</text>
+  <text x="12" y="80"  font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.5">0</text>
+  <text x="12" y="100" font-family="monospace" font-size="13" fill="#24a024" opacity="0.95">1</text>
+  <text x="12" y="120" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">1</text>
+  <text x="12" y="140" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.5">0</text>
+  <text x="12" y="160" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.75">0</text>
+  <text x="12" y="180" font-family="monospace" font-size="13" fill="#24a024" opacity="1">1</text>
+  <text x="12" y="200" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.6">0</text>
+  <text x="12" y="220" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">1</text>
+  <text x="12" y="240" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">0</text>
+  <text x="12" y="260" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.35">1</text>
+  <text x="12" y="280" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.5">0</text>
+
+  <!-- Column 2 -->
+  <text x="32" y="30"  font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.6">0</text>
+  <text x="32" y="50"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.8">1</text>
+  <text x="32" y="70"  font-family="monospace" font-size="13" fill="#24a024" opacity="0.9">0</text>
+  <text x="32" y="90"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">1</text>
+  <text x="32" y="110" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.45">1</text>
+  <text x="32" y="130" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">0</text>
+  <text x="32" y="150" font-family="monospace" font-size="13" fill="#24a024" opacity="0.95">1</text>
+  <text x="32" y="170" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.55">0</text>
+  <text x="32" y="190" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">0</text>
+  <text x="32" y="210" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">1</text>
+  <text x="32" y="230" font-family="monospace" font-size="13" fill="#24a024" opacity="0.85">0</text>
+  <text x="32" y="250" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.5">1</text>
+  <text x="32" y="270" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">0</text>
+  <text x="32" y="290" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.6">1</text>
+
+  <!-- Column 3 -->
+  <text x="52" y="15"  font-family="monospace" font-size="13" fill="#24a024" opacity="1">0</text>
+  <text x="52" y="35"  font-family="monospace" font-size="13" fill="#1a6b1a" opacity="0.85">1</text>
+  <text x="52" y="55"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">0</text>
+  <text x="52" y="75"  font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.5">1</text>
+  <text x="52" y="95"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">0</text>
+  <text x="52" y="115" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">1</text>
+  <text x="52" y="135" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.6">0</text>
+  <text x="52" y="155" font-family="monospace" font-size="13" fill="#24a024" opacity="0.9">1</text>
+  <text x="52" y="175" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.75">0</text>
+  <text x="52" y="195" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.45">0</text>
+  <text x="52" y="215" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.55">1</text>
+  <text x="52" y="235" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.38">0</text>
+  <text x="52" y="255" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.5">1</text>
+  <text x="52" y="275" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">0</text>
+  <text x="52" y="295" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.55">1</text>
+
+  <!-- Column 4 -->
+  <text x="72" y="25"  font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.55">1</text>
+  <text x="72" y="45"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.72">0</text>
+  <text x="72" y="65"  font-family="monospace" font-size="13" fill="#24a024" opacity="0.88">1</text>
+  <text x="72" y="85"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.6">0</text>
+  <text x="72" y="105" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">1</text>
+  <text x="72" y="125" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">0</text>
+  <text x="72" y="145" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.5">1</text>
+  <text x="72" y="165" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">0</text>
+  <text x="72" y="185" font-family="monospace" font-size="13" fill="#24a024" opacity="0.92">1</text>
+  <text x="72" y="205" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.6">0</text>
+  <text x="72" y="225" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.43">1</text>
+  <text x="72" y="245" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.58">0</text>
+  <text x="72" y="265" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.38">1</text>
+  <text x="72" y="285" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.5">0</text>
+
+  <!-- Column 5 -->
+  <text x="92" y="18"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.75">1</text>
+  <text x="92" y="38"  font-family="monospace" font-size="13" fill="#24a024" opacity="1">0</text>
+  <text x="92" y="58"  font-family="monospace" font-size="13" fill="#1a6b1a" opacity="0.9">1</text>
+  <text x="92" y="78"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.68">0</text>
+  <text x="92" y="98"  font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.5">1</text>
+  <text x="92" y="118" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.62">0</text>
+  <text x="92" y="138" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">1</text>
+  <text x="92" y="158" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.55">0</text>
+  <text x="92" y="178" font-family="monospace" font-size="13" fill="#24a024" opacity="0.85">1</text>
+  <text x="92" y="198" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">0</text>
+  <text x="92" y="218" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.45">1</text>
+  <text x="92" y="238" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.55">0</text>
+  <text x="92" y="258" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.38">1</text>
+  <text x="92" y="278" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.48">0</text>
+  <text x="92" y="298" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">1</text>
+
+  <!-- Column 6 -->
+  <text x="112" y="28" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.5">0</text>
+  <text x="112" y="48" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">1</text>
+  <text x="112" y="68" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.45">0</text>
+  <text x="112" y="88" font-family="monospace" font-size="13" fill="#24a024" opacity="0.9">1</text>
+  <text x="112" y="108" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.72">0</text>
+  <text x="112" y="128" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.47">1</text>
+  <text x="112" y="148" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">0</text>
+  <text x="112" y="168" font-family="monospace" font-size="13" fill="#24a024" opacity="0.88">1</text>
+  <text x="112" y="188" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.6">0</text>
+  <text x="112" y="208" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">1</text>
+  <text x="112" y="228" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.58">0</text>
+  <text x="112" y="248" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.38">1</text>
+  <text x="112" y="268" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.52">0</text>
+  <text x="112" y="288" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">1</text>
+
+  <!-- Column 7 -->
+  <text x="132" y="20" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.62">1</text>
+  <text x="132" y="40" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.45">0</text>
+  <text x="132" y="60" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">1</text>
+  <text x="132" y="80" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.48">0</text>
+  <text x="132" y="100" font-family="monospace" font-size="13" fill="#24a024" opacity="0.95">1</text>
+  <text x="132" y="120" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">0</text>
+  <text x="132" y="140" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.45">1</text>
+  <text x="132" y="160" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.62">0</text>
+  <text x="132" y="180" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">1</text>
+  <text x="132" y="200" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.58">0</text>
+  <text x="132" y="220" font-family="monospace" font-size="13" fill="#24a024" opacity="0.88">1</text>
+  <text x="132" y="240" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">0</text>
+  <text x="132" y="260" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">1</text>
+  <text x="132" y="280" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.5">0</text>
+  <text x="132" y="300" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.38">1</text>
+
+  <!-- Column 8 -->
+  <text x="152" y="32" font-family="monospace" font-size="13" fill="#24a024" opacity="0.9">0</text>
+  <text x="152" y="52" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.72">1</text>
+  <text x="152" y="72" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.48">0</text>
+  <text x="152" y="92" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">1</text>
+  <text x="152" y="112" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">0</text>
+  <text x="152" y="132" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.6">1</text>
+  <text x="152" y="152" font-family="monospace" font-size="13" fill="#24a024" opacity="0.85">0</text>
+  <text x="152" y="172" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.7">1</text>
+  <text x="152" y="192" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.45">0</text>
+  <text x="152" y="212" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.58">1</text>
+  <text x="152" y="232" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">0</text>
+  <text x="152" y="252" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.55">1</text>
+  <text x="152" y="272" font-family="monospace" font-size="13" fill="#24a024" opacity="0.8">0</text>
+  <text x="152" y="292" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.62">1</text>
+
+  <!-- Column 9 -->
+  <text x="172" y="22" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.52">1</text>
+  <text x="172" y="42" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.68">0</text>
+  <text x="172" y="62" font-family="monospace" font-size="13" fill="#24a024" opacity="0.92">1</text>
+  <text x="172" y="82" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.72">0</text>
+  <text x="172" y="102" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.46">1</text>
+  <text x="172" y="122" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.62">0</text>
+  <text x="172" y="142" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.4">1</text>
+  <text x="172" y="162" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.58">0</text>
+  <text x="172" y="182" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">1</text>
+  <text x="172" y="202" font-family="monospace" font-size="13" fill="#24a024" opacity="0.88">0</text>
+  <text x="172" y="222" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.65">1</text>
+  <text x="172" y="242" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.42">0</text>
+  <text x="172" y="262" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.55">1</text>
+  <text x="172" y="282" font-family="monospace" font-size="13" fill="#0f2e0f" opacity="0.38">0</text>
+  <text x="172" y="299" font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.5">1</text>
+</svg>
