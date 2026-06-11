@@ -1,0 +1,21 @@
+/* LIBERTATIA — Paper // Black ink on off-white // libertatia.org // AGPL */
+@import url("../hacker_bbs_shared/base.css?v=4");
+:root {
+  --lt-bg: #f5f0e8; --lt-bg-raised: #ffffff; --lt-bg-sunken: #ede8e0;
+  --lt-bg-header: #1a1a14; --lt-bg-hover: #e8e0d0; --lt-bg-active: #ddd8cc;
+  --lt-primary: #1a1a14; --lt-primary-rgb: 26, 26, 20;
+  --lt-primary-hi: #000000; --lt-primary-lo: #4a4a3a;
+  --lt-primary-dim: #c8c0b0; --lt-primary-deep: #e8e0d0;
+  --lt-muted: #6a6a58; --lt-border: #c0b8a8; --lt-border-hi: #a0988a;
+  --lt-text: #1a1a14; --lt-text-hi: #000000; --lt-text-lo: #4a4a3a; --lt-text-dim: #8a8278;
+  --lt-on-primary: #f5f0e8;
+  --lt-danger: #ffd0c8; --lt-danger-hi: #ffb0a0; --lt-danger-text: #8a1a00;
+  --lt-success-bg: #d0f0d8; --lt-success-border: #408060; --lt-success-text: #1a4a28;
+  --lt-glow: rgba(0,0,0,0); --lt-glow-soft: rgba(0,0,0,0); --lt-glow-faint: rgba(0,0,0,0);
+  --lt-scan-color: rgba(0,0,0,0);
+  --lt-thumbnail-filter: none;
+  --lt-depth-0: #7b1c1c; --lt-depth-1: #703e11; --lt-depth-2: #4e4e0b; --lt-depth-3: #16492d; --lt-depth-4: #123e5f; --lt-depth-5: #382754; --lt-depth-6: #5f2243;
+  --lt-title-border: #1a5888;
+  --lt-title-bg: #e8e0d0;
+}
+.form-check-input:checked[type="checkbox"] { --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23f5f0e8' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e"); }

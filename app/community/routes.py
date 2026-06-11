@@ -1111,9 +1111,9 @@ def add_post(actor, type=None):
         form.language_id.data = current_user.language_id or g.site.language_id
 
         # The source query parameter is used when cross-posting - load the source post's content into the form
-        if request.args.get('source'):
+        if (post_type == POST_TYPE_LINK or post_type == POST_TYPE_VIDEO) and request.args.get('source'):
             source_post = Post.query.get(request.args.get('source'))
-            if source_post is None or source_post.deleted:
+            if source_post.deleted:
                 abort(404)
             form.title.data = source_post.title
             form.body.data = source_post.body
@@ -1121,13 +1121,11 @@ def add_post(actor, type=None):
             form.nsfl.data = source_post.nsfl
             form.ai_generated.data = source_post.ai_generated
             form.language_id.data = source_post.language_id
-            form.tags.data = tags_to_string(source_post)
             if post_type == POST_TYPE_LINK:
-                # Source could be a LINK, IMAGE, or video-hosted-link post —
-                # all three end up here. source_post.url is the right value for all.
                 form.link_url.data = source_post.url
             elif post_type == POST_TYPE_VIDEO:
                 form.video_url.data = source_post.url
+            form.tags.data = tags_to_string(source_post)
 
         if (post_type == POST_TYPE_LINK or post_type == POST_TYPE_VIDEO) and request.args.get('link'):
             if post_type == POST_TYPE_LINK:
@@ -1571,7 +1569,7 @@ def community_ban_user(community_id: int, user_id: int):
     user = User.query.get_or_404(user_id)
     existing = CommunityBan.query.filter_by(community_id=community.id, user_id=user.id).first()
 
-    if (community.is_owner() or current_user.is_admin_or_staff()) and community.is_moderator(user):
+    if (community.is_moderator() or current_user.is_admin_or_staff()) and not community.is_moderator(user):
         form = BanUserCommunityForm()
         if form.validate_on_submit():
             # Both CommunityBan and CommunityMember need to be updated. CommunityBan is under the control of moderators while
@@ -1653,7 +1651,7 @@ def community_unban_user(community_id: int, user_id: int):
     community = Community.query.get_or_404(community_id)
     user = User.query.get_or_404(user_id)
 
-    if (community.is_owner() or current_user.is_admin_or_staff()) and community.is_moderator(user):
+    if (community.is_moderator() or current_user.is_admin_or_staff()) and not community.is_moderator(user):
         existing_ban = CommunityBan.query.filter_by(community_id=community.id, user_id=user.id).first()
         if existing_ban:
             db.session.delete(existing_ban)

@@ -506,6 +506,7 @@ class Topic(db.Model):
     num_communities = db.Column(db.Integer, default=0)
     parent_id = db.Column(db.Integer)
     show_posts_in_children = db.Column(db.Boolean, default=False)
+    countries = db.Column(MutableList.as_mutable(ARRAY(db.String(15))))
     communities = db.relationship('Community', lazy='dynamic', backref='topic', cascade="all, delete-orphan")
 
     def path(self):
@@ -1510,7 +1511,15 @@ class User(UserMixin, db.Model):
             {'user_id': self.id, 'type': NOTIF_USER}).scalars())
 
     def encode_jwt_token(self):
-        payload = {'sub': str(self.id), 'iss': current_app.config['SERVER_NAME'], 'iat': int(time())}
+        if not current_app.config['SECRET_KEY']:
+            raise Exception('SECRET_KEY environment variable is not set')
+        expiry_seconds = current_app.config['JWT_EXPIRY_DAYS'] * 86400
+        payload = {'sub': str(self.id),
+                   'iss': current_app.config['SERVER_NAME'],
+                   'iat': int(time()),
+                   'exp': int(time()) + expiry_seconds,
+                   'jti': str(uuid.uuid4())  # Unique token ID, for revocation
+                   }
         return jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
 
     # mark a post as 'read' for this user
@@ -2189,7 +2198,12 @@ class Post(db.Model):
 
         limit = 9
         new_cross_posts = db.session.query(Post).filter(Post.id != self.id, Post.url == self.url, Post.deleted == False,
-                                                        Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.id)).limit(limit)
+                                                        Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.id)).limit(limit).all()
+
+        # grab these rows in id order first, otherwise the same url hitting a few communities at
+        # once ends up with two of these running at the same time and deadlocking on each other
+        if new_cross_posts:
+            db.session.query(Post).filter(Post.id.in_([ncp.id for ncp in new_cross_posts])).order_by(Post.id).with_for_update().all()
 
         # other posts: update their cross_posts field with this post.id if they have less than the limit
         for ncp in new_cross_posts:
@@ -2199,7 +2213,7 @@ class Post(db.Model):
                 ncp.cross_posts.append(self.id)
 
         # this post: set the cross_posts field to the limited list of ids from the most recent other posts
-        if new_cross_posts.count() > 0:
+        if new_cross_posts:
             self.cross_posts = [ncp.id for ncp in new_cross_posts]
         db.session.commit()
 
@@ -2310,8 +2324,8 @@ class Post(db.Model):
             if self.ap_id is None or self.ap_id == '' or len(self.ap_id) == 10:
                 slug = slugify(self.title, max_length=100 - len(current_app.config["SERVER_NAME"]))
                 if slug:
-                    self.ap_id = f'{current_app.config["SERVER_URL"]}/c/{community.name}/p/{self.id}/{slug}'
-                    self.slug = f'/c/{community.link()}/p/{self.id}/{slug}'
+                    self.ap_id = f'{current_app.config["SERVER_URL"]}/c/{community.name}@{current_app.config["SERVER_NAME"]}/p/{self.id}/{slug}'
+                    self.slug = f'/c/{community.name}@{current_app.config["SERVER_NAME"]}/p/{self.id}/{slug}'
                 else:
                     # Post title can't be slugified, fall back to old url structure
                     self.ap_id = f'{current_app.config["SERVER_URL"]}/post/{self.id}'
@@ -3161,6 +3175,7 @@ class Domain(db.Model):
     notify_mods = db.Column(db.Boolean, default=False, index=True)
     notify_admins = db.Column(db.Boolean, default=False, index=True)
     post_warning = db.Column(db.String(512))
+    warning_type = db.Column(db.Integer, default=0)             # 0 = warning, 1 = helpful context, 2 = recommendation
 
     def blocked_by(self, user):
         block = DomainBlock.query.filter_by(domain_id=self.id, user_id=user.id).first()
@@ -3175,6 +3190,15 @@ class Domain(db.Model):
             post.delete_dependencies()
             db.session.delete(post)
         db.session.commit()
+
+    def type_to_class(self):
+        if self.warning_type is None or self.warning_type == 0:
+            return 'fe-warning red'
+        elif self.warning_type == 1:
+            return 'fe-context green'
+        elif self.warning_type == 2:
+            return 'fe-recommended red'
+        return ''
 
 
 class DomainBlock(db.Model):
@@ -3674,6 +3698,7 @@ class Site(db.Model):
     private_instance = db.Column(db.Boolean, default=False)
     language_id = db.Column(db.Integer)
     honeypot = db.Column(db.Boolean, default=True)
+    allowlist_mode = db.Column(db.Integer, default=0)   # 0 = weak, 1 = strong, 2 = intense
 
 
     @staticmethod
@@ -4093,6 +4118,12 @@ class CronJobLog(db.Model):
             return timedelta(hours=25)
         elif self.name == 'send_queue':
             return timedelta(minutes=5)
+
+
+class RevokedToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), unique=True, index=True)  # JWT ID
+    revoked_at = db.Column(db.DateTime, default=utcnow)
 
 
 def _large_community_subscribers() -> float:

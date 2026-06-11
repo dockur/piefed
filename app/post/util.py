@@ -9,7 +9,7 @@ from flask_login import current_user
 from sqlalchemy import desc, asc, text, or_
 
 from app import db, cache
-from app.constants import POST_TYPE_LINK, POST_TYPE_IMAGE, POST_TYPE_VIDEO, POST_TYPE_POLL, POST_TYPE_ARTICLE
+from app.constants import POST_TYPE_LINK, POST_TYPE_IMAGE, POST_TYPE_VIDEO, POST_TYPE_POLL
 from app.models import PostReply, Post, Community, User, Language, utcnow
 from app.utils import blocked_or_banned_instances, blocked_users, is_video_hosting_site, get_request
 
@@ -294,12 +294,10 @@ def post_type_to_form_url_type(post_type: int, post_url: str):
     if post_type == POST_TYPE_LINK or is_video_hosting_site(post_url):
         return 'link'
     elif post_type == POST_TYPE_IMAGE:
-        return 'link'
+        return 'image'
     elif post_type == POST_TYPE_VIDEO:
         return 'video'
     elif post_type == POST_TYPE_POLL:
         return 'poll'
-    elif post_type == POST_TYPE_ARTICLE:
-        return 'discussion'
     else:
         return ''

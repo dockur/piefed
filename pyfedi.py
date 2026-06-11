@@ -17,7 +17,7 @@ from app.constants import POST_TYPE_LINK, POST_TYPE_IMAGE, POST_TYPE_ARTICLE, PO
     POST_TYPE_EVENT
 from app.models import Site
 from app.utils import getmtime, gibberish, shorten_string, shorten_url, digits, user_access, community_membership, \
-    can_create_post, can_upvote, can_downvote, shorten_number, ap_datetime, current_theme, community_link_to_href, \
+    can_upvote, can_downvote, shorten_number, ap_datetime, current_theme, community_link_to_href, \
     in_sorted_list, role_access, first_paragraph, person_link_to_href, feed_membership, html_to_text, remove_images, \
     notif_id_to_string, feed_link_to_href, get_setting, set_setting, show_explore, human_filesize, can_upload_video, \
     debug_checkpoint, compaction_level, humanize_number, round_invisible_digits, get_site_as_dict, localize_datetime, \
@@ -57,7 +57,6 @@ with app.app_context():
     app.jinja_env.globals['user_access'] = user_access
     app.jinja_env.globals['role_access'] = role_access
     app.jinja_env.globals['ap_datetime'] = ap_datetime
-    app.jinja_env.globals['can_create'] = can_create_post
     app.jinja_env.globals['can_upvote'] = can_upvote
     app.jinja_env.globals['can_downvote'] = can_downvote
     app.jinja_env.globals['can_upload_video'] = can_upload_video
@@ -87,7 +86,12 @@ with app.app_context():
 def before_request():
     # Handle CORS preflight requests for all routes
     if request.method == 'OPTIONS':
-        return '', 200
+        response = flask.make_response('', 200)
+        response.headers['Access-Control-Allow-Origin'] = current_app.config.get('CORS_ALLOW_ORIGIN', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, User-Agent'
+        #response.headers['Vary'] = 'Origin'
+        return response
     
     # Store nonce in g (g is per-request, unlike session)
     g.nonce = gibberish()

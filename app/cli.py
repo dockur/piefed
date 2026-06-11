@@ -5,6 +5,7 @@
 # You should have received a copy of the GPL along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import imaplib
+import poplib
 import logging
 import os
 import re
@@ -604,6 +605,7 @@ def register(app):
                         scheduled_post.ap_id = None
                         scheduled_post.scheduled_for = None
                         scheduled_post.posted_at = utcnow()
+                        scheduled_post.created_at = utcnow()
                         scheduled_post.edited_at = None
                         scheduled_post.status = POST_STATUS_PUBLISHED
                         scheduled_post.title = render_from_tpl(scheduled_post.title)
@@ -916,56 +918,95 @@ def register(app):
                 with patch_db_session(session):
                     import email
 
-                    imap_host = current_app.config['BOUNCE_HOST']
-                    imap_user = current_app.config['BOUNCE_USERNAME']
-                    imap_pass = current_app.config['BOUNCE_PASSWORD']
+                    bounce_host = current_app.config['BOUNCE_HOST']
+                    host_type = current_app.config['BOUNCE_HOST_TYPE']
+                    inbox_user = current_app.config['BOUNCE_USERNAME']
+                    inbox_pass = current_app.config['BOUNCE_PASSWORD']
                     something_deleted = False
 
-                    if imap_host:
+                    if bounce_host:
 
-                        # connect to host using SSL
-                        imap = imaplib.IMAP4_SSL(imap_host, port=993)
+                        if host_type.lower() == 'imap':
+                            # connect to host using SSL
+                            imap = imaplib.IMAP4_SSL(bounce_host, port=993)
 
-                        ## login to server
-                        imap.login(imap_user, imap_pass)
+                            ## login to server
+                            imap.login(inbox_user, inbox_pass)
 
-                        imap.select('Inbox')
+                            imap.select('Inbox')
 
-                        tmp, data = imap.search(None, 'ALL')
-                        rgx = r'[\w\.-]+@[\w\.-]+'
+                            tmp, data = imap.search(None, 'ALL')
+                            rgx = r'[\w\.-]+@[\w\.-]+'
 
-                        emails = set()
+                            emails = set()
 
-                        for num in data[0].split():
-                            tmp, data = imap.fetch(num, '(RFC822)')
-                            email_message = email.message_from_bytes(data[0][1])
-                            match = []
-                            if not isinstance(email_message._payload, str):
-                                if isinstance(email_message._payload[0]._payload, str):
-                                    payload = email_message._payload[0]._payload.replace("\n", " ").replace("\r", " ")
-                                    match = re.findall(rgx, payload)
-                                elif isinstance(email_message._payload[0]._payload, list):
-                                    if isinstance(email_message._payload[0]._payload[0]._payload, str):
-                                        payload = email_message._payload[0]._payload[0]._payload.replace("\n", " ").replace("\r", " ")
+                            for num in data[0].split():
+                                tmp, data = imap.fetch(num, '(RFC822)')
+                                email_message = email.message_from_bytes(data[0][1])
+                                match = []
+                                if not isinstance(email_message._payload, str):
+                                    if isinstance(email_message._payload[0]._payload, str):
+                                        payload = email_message._payload[0]._payload.replace("\n", " ").replace("\r", " ")
                                         match = re.findall(rgx, payload)
+                                    elif isinstance(email_message._payload[0]._payload, list):
+                                        if isinstance(email_message._payload[0]._payload[0]._payload, str):
+                                            payload = email_message._payload[0]._payload[0]._payload.replace("\n", " ").replace("\r", " ")
+                                            match = re.findall(rgx, payload)
 
-                                for m in match:
-                                    if current_app.config['SERVER_NAME'] not in m and current_app.config['SERVER_NAME'].upper() not in m:
-                                        emails.add(m)
-                                        print(str(num) + ' ' + m)
+                                    for m in match:
+                                        if current_app.config['SERVER_NAME'] not in m and current_app.config['SERVER_NAME'].upper() not in m:
+                                            emails.add(m)
+                                            print(str(num) + ' ' + m)
 
-                            imap.store(num, '+FLAGS', '\\Deleted')
-                            something_deleted = True
+                                imap.store(num, '+FLAGS', '\\Deleted')
+                                something_deleted = True
 
-                        if something_deleted:
-                            imap.expunge()
-                            pass
+                            if something_deleted:
+                                imap.expunge()
+                                pass
 
-                        imap.close()
+                            imap.close()
+
+                        elif host_type.lower() == 'pop3':
+                            # connect to host
+                            pop3 = poplib.POP3(bounce_host, port=110)
+
+                            ## login to server
+                            pop3.user(inbox_user)
+                            pop3.pass_(inbox_pass)
+
+                            rgx = r'[\w\.-]+@[\w\.-]+'
+                            emails = set()
+
+                            # Get message count
+                            tmp = pop3.list()
+                            message_ids = [msg.decode().split()[0] for msg in tmp[1]]
+
+                            for msg_id in message_ids:
+                                tmp, lines, octets = pop3.retr(msg_id)
+                                email_message = email.message_from_bytes(b'\n'.join(lines))
+                                match = []
+                                if not isinstance(email_message._payload, str):
+                                    if isinstance(email_message._payload[0]._payload, str):
+                                        payload = email_message._payload[0]._payload.replace("\n", " ").replace("\r", " ")
+                                        match = re.findall(rgx, payload)
+                                    elif isinstance(email_message._payload[0]._payload, list):
+                                        if isinstance(email_message._payload[0]._payload[0]._payload, str):
+                                            payload = email_message._payload[0]._payload[0]._payload.replace("\n", " ").replace("\r", " ")
+                                            match = re.findall(rgx, payload)
+
+                                    for m in match:
+                                        if current_app.config['SERVER_NAME'] not in m and current_app.config['SERVER_NAME'].upper() not in m:
+                                            emails.add(m)
+                                            print(str(msg_id) + ' ' + m)
+
+                                pop3.dele(msg_id)
+
+                            pop3.quit()
 
                         # Keep track of how many times email to an account has bounced. After 2 bounces, disable email sending to them
                         for bounced_email in emails:
-                            bounced_accounts = User.query.filter_by(email=bounced_email).all()
+                            bounced_accounts = User.query.filter_by(email=bounced_email.strip()).all()
                             for account in bounced_accounts:
                                 if account.bounces is None:
                                     account.bounces = 0

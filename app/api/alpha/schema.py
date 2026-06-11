@@ -921,6 +921,10 @@ class UserLoginResponse(DefaultSchema):
     jwt = fields.String(required=True)
 
 
+class LogoutResponse(DefaultSchema):
+    success = fields.Boolean(required=True)
+
+
 class UserUnreadCountsResponse(DefaultSchema):
     mentions = fields.Integer(required=True, metadata={"description": "Post and comment mentions"})
     private_messages = fields.Integer(required=True)

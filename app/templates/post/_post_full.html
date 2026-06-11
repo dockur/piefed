@@ -89,7 +89,7 @@
                     {{ post.url }}
                 </a>
                 {% if post.domain.post_warning -%}
-                    <span class="fe fe-warning red" title="{{ post.domain.post_warning }}"></span>
+                    <span class="fe {{ post.domain.type_to_class() }}" title="{{ post.domain.post_warning }}"></span>
                 {% endif -%}
             </p>
             {% if post.url.endswith('.mp3') -%}
@@ -475,7 +475,7 @@
                 </div>
             </div>
         {% endif -%}
-        {% if current_user.is_authenticated and post.type in [POST_TYPE_LINK, POST_TYPE_VIDEO, POST_TYPE_IMAGE] -%}
+        {% if current_user.is_authenticated and post.type == POST_TYPE_LINK or post.type == POST_TYPE_VIDEO -%}
             <div class="post_cross_post_link">
                 <a rel="nofollow" aria-label="{{ _('Cross-post') }}" title="{{ _('Cross-post') }}" href="{{ url_for('post.post_cross_post', post_id=post.id) }}">
                     <span class="fe fe-cross-post"></span>

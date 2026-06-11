@@ -66,7 +66,8 @@ from captcha.image import ImageCaptcha
 from app.models import CronJobLog, Settings, Domain, Instance, BannedInstances, User, Community, DomainBlock, IpBan, \
     Site, Post, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic, UserBlock, Language, \
     File, ModLog, CommunityBlock, Feed, FeedMember, CommunityFlair, CommunityJoinRequest, Notification, UserNote, \
-    PostReply, PostReplyBookmark, AllowedInstances, InstanceBan, Tag, Emoji, UserExtraField, ArchivedPostReply
+    PostReply, PostReplyBookmark, AllowedInstances, InstanceBan, Tag, Emoji, UserExtraField, ArchivedPostReply, \
+    RevokedToken
 
 logger = logging.getLogger(__name__)
 
@@ -470,7 +471,7 @@ def allowlist_html(html: str, a_target='_blank', test_env=False) -> str:
             if tag.name == 'span' and 'class' in tag.attrs and 'invisible' in tag.attrs['class']:
                 tag.extract()
             # Add nofollow and target=_blank to anchors
-            if tag.name == 'a':
+            if tag.name == 'a' and tag.attrs.get('href') is not None:
                 if not tag.attrs.get('href', "").startswith("#"):
                     tag.attrs['rel'] = 'nofollow ugc'
                     tag.attrs['target'] = a_target
@@ -1417,6 +1418,12 @@ def banned_instances(user_id) -> List[int]:
     return [block.instance_id for block in blocks]
 
 
+@cache.memoize(timeout=86400)
+def allowed_instance_domains() -> List[str]:
+    allowed = db.session.query(AllowedInstances).all()
+    return [instance.domain for instance in allowed]
+
+
 def retrieve_block_list():
     try:
         response = httpx_client.get('https://raw.githubusercontent.com/rimu/no-qanon/master/domains.txt', timeout=1)
@@ -1820,8 +1827,14 @@ def can_create_post(user, content: Community) -> bool:
         if user.verified is False or user.private_key is None:
             return False
     else:
-        if instance_banned(user.instance.domain):   # don't allow posts from defederated instances
-            return False
+        if not hasattr(g, 'site'):
+            g.site = db.session.query(Site).get(1)
+        if get_setting('use_allowlist') and g.site.allowlist_mode == ALLOWLIST_INTENSE:
+            if not instance_allowed(user.ap_domain):
+                return False
+        else:
+            if instance_banned(user.ap_domain):   # don't allow posts from defederated instances
+                return False
         if user.created_very_recently() and user.post_count > 3:    # new users can only do 3 posts in their first 24h
             return False
 
@@ -1857,8 +1870,14 @@ def can_create_post_reply(user, content: Community) -> bool:
         if user.verified is False or user.private_key is None:
             return False
     else:
-        if instance_banned(user.instance.domain):
-            return False
+        if not hasattr(g, 'site'):
+            g.site = db.session.query(Site).get(1)
+        if get_setting('use_allowlist') and g.site.allowlist_mode == ALLOWLIST_INTENSE:
+            if not instance_allowed(user.ap_domain):
+                return False
+        else:
+            if instance_banned(user.ap_domain):
+                return False
 
     if content.banned:
         return False
@@ -2782,6 +2801,9 @@ def add_to_modlog(action: str, actor: User, target_user: User = None, reason: st
 def authorise_api_user(auth, return_type=None, id_match=None) -> User | dict | int:
     if not auth:
         raise Exception('incorrect_login')
+    if not auth.startswith('Bearer '):
+        raise Exception('incorrect_login')
+
     token = auth[7:]  # remove 'Bearer '
 
     try:
@@ -2790,6 +2812,8 @@ def authorise_api_user(auth, return_type=None, id_match=None) -> User | dict | i
         raise Exception('incorrect_login - problem decoding bearer token')
 
     if decoded:
+        if RevokedToken.query.filter_by(jti=decoded.get('jti')).first():
+            raise Exception('incorrect_login')
         user_id = decoded['sub']
         user = User.query.get(user_id)
         if user is None:
