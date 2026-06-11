@@ -2198,7 +2198,12 @@ class Post(db.Model):
 
         limit = 9
         new_cross_posts = db.session.query(Post).filter(Post.id != self.id, Post.url == self.url, Post.deleted == False,
-                                                        Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.id)).limit(limit)
+                                                        Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.id)).limit(limit).all()
+
+        # grab these rows in id order first, otherwise the same url hitting a few communities at
+        # once ends up with two of these running at the same time and deadlocking on each other
+        if new_cross_posts:
+            db.session.query(Post).filter(Post.id.in_([ncp.id for ncp in new_cross_posts])).order_by(Post.id).with_for_update().all()
 
         # other posts: update their cross_posts field with this post.id if they have less than the limit
         for ncp in new_cross_posts:
@@ -2208,7 +2213,7 @@ class Post(db.Model):
                 ncp.cross_posts.append(self.id)
 
         # this post: set the cross_posts field to the limited list of ids from the most recent other posts
-        if new_cross_posts.count() > 0:
+        if new_cross_posts:
             self.cross_posts = [ncp.id for ncp in new_cross_posts]
         db.session.commit()
 
