@@ -9,7 +9,7 @@ flask populate_community_search
 
 # Schedule cron jobs in background
 if [[ "${CRON:-}" == [YyTt1]* ]]; then
-  supercronic /app/docker.cron >/dev/null &
+  supercronic -quiet -no-reap /app/docker.cron &
 fi
 
 if [ "${FLASK_DEBUG:-}" = "1" ] && [ "${FLASK_ENV:-}" = "development" ]; then
