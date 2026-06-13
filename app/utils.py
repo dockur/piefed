@@ -2585,8 +2585,8 @@ def fixup_url(url):
         path = parsed_url.path
         query_params = parse_qs(parsed_url.query)
 
-        # Handle YouTube playlists - let them through unmolested
-        if path == '/playlist' and 'list' in query_params:
+        # Handle YouTube playlists and posts - let them through unmolested
+        if path == '/playlist' and 'list' in query_params or path.startswith("/post/"):
             thumbnail_url = ''
             embed_url = url
             return thumbnail_url, embed_url

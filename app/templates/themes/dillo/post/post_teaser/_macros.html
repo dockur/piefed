@@ -365,7 +365,7 @@
                         <p><a href="{{ post.url }}">{{ _('View video') }}</a></p>
                     {% endif -%}
                 {% endif -%}
-                {% if 'youtube.com' in post.url -%}
+                {% if post.youtube_can_embed() -%}
                     <div class="video-wrapper {{ 'blur' if blur_content }}" data-src="https://www.youtube.com/embed/{{ post.youtube_embed() }}">
                         <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, autoplay='true') }}" rel="nofollow ugc" aria-label="{{ _('Read article') }}">
                             <img src="https://img.youtube.com/vi/{{ post.youtube_video_id() }}/hqdefault.jpg" alt="Video Thumbnail" width="512" height="288" loading="lazy" decoding="async" referrerpolicy="no-referrer">
