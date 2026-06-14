@@ -15,3 +15,9 @@ class TestFixupUrl(unittest.TestCase):
         thumbnail, embed = fixup_url('https://www.youtube.com/playlist?list=OLAK5uy_m0ymBxrjfVeJeuv9sde3pN_yvAfwWuxGw')
         self.assertEqual(thumbnail, '')
         self.assertEqual(embed, 'https://www.youtube.com/playlist?list=OLAK5uy_m0ymBxrjfVeJeuv9sde3pN_yvAfwWuxGw')
+
+    def test_post(self):
+        """Test youtube posts"""
+        thumbnail, embed = fixup_url('https://www.youtube.com/post/abcdefg')
+        self.assertEqual(thumbnail, '')
+        self.assertEqual(embed, 'https://www.youtube.com/post/abcdefg')

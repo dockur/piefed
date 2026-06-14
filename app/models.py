@@ -2273,6 +2273,20 @@ class Post(db.Model):
     def has_been_reported(self):
         return self.reports > 0 and current_user.is_authenticated and self.community.is_moderator()
 
+    def youtube_can_embed(self) -> bool:
+        if "youtube.com" not in self.url:
+            return False
+
+        parsed_url = urlparse(self.url)
+        query_params = parse_qs(parsed_url.query)
+
+        # Only create embed for videos, playlists and shorts (not e.g. posts)
+        return (
+            'list' in query_params or
+            'v' in query_params or
+            "/shorts/" in parsed_url.path
+        )
+
     def youtube_embed(self, rel=True) -> str:
         if self.url:
             parsed_url = urlparse(self.url)
