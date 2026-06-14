@@ -648,6 +648,8 @@ def save_icon_file(icon_file, directory='communities') -> File:
             extra_args = {'ContentType': guess_mime_type(final_place)}
             if current_app.config.get('S3_STORAGE_CLASS'):
                 extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+            if current_app.config.get('S3_PUBLIC_ACL'):
+                extra_args['ACL'] = 'public-read'
             s3.upload_file(final_place, current_app.config['S3_BUCKET'], s3_path, ExtraArgs=extra_args)
             file.file_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_path}"
 
@@ -657,6 +659,8 @@ def save_icon_file(icon_file, directory='communities') -> File:
                 extra_args = {'ContentType': guess_mime_type(final_place_thumbnail)}
                 if current_app.config.get('S3_STORAGE_CLASS'):
                     extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                if current_app.config.get('S3_PUBLIC_ACL'):
+                    extra_args['ACL'] = 'public-read'
                 s3.upload_file(final_place_thumbnail, current_app.config['S3_BUCKET'], s3_thumbnail_path, ExtraArgs=extra_args)
                 file.thumbnail_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_thumbnail_path}"
                 os.unlink(final_place_thumbnail)
@@ -768,6 +772,8 @@ def save_banner_file(banner_file, directory='communities') -> File:
             extra_args = {'ContentType': guess_mime_type(final_place)}
             if current_app.config.get('S3_STORAGE_CLASS'):
                 extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+            if current_app.config.get('S3_PUBLIC_ACL'):
+                extra_args['ACL'] = 'public-read'
             s3.upload_file(final_place, current_app.config['S3_BUCKET'], s3_path, ExtraArgs=extra_args)
             file.file_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_path}"
             
@@ -776,6 +782,8 @@ def save_banner_file(banner_file, directory='communities') -> File:
             extra_args = {'ContentType': guess_mime_type(final_place_thumbnail)}
             if current_app.config.get('S3_STORAGE_CLASS'):
                 extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+            if current_app.config.get('S3_PUBLIC_ACL'):
+                extra_args['ACL'] = 'public-read'
             s3.upload_file(final_place_thumbnail, current_app.config['S3_BUCKET'], s3_thumbnail_path, ExtraArgs=extra_args)
             file.thumbnail_path = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_thumbnail_path}"
             

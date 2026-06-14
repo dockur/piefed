@@ -519,6 +519,8 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
             extra_args = {'ContentType': guess_mime_type(final_place)}
             if current_app.config.get('S3_STORAGE_CLASS'):
                 extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+            if current_app.config.get('S3_PUBLIC_ACL'):
+                extra_args['ACL'] = 'public-read'
             s3 = session.client(
                 service_name='s3',
                 region_name=current_app.config['S3_REGION'],
