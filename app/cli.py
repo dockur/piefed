@@ -801,6 +801,8 @@ def register(app):
                 extra_args = {'ContentType': content_type}
                 if current_app.config.get('S3_STORAGE_CLASS'):
                     extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                if current_app.config.get('S3_PUBLIC_ACL'):
+                    extra_args['ACL'] = 'public-read'
                 new_path = file.source_url.replace('/static/media/', "/")
                 s3_path = new_path.replace(f'https://{server_name}/', '')
                 new_path = new_path.replace(server_name, current_app.config['S3_PUBLIC_URL'])

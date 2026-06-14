@@ -1592,6 +1592,8 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory, to
                                             extra_args = {'ContentType': content_type}
                                             if current_app.config.get('S3_STORAGE_CLASS'):
                                                 extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                                            if current_app.config.get('S3_PUBLIC_ACL'):
+                                                extra_args['ACL'] = 'public-read'
                                             boto3_session = boto3.session.Session()
                                             s3 = boto3_session.client(
                                                 service_name='s3',
@@ -1637,6 +1639,8 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory, to
                                             extra_args = {'ContentType': content_type}
                                             if current_app.config.get('S3_STORAGE_CLASS'):
                                                 extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                                            if current_app.config.get('S3_PUBLIC_ACL'):
+                                                extra_args['ACL'] = 'public-read'
                                             if boto3_session is None and s3 is None:
                                                 boto3_session = boto3.session.Session()
                                                 s3 = boto3_session.client(
