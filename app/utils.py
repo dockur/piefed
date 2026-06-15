@@ -2383,6 +2383,8 @@ def url_to_thumbnail_file(filename) -> File:
                 extra_args = {'ContentType': content_type}
                 if current_app.config.get('S3_STORAGE_CLASS'):
                     extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                if current_app.config.get('S3_PUBLIC_ACL'):
+                    extra_args['ACL'] = 'public-read'
                 boto3_session = boto3.session.Session()
                 s3 = boto3_session.client(
                     service_name='s3',
@@ -3446,6 +3448,8 @@ def move_file_to_s3(file_id, s3):
                     extra_args = {'ContentType': content_type}
                     if current_app.config.get('S3_STORAGE_CLASS'):
                         extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                    if current_app.config.get('S3_PUBLIC_ACL'):
+                        extra_args['ACL'] = 'public-read'
                     new_path = file.thumbnail_path.replace('app/static/media/', "")
                     s3.upload_file(file.thumbnail_path, current_app.config['S3_BUCKET'], new_path,
                                    ExtraArgs=extra_args)
@@ -3460,6 +3464,8 @@ def move_file_to_s3(file_id, s3):
                     extra_args = {'ContentType': content_type}
                     if current_app.config.get('S3_STORAGE_CLASS'):
                         extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                    if current_app.config.get('S3_PUBLIC_ACL'):
+                        extra_args['ACL'] = 'public-read'
                     new_path = file.file_path.replace('app/static/media/', "")
                     s3.upload_file(file.file_path, current_app.config['S3_BUCKET'], new_path,
                                    ExtraArgs=extra_args)
@@ -3474,6 +3480,8 @@ def move_file_to_s3(file_id, s3):
                     extra_args = {'ContentType': content_type}
                     if current_app.config.get('S3_STORAGE_CLASS'):
                         extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                    if current_app.config.get('S3_PUBLIC_ACL'):
+                        extra_args['ACL'] = 'public-read'
                     new_path = file.source_url.replace('app/static/media/', "")
                     s3.upload_file(file.source_url, current_app.config['S3_BUCKET'], new_path,
                                    ExtraArgs=extra_args)

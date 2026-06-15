@@ -173,6 +173,8 @@ def move_community_images_to_here(community_id):
                     extra_args = {'ContentType': content_type}
                     if current_app.config.get('S3_STORAGE_CLASS'):
                         extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                    if current_app.config.get('S3_PUBLIC_ACL'):
+                        extra_args['ACL'] = 'public-read'
                     boto3_session = boto3.session.Session()
                     s3 = boto3_session.client(
                         service_name='s3',
@@ -231,6 +233,8 @@ def move_community_images_to_here(community_id):
                                             extra_args = {'ContentType': content_type}
                                             if current_app.config.get('S3_STORAGE_CLASS'):
                                                 extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
+                                            if current_app.config.get('S3_PUBLIC_ACL'):
+                                                extra_args['ACL'] = 'public-read'
                                             new_path = f"posts/{new_filename[0:2]}/{new_filename[2:4]}/{new_filename}{file_extension}"
                                             s3.upload_file(tmp_file, current_app.config['S3_BUCKET'], new_path,
                                                            ExtraArgs=extra_args)
