@@ -1,3 +1,4 @@
+from app.models import User
 from flask import current_app
 from flask_login import current_user
 from sqlalchemy import text
@@ -9,13 +10,14 @@ from app.utils import authorise_api_user
 
 def post_upload_image(auth, image_file=None):
     try:
-        user_id = authorise_api_user(auth)
+        user: User = authorise_api_user(auth, return_type="model")
     except Exception:
         if current_user.is_authenticated:
-            user_id = current_user.id
+            user = current_user
         else:
             raise Exception('incorrect_login')
 
+    user_id = user.id
     total_size = 0
     file_sizes = db.session.execute(text('SELECT file_id, size FROM "user_file" WHERE user_id = :user_id'),
                                     {'user_id': user_id}).all()
@@ -25,7 +27,7 @@ def post_upload_image(auth, image_file=None):
     if total_size > current_app.config['FILE_UPLOAD_QUOTA']:
         raise Exception('quota_exceeded')
 
-    url = process_upload(image_file, user_id=user_id)
+    url = process_upload(image_file, user=user)
     return {'url': url}
 
 

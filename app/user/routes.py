@@ -2158,25 +2158,25 @@ def user_file_upload():
                     db.session.commit()
 
         if form.file1.data:
-            process_upload(form.file1.data, user_id=current_user.id)
+            process_upload(form.file1.data, user=current_user)
         if form.file2.data:
-            process_upload(form.file2.data, user_id=current_user.id)
+            process_upload(form.file2.data, user=current_user)
         if form.file3.data:
-            process_upload(form.file3.data, user_id=current_user.id)
+            process_upload(form.file3.data, user=current_user)
         if form.file4.data:
-            process_upload(form.file4.data, user_id=current_user.id)
+            process_upload(form.file4.data, user=current_user)
         if form.file5.data:
-            process_upload(form.file5.data, user_id=current_user.id)
+            process_upload(form.file5.data, user=current_user)
         if form.file6.data:
-            process_upload(form.file6.data, user_id=current_user.id)
+            process_upload(form.file6.data, user=current_user)
         if form.file7.data:
-            process_upload(form.file7.data, user_id=current_user.id)
+            process_upload(form.file7.data, user=current_user)
         if form.file8.data:
-            process_upload(form.file8.data, user_id=current_user.id)
+            process_upload(form.file8.data, user=current_user)
         if form.file9.data:
-            process_upload(form.file9.data, user_id=current_user.id)
+            process_upload(form.file9.data, user=current_user)
         if form.file10.data:
-            process_upload(form.file10.data, user_id=current_user.id)
+            process_upload(form.file10.data, user=current_user)
 
         return redirect(form.referrer.data)
 
