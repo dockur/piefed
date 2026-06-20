@@ -2203,7 +2203,7 @@ class Post(db.Model):
         # grab these rows in id order first, otherwise the same url hitting a few communities at
         # once ends up with two of these running at the same time and deadlocking on each other
         if new_cross_posts:
-            db.session.query(Post).filter(Post.id.in_([ncp.id for ncp in new_cross_posts])).order_by(Post.id).with_for_update().all()
+            db.session.query(Post.id).filter(Post.id.in_([ncp.id for ncp in new_cross_posts])).order_by(Post.id).with_for_update().all()
 
         # other posts: update their cross_posts field with this post.id if they have less than the limit
         for ncp in new_cross_posts:
