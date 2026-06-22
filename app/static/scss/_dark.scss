@@ -20,7 +20,8 @@
     border-radius: var(--spacing-4);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     padding: var(--spacing-8) var(--spacing-12);
-    font-size: $fs0x9375rem;
+    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .form-control::placeholder {

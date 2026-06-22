@@ -23,12 +23,14 @@ html {
 }
 
 body {
-  font-size: $fs0x95rem;
+  font-size: 16px; // will be overwritten by rem equivalent if browser supports it //
+  font-size: var(--font-size-16);
   --bs-body-font-family: system-ui,-apple-system,"Inter",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji";
 
   &.embed {
     .post_teaser_body h3 {
-      font-size: $fs1x2rem!important;
+      font-size: 18px !important;
+      font-size: var(--font-size-18) !important;
       margin-bottom: var(--spacing-2);
     }
 
@@ -293,7 +295,8 @@ div.navbar {
     padding-left: 0;
     break-after: avoid-column;
     text-align: right;
-    font-size: $fs120pc;
+    font-size: 20px;
+    font-size: var(--font-size-20);
     @include breakpoint(tablet) {
       text-align: left;
     }
@@ -400,7 +403,8 @@ form {
           content: '*';
           color: red;
           margin-left: var(--spacing-2);
-          font-size: $fs80pc;
+          font-size: 12px;
+          font-size: var(--font-size-12);
           position: relative;
         }
       }
@@ -417,7 +421,8 @@ form {
         content: '*';
         color: red;
         margin-left: var(--spacing-2);
-        font-size: $fs80pc;
+        font-size: 12px;
+        font-size: var(--font-size-12);
         position: relative;
       }
     }
@@ -449,13 +454,15 @@ form {
 }
 
 #breadcrumb_nav {
-  font-size: $fs87pc;
+  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 @include breakpoint(tablet) {
   #breadcrumb_nav {
       display: block;
-      font-size: $fs87pc;
+      font-size: 12px;
+      font-size: var(--font-size-12);
 
       .breadcrumb {
           padding: 0;
@@ -493,12 +500,14 @@ form {
   }
 
   .fe {
-    font-size: $fs150pc;
+    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   @media (max-width: 350px) {
     a {
-      font-size: $fs80pc;
+      font-size: 12px;
+      font-size: var(--font-size-12);
       padding-left: 0;
       padding-right: 0;
     }
@@ -509,7 +518,8 @@ form {
 
   @media (max-width: 420px) {
     a {
-      font-size: $fs80pc;
+      font-size: 12px;
+      font-size: var(--font-size-12);
       padding-left: 0;
       padding-right: 0;
     }
@@ -539,7 +549,8 @@ form {
 
     tr td {
       padding: var(--spacing-8) var(--spacing-4);
-      font-size: $fs12px;
+      font-size: 12px; // will be overwritten by rem if browser supports it //
+      font-size: var(--font-size-12);
     }
   }
 }
@@ -792,7 +803,8 @@ ul.form-multicheck-columns {
       }
 
       .fe-discussion, .fe-poll, .fe-link {
-        font-size: $fs52px;
+        font-size: 52px;
+        font-size: var(--font-size-52);
       }
 
       img {
@@ -815,27 +827,31 @@ ul.form-multicheck-columns {
           background: none;
         }
         .fe::before {
-          font-size: $fs28px;
+          font-size: 28px;
+          font-size: var(--font-size-28);
           padding-right: var(--spacing-8);
         }
       }
 
       &.missing_thumbnail {
         .fe::before {
-          font-size: x-large;
+          font-size: 24px;
+          font-size: var(--font-size-24);
           opacity: $opacity-08;
         }
       }
     }
     &.blocked {
       opacity: $opacity-02;
-      font-size: $fs80pc;
+      font-size: 12px;
+      font-size: var(--font-size-12);
 
       .voting_buttons {
         width: 46px;
         line-height: var(--spacing-24);
         .upvote_button, .downvote_button {
-          font-size: $fs80pc;
+          font-size: 12px;
+          font-size: var(--font-size-12);
         }
       }
     }
@@ -912,7 +928,8 @@ ul.form-multicheck-columns {
     left: 43%;
     top: 40%;
     width: 13%;
-    font-size: $fs64px;
+    font-size: 64px;
+    font-size: var(--font-size-64);
     background-color: $white;
     opacity: $opacity-05;
   }
@@ -1241,7 +1258,8 @@ details {
   }
 
   .text-muted {
-    font-size: $fs13px;
+    font-size: 14px; // will be overwritten by rem if browser supports it //
+    font-size: var(--font-size-14); 
   }
 }
 
@@ -1251,7 +1269,8 @@ details {
   margin-right: var(--spacing-8);
 
   .comment_time {
-    font-size: $fs87pc;
+    font-size: 12px;
+    font-size: var(--font-size-12);
     --bs-text-opacity: #{$opacity-10};
     color: var(--bs-secondary-color) !important;
 
@@ -1412,7 +1431,8 @@ details {
   min-width: $min-touch-target + 10;
   padding: 0 0 var(--spacing-4) var(--spacing-4);
   line-height: var(--spacing-28);
-  font-size: $fs14px;
+  font-size: 14px;
+  font-size: var(--font-size-14);
 
   @include breakpoint(laptop) {
     line-height: 25px;
@@ -1584,7 +1604,8 @@ details {
     }
 
     .notify_toggle {
-      font-size: $fs87pc;
+      font-size: 14px;
+      font-size: var(--font-size-14);
 
       a {
         width: 44px;
@@ -1907,7 +1928,8 @@ a.unread, div.unread {
     padding: var(--spacing-4) var(--spacing-8);
     font-family: "Open Sans", "Segoe UI", Tahoma, Arial, sans-serif;
     margin: 0 var(--spacing-20) var(--spacing-12) var(--spacing-20);
-    font-size: $fs95pc;
+    font-size: 14px;
+    font-size: var(--font-size-14);
     border-left-style: solid;
     border-left-width: var(--spacing-4);
     background-color: var(--bs-secondary-bg-subtle);
@@ -2010,7 +2032,8 @@ a.unread, div.unread {
 }
 
 .warning_badge {
-  font-size: $fs12px;
+  font-size: 12px; // will be overwritten by rem if browser supports it //
+  font-size: var(--font-size-12);
   border-radius: var(--border-2);
   margin-right: var(--spacing-2);
   overflow: hidden;
@@ -2209,7 +2232,8 @@ h1 .warning_badge {
 }
 
 .card-title {
-  font-size: $fs140pc;
+  font-size: 20px;
+  font-size: var(--font-size-20);
 }
 
 .card-header {
@@ -2428,14 +2452,16 @@ form {
 
 .domain_link {
   color: $dark-grey;
-  font-size: $fs73pc;
+  font-size: 12px;
+  font-size: var(--font-size-12);
   a {
     color: $dark-grey;
   }
 }
 
 .post_flair {
-  font-size: $fs73pc;
+  font-size: 12px;
+  font-size: var(--font-size-12);
   padding: var(--spacing-2) var(--spacing-4);
   border-radius: var(--spacing-4);
   text-wrap: nowrap;
@@ -2477,7 +2503,8 @@ form {
   gap: var(--spacing-8);
 
   .post_flair {
-    font-size: $fs90pc;
+    font-size: 12px;
+    font-size: var(--font-size-12);
     padding: var(--spacing-2) var(--spacing-4);
     line-height: var(--spacing-20);
     display: inline-block;
@@ -2489,7 +2516,8 @@ form {
 }
 
 .user_flair, .user_note {
-  font-size: $fs87pc;
+  font-size: 12px;
+  font-size: var(--font-size-12);
   background-color: $white-fade;
   border-radius: var(--spacing-4);
   border: solid var(--border-1) $grey;
@@ -2799,7 +2827,8 @@ form {
     width: 300px;
 
     p {
-      font-size: $fs13px;
+      font-size: 14px; // will be overwritten by rem if browser supports it //
+      font-size: var(--font-size-14);
     }
 
     .preview_avatar_image {
@@ -2963,7 +2992,8 @@ form {
           width: var(--spacing-20);
           flex-shrink: 0;
           overflow: hidden;
-          font-size: $fs17px;
+          font-size: 18px;
+          font-size: var(--font-size-18);
 
           img {
             margin-top: calc(var(--spacing-4) * -1);
@@ -2972,14 +3002,16 @@ form {
 
         .emoji_alt_code {
             margin: var(--spacing-2) var(--spacing-4);
-            font-size: $fs0x8em;
+            font-size: 14px;
+            font-size: var(--font-size-14);
         }
     }
 
     .message_reaction_count {
-        font-size: $fs90pc;
+        font-size: 14px;
+        font-size: var(--font-size-14);
         margin: 0 var(--spacing-2);
-        line-height: $fs1x0317em;
+        line-height: var(--font-size-local);
         align-self: center;
     }
 
@@ -3009,7 +3041,7 @@ form {
         border: var(--border-1) solid var(--bs-border-color);
 
         & i {
-            font-size: $fs1em;
+            font-size: var(--font-size-local);
             color: var(--bs-secondary-color);
         }
 
@@ -3031,7 +3063,8 @@ form {
             font-weight: 700;
             color: var(--bs-secondary-color);
             margin-right: 0;
-            line-height: $fs14px;
+            line-height: 14px;
+            line-height: var(--font-size-14);
         }
 
         &:hover .message_reaction_count {
@@ -3067,7 +3100,8 @@ form {
 
 /* Emoji styling */
 .emoji-picker .emoji {
-  font-size: $fs1x45rem;
+  font-size: 24px;
+  font-size: var(--font-size-24);
   line-height: 1;
 }
 
@@ -3098,7 +3132,8 @@ form {
 
 #side_pane {
     .list-group-item .text-muted {
-      font-size: $fs87pc;
+      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 }
 
