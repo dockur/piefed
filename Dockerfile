@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install gunicorn
 
-FROM python:3.13-alpine
+FROM python:3.13-alpine AS runtime
 
 RUN adduser -D python
 
