@@ -1,0 +1,4 @@
+5 2 * * * cd /app && ./daily.sh 2>&1 | tee -a /tmp/daily.log
+*/1 * * * * cd /app && ./send_queue.sh 2>&1 | tee -a /tmp/send_queue.log
+*/30 * * * * cd /app && ./email_notifs.sh 2>&1 | tee -a /tmp/email_notifs.log
+5 4 * * 1 cd /app && ./remove_orphan_files.sh 2>&1 | tee -a /tmp/remove_orphan_files.log

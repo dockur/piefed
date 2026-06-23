@@ -99,6 +99,16 @@ You will have an easier time if Nginx runs on the host (if using Nginx) rather t
 more easily. Once everything else is set up, go to https://your-instance/test_ip and make sure it's detecting your IP address correctly.
 
 #### SETUP CRON (AUTOMATED) JOBS
+
+Either set the `CRON` variable in your compose file like this:
+
+```yaml
+environment:
+  - CRON=true
+```
+
+or otherwise schedule the tasks on your host machine:
+
 ```bash
 sudo nano /etc/cron.d/piefed
 ```
