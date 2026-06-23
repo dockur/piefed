@@ -30,7 +30,8 @@ $min-touch-target: 44px; // many instances of this size referenced in styles.scs
   display: block;
   width: 100%;
   padding: var(--spacing-8) var(--spacing-12);
-  font-size: $fs0x9375rem;
+  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: var(--spacing-24);
   color: var(--bs-body-color);
   background-color: var(--white);

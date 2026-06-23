@@ -1,50 +1,34 @@
 @import "_layout.scss";
 
-$fs0x95rem: 0.95rem; // body styles.scss
-$fs12px: 12px; // one in styles.scss, communities_table
-$fs13px: 13px; // muted and p font style
-$fs14px: 14px; // line-height styles.scss, voting_buttons
-$fs17px: 17px; // emoji font size styles.scss
-$fs18px: 18px;
-$fs28px: 28px; // fe::before 
-$fs30px: 30px; // line height in _compact
-$fs40px: 40px;
-$fs52px: 52px; // fe-discussion, fe-poll, fe-link
-$fs64px: 64px; // fe-video
+:root {
+    --font-size-10: 0.625rem; // 10px
+    --font-size-12: 0.75rem; // 12px, styles.scss, communities_table,  domain_link, post_flair, user_flair, post_flair_sidepane, label required after, link (a) at different breakpoints, blocked, upvote, downvote, .comment_time, #side_pane .list-group-item .text-muted, #breadcrumb_nav
+    --font-size-14: 0.875rem; // 14px, muted and p font style, line-height, voting_buttons styles.scss, .small _typography, notify_toggle, .message_reaction_count, _compact post_utilities_bar, _compact btn, blockquote 
+    --font-size-16: 1rem; // 16px, body styles.scss, _controls.scss form-control, _dark form-control
+    --font-size-18: 1.125rem; // 18px, emoji font size styles.scss, post_teaser_body h3
+    --font-size-20: 1.25rem; // 20px, communities_menu .dropdown-header, .card-title, .mobilenav .fe, .fe-answer, .fe-unanswer
+    --font-size-24: 1.5rem; // 24px, equivalent to "x-large" named font size, .missing_thumbnail, .emoji-picker .emoji, .side-pane h2 _compact
+    --font-size-28: 1.75; // 28px, fe::before 
+    --font-size-30: 1.875rem; // 30px, line height in _compact
+    --font-size-32: 2rem; // 32px
+    --font-size-40: 2.5rem; // 40px, fe-external-noimg in _typography
+    --font-size-52: 3.25rem; // 52px, fe-discussion, fe-poll, fe-link
+    --font-size-64: 4rem; // 64px, fe-video
+    
+    --font-size-local: 1em; // i (italics), .message_reaction_count
 
-// note there is a named font size "x-large" for missing_thumbnail
-
-$fs0x9375rem: 0.9375rem; // _controls.scss form-control, _dark form-control (Duplicate?)
-$fs1x2rem: 1.2rem; // styles.scss font-size
-$fs1x25rem: 1.25rem; // styles.scss
-$fs1x45rem: 1.45rem; // styles.scss
-$fs1x5rem: 1.5rem; // _compact.scss
-
-$fs0x8em: 0.8em; // styles.scss emoji_alt_code
-$fs1em: 1em; // i (italics)
-$fs1x0317em: 1.0317em; // styles.scss, message_reaction_count line height
+}
 
 // values in styles.scss
-$h1: 2rem;
-$h2: 1.8rem;
-$h3: 1.6rem;
-$h3post: 110%;
-$h4: 1.25rem;
-// no h5 size specified
-$h6: 1rem;
+$h1: var(--font-size-32);
+$h2: var(--font-size-30);
+$h3: var(--font-size-24);
+$h3post: var(--font-size-18);
+$h4: var(--font-size-20);
+$h5: var(--font-size-18); // most h5 is 1.25rem from reboot bootstrap class (equivalent to 20px)
+$h6: var(--font-size-16);
+
 $h-letterspacing: -0.2px; // in styles.scss
-
-$small_text: 87%; // existing variable, moved to the top DUPLICATE
-
-$fs73pc: 73%; // domain_link, post_flair
-$fs80pc: 80%; // a at different break points, blocked, upvote, downvote
-$fs87pc: 87%; // breadcrumb_nav at different break points, comment_time, notify_toggle, user_flair, user_note, side_pane
-$fs90pc: 90%; // post_flair, message_reaction_count
-$fs93pc: 93%; // _compact button, _compact post_utilities_bar
-$fs95pc: 95%; // blockquote
-$fs120pc: 120%;
-$fs140pc: 140%; // card-title
-$fs150pc: 150%; // .fe
 
 /* for more info about the feather font used for icons see https://at-ui.github.io/feather-font/ */
 /* use https://fontdrop.info/ to get the unicode values of the feather.ttf file */
@@ -110,7 +94,8 @@ $fs150pc: 150%; // .fe
 }
 
 .fe-external-noimg::before {
-  font-size: $fs40px;
+  font-size: 40px;
+  font-size: var(--font-size-40);
   float: right;
   position: relative;
   top: var(--spacing-12);
@@ -405,7 +390,8 @@ $fs150pc: 150%; // .fe
 
 h1 {
   .fe-bell, .fe-no-bell {
-    font-size: $fs18px;
+    font-size: 18px;
+    font-size: var(--font-size-18);
     top: calc(-1 * var(--spacing-4));
     left: var(--spacing-12);
   }
@@ -542,7 +528,8 @@ h1 {
 .fe-answer::before {
   content: "\e92b";
   color: var(--bs-form-valid-border-color);
-  font-size: $fs150pc;
+  font-size: 20px;
+  font-size: var(--font-size-20);
   position: relative;
   display: flex;
 }
@@ -550,7 +537,8 @@ h1 {
 .fe-unanswer::before {
   content: "\ea02";
   color: var(--bs-danger);
-  font-size: $fs150pc;
+  font-size: 20px;
+  font-size: var(--font-size-20);
   position: relative;
   display: flex;
 }
@@ -564,7 +552,8 @@ a.no-underline {
 }
 
 .small, small {
-  font-size: $small_text;
+  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 fieldset legend {
