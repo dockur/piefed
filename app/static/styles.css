@@ -211,6 +211,7 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 :root {
   --font-size-10: 0.625rem;
   --font-size-12: 0.75rem;
+  --font-size-13: 0.8rem;
   --font-size-14: 0.875rem;
   --font-size-16: 1rem;
   --font-size-18: 1.125rem;
@@ -734,8 +735,8 @@ a.no-underline:hover {
 }
 
 .small, small {
-  font-size: 14px;
-  font-size: var(--font-size-14);
+  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 fieldset legend {
@@ -1312,8 +1313,8 @@ form .mb-3.required > label:after {
 }
 
 #breadcrumb_nav {
-  font-size: 12px;
-  font-size: var(--font-size-12);
+  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 #breadcrumb_nav .breadcrumb {
   position: relative;
