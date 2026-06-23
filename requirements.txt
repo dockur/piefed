@@ -22,7 +22,7 @@ pyld==2.0.4
 boto3~=1.39.0
 markdown2==2.5.3
 beautifulsoup4==4.12.2
-flask-caching~=2.3.0
+flask-caching~=2.4.0
 Pillow
 pillow-heif
 pillow-avif-plugin
