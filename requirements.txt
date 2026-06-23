@@ -19,7 +19,7 @@ SQLAlchemy-Utils==0.41.1
 cryptography==48.0.0
 Bootstrap-Flask==2.5.0
 pyld==2.0.4
-boto3~=1.39.0
+boto3~=1.43.36
 markdown2==2.5.3
 beautifulsoup4==4.12.2
 flask-caching~=2.3.0
