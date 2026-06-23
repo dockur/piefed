@@ -2441,6 +2441,9 @@ class Post(db.Model):
         except ValueError:
             return pendulum.instance(self.last_active if sort == 'active' and self.last_active else self.posted_at).diff_for_humans(locale='en')
 
+    def posted_at_formatted(self, sort):
+        return pendulum.instance(self.last_active if sort == 'active' and self.last_active else self.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ')
+
     def notify_new_replies(self, user_id: int) -> bool:
         existing_notification = db.session.query(NotificationSubscription).\
             filter(NotificationSubscription.entity_id == self.id,

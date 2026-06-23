@@ -57,7 +57,7 @@
     {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() -%}
         <span class="user_flair pronouns">{{ user_pronouns[post.author.id] }}</span>
     {%- endif %}
-    <time datetime="{{ post.last_active }}" title="{{ post.last_active }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
+    <time datetime="{{ post.posted_at_formatted(sort) }}" title="{{ post.posted_at_formatted(sort) }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
 {%- endmacro %}
 
 {% macro render_utilities_bar(post, sort=None, embed=False, low_bandwidth=False, current_user=None, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, moderated_community_ids=None) -%}

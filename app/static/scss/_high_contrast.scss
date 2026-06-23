@@ -3,89 +3,89 @@
 
 @media (prefers-contrast: more) {
   :root {
-    --bs-link-color: #{$black};
-    --bs-link-color-rgb: #{$black};
-    --bs-link-hover-color-rgb: #{$darker-grey};
+    --bs-link-color: var(--black);
+    --bs-link-color-rgb: var(--black);
+    --bs-link-hover-color-rgb: var(--darker-grey);
   }
 
   [data-bs-theme="dark"] {
-      --bs-body-bg: #{$black};
-      --bs-link-color: #{$white};
-      --bs-link-color-rgb: #{$white};
-      --bs-link-hover-color-rgb: #{$white-fade};
-      --bs-heading-color: #{$white};
-      --bs-body-color: #{$white};
-      --bs-body-color-rgb: #{$white};
+      --bs-body-bg: var(--black);
+      --bs-link-color: var(--white);
+      --bs-link-color-rgb: var(--white);
+      --bs-link-hover-color-rgb: var(--white-fade);
+      --bs-heading-color: var(--white);
+      --bs-body-color: var(--white);
+      --bs-body-color-rgb: var(--white);
   }
 
   .btn-primary {
-      --bs-btn-bg: #{$black};
-      --bs-btn-border-color: #{$black};
-      --bs-btn-hover-bg: #{$darker-grey};
+      --bs-btn-bg: var(--black);
+      --bs-btn-border-color: var(--black);
+      --bs-btn-hover-bg: var(--darker-grey);
   }
   [data-bs-theme="dark"] .btn-primary {
-      --bs-btn-bg: #{$white};
-      --bs-btn-border-color: #{$white};
-      --bs-btn-hover-bg: #{$white};
-      --bs-btn-color: #{$black};
+      --bs-btn-bg: var(--white);
+      --bs-btn-border-color: var(--white);
+      --bs-btn-hover-bg: var(--white);
+      --bs-btn-color: var(--black);
   }
   [data-bs-theme="dark"] .btn-primary:hover {
-      --bs-btn-hover-color: #{$black};
+      --bs-btn-hover-color: var(--black);
   }
 
   .btn-outline-secondary {
-      --bs-btn-color: #{$black};
+      --bs-btn-color: var(--black);
   }
   [data-bs-theme="dark"] .btn-outline-secondary {
-      --bs-btn-color: #{$white};
+      --bs-btn-color: var(--white);
   }
 
   .post_list .post_teaser {
-      border-bottom: solid var(--border-1) #{$black};
+      border-bottom: solid var(--border-1) var(--black);
   }
   [data-bs-theme="dark"] .post_list .post_teaser {
-      border-bottom: solid var(--border-1) $white;
+      border-bottom: solid var(--border-1) var(--white);
   }
 
   .domain_link, .domain_link a {
-      color: $black;
+      color: var(--black);
   }
   [data-bs-theme="dark"] .domain_link, [data-bs-theme="dark"] .domain_link a {
-      color: $whitesmoke;
+      color: var(--whitesmoke);
   }
 
   .main_pane, .voting_buttons div {
-      border: solid var(--border-1) $darker-grey;
+      border: solid var(--border-1) var(--darker-grey);
   }
   [data-bs-theme="dark"] .main_pane, [data-bs-theme="dark"] .voting_buttons div {
-      border: solid var(--border-1) $white-fade;
+      border: solid var(--border-1) var(--white-fade);
   }
 
   div.navbar {
-      border-bottom: solid var(--border-1) $darker-grey;
+      border-bottom: solid var(--border-1) var(--darker-grey);
   }
   [data-bs-theme="dark"] div.navbar {
-      border-bottom: solid var(--border-1) $white;
+      border-bottom: solid var(--border-1) var(--white);
   }
 
   .nav-link {
-      color: $black;
+      color: var(--black);
   }
   [data-bs-theme="dark"] .nav-link {
-      color: $white;
+      color: var(--white);
   }
 
   .card {
-      --bs-card-border-color: #{$darker-grey};
+      --bs-card-border-color: var(--darker-grey);
   }
   [data-bs-theme="dark"] .card {
-      --bs-card-border-color: #{$white};
+      --bs-card-border-color: var(--white);
   }
 
   .coolfieldset.collapsed legend, .coolfieldset legend, .coolfieldset.expanded legend {
-      background-color: $white;
+      background-color: var(--white);
   }
   [data-bs-theme="dark"] .coolfieldset.collapsed legend, [data-bs-theme="dark"] .coolfieldset legend, [data-bs-theme="dark"] .coolfieldset.expanded legend {
-      background-color: $black;
+      background-color: var(--black);
   }
 }

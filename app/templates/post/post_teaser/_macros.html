@@ -71,7 +71,7 @@
         {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() -%}
             <span class="user_flair pronouns">{{ user_pronouns[post.author.id] }}</span>
         {%- endif %}
-        <time datetime="{{ post.last_active }}" title="{{ post.last_active }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
+        <time datetime="{{ post.posted_at_formatted(sort) }}" title="{{ post.posted_at_formatted(sort) }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
 {% endif -%}
 {%- endmacro %}
 

@@ -572,6 +572,6 @@ fieldset legend {
 }
 
 .form-control::placeholder {
-  color: rgba(var(--bs-secondary-color-rgb), $opacity-05);
+  color: rgba(var(--bs-secondary-color-rgb), var(--opacity-05));
   font-style: italic;
 }
