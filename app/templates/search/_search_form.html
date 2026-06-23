@@ -9,26 +9,33 @@
         <input type="radio" name="search_for" class="btn-check" id="btncheck3" autocomplete="off" value="communities" {{ 'checked' if search_for | default('') == 'communities' else '' }}>
         <label class="btn btn-outline-primary" for="btncheck3">{{ _('Communities') }}</label>
     </div>
-    <div class="form-group"><label class="form-control-label" for="search_term" aria-label="{{ _('Search here') }}">{{ _('Keyword') }} ({{ _('optional') }})</label>
+    <div class="form-group"><label class="form-control-label" for="search_term" aria-label="{{ _('Search here') }}">{{ _('Keyword') }}</label>
         <input autofocus="" class="form-control" id="search_term" name="q" type="search" value="{{ q | default('') }}">
     </div>
-    <div class="form-group"><label class="form-control-label" for="community" aria-label="{{ _('Restrict results by community') }}">{{ _('Community') }}</label>
-        <input type="text" class="form-control" id="community" name="community"
-               list="community_suggestions"
-               hx-post="/post/search_community_suggestions"
-               hx-trigger="keyup delay:500ms"
-               hx-target="#community_suggestions"
-               hx-swap="innerHTML settle:0ms"
-               autocomplete="off"
-               value="{{ community_str | default('') }}"
-               pattern="!?[^@\s]+@[^@\s]+\.[^@\s]+"
-               title="{{ _('Enter a community name in the format community@server.name') }}"
-        >
-        <datalist id="community_suggestions"></datalist>
+    <div class="form-group"><label class="form-control-label" for="sort_by" aria-label="{{ _('Sort results') }}">{{ _('Sort by') }}</label>
+        <select class="form-control form-select" id="sort_by" name="sort_by">
+            <option value="" {{ 'selected' if sort_by | default('') == '' else '' }}>{{ _('Relevance') }}</option>
+            <option value="date" {{ 'selected' if sort_by | default('') == 'date' else '' }}>{{ _('Recent first') }}</option>
+            <option value="top" {{ 'selected' if sort_by | default('') == 'top' else '' }}>{{ _('Top') }}</option>
+        </select>
     </div>
     <fieldset class="mt-4 mb-4 coolfieldset collapsed">
         <legend class="w-auto">{{ _('More options') }}</legend>
-            <div class="form-group"><label class="form-control-label" for="type" aria-label="{{ _('Restrict results by type') }}">{{ _('Type') }}</label>
+        <div class="form-group"><label class="form-control-label" for="community" aria-label="{{ _('Restrict results by community') }}">{{ _('Community') }}</label>
+            <input type="text" class="form-control" id="community" name="community"
+                   list="community_suggestions"
+                   hx-post="/post/search_community_suggestions"
+                   hx-trigger="keyup delay:500ms"
+                   hx-target="#community_suggestions"
+                   hx-swap="innerHTML settle:0ms"
+                   autocomplete="off"
+                   value="{{ community_str | default('') }}"
+                   pattern="!?[^@\s]+@[^@\s]+\.[^@\s]+"
+                   title="{{ _('Enter a community name in the format community@server.name') }}"
+            >
+            <datalist id="community_suggestions"></datalist>
+        </div>
+        <div class="form-group"><label class="form-control-label" for="type" aria-label="{{ _('Restrict results by type') }}">{{ _('Type') }}</label>
             <select class="form-control form-select" id="type" name="type">
                 <option value="0" {{ 'selected' if type | default(0) == 0 else '' }}>{{ _('All') }}</option>
                 <option value="{{ POST_TYPE_ARTICLE }}" {{ 'selected' if type | default(0) == POST_TYPE_ARTICLE else '' }}>{{ _('Discussion') }}</option>
@@ -54,13 +61,6 @@
                         <option value="{{ sw }}" {{ 'selected' if software | default('') == sw else '' }}>{{ sw }}</option>
                     {% endif %}
                 {% endfor %}
-            </select>
-        </div>
-        <div class="form-group"><label class="form-control-label" for="sort_by" aria-label="{{ _('Sort results') }}">{{ _('Sort by') }}</label>
-            <select class="form-control form-select" id="sort_by" name="sort_by">
-                <option value="" {{ 'selected' if sort_by | default('') == '' else '' }}>{{ _('Relevance') }}</option>
-                <option value="date" {{ 'selected' if sort_by | default('') == 'date' else '' }}>{{ _('Recent first') }}</option>
-                <option value="top" {{ 'selected' if sort_by | default('') == 'top' else '' }}>{{ _('Top') }}</option>
             </select>
         </div>
         <div class="form-group"><label class="form-control-label" for="nsfw" aria-label="{{ _('NSFW') }}">{{ _('NSFW') }}</label>

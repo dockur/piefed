@@ -20,7 +20,7 @@
                   </ol>
                 </nav>
 
-                <h1 class="mt-2 mb-4 post_title">{{ _('Embed code for %(post_title)s', post_title=post.title) }}</h1>
+                <h1 class="mb-4 post_title">{{ _('Embed code for %(post_title)s', post_title=post.title) }}</h1>
                 <p>
                     <textarea id="embedCode" class="form-control" rows="5" cols="50"><p><iframe src="{{ url_for('post.post_embed', post_id=post.id, _external=True) }}" class="piefed-embed" style="max-width: 100%; border: 0" width="400" allowfullscreen="allowfullscreen"></iframe></p><script src="https://{{ instance_domain }}/static/js/embed.js" async="async"></script></textarea>
                 </p>

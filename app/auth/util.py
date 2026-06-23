@@ -12,7 +12,7 @@ from flask import current_app, flash, g, make_response, redirect, request, sessi
 from flask_babel import _
 from flask_login import current_user, login_user
 from markupsafe import Markup
-from sqlalchemy import func, text
+from sqlalchemy import func
 from wtforms import Label
 
 from app import cache, db, plugins

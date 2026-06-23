@@ -17,7 +17,7 @@
         {% if len(communities) -%}
             <p>{{ _('This link has already been shared in these communities:') }}<br>
             {% for community in communities -%}
-                {{ community.display_name() }}<br>
+                <a href="{{ posts_keyed_by_community[community.id].slug }}">{{ community.display_name() }}</a><br>
             {% endfor -%}</p>
         {% endif -%}
         {{ render_form(form) }}

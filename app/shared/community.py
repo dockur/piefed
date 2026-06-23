@@ -16,14 +16,15 @@ from app.chat.util import send_message
 from app.constants import *
 from app.email import send_email
 from app.models import CommunityBlock, CommunityMember, Notification, NotificationSubscription, User, Conversation, \
-    Community, Language, File, CommunityFlair, utcnow, CommunityInvitation
+    Community, Language, File, CommunityFlair, utcnow, CommunityInvitation, CommunityFavorite
 from app.shared.tasks import task_selector
 from app.shared.upload import process_upload
 from app.user.utils import search_for_user
 from app.utils import authorise_api_user, blocked_communities, shorten_string, markdown_to_html, \
     instance_banned, community_membership, joined_communities, moderating_communities, is_image_url, \
     communities_banned_from, piefed_markdown_to_lemmy_markdown, community_moderators, add_to_modlog, \
-    get_recipient_language, moderating_communities_ids, moderating_communities_ids_all_users, gibberish
+    get_recipient_language, moderating_communities_ids, moderating_communities_ids_all_users, gibberish, \
+    favorite_communities
 
 
 # function can be shared between WEB and API (only API calls it for now)
@@ -428,6 +429,52 @@ def subscribe_community(community_id: int, subscribe, src, auth=None):
                     user_id=user_id, entity_id=community_id, type=NOTIF_COMMUNITY)
                 db.session.add(new_notification)
                 db.session.commit()
+
+    if src == SRC_API:
+        return user_id
+    else:
+        return render_template('community/_notification_toggle.html', community=community)
+
+
+def favorite_community(community_id: int, subscribe, src, auth=None):
+    community = db.session.query(Community).filter_by(id=community_id, banned=False).one()
+    user_id = authorise_api_user(auth) if src == SRC_API else current_user.id
+
+    if src == SRC_WEB:
+        subscribe = False if community_id in favorite_communities(user_id) else True
+
+    existing_fave = CommunityFavorite.query.filter_by(community_id=community_id, user_id=user_id).first()
+    if subscribe == False:
+        if existing_fave:
+            db.session.delete(existing_fave)
+            db.session.commit()
+        else:
+            msg = 'A favorite for this community did not exist.'
+            if src == SRC_API:
+                raise Exception(msg)
+            else:
+                flash(_(msg))
+
+    else:
+        if existing_fave:
+            msg = 'A favorite for this community already existed.'
+            if src == SRC_API:
+                raise Exception(msg)
+            else:
+                flash(_(msg))
+        else:
+            if community_id in communities_banned_from(user_id):
+                msg = 'You are banned from this community.'
+                if src == SRC_API:
+                    raise Exception(msg)
+                else:
+                    flash(_(msg))
+            else:
+                new_notification = CommunityFavorite(community_id=community_id,user_id=user_id)
+                db.session.add(new_notification)
+                db.session.commit()
+
+    cache.delete_memoized(favorite_communities, user_id)
 
     if src == SRC_API:
         return user_id

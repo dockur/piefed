@@ -13,8 +13,8 @@ from slugify import slugify
 from sqlalchemy import desc, or_
 
 from app import db, cache, celery
-from app.activitypub.signature import RsaKeys, default_context, send_post_request
-from app.activitypub.util import find_actor_or_create, extract_domain_and_actor
+from app.activitypub.signature import RsaKeys, send_post_request
+from app.activitypub.util import extract_domain_and_actor
 from app.community.util import save_icon_file, save_banner_file, hashtags_used_in_communities
 from app.constants import SUBSCRIPTION_OWNER, SUBSCRIPTION_MODERATOR, POST_TYPE_IMAGE, \
     POST_TYPE_LINK, POST_TYPE_VIDEO, NOTIF_FEED, SUBSCRIPTION_MEMBER, SUBSCRIPTION_NONMEMBER, SRC_WEB

@@ -172,7 +172,7 @@ def _get_user_posts(user, post_page):
         ).order_by(desc(Post.posted_at)).paginate(page=post_page, per_page=20, error_out=False)
     else:
         # Everyone else sees only public, non-deleted posts
-        return base_query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING).order_by(
+        return base_query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Post.private == False).order_by(
             desc(Post.posted_at)).paginate(page=post_page, per_page=20, error_out=False)
 
 
@@ -189,7 +189,7 @@ def _get_user_post_replies(user, replies_page):
             desc(PostReply.posted_at)).paginate(page=replies_page, per_page=20, error_out=False)
     else:
         # Everyone else sees only non-deleted replies
-        return base_query.filter(PostReply.deleted == False).order_by(
+        return base_query.filter(PostReply.deleted == False, PostReply.private == False).order_by(
             desc(PostReply.posted_at)).paginate(page=replies_page, per_page=20, error_out=False)
 
 

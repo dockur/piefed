@@ -13,6 +13,7 @@ User-Agent: *
   Disallow: /static/media/users/
   Disallow: /post/*/options
   Disallow: /comment/
+  Disallow: /post/*/comment/*
   Disallow: /honey
   Disallow: /honey/
   Content-Signal: ai-train=no, search=yes, ai-input=no

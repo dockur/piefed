@@ -244,6 +244,17 @@ $fs150pc: 150%; // .fe
   content: "\e930";
 }
 
+.fe-star {
+  top: calc(-1 * var(--spacing-4));
+  left: var(--spacing-12);
+  font-size: 18px;
+  position: relative;
+
+  &.selected {
+    color: var(--bs-form-valid-color);
+  }
+}
+
 .fe-star::before {
   content: "\e9d5";
 }

@@ -450,6 +450,35 @@ form {
 
 #breadcrumb_nav {
   font-size: $fs87pc;
+
+  .breadcrumb {
+    position: relative;
+    left: calc(-1 * var(--bs-breadcrumb-item-padding-x));
+    top: -5px;
+
+    .breadcrumb-item {
+      line-height: 33px;
+      padding-left: 0;
+      padding-right: 0;
+      margin-bottom: 0;
+      a {
+        line-height: 33px;
+        display: inline-block;
+        border: 0;
+        padding-right: var(--bs-breadcrumb-item-padding-x);
+        padding-left: var(--bs-breadcrumb-item-padding-x);
+      }
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      padding-right: 0;
+      content: "›";
+    }
+
+    .breadcrumb-item.active::before {
+      padding-right: var(--bs-breadcrumb-item-padding-x);
+    }
+  }
 }
 
 @include breakpoint(tablet) {
@@ -461,10 +490,6 @@ form {
           padding: 0;
           margin-bottom: 0;
           background-color: inherit;
-
-          .breadcrumb-item + .breadcrumb-item::before {
-              content: ">";
-          }
       }
   }
 }
@@ -576,7 +601,7 @@ form {
     .breadcrumb {
       background-color: $black-tint-03;
       display: inline-block;
-      padding: var(--spacing-8) var(--spacing-12);
+      padding-right: var(--spacing-8);
       @include breakpoint(tablet) {
         border-radius: var(--spacing-4);
       }
@@ -591,8 +616,8 @@ form {
       }
 
       .breadcrumb-item + .breadcrumb-item::before {
-          content: ">";
-         color: $white;
+        content: "›";
+        color: $white;
       }
     }
   }
@@ -722,6 +747,12 @@ ul.form-multicheck-columns {
     border-bottom: solid var(--border-2) $light-grey;
     padding-top: var(--spacing-8);
     padding-bottom: var(--spacing-8);
+
+    &:hover {
+      cursor: pointer;
+      /*background-color: rgba(var(--bs-secondary-bg-rgb), 0.2); */
+      background-color: color-mix(in srgb, var(--bs-secondary-bg) 30%,  var(--bs-body-bg));
+    }
 
     h3 {
       font-size: $h3post;
@@ -999,6 +1030,21 @@ time {
       &:active {
         line-height: var(--spacing-24);
       }
+    }
+  }
+
+  .post_replies_link {
+    a {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  .post_options_link {
+    > div > a {
+      display: block;
+      width: 100%;
+      text-align: right;
     }
   }
 }
@@ -1890,6 +1936,43 @@ a.unread, div.unread {
   margin-right: 0;
 }
 
+.microblog_teaser_header {
+  .time {
+    display: inline-block;
+    line-height: var(--spacing-32);
+  }
+
+  .render_username {
+    display: inline-block;
+    a img {
+      width: var(--spacing-32);
+      height: var(--spacing-32);
+    }
+
+    .author_link {
+      line-height: var(--spacing-32);
+    }
+  }
+}
+
+.microblog_header {
+  .time {
+    float: right;
+    line-height: var(--spacing-32);
+  }
+
+  .render_username {
+    a img {
+      width: var(--spacing-32);
+      height: var(--spacing-32);
+    }
+
+    .author_link {
+      line-height: var(--spacing-32);
+    }
+  }
+}
+
 .post_body, .comment_body, #preview, .reply_preview, .accordion-body, .post_col {
   word-wrap: break-word;
   line-height: 1.6;
@@ -2490,10 +2573,10 @@ form {
 
 .user_flair, .user_note {
   font-size: $fs87pc;
-  background-color: $white-fade;
+  background-color: var(--bs-secondary-bg-subtle);
   border-radius: var(--spacing-4);
-  border: solid var(--border-1) $grey;
-  color: $super-dark-grey;
+  border: solid var(--border-1) var(--bs-secondary-bg-subtle);
+  color: var(--bs-secondary-color);
   padding: 0px var(--spacing-2) 0px var(--spacing-4);
   display: inline-block;
 }
@@ -2855,6 +2938,7 @@ form {
 
 .voting_buttons_new {
   cursor: pointer;
+  position: relative;
 }
 
 /* Voting dialog positioning */
@@ -3183,6 +3267,23 @@ form {
     height: var(--spacing-20);
   }
 }
+
+/* hide labels on <input class="hide_label"> */
+label:has(+ input.hide_label) {
+    display: none;
+}
+
+.voting-spinner {
+  display:none;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:20px;
+  height:20px
+}
+
+.voting_buttons_new.htmx-request .voting-spinner { display: block; }
 
 @keyframes blink-animation {
   to {

@@ -28,7 +28,7 @@ def run_search():
         banned_from = []
 
     page = request.args.get('page', 1, type=int)
-    community = request.args.get('community', '')
+    community = request.args.get('community', '').strip()
     language_id = request.args.get('language', 0, type=int)
     type = request.args.get('type', 0, type=int)
     software = request.args.get('software', '')
@@ -41,19 +41,22 @@ def run_search():
 
     community_id = request.args.get('community_id', 0, int)
     if community_id == 0 and community:
-        if not community.startswith('!'):
-            community = f'!{community}'
-        if not "@" in community:
-            community = community + "@" + current_app.config['SERVER_NAME']
-        community_obj = search_for_community(community, allow_fetch=False)
-        if community_obj:
-            community_id = community_obj.id
+        if q == '' and search_for == 'communities':     # when trying to find a community, people go to the search and then type stuff into the field labelled 'Community'. This is wrong.
+            return redirect(f'/communities?search={community}&language_id={language_id}')
+        else:
+            if not community.startswith('!'):
+                community = f'!{community}'
+            if not "@" in community:
+                community = community + "@" + current_app.config['SERVER_NAME']
+            community_obj = search_for_community(community, allow_fetch=False)
+            if community_obj:
+                community_id = community_obj.id
 
     if q != '' or type != 0 or language_id != 0 or community_id != 0 or nsfw != '' or minimum_upvote != '':
         posts = None
         db.session.execute(text("SET work_mem = '100MB';"))
         if search_for == 'posts':
-            posts = Post.query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING)
+            posts = Post.query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Post.private == False)
             if current_user.is_authenticated:
                 if current_user.ignore_bots == 1:
                     posts = posts.filter(Post.from_bot == False)
@@ -122,7 +125,7 @@ def run_search():
 
         replies = None
         if search_for == 'comments':
-            replies = PostReply.query.filter(PostReply.deleted == False)
+            replies = PostReply.query.filter(PostReply.deleted == False, PostReply.private == False)
             if current_user.is_authenticated:
                 if current_user.ignore_bots == 1:
                     replies = replies.filter(PostReply.from_bot == False)

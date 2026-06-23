@@ -1,5 +1,4 @@
 from datetime import timedelta
-import time
 
 from flask import current_app, g
 from sqlalchemy import desc, text, and_, exists, asc, or_

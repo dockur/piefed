@@ -10,9 +10,9 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Edit note for "%(user_name)s"', user_name=user.display_name()) }}</div>
+                    <div class="card-title">{{ _('Edit private note for "%(user_name)s"', user_name=user.display_name()) }}</div>
                     <div class="card-body">
-                        <strong>{{ _('Emoji quick access') }}</strong>
+                        <strong>{{ _('Use an emoji for the note') }}</strong>
                         <div>
                             <button id="thumbsup" class="emojitoggle">👍</button>
                             <button id="thumbsdown" class="emojitoggle">👎</button>
@@ -41,6 +41,7 @@
                             <button id="no-entry" class="emojitoggle">⛔</button>
                             <button id="vomit" class="emojitoggle">🤮</button>
                         </div>
+                        <p class="mt-2 mb-2">{{ _('or some text, below:') }}</p>
                         {{ render_form(form) }}
                         {% if return_to -%}
                             <p></p>

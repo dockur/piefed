@@ -11,44 +11,68 @@
                 </a>
             </div>
         {% endif -%}
-        <h1 class="mt-2 post_title" lang="{{ post.language_code() }}">
-            {{ post.title }}
-            {% if post.nsfw -%}
-                <span class="warning_badge nsfw" title="{{ _('Not safe for work') }}">
-                    {{ _('nsfw') }}
-                </span>
-            {% endif -%}
-            {% if post.nsfl -%}
-                <span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">
-                    {{ _('nsfl') }}
-                </span>
-            {% endif -%}
-            {% if post.ai_generated -%}
-                <span class="warning_badge ai_generated" title="{{ _('This post contains AI generated content') }}">
-                    {{ _('AI') }}
-                </span>
-            {% endif -%}
-        </h1>
+        {% if post.is_microblog() -%}
+            <div class="microblog_header mb-2">
+                {% if post.has_been_reported() -%}
+                    <a href="{{ url_for('community.community_moderate', actor=post.community.link()) }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
+                {% endif -%}
+                {% if post.edited_at -%}
+                    <div class="time text-muted small">edited <time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.edited_at, locale) }}</time></div>
+                {% else %}
+                    <div class="time text-muted small"><time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.posted_at, locale) }}</time></div>
+                {% endif -%}
 
-        <div class="mb-2">
-            {% if post.has_been_reported() -%}
-            <a href="{{ url_for('community.community_moderate', actor=post.community.link()) }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
-            {% endif -%}
-            {% if post.type != POST_TYPE_EVENT -%}
-                <small>{{ _('submitted') }} <time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.posted_at, locale) }}</time> {{ _('by') }}
-                    {% if not post.deleted or post.community.is_moderator() or post.community.is_owner() or current_user.get_id() in admin_ids -%}
-                        {{ render_username(post.author, htmx_redirect_back_to=request.path, user_notes=user_notes, current_user=current_user, admin_ids=admin_ids, low_bandwidth=low_bandwidth) }}
-                    {% else -%}
-                        [{{ _('deleted') }}]
-                    {% endif -%}
+                {% if not post.deleted or post.community.is_moderator() or post.community.is_owner() or current_user.get_id() in admin_ids -%}
+                    {{ render_username(post.author, htmx_redirect_back_to=request.path, user_notes=user_notes, current_user=current_user, admin_ids=admin_ids, low_bandwidth=low_bandwidth) }}
+                {% else -%}
+                    [{{ _('deleted') }}]
+                {% endif -%}
                 {% if user_flair and post.author.id in user_flair -%}
                     <span class="user_flair">{{ user_flair[post.author.id] }}</span>
                 {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() %}
                     <span class="user_flair pronouns">{{ user_pronouns[post.author.id] }}</span>
-                {% endif %}
-                {% if post.edited_at -%} edited <time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.edited_at, locale) }}</time>{% endif -%}</small>
-            {% endif -%}
-        </div>
+                {% endif -%}
+            </div>
+        {%- else -%}
+            <h1 class="post_title" lang="{{ post.language_code() }}">
+                {{ post.title }}
+                {% if post.nsfw -%}
+                    <span class="warning_badge nsfw" title="{{ _('Not safe for work') }}">
+                        {{ _('nsfw') }}
+                    </span>
+                {% endif -%}
+                {% if post.nsfl -%}
+                    <span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">
+                        {{ _('nsfl') }}
+                    </span>
+                {% endif -%}
+                {% if post.ai_generated -%}
+                    <span class="warning_badge ai_generated" title="{{ _('This post contains AI generated content') }}">
+                        {{ _('AI') }}
+                    </span>
+                {% endif -%}
+            </h1>
+
+            <div class="mb-2">
+                {% if post.has_been_reported() -%}
+                <a href="{{ url_for('community.community_moderate', actor=post.community.link()) }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
+                {% endif -%}
+                {% if post.type != POST_TYPE_EVENT -%}
+                    <small>{{ _('submitted') }} <time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.posted_at, locale) }}</time> {{ _('by') }}
+                        {% if not post.deleted or post.community.is_moderator() or post.community.is_owner() or current_user.get_id() in admin_ids -%}
+                            {{ render_username(post.author, htmx_redirect_back_to=request.path, user_notes=user_notes, current_user=current_user, admin_ids=admin_ids, low_bandwidth=low_bandwidth) }}
+                        {% else -%}
+                            [{{ _('deleted') }}]
+                        {% endif -%}
+                    {% if user_flair and post.author.id in user_flair -%}
+                        <span class="user_flair">{{ user_flair[post.author.id] }}</span>
+                    {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() %}
+                        <span class="user_flair pronouns">{{ user_pronouns[post.author.id] }}</span>
+                    {% endif %}
+                    {% if post.edited_at -%} edited <time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.edited_at, locale) }}</time>{% endif -%}</small>
+                {% endif -%}
+            </div>
+        {%- endif -%}
         {% if post.type == POST_TYPE_IMAGE and not post.deleted -%}
             <div class="post_image">
                 {% if post.image_id -%}

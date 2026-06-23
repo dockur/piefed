@@ -491,62 +491,58 @@ def register(app):
     @app.cli.command('send-queue')
     def send_queue():
         with app.app_context():
-            session = get_task_session()
             try:
-                with patch_db_session(session):
-                    from app import redis_client
-                    try:  # avoid parallel runs of this task using Redis lock
-                        with redis_client.lock("lock:send-queue", timeout=300, blocking_timeout=1):
-                            # Check size of redis memory. Abort if > 200 MB used
-                            try:
-                                if redis_client and current_app.config['REDIS_MEMORY_LIMIT'] != -1 and \
-                                        redis_client.memory_stats()['total.allocated'] > current_app.config['REDIS_MEMORY_LIMIT']:
-                                    print('Redis memory is quite full - stopping send queue to avoid making it worse.')
-                                    redis_client.set("pause_federation", "1", ex=600)   # this also stops incoming federation
-                                    return
-                                else:
-                                    redis_client.set("pause_federation", "0", ex=600)
-                            except:  # retrieving memory stats fails on recent versions of redis. Once the redis package is fixed this problem should go away.
-                                ...
-                            if not current_app.debug:
-                                sleep(uniform(0, 10))  # Cron jobs are not very granular so there is a danger all instances will send in the same instant. A random delay avoids this.
+                from app import redis_client
+                try:  # avoid parallel runs of this task using Redis lock
+                    with redis_client.lock("lock:send-queue", timeout=300, blocking_timeout=1):
+                        # Check size of redis memory. Abort if > 200 MB used
+                        try:
+                            if redis_client and current_app.config['REDIS_MEMORY_LIMIT'] != -1 and \
+                                    redis_client.memory_stats()['total.allocated'] > current_app.config['REDIS_MEMORY_LIMIT']:
+                                print('Redis memory is quite full - stopping send queue to avoid making it worse.')
+                                redis_client.set("pause_federation", "1", ex=600)   # this also stops incoming federation
+                                return
+                            else:
+                                redis_client.set("pause_federation", "0", ex=600)
+                        except:  # retrieving memory stats fails on recent versions of redis. Once the redis package is fixed this problem should go away.
+                            ...
+                        if not current_app.debug:
+                            sleep(uniform(0, 10))  # Cron jobs are not very granular so there is a danger all instances will send in the same instant. A random delay avoids this.
 
-                            to_be_deleted = []
-                            # Send all waiting Activities that are due to be sent
-                            for to_send in session.query(SendQueue).filter(SendQueue.send_after < utcnow()):
-                                if instance_online(to_send.destination_domain):
-                                    if to_send.retries <= to_send.max_retries:
-                                        send_post_request(to_send.destination, json.loads(to_send.payload), to_send.private_key,
-                                                          to_send.actor,
-                                                          retries=to_send.retries + 1)
-                                    to_be_deleted.append(to_send.id)
-                                elif instance_gone_forever(to_send.destination_domain):
-                                    to_be_deleted.append(to_send.id)
-                            # Remove them once sent - send_post_request will have re-queued them if they failed
-                            if len(to_be_deleted):
-                                session.execute(text('DELETE FROM "send_queue" WHERE id IN :to_be_deleted'),
-                                                   {'to_be_deleted': tuple(to_be_deleted)})
-                                session.commit()
+                        to_be_deleted = []
+                        # Send all waiting Activities that are due to be sent
+                        for to_send in db.session.query(SendQueue).filter(SendQueue.send_after < utcnow()):
+                            if instance_online(to_send.destination_domain):
+                                if to_send.retries <= to_send.max_retries:
+                                    send_post_request(to_send.destination, json.loads(to_send.payload), to_send.private_key,
+                                                      to_send.actor,
+                                                      retries=to_send.retries + 1)
+                                to_be_deleted.append(to_send.id)
+                            elif instance_gone_forever(to_send.destination_domain):
+                                to_be_deleted.append(to_send.id)
+                        # Remove them once sent - send_post_request will have re-queued them if they failed
+                        if len(to_be_deleted):
+                            db.session.execute(text('DELETE FROM "send_queue" WHERE id IN :to_be_deleted'),
+                                               {'to_be_deleted': tuple(to_be_deleted)})
+                            db.session.commit()
 
-                            publish_scheduled_posts()
+                        publish_scheduled_posts()
 
-                            send_batched_activities()
+                        send_batched_activities()
 
-                            reminders()
+                        reminders()
 
-                            plugins.fire_hook('cron_often')
+                        plugins.fire_hook('cron_often')
 
-                    except redis.exceptions.LockError:
-                        print('Send queue is still running - stopping this process to avoid duplication.')
-                        return
-                    except Exception as e:
-                        print('Could not connect to redis or other error occurred')
-                        raise e
+                except redis.exceptions.LockError:
+                    print('Send queue is still running - stopping this process to avoid duplication.')
+                    return
+                except Exception as e:
+                    print('Could not connect to redis or other error occurred')
+                    raise e
             except Exception:
-                session.rollback()
+                db.session.rollback()
                 raise
-            finally:
-                session.close()
 
             log_cron_task_to_db("send_queue")
 
@@ -604,6 +600,7 @@ def register(app):
                         scheduled_post.id = None
                         scheduled_post.ap_id = None
                         scheduled_post.scheduled_for = None
+                        scheduled_post.archived = None
                         scheduled_post.posted_at = utcnow()
                         scheduled_post.created_at = utcnow()
                         scheduled_post.edited_at = None

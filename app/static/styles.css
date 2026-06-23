@@ -340,6 +340,16 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
   content: "\e930";
 }
 
+.fe-star {
+  top: calc(-1 * var(--spacing-4));
+  left: var(--spacing-12);
+  font-size: 18px;
+  position: relative;
+}
+.fe-star.selected {
+  color: var(--bs-form-valid-color);
+}
+
 .fe-star::before {
   content: "\e9d5";
 }
@@ -1211,6 +1221,31 @@ form .mb-3.required > label:after {
 #breadcrumb_nav {
   font-size: 87%;
 }
+#breadcrumb_nav .breadcrumb {
+  position: relative;
+  left: calc(-1 * var(--bs-breadcrumb-item-padding-x));
+  top: -5px;
+}
+#breadcrumb_nav .breadcrumb .breadcrumb-item {
+  line-height: 33px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 0;
+}
+#breadcrumb_nav .breadcrumb .breadcrumb-item a {
+  line-height: 33px;
+  display: inline-block;
+  border: 0;
+  padding-right: var(--bs-breadcrumb-item-padding-x);
+  padding-left: var(--bs-breadcrumb-item-padding-x);
+}
+#breadcrumb_nav .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  padding-right: 0;
+  content: "›";
+}
+#breadcrumb_nav .breadcrumb .breadcrumb-item.active::before {
+  padding-right: var(--bs-breadcrumb-item-padding-x);
+}
 
 @media (min-width: 992px) {
   #breadcrumb_nav {
@@ -1221,9 +1256,6 @@ form .mb-3.required > label:after {
     padding: 0;
     margin-bottom: 0;
     background-color: inherit;
-  }
-  #breadcrumb_nav .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
-    content: ">";
   }
 }
 .mobilenav {
@@ -1326,7 +1358,7 @@ form .mb-3.required > label:after {
 .community_header #breadcrumb_nav .breadcrumb, .event_banner #breadcrumb_nav .breadcrumb {
   background-color: rgba(0, 0, 0, 0.6);
   display: inline-block;
-  padding: var(--spacing-8) var(--spacing-12);
+  padding-right: var(--spacing-8);
   margin-bottom: 0;
 }
 @media (min-width: 992px) {
@@ -1342,7 +1374,7 @@ form .mb-3.required > label:after {
   color: #fff;
 }
 .community_header #breadcrumb_nav .breadcrumb .breadcrumb-item + .breadcrumb-item::before, .event_banner #breadcrumb_nav .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
-  content: ">";
+  content: "›";
   color: #fff;
 }
 
@@ -1450,6 +1482,11 @@ ul.form-multicheck-columns li {
   border-bottom: solid var(--border-2) #ddd;
   padding-top: var(--spacing-8);
   padding-bottom: var(--spacing-8);
+}
+.post_list .post_teaser:hover {
+  cursor: pointer;
+  /*background-color: rgba(var(--bs-secondary-bg-rgb), 0.2); */
+  background-color: color-mix(in srgb, var(--bs-secondary-bg) 30%, var(--bs-body-bg));
 }
 .post_list .post_teaser h3 {
   font-size: 110%;
@@ -1699,6 +1736,15 @@ time {
 }
 .post_utilities_bar div .dropdown-item:active {
   line-height: var(--spacing-24);
+}
+.post_utilities_bar .post_replies_link a {
+  display: block;
+  width: 100%;
+}
+.post_utilities_bar .post_options_link > div > a {
+  display: block;
+  width: 100%;
+  text-align: right;
 }
 
 .post_full p .post_link {
@@ -2459,6 +2505,33 @@ a.unread:before, div.unread:before {
   margin-right: 0;
 }
 
+.microblog_teaser_header .time {
+  display: inline-block;
+  line-height: var(--spacing-32);
+}
+.microblog_teaser_header .render_username {
+  display: inline-block;
+}
+.microblog_teaser_header .render_username a img {
+  width: var(--spacing-32);
+  height: var(--spacing-32);
+}
+.microblog_teaser_header .render_username .author_link {
+  line-height: var(--spacing-32);
+}
+
+.microblog_header .time {
+  float: right;
+  line-height: var(--spacing-32);
+}
+.microblog_header .render_username a img {
+  width: var(--spacing-32);
+  height: var(--spacing-32);
+}
+.microblog_header .render_username .author_link {
+  line-height: var(--spacing-32);
+}
+
 .post_body, .comment_body, #preview, .reply_preview, .accordion-body, .post_col {
   word-wrap: break-word;
   line-height: 1.6;
@@ -3009,10 +3082,10 @@ form h5 {
 
 .user_flair, .user_note {
   font-size: 87%;
-  background-color: #f0f0f2;
+  background-color: var(--bs-secondary-bg-subtle);
   border-radius: var(--spacing-4);
-  border: solid var(--border-1) #bbb;
-  color: #424549;
+  border: solid var(--border-1) var(--bs-secondary-bg-subtle);
+  color: var(--bs-secondary-color);
   padding: 0px var(--spacing-2) 0px var(--spacing-4);
   display: inline-block;
 }
@@ -3325,6 +3398,7 @@ form h5 {
 
 .voting_buttons_new {
   cursor: pointer;
+  position: relative;
 }
 
 /* Voting dialog positioning */
@@ -3603,6 +3677,25 @@ form h5 {
 #outer_container .share_desktop a img {
   width: var(--spacing-20);
   height: var(--spacing-20);
+}
+
+/* hide labels on <input class="hide_label"> */
+label:has(+ input.hide_label) {
+  display: none;
+}
+
+.voting-spinner {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+}
+
+.voting_buttons_new.htmx-request .voting-spinner {
+  display: block;
 }
 
 @keyframes blink-animation {

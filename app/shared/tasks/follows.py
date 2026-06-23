@@ -1,7 +1,7 @@
 from app import cache, celery, db
 from app.constants import *
 from app.activitypub.signature import default_context, post_request, send_post_request
-from app.models import Community, CommunityBan, CommunityJoinRequest, User, Feed, FeedJoinRequest
+from app.models import Community, CommunityBan, CommunityJoinRequest, User, Feed, FeedJoinRequest, UserFollowRequest
 from app.utils import community_membership, gibberish, joined_communities, instance_banned, get_task_session, \
     feed_membership, menu_subscribed_feeds, patch_db_session
 
@@ -206,5 +206,72 @@ def leave_feed(send_async, user_id, feed_id):
 
     except Exception:
         session.rollback()
+    finally:
+        session.close()
+
+
+@celery.task
+def follow_user(to_follow_id, user_id, send_async=True):
+    session = get_task_session()
+    try:
+        to_follow: User = session.query(User).get(to_follow_id)
+        user: User = session.query(User).get(user_id)
+        if not to_follow.is_local() and to_follow.instance.online():
+            join_request = UserFollowRequest(user_id=user_id, follow_id=to_follow_id)
+            session.add(join_request)
+            session.commit()
+
+            to_follow_ap_id = f"{current_app.config['SERVER_URL']}/activities/follow_user/{join_request.uuid}"
+            follow = {
+                'id': to_follow_ap_id,
+                'type': 'Follow',
+                'actor': user.public_url(),
+                'object': to_follow.public_url(),
+                '@context': default_context(),
+                'to': [to_follow.public_url()],
+            }
+            send_post_request(to_follow.ap_inbox_url, follow, user.private_key, user.public_url() + '#main-key')
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
+@celery.task
+def unfollow_user(to_follow_id, user_id, send_async=True):
+    session = get_task_session()
+    try:
+        to_follow: User = session.query(User).get(to_follow_id)
+        user: User = session.query(User).get(user_id)
+        if not to_follow.is_local() and to_follow.instance.online():
+            join_request = session.query(UserFollowRequest).filter(UserFollowRequest.user_id == int(user_id),
+                                                                   UserFollowRequest.follow_id == int(to_follow_id)).first()
+            if join_request:
+                session.delete(join_request)
+                session.commit()
+                to_follow_ap_id = f"{current_app.config['SERVER_URL']}/activities/follow_user/{join_request.uuid}"
+            else:
+                to_follow_ap_id = f"{current_app.config['SERVER_URL']}/activities/follow_user/{gibberish(15)}"
+            undo_id = f"{current_app.config['SERVER_URL']}/activities/undo/" + gibberish(15)
+            follow = {
+                'id': to_follow_ap_id,
+                'type': 'Follow',
+                'actor': user.public_url(),
+                'object': to_follow.public_url(),
+                '@context': default_context(),
+                'to': [to_follow.public_url()],
+            }
+            undo = {
+                'actor': user.public_url(),
+                'to': [to_follow.public_url()],
+                'type': 'Undo',
+                'id': undo_id,
+                'object': follow
+            }
+            send_post_request(to_follow.ap_inbox_url, undo, user.private_key, user.public_url() + '#main-key')
+    except Exception:
+        session.rollback()
+        raise
     finally:
         session.close()

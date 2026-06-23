@@ -49,7 +49,7 @@ def show_domain(domain_id):
             if current_user.is_anonymous or current_user.ignore_bots == 1:
                 posts = Post.query.join(Community, Community.id == Post.community_id). \
                     filter(Post.from_bot == False, Post.domain_id == domain.id, Community.banned == False,
-                           Post.deleted == False, Post.status > POST_STATUS_REVIEWING). \
+                           Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Post.private == False). \
                     order_by(desc(Post.posted_at))
             else:
                 posts = Post.query.join(Community).filter(Post.domain_id == domain.id, Community.banned == False,
@@ -122,8 +122,8 @@ def show_domain_rss(domain_id):
 
             posts = Post.query.join(Community, Community.id == Post.community_id). \
                 filter(Post.from_bot == False, Post.domain_id == domain.id, Community.banned == False,
-                       Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Community.private == False). \
-                order_by(desc(Post.posted_at)).limit(20)
+                       Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Community.private == False,
+                       Post.private == False).order_by(desc(Post.posted_at)).limit(20)
 
             fg = FeedGenerator()
             fg.id(f"{current_app.config['SERVER_URL']}/d/{domain_id}")

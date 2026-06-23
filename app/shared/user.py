@@ -5,7 +5,7 @@ from sqlalchemy import text
 
 from app import db, cache
 from app.constants import *
-from app.models import UserBlock, NotificationSubscription, User, IpBan
+from app.models import UserBlock, NotificationSubscription, User, IpBan, UserFollower, Notification
 from app.shared.tasks import task_selector
 from app.user.utils import purge_user_then_delete
 from app.utils import authorise_api_user, blocked_users, render_template, add_to_modlog
@@ -221,3 +221,65 @@ def unban_user(input, src, auth=None):
                   reason='')
 
     add_to_modlog('unban_user', actor=user, target_user=to_unban, link_text=to_unban.display_name(), link=to_unban.link())
+
+
+def follow_user(follow_id: int, src, auth=None):
+    if src == SRC_API:
+        user = authorise_api_user(auth, return_type='model')
+    else:
+        user = current_user
+
+    to_follow: User = db.session.query(User).get(follow_id)
+
+    is_accepted = False
+    if to_follow.is_local():
+        if to_follow.ap_manually_approves_followers is True:
+            is_accepted = False
+        else:
+            is_accepted = True
+            user.num_following += 1
+            to_follow.num_followers += 1
+
+    db.session.add(UserFollower(local_user_id=user.id, remote_user_id=follow_id, is_accepted=is_accepted, is_inward=False))
+    db.session.commit()
+
+    if to_follow.is_local():
+        if not is_accepted:
+            targets_data = {'gen': '0',
+                            'author_id': user.id,
+                            'author_user_name': user.ap_id if user.ap_id else user.user_name}
+            new_notification = Notification(title=_('Someone wants to follow you'), url=f"/user/{user.id}",
+                                            user_id=to_follow.id, author_id=user.id,
+                                            notif_type=NOTIF_FOLLOW,
+                                            subtype='new_follower',
+                                            targets=targets_data)
+            db.session.add(new_notification)
+            to_follow.unread_notifications += 1
+            db.session.commit()
+    else:
+        task_selector('follow_user', to_follow_id=follow_id, user_id=user.id)
+
+
+def unfollow_user(follow_id: int, src, auth=None):
+    if src == SRC_API:
+        user = authorise_api_user(auth, return_type='model')
+    else:
+        user = current_user
+
+    to_unfollow: User = db.session.query(User).get(follow_id)
+
+    user.num_following -= 1
+    to_unfollow.num_followers -= 1
+
+    db.session.execute(text(
+        'DELETE FROM "user_follower" WHERE local_user_id = :local_user_id AND remote_user_id = :remote_user_id'),
+            {'local_user_id': user.id, 'remote_user_id': to_unfollow.id})
+    db.session.commit()
+
+    if not to_unfollow.is_local():
+        task_selector('unfollow_user', to_follow_id=follow_id, user_id=user.id)
+    else:
+        db.session.execute(text(
+            'DELETE FROM "user_follow_request" WHERE user_id = :user_id AND follow_id = :follow_id'),
+                {'user_id': user.id, 'follow_id': to_unfollow.id})
+        db.session.commit()

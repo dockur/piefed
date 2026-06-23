@@ -7,7 +7,7 @@ from datetime import datetime
 
 import boto3
 from PIL import Image, ImageOps
-from flask import flash, request, current_app, g
+from flask import flash, request, current_app, g, abort
 from flask_babel import _, force_locale, gettext
 from flask_login import current_user
 from pillow_heif import register_heif_opener
@@ -25,7 +25,7 @@ from app.utils import render_template, authorise_api_user, shorten_string, gibbe
     opengraph_parse, url_to_thumbnail_file, can_create_post, is_video_hosting_site, recently_upvoted_posts, \
     is_image_url, add_to_modlog, store_files_in_s3, guess_mime_type, retrieve_image_hash, \
     hash_matches_blocked_image, can_upvote, can_downvote, get_recipient_language, to_srgb, can_upload_video, \
-    is_video_url, sanitize_svg
+    is_video_url, sanitize_svg, user_ip_banned
 
 
 def vote_for_post(post_id: int, vote_direction, federate: bool, emoji: str, src, auth=None):
@@ -46,6 +46,9 @@ def vote_for_post(post_id: int, vote_direction, federate: bool, emoji: str, src,
                                                                             '') == '' else 'post/_post_voting_buttons_masonry.html'
             return render_template(template, post=post, community=post.community, recently_upvoted=[],
                                    recently_downvoted=[])
+
+    if user.banned or user_ip_banned():
+        abort(403)
 
     undo = post.vote(user, vote_direction, emoji)
 
@@ -178,7 +181,7 @@ def make_post(input, community, type, src, auth=None, uploaded_file=None):
     # ideally, a similar change could be made for incoming activitypub (create_post() and update_post_from_activity() could share code)
     # once this happens, and post.new() just does the minimum before being passed off to an update function, post.new() can be used here again.
 
-    if not can_create_post(user, community):
+    if not can_create_post(user, community) or user_ip_banned():
         raise Exception('You are not permitted to make posts in this community')
 
     if url:
@@ -745,6 +748,7 @@ def delete_post(post_id: int, federate_deletion, src, auth):
         post.deleted = True
         post.deleted_by = user_id
         post.author.post_count -= 1
+        post.author.last_seen = utcnow()
         post.community.post_count -= 1
         db.session.commit()
 
@@ -1090,12 +1094,15 @@ def mark_post_read(post_ids: List[int], read: bool, user_id: int):
             db.session.execute(text(
                 'INSERT INTO "read_posts" (user_id, read_post_id, interacted_at) VALUES (:user_id, :post_id, :stamp) ON CONFLICT (user_id, read_post_id) DO UPDATE SET interacted_at = EXCLUDED.interacted_at'),
                 {"user_id": user_id, "post_id": post_id, "stamp": utcnow()})
-        db.session.commit()
     else:
         for post_id in post_ids:
             db.session.execute(
                 text('DELETE FROM "read_posts" WHERE user_id = :user_id AND read_post_id = :post_id'),
                 {"user_id": user_id, "post_id": post_id})
+    from app import redis_client
+    with redis_client.lock(f"lock:user:{user_id}", timeout=10, blocking_timeout=6):
+        db.session.execute(text('UPDATE "user" SET last_seen = now() WHERE id = :user_id'),
+                           {'user_id': user_id})
         db.session.commit()
 
 
@@ -1117,6 +1124,9 @@ def vote_for_poll(post_id, votes, src, auth=None):
         user = authorise_api_user(auth, return_type='model')
     else:
         user = current_user
+
+    if user.banned or user_ip_banned():
+        abort(403)
     
     if isinstance(votes, int):
         votes = [votes]
