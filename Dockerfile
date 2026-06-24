@@ -5,13 +5,12 @@ RUN apk add --no-cache \
     gcc \
     bash \
     musl-dev \
+    libpq-dev \
     pkgconfig \
     python3-dev
 
 RUN python -m venv /venv
 ENV PATH="/venv/bin:$PATH"
-
-RUN apk add --no-cache pkgconfig gcc python3-dev musl-dev tesseract-ocr tesseract-ocr-data-eng postgresql-client libpq-dev bash
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=source=requirements.txt,target=/tmp/requirements.txt \
