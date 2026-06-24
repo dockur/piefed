@@ -749,22 +749,6 @@ ul.form-multicheck-columns {
       overflow: hidden;
     }
 
-    .meta_row, .main_row, .utilities_row {
-      a {
-        text-decoration: none;
-      }
-    }
-
-    .main_row {
-      position: relative;
-
-      .author {
-        margin-bottom: var(--spacing-32);
-        display: inline-block;
-        max-width: 78%;
-      }
-    }
-
     .col_thumbnail {
       float: right;
       width: var(--spacing-72);
