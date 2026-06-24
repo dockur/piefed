@@ -867,15 +867,6 @@ ul.form-multicheck-columns {
       opacity: var(--opacity-02);
       font-size: 12px;
       font-size: var(--font-size-12);
-
-      .voting_buttons {
-        width: 46px;
-        line-height: var(--spacing-24);
-        .upvote_button, .downvote_button {
-          font-size: 12px;
-          font-size: var(--font-size-12);
-        }
-      }
     }
 
     .post_teaser_clickable {
@@ -1459,83 +1450,6 @@ details {
   }
   .htmx-request.htmx-indicator{
     display:inline;
-  }
-}
-
-.voting_buttons {
-  float: right;
-  display: block;
-  min-width: $min-touch-target + 10;
-  padding: 0 0 var(--spacing-4) var(--spacing-4);
-  line-height: var(--spacing-28);
-  font-size: 14px;
-  font-size: var(--font-size-14);
-
-  @include breakpoint(laptop) {
-    line-height: 25px;
-  }
-
-  div {
-    border: solid var(--border-1) var(--primary-colour);
-  }
-
-  .upvote_button, .downvote_button {
-    position: relative;
-    padding: 0 var(--spacing-2);
-    min-height: $min-touch-target;
-    min-width: $min-touch-target;
-    border-radius: var(--spacing-2);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &.digits_4 {
-      width: 68px;
-    }
-
-    &.digits_5 {
-      width: 76px;
-    }
-
-    &.digits_6 {
-      width: 84px;
-    }
-
-    &.voted_up {
-      color: var(--green-html);
-      font-weight: bold;
-    }
-    &.voted_down {
-      color: var(--darkred);
-      font-weight: bold;
-    }
-  }
-
-  .downvote_button {
-    margin-top: var(--spacing-4);
-  }
-
-  .htmx-indicator{
-    position: absolute;
-    width: var(--spacing-20);
-    height: 20px;
-  }
-  .htmx-request .htmx-indicator{
-    display:inline;
-    position: absolute;
-    width: var(--spacing-20);
-    height: var(--spacing-20);
-    right: var(--spacing-16);
-    top: var(--spacing-4);
-    opacity: var(--opacity-10) !important;
-  }
-  .htmx-request.htmx-indicator{
-    display:inline;
-  }
-
-  a {
-    text-decoration: none;
   }
 }
 

@@ -54,13 +54,6 @@
       color: var(--whitesmoke);
   }
 
-  .main_pane, .voting_buttons div {
-      border: solid var(--border-1) var(--darker-grey);
-  }
-  [data-bs-theme="dark"] .main_pane, [data-bs-theme="dark"] .voting_buttons div {
-      border: solid var(--border-1) var(--white-fade);
-  }
-
   div.navbar {
       border-bottom: solid var(--border-1) var(--darker-grey);
   }
