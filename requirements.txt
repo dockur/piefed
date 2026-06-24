@@ -14,7 +14,7 @@ flask-bcrypt~=1.0.0
 psycopg2
 httpx[http2]~=0.28.0
 pyjwt==2.8.0
-SQLAlchemy-Searchable==2.1.0
+SQLAlchemy-Searchable==2.2.0
 SQLAlchemy-Utils==0.41.1
 cryptography==48.0.0
 Bootstrap-Flask==2.5.0
