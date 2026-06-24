@@ -3,7 +3,7 @@
 {% else -%}
     {% extends "base.html" -%}
 {% endif -%}
-{% from 'bootstrap5/form.html' import render_form -%}
+{% from 'bootstrap5/form.html' import render_field -%}
 
 {% block app_content -%}
     <div class="row">
@@ -11,7 +11,18 @@
             <div class="card mt-5">
                 <div class="card-body p-6">
                     <div class="card-title text-center mb-4">{{ _('Content filter setup') }}</div>
-                    {{ render_form(form) }}
+                    <form method="post">
+                        {{ form.csrf_token() }}
+                        {{ render_field(form.trump_musk_level) }}
+                        {{ render_field(form.ignore_bots) }}
+                        <p class="small field_hint">{{ _('Bots automatically create posts from major news organisations, etc which can be annoying.') }}</p>
+                        {{ render_field(form.hide_nsfw) }}
+                        {{ render_field(form.hide_nsfl) }}
+                        <p class="small field_hint">{{ _('NSFL posts may contain gore, intense war footage or other disturbing content.') }}</p>
+                        {{ render_field(form.hide_gen_ai) }}
+                        <p class="small field_hint">{{ _('These posts were written using AI or link to articles made using AI.') }}</p>
+                        {{ render_field(form.submit) }}
+                    </form>
                     <p class="mt-4">{{ _('You will be able to change this later.') }}</p>
                 </div>
             </div>

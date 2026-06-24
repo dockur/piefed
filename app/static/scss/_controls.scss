@@ -29,13 +29,14 @@ $min-touch-target: 44px; // many instances of this size referenced in styles.scs
 .form-control {
   display: block;
   width: 100%;
-  padding: var(--spacing-8) var(--spacing-12);
-  font-size: $fs0x9375rem;
+  padding: var(--spacing-6) var(--spacing-10);
+  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: var(--spacing-24);
   color: var(--bs-body-color);
-  background-color: $white;
+  background-color: var(--white);
   background-clip: padding-box;
-  border: var(--border-1) solid $blue-rgba;
+  border: var(--border-1) solid var(--blue-rgba);
   border-radius: var(--spacing-4);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -62,31 +63,31 @@ $min-touch-target: 44px; // many instances of this size referenced in styles.scs
 
 .form-control:focus {
     color: var(--bs-body-color);
-    background-color: $white;
-    border-color: $blue-mid;
+    background-color: var(--white);
+    border-color: var(--blue-mid);
     outline: 0;
-    box-shadow: 0 0 0 var(--spacing-2) $blue-rgba-02;
+    box-shadow: 0 0 0 var(--spacing-2) var(--blue-rgba-02);
 }
 
 .btn-secondary {
-  color: $white;
-  background-color: $blue-bright;
-  border-color: $blue-bright;
+  color: var(--white);
+  background-color: var(--blue-bright);
+  border-color: var(--blue-bright);
 
   &:hover {
-    color: $white;
-    background-color: $primary-colour;
-    border-color: $primary-colour;
+    color: var(--white);
+    background-color: var(--primary-colour);
+    border-color: var(--primary-colour);
   }
 }
 
 .table-striped tbody tr .current_sort,
 .table-striped thead th.current_sort {
-  background-color: $white-fade;
+  background-color: var(--white-fade);
 
 }
 
 .table-striped tbody tr:nth-of-type(2n+1) .current_sort {
-  background-color: $blue-light;
+  background-color: var(--blue-light);
 
 }

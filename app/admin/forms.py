@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileRequired, FileAllowed
+from flask_wtf.file import FileAllowed
 from sqlalchemy import func
-from wtforms import StringField, PasswordField, SubmitField, EmailField, HiddenField, BooleanField, TextAreaField, \
-    SelectField, FileField, IntegerField, FloatField, RadioField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, BooleanField, TextAreaField, \
+    SelectField, FileField, IntegerField, RadioField
 from wtforms.fields.choices import SelectMultipleField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Optional
+from wtforms.validators import ValidationError, DataRequired, EqualTo, Length, Optional
 from flask_babel import _, lazy_gettext as _l
 
 from app.constants import DOWNVOTE_ACCEPT_ALL, DOWNVOTE_ACCEPT_MEMBERS, DOWNVOTE_ACCEPT_INSTANCE, \

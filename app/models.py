@@ -6,7 +6,6 @@ import os
 import uuid
 import re
 import unicodedata
-from collections import defaultdict
 from datetime import datetime, timedelta
 from time import time
 from typing import List, Union
@@ -590,6 +589,7 @@ class Community(db.Model):
     new_mods_wanted = db.Column(db.Boolean, default=False)
     searchable = db.Column(db.Boolean, default=True)
     private_mods = db.Column(db.Boolean, default=False)
+    un_moderated = db.Column(db.Boolean, default=False)
 
     active_daily = db.Column(db.Integer, default=0)
     active_weekly = db.Column(db.Integer, default=0)
@@ -822,7 +822,7 @@ class Community(db.Model):
         if not include_dormant:
             instances = instances.filter(Instance.dormant == False)
         instances = instances.filter(Instance.id != 1, Instance.gone_forever == False)
-        return instances.all()
+        return instances.distinct().all()
 
 
     def has_followers_from_domain(self, domain: str) -> bool:
@@ -892,6 +892,7 @@ class Community(db.Model):
         db.session.query(CommunityBlock).filter(CommunityBlock.community_id == self.id).delete()
         db.session.query(CommunityJoinRequest).filter(CommunityJoinRequest.community_id == self.id).delete()
         db.session.query(CommunityMember).filter(CommunityMember.community_id == self.id).delete()
+        db.session.query(CommunityFavorite).filter(CommunityFavorite.community_id == self.id).delete()
         db.session.query(Report).filter(Report.suspect_community_id == self.id).delete()
         db.session.query(UserFlair).filter(UserFlair.community_id == self.id).delete()
         db.session.query(ModLog).filter(ModLog.community_id == self.id).update({ModLog.community_id: None})
@@ -1027,6 +1028,8 @@ class User(UserMixin, db.Model):
     code_style = db.Column(db.String(25), default='fruity')
     admin_note = db.Column(db.Text)
     page_length = db.Column(db.Integer)
+    num_following = db.Column(db.Integer, default=0)    # number of users being followed, not number of communities
+    num_followers = db.Column(db.Integer, default=0)    # number of users that follow this user
 
     avatar = db.relationship('File', lazy='joined', foreign_keys=[avatar_id], single_parent=True, cascade="all, delete-orphan")
     cover = db.relationship('File', lazy='joined', foreign_keys=[cover_id], single_parent=True, cascade="all, delete-orphan")
@@ -1444,6 +1447,8 @@ class User(UserMixin, db.Model):
         db.session.query(UserFlair).filter(UserFlair.user_id == self.id).delete()
         db.session.query(UserFollower).filter(or_(UserFollower.local_user_id == self.id, UserFollower.remote_user_id == self.id)).delete()
         db.session.query(UserFollowRequest).filter(UserFollowRequest.user_id == self.id).delete()
+        db.session.query(UserFollowRequest).filter(UserFollowRequest.follow_id == self.id).delete()
+        db.session.query(CommunityFavorite).filter(CommunityFavorite.user_id == self.id).delete()
         db.session.query(CommunityMember).filter(CommunityMember.user_id == self.id).delete()
         db.session.query(CommunityBlock).filter(CommunityBlock.user_id == self.id).delete()
         db.session.query(CommunityBan).filter(CommunityBan.user_id == self.id).delete()
@@ -1563,6 +1568,29 @@ class User(UserMixin, db.Model):
 
         return True
 
+    # instances that have users which follow this user. (excluding the current instance)
+    def following_instances(self, include_dormant=False, software='') -> List[Instance]:
+        instances = db.session.query(Instance).join(User, User.instance_id == Instance.id).\
+            join(UserFollower, UserFollower.remote_user_id == User.id).filter(UserFollower.local_user_id == self.id)
+        if not include_dormant:
+            instances = instances.filter(Instance.dormant == False)
+        instances = instances.filter(Instance.id != 1, Instance.gone_forever == False, UserFollower.is_inward == True)
+        if software:
+            instances = instances.filter(Instance.software == software)
+        return instances.distinct().all()
+
+    def is_following(self, other_user) -> str:
+        user_follow = db.session.query(UserFollower).filter(UserFollower.local_user_id == self.id,
+                                                            UserFollower.remote_user_id == other_user.id).first()
+        if user_follow:
+            if user_follow.is_accepted is True:
+                return 'following'
+            elif user_follow.is_accepted is False:
+                return 'pending'
+            else:
+                return 'no'
+        return 'no'
+
 
 class ActivityLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -1605,6 +1633,7 @@ class Post(db.Model):
     notify_author = db.Column(db.Boolean, default=True)
     indexable = db.Column(db.Boolean, default=True, index=True)
     from_bot = db.Column(db.Boolean, default=False, index=True)
+    private = db.Column(db.Boolean, default=False, index=True)
     created_at = db.Column(db.DateTime, index=True, default=utcnow)  # this is when the content arrived here
     posted_at = db.Column(db.DateTime, index=True, default=utcnow)  # this is when the original server created it
     last_active = db.Column(db.DateTime, index=True)
@@ -1734,20 +1763,21 @@ class Post(db.Model):
             find_hashtag_or_create, \
             find_licence_or_create, make_image_sizes, notify_about_post, find_flair_or_create
         from app.utils import allowlist_html, markdown_to_html, html_to_text, microblog_content_to_title, \
-            blocked_phrases, get_setting, \
+            microblog_content_to_link, blocked_phrases, get_setting, \
             is_image_url, is_video_url, domain_from_url, opengraph_parse, shorten_string, fixup_url, \
             is_video_hosting_site, communities_banned_from, recently_upvoted_posts, blocked_users
 
         microblog = False
+        private = False
         if 'name' not in request_json['object']:  # Microblog posts
             if 'content' in request_json['object'] and request_json['object']['content'] is not None:
-                title = "[Microblog]"
+                title = ""
                 microblog = True
             else:
                 return None
             if 'to' in request_json and len(request_json['to']) == 1:
-                if request_json['to'][0].endswith('/followers'):  # Mastodon followers-only posts cannot be accepted because all posts are public in PieFed
-                    return None
+                if request_json['to'][0].endswith('/followers'):  # Mastodon followers-only posts are private
+                    private = True
         else:
             title = request_json['object']['name'].strip()
         nsfl_in_title = '[NSFL]' in title.upper() or '(NSFL)' in title.upper() or '[COMBAT]' in title.upper()
@@ -1758,6 +1788,7 @@ class Post(db.Model):
                     nsfw=request_json['object']['sensitive'] if 'sensitive' in request_json['object'] else False,
                     nsfl=request_json['object']['nsfl'] if 'nsfl' in request_json['object'] else nsfl_in_title,
                     ai_generated=request_json['object']['genAI'] if 'genAI' in request_json['object'] else False,
+                    private=private,
                     ap_id=request_json['object']['id'],
                     ap_create_id=request_json['id'],
                     ap_announce_id=announce_id,
@@ -1799,10 +1830,7 @@ class Post(db.Model):
                 post.body = html_to_text(post.body_html)
             if microblog:
                 autogenerated_title, link = microblog_content_to_title(post.body_html)
-                if len(autogenerated_title) < 20:
-                    title = '[Microblog] ' + autogenerated_title.strip()
-                else:
-                    title = autogenerated_title.strip()
+                title = autogenerated_title.strip()
                 if '[NSFL]' in title.upper() or '(NSFL)' in title.upper() or '[COMBAT]' in title.upper():
                     post.nsfl = True
                 if '[NSFW]' in title.upper() or '(NSFW)' in title.upper():
@@ -1810,6 +1838,9 @@ class Post(db.Model):
                 post.title = title
                 if link != '':
                     post.url = link
+                else:
+                    if link_from_body := microblog_content_to_link(post.body_html, exclude=furl(request_json['object']['id']).host):
+                        post.url = link_from_body
         # Discard post if it contains certain phrases. Good for stopping spam floods.
         blocked_phrases_list = blocked_phrases()
         for blocked_phrase in blocked_phrases_list:
@@ -2369,6 +2400,9 @@ class Post(db.Model):
         if self.url:
             return self.url.replace('watch', 'embed')
 
+    def is_microblog(self):
+        return self.microblog and self.community.name == 'microblogs'
+
     def profile_id(self):
         if self.ap_id:
             return self.ap_id
@@ -2406,6 +2440,9 @@ class Post(db.Model):
             return pendulum.instance(self.last_active if sort == 'active' and self.last_active else self.posted_at).diff_for_humans(locale=locale)
         except ValueError:
             return pendulum.instance(self.last_active if sort == 'active' and self.last_active else self.posted_at).diff_for_humans(locale='en')
+
+    def posted_at_formatted(self, sort):
+        return pendulum.instance(self.last_active if sort == 'active' and self.last_active else self.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ')
 
     def notify_new_replies(self, user_id: int) -> bool:
         existing_notification = db.session.query(NotificationSubscription).\
@@ -2602,6 +2639,9 @@ class Post(db.Model):
 
             db.session.commit()
             if user.is_local():
+                with redis_client.lock(f"lock:user:{user.id}", timeout=10, blocking_timeout=6):
+                    user.last_seen = utcnow()
+                    db.session.commit()
                 from app.utils import recently_upvoted_posts, recently_downvoted_posts
                 cache.delete_memoized(recently_upvoted_posts, user.id)
                 cache.delete_memoized(recently_downvoted_posts, user.id)
@@ -2656,6 +2696,7 @@ class PostReply(db.Model):
     score = db.Column(db.Integer, default=0, index=True)  # used for 'top' sorting
     indexable = db.Column(db.Boolean, default=True, index=True)
     nsfw = db.Column(db.Boolean, default=False, index=True)
+    private = db.Column(db.Boolean, default=False, index=True)
     distinguished = db.Column(db.Boolean, default=False)
     notify_author = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, index=True, default=utcnow)
@@ -2737,6 +2778,11 @@ class PostReply(db.Model):
             parent_id = None
             depth = 0
 
+        private = False
+        if request_json and 'to' in request_json and len(request_json['to']) == 1:
+            if request_json['to'][0].endswith('/followers'):  # Mastodon followers-only posts are private
+                private = True
+
         reply = PostReply(user_id=user.id, post_id=post.id, parent_id=parent_id,
                           depth=depth,
                           community_id=post.community.id, body=body,
@@ -2744,9 +2790,7 @@ class PostReply(db.Model):
                           from_bot=user.bot or user.bot_override, nsfw=post.nsfw,
                           notify_author=notify_author, instance_id=user.instance_id,
                           language_id=language_id,
-                          distinguished=distinguished,
-                          answer=answer,
-                          indexable=user.indexable,
+                          distinguished=distinguished, answer=answer, private=private, indexable=user.indexable,
                           ap_id=request_json['object']['id'] if request_json else None,
                           ap_create_id=request_json['id'] if request_json else None,
                           ap_announce_id=announce_id)
@@ -3127,6 +3171,9 @@ class PostReply(db.Model):
             self.ranking = wilson_confidence_lower_bound(self.up_votes, self.down_votes)
             db.session.commit()
             if user.is_local():
+                with redis_client.lock(f"lock:user:{user.id}", timeout=10, blocking_timeout=6):
+                    user.last_seen = utcnow()
+                    db.session.commit()
                 from app.utils import recently_upvoted_post_replies, recently_downvoted_post_replies
                 cache.delete_memoized(recently_upvoted_post_replies, user.id)
                 cache.delete_memoized(recently_downvoted_post_replies, user.id)
@@ -3244,6 +3291,11 @@ class CommunityMember(db.Model):
     )
 
 
+class CommunityFavorite(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    community_id = db.Column(db.Integer, db.ForeignKey('community.id'), primary_key=True)
+
+
 class CommunityWikiPage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     community_id = db.Column(db.Integer, db.ForeignKey('community.id'), index=True)
@@ -3291,7 +3343,7 @@ class CommunityWikiPageRevision(db.Model):
 class UserFollower(db.Model):
     local_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     remote_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    is_accepted = db.Column(db.Boolean, default=True)  # flip to ban remote user / reject follow
+    is_accepted = db.Column(db.Boolean)              # None = request sent. True = accepted. False = Rejected
     is_inward = db.Column(db.Boolean, default=True)  # true = remote user is following a local one
     created_at = db.Column(db.DateTime, default=utcnow)
 
@@ -3349,6 +3401,7 @@ class CommunityJoinRequest(db.Model):
 
 class UserFollowRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     follow_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 

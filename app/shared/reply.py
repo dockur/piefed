@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from flask import current_app, flash
+from flask import current_app, flash, abort
 from flask_babel import _, force_locale, gettext
 from flask_login import current_user
 from sqlalchemy import text
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.constants import *
@@ -12,7 +13,7 @@ from app.models import Notification, NotificationSubscription, Post, PostReply, 
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, add_to_modlog, can_create_post_reply, \
-    can_upvote, can_downvote, get_recipient_language
+    can_upvote, can_downvote, get_recipient_language, user_ip_banned
 
 
 def vote_for_reply(reply_id: int, vote_direction, federate: bool, emoji: str | None, src, auth=None):
@@ -26,6 +27,9 @@ def vote_for_reply(reply_id: int, vote_direction, federate: bool, emoji: str | N
     else:
         reply = db.session.query(PostReply).get_or_404(reply_id)
         user = current_user
+
+    if user.banned or user_ip_banned():
+        abort(403)
 
     undo = reply.vote(user, vote_direction, emoji)
 
@@ -151,6 +155,9 @@ def make_reply(input, post, parent_id, src, auth=None):
         distinguished = input.distinguished.data
         answer = False
 
+    if user.banned or user_ip_banned():
+        raise Exception('You are not permitted to comment in this community')
+
     if not post.community.is_moderator(user) and not post.community.is_owner(user) and not user.is_admin_or_staff():
         distinguished = False
 
@@ -240,6 +247,8 @@ def delete_reply(reply_id, src, auth):
 
     if not reply.author.bot:
         reply.post.reply_count -= 1
+        reply.post.reply_count_cross_posted -= 1
+        reply.community.post_reply_count -= 1
     reply.author.post_reply_count -= 1
     if reply.path:
         db.session.execute(text('update post_reply set child_count = child_count - 1 where id in :parents'),

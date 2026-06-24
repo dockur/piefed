@@ -47,7 +47,6 @@ from flask_babel import _, lazy_gettext as _l
 from flask_login import current_user, logout_user
 from flask_wtf.csrf import validate_csrf
 from sqlalchemy import text, or_, desc, asc, event, select, func, update
-from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 from wtforms.fields import SelectMultipleField, StringField
 from wtforms.widgets import ListWidget, CheckboxInput, TextInput
@@ -67,7 +66,7 @@ from app.models import CronJobLog, Settings, Domain, Instance, BannedInstances, 
     Site, Post, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic, UserBlock, Language, \
     File, ModLog, CommunityBlock, Feed, FeedMember, CommunityFlair, CommunityJoinRequest, Notification, UserNote, \
     PostReply, PostReplyBookmark, AllowedInstances, InstanceBan, Tag, Emoji, UserExtraField, ArchivedPostReply, \
-    RevokedToken
+    RevokedToken, CommunityFavorite
 
 logger = logging.getLogger(__name__)
 
@@ -1050,6 +1049,15 @@ def microblog_content_to_title(html: str) -> Tuple[str, str]:
     return title.strip(), link
 
 
+def microblog_content_to_link(html: str, exclude: str):
+    soup = BeautifulSoup(html, "html.parser")
+
+    for link in soup.find_all("a"):
+        if furl(link.get("href")).host != exclude:
+            return link.get("href")
+    return None
+
+
 def first_paragraph(html):
     soup = BeautifulSoup(html, 'html.parser')
     first_para = soup.find('p')
@@ -1894,15 +1902,20 @@ def can_create_post_reply(user, content: Community) -> bool:
     return True
 
 
-def can_upload_video():
+def can_upload_video(user: User | None = None):
+    """Checks if the user can upload a video.
+
+    :param user: The user to check, e.g. for API contexts. If not provided, uses the current_user from flask_login.
+    """
     upload_access = get_setting('allow_video_file_uploads', 'no')
+    upload_user = user or current_user
     if upload_access == 'no':
         return False
-    elif upload_access == 'user 1' and current_user.get_id() != 1:
+    elif upload_access == 'user 1' and upload_user.get_id() != 1:
         return False
-    elif upload_access == 'admins' and not current_user.is_admin_or_staff():
+    elif upload_access == 'admins' and not upload_user.is_admin_or_staff():
         return False
-    elif upload_access == 'users' and not current_user.is_authenticated:
+    elif upload_access == 'users' and not current_user.is_authenticated and user is None:
         return False
     return True
 
@@ -2505,13 +2518,13 @@ def current_theme():
 
 def theme_list():
     """ All the themes available, by looking in the templates/themes directory """
-    result = [('piefed', 'PieFed')]
+    result = []
     for root, dirs, files in os.walk('app/templates/themes'):
         for dir in dirs:
             if os.path.exists(f'app/templates/themes/{dir}/{dir}.json'):
                 theme_settings = json.loads(file_get_contents(f'app/templates/themes/{dir}/{dir}.json'))
                 result.append((dir, theme_settings['name']))
-    return result
+    return [('piefed', 'PieFed')] + sorted(result)
 
 
 def sha256_digest(input_string):
@@ -3181,7 +3194,7 @@ def paginate_post_ids(post_ids, page: int, page_length: int):
     return post_ids[start:end]
 
 
-def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, hashtag: str = '') -> List[int]:
+def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, hashtag: str = '', include_following=False) -> List[int]:
     from app import redis_client
     if community_ids is None or len(community_ids) == 0:
         return []
@@ -3189,23 +3202,40 @@ def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, ha
         if redis_client.exists(result_id):
             return json.loads(redis_client.get(result_id))
 
+    params = {}                 # parameters provided to the SQL query
+    sources = []                # communities and possibly followers as well
     if community_ids[0] == -1:  # A special value meaning to get posts from all communities
         post_id_sql = 'SELECT p.id, p.cross_posts, p.user_id, p.reply_count FROM "post" as p\nINNER JOIN "community" as c on p.community_id = c.id\n'
-        post_id_where = ['c.banned is false AND c.show_all is true']
-        if current_user.is_authenticated and current_user.hide_low_quality:
-            post_id_where.append('c.low_quality is false')
-        params = {}
+        sources.append('c.show_all is true')
+        if current_user.is_authenticated and current_user.num_following and include_following:
+            sources.append("""EXISTS (SELECT 1
+                                    FROM user_follower uf
+                                    WHERE uf.local_user_id = :local_user_id
+                                      AND uf.remote_user_id = p.user_id AND is_inward is false)""")
+            params['local_user_id'] = current_user.id
     else:
         post_id_sql = 'SELECT p.id, p.cross_posts, p.user_id, p.reply_count FROM "post" as p\nINNER JOIN "community" as c on p.community_id = c.id\n'
-        post_id_where = ['c.id IN :community_ids AND c.banned is false ']
-        params = {'community_ids': tuple(community_ids)}
-        if hashtag:
-            # Filter by post tag
-            tag_record = Tag.query.filter(Tag.name == hashtag.strip()).first()
-            if tag_record:
-                post_id_sql += 'INNER JOIN "post_tag" as pt ON p.id = pt.post_id'
-                post_id_where.append('pt.tag_id = :tag_record_id')
-                params['tag_record_id'] = tag_record.id
+        sources.append('c.id IN :community_ids')
+        if current_user.is_authenticated and current_user.num_following and include_following:
+            sources.append("""EXISTS (SELECT 1 FROM user_follower uf
+                                      WHERE uf.local_user_id = :local_user_id
+                                      AND uf.remote_user_id = p.user_id AND is_inward is false)""")
+            params['local_user_id'] = current_user.id
+        params['community_ids'] = tuple(community_ids)
+
+    post_id_where = ["(" + " OR ".join(sources) + ")", 'c.banned is false']
+    if current_user.is_authenticated and current_user.hide_low_quality and community_ids[0] == -1:
+        post_id_where.append('c.low_quality is false')
+    if not include_following:
+        post_id_where.append('p.private is false')
+
+    # Filter by post tag
+    if hashtag:
+        tag_record = Tag.query.filter(Tag.name == hashtag.strip()).first()
+        if tag_record:
+            post_id_sql += 'INNER JOIN "post_tag" as pt ON p.id = pt.post_id\n'
+            post_id_where.append('pt.tag_id = :tag_record_id')
+            params['tag_record_id'] = tag_record.id
 
     # filter out posts in communities where the community name is objectionable to them or they blocked the instance
     if current_user.is_authenticated:
@@ -3273,6 +3303,7 @@ def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, ha
         if banned_from:
             post_id_where.append('p.community_id NOT IN :banned_from ')
             params['banned_from'] = tuple(banned_from)
+
     # sorting
     post_id_sort = ''
     if sort == '' or sort == 'hot':
@@ -3723,8 +3754,9 @@ def possible_communities():
     if len(comms) > 0:
         which_community['Joined communities'] = comms
     comms = []
-    for c in db.session.query(Community.id, Community.ap_id, Community.title, Community.ap_domain).filter(
-            Community.banned == False).order_by(Community.title).all():
+    for c in db.session.query(Community.id, Community.ap_id, Community.title, Community.ap_domain).\
+            filter(Community.banned == False).join(Instance, Instance.id == Community.instance_id).\
+            filter(Instance.gone_forever == False, Community.name != 'microblogs').order_by(Community.title).all():
         if c.id not in already_added:
             if c.ap_id is None:
                 display_name = c.title
@@ -3742,9 +3774,48 @@ def user_notes(user_id):
     if user_id is None:
         return {}
     result = {}
-    for note in UserNote.query.filter(UserNote.user_id == user_id).all():
+    for note in db.session.query(UserNote).filter(UserNote.user_id == user_id).all():
         result[note.target_id] = note.body
     return result
+
+
+@cache.memoize(timeout=300)
+def favorite_communities(user_id):
+    if user_id is None:
+        return []
+    return (
+        db.session.execute(
+            select(CommunityFavorite.community_id)
+            .where(CommunityFavorite.user_id == user_id)
+        )
+        .scalars()
+        .all()
+    )
+
+
+def communities_run_by_bots():
+    sql = """SELECT c.id
+            FROM community c
+            WHERE EXISTS (
+                    -- must have at least one moderator
+                    SELECT 1
+                    FROM community_member cm
+                    WHERE cm.community_id = c.id
+                      AND cm.is_banned = false
+                      AND (cm.is_moderator OR cm.is_owner)
+                  )
+              AND NOT EXISTS (
+                    -- ...and no moderator who is a human (non-bot)
+                    SELECT 1
+                    FROM community_member cm
+                    JOIN "user" u ON u.id = cm.user_id
+                    WHERE cm.community_id = c.id
+                      AND cm.is_banned = false
+                      AND (cm.is_moderator OR cm.is_owner)
+                      AND COALESCE(u.bot, false) = false
+                      AND COALESCE(u.bot_override, false) = false
+                  )"""
+    return db.session.execute(text(sql)).scalars().all()
 
 
 class SqlKeysetPagination:
@@ -3970,9 +4041,7 @@ def is_valid_xml_utf8(pystring):
     return True
 
 
-def archive_post(post_id: int):
-    from app import redis_client
-    import os
+def archive_post(post_id: int, s3_connection):
     session = get_task_session()  # noqa: F811
     try:
         with patch_db_session(session):
@@ -3980,187 +4049,163 @@ def archive_post(post_id: int):
                 filename = f'post_{post_id}{gibberish(5)}.json'
             else:
                 filename = f'post_{post_id}.json'
-            with redis_client.lock(f"lock:post:{post_id}", timeout=300, blocking_timeout=6):
-                post = session.query(Post).get(post_id)
+            post = session.query(Post).get(post_id)
 
-                if post is None:
-                    return
+            if post is None:
+                return
 
-                # Delete thumbnail and medium sized versions if post has an image
-                if post.image_id is not None:
+            # Delete thumbnail and medium sized versions if post has an image
+            if post.image_id is not None:
 
-                    image_file = session.query(File).get(post.image_id)
-                    if image_file:
-                        if store_files_in_s3():
-                            boto3_session = boto3.session.Session()
-                            s3 = boto3_session.client(
-                                service_name='s3',
-                                region_name=current_app.config['S3_REGION'],
-                                endpoint_url=current_app.config['S3_ENDPOINT'],
-                                aws_access_key_id=current_app.config['S3_ACCESS_KEY'],
-                                aws_secret_access_key=current_app.config['S3_ACCESS_SECRET'],
-                            )
+                image_file = session.query(File).get(post.image_id)
+                if image_file:
 
-                        # Delete thumbnail
-                        if image_file.thumbnail_path:
-                            if image_file.thumbnail_path.startswith('app/'):
-                                # Local file deletion
-                                try:
-                                    os.unlink(image_file.thumbnail_path)
-                                except (OSError, FileNotFoundError):
-                                    pass
-                            elif store_files_in_s3() and image_file.thumbnail_path.startswith(
-                                    f'https://{current_app.config["S3_PUBLIC_URL"]}'):
-                                # S3 file deletion
-                                try:
-                                    s3_key = image_file.thumbnail_path.split(current_app.config['S3_PUBLIC_URL'])[-1].lstrip('/')
-                                    s3.delete_object(Bucket=current_app.config['S3_BUCKET'], Key=s3_key)
-                                except Exception:
-                                    pass
-                            image_file.thumbnail_path = None
+                    # Delete thumbnail
+                    if image_file.thumbnail_path:
+                        if image_file.thumbnail_path.startswith('app/'):
+                            # Local file deletion
+                            try:
+                                os.unlink(image_file.thumbnail_path)
+                            except (OSError, FileNotFoundError):
+                                pass
+                        elif store_files_in_s3() and image_file.thumbnail_path.startswith(
+                                f'https://{current_app.config["S3_PUBLIC_URL"]}'):
+                            # S3 file deletion
+                            try:
+                                s3_key = image_file.thumbnail_path.split(current_app.config['S3_PUBLIC_URL'])[-1].lstrip('/')
+                                s3_connection.delete_object(Bucket=current_app.config['S3_BUCKET'], Key=s3_key)
+                            except Exception:
+                                pass
+                        image_file.thumbnail_path = None
 
-                        # Delete medium sized version (file_path)
-                        if image_file.file_path:
-                            if image_file.file_path.startswith('app/'):
-                                # Local file deletion
-                                try:
-                                    os.unlink(image_file.file_path)
-                                except (OSError, FileNotFoundError):
-                                    pass
-                            elif store_files_in_s3() and image_file.file_path.startswith(
-                                    f'https://{current_app.config["S3_PUBLIC_URL"]}'):
-                                # S3 file deletion
-                                try:
-                                    s3_key = image_file.file_path.split(current_app.config['S3_PUBLIC_URL'])[-1].lstrip('/')
-                                    s3.delete_object(Bucket=current_app.config['S3_BUCKET'], Key=s3_key)
-                                except Exception:
-                                    pass
-                            image_file.file_path = None
-
-                        if store_files_in_s3():
-                            s3.close()
-
-                    session.commit()
-
-                if post.reply_count == 0 and (post.body is None or len(post.body) < 200):  # don't save to json when the url of the json will be longer than the savings from removing the body
-                    return
-
-                save_this = {}
-
-                save_this['id'] = post.id
-                save_this['version'] = 1
-                save_this['body'] = post.body
-                save_this['body_html'] = post.body_html
-                save_this['replies'] = []
-                post.body = None
-                post.body_html = None
-                if post.reply_count:
-                    from app.post.util import post_replies
-                    # Get replies sorted by 'hot' with scores preserved - keep hierarchical structure
-                    hot_replies = post_replies(post, 'hot', None, db_only=True)  # No viewer to get all replies
-
-                    # Serialization of hierarchical tree
-                    def serialize_tree(reply_tree):
-                        result = []
-                        for reply_dict in reply_tree:
-                            comment = reply_dict['comment']
-                            serialized = {
-                                'id': int(comment.id) if comment.id else None,
-                                'body': str(comment.body) if comment.body else '',
-                                'body_html': str(comment.body_html) if comment.body_html else '',
-                                'posted_at': comment.posted_at.isoformat() if comment.posted_at else None,
-                                'edited_at': comment.edited_at.isoformat() if comment.edited_at else None,
-                                'score': int(comment.score) if comment.score else 0,
-                                'ranking': float(comment.ranking) if comment.ranking else 0.0,
-                                'parent_id': int(comment.parent_id) if comment.parent_id else None,
-                                'distinguished': bool(comment.distinguished),
-                                'deleted': bool(comment.deleted),
-                                'deleted_by': int(comment.deleted_by) if comment.deleted_by else None,
-                                'user_id': int(comment.user_id) if comment.user_id else None,
-                                'depth': int(comment.depth) if comment.depth else 0,
-                                'language_id': int(comment.language_id) if comment.language_id else None,
-                                'replies_enabled': bool(comment.replies_enabled),
-                                'community_id': int(comment.community_id) if comment.community_id else None,
-                                'up_votes': int(comment.up_votes) if comment.up_votes else 0,
-                                'down_votes': int(comment.down_votes) if comment.down_votes else 0,
-                                'child_count': int(comment.child_count) if comment.child_count else 0,
-                                'path': list(comment.path) if comment.path else [],
-                                'answer': bool(comment.answer),
-                                'author_name': str(comment.author.display_name()) if comment.author and comment.author.display_name() else 'Unknown',
-                                'author_id': int(comment.author.id) if comment.author and comment.author.id else None,
-                                'author_indexable': bool(comment.author.indexable) if comment.author else True,
-                                'author_deleted': bool(comment.author.deleted) if comment.author else False,
-                                'author_user_name': comment.author.user_name if comment.author else False,
-                                'author_ap_id': comment.author.ap_id if comment.author else False,
-                                'author_ap_profile_id': comment.author.ap_profile_id if comment.author else False,
-                                'author_reputation': comment.author.reputation if comment.author else 0,
-                                'author_created': comment.author.created.isoformat() if comment.author else None,
-                                'author_ap_domain': comment.author.ap_domain if comment.author else '',
-                                'author_bot': comment.author.bot if comment.author else False,
-                                'author_banned': comment.author.banned if comment.author else False,
-                                'replies': serialize_tree(reply_dict['replies'])
-                            }
-                            result.append(serialized)
-                        return result
-
-                    save_this['replies'] = serialize_tree(hot_replies)
-
-                if store_files_in_s3():
-                    # upload to s3
-                    boto3_session = boto3.session.Session()
-                    s3 = boto3_session.client(
-                        service_name='s3',
-                        region_name=current_app.config['S3_REGION'],
-                        endpoint_url=current_app.config['S3_ENDPOINT'],
-                        aws_access_key_id=current_app.config['S3_ACCESS_KEY'],
-                        aws_secret_access_key=current_app.config['S3_ACCESS_SECRET'],
-                    )
-
-                    # upload orjson(save_this) to a file in S3 named f'archived/{filename}'
-                    # save url to  new file into s3_url variable
-                    s3_key = f'archived/{filename}.gz'
-                    json_data = orjson.dumps(save_this)
-                    compressed_data = gzip.compress(json_data)
-
-                    s3.put_object(
-                        Bucket=current_app.config['S3_BUCKET'],
-                        Key=s3_key,
-                        Body=compressed_data,
-                        ContentType='application/gzip',
-                        ContentEncoding='gzip'
-                    )
-
-                    s3_url = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_key}"
-
-                    s3.close()
-                    post.archived = s3_url
-                else:
-                    ensure_directory_exists('app/static/media/archived')
-                    file_path = f'app/static/media/archived/{filename}'
-                    with gzip.open(file_path + '.gz', 'wb') as f:
-                        f.write(orjson.dumps(save_this))
-                    post.archived = file_path + '.gz'
+                    # Delete medium sized version (file_path)
+                    if image_file.file_path:
+                        if image_file.file_path.startswith('app/'):
+                            # Local file deletion
+                            try:
+                                os.unlink(image_file.file_path)
+                            except (OSError, FileNotFoundError):
+                                pass
+                        elif store_files_in_s3() and image_file.file_path.startswith(
+                                f'https://{current_app.config["S3_PUBLIC_URL"]}'):
+                            # S3 file deletion
+                            try:
+                                s3_key = image_file.file_path.split(current_app.config['S3_PUBLIC_URL'])[-1].lstrip('/')
+                                s3_connection.delete_object(Bucket=current_app.config['S3_BUCKET'], Key=s3_key)
+                            except Exception:
+                                pass
+                        image_file.file_path = None
 
                 session.commit()
 
-                # Delete all post_replies associated with the post
-                # First, get all reply IDs that have bookmarks by users other than the reply author
-                bookmarked_reply_ids = set(
-                    session.execute(text('''
-                        SELECT DISTINCT prb.post_reply_id
-                        FROM post_reply_bookmark prb
-                        JOIN post_reply pr ON prb.post_reply_id = pr.id
-                        WHERE pr.post_id = :post_id
-                    '''), {'post_id': post.id}).scalars()
+            if post.reply_count == 0 and (post.body is None or len(post.body) < 200):  # don't save to json when the url of the json will be longer than the savings from removing the body
+                return
+
+            save_this = {}
+
+            save_this['id'] = post.id
+            save_this['version'] = 1
+            save_this['body'] = post.body
+            save_this['body_html'] = post.body_html
+            save_this['replies'] = []
+            post.body = None
+            post.body_html = None
+            if post.reply_count:
+                from app.post.util import post_replies
+                # Get replies sorted by 'hot' with scores preserved - keep hierarchical structure
+                hot_replies = post_replies(post, 'hot', None, db_only=True)  # No viewer to get all replies
+
+                # Serialization of hierarchical tree
+                def serialize_tree(reply_tree):
+                    result = []
+                    for reply_dict in reply_tree:
+                        comment = reply_dict['comment']
+                        serialized = {
+                            'id': int(comment.id) if comment.id else None,
+                            'body': str(comment.body) if comment.body else '',
+                            'body_html': str(comment.body_html) if comment.body_html else '',
+                            'posted_at': comment.posted_at.isoformat() if comment.posted_at else None,
+                            'edited_at': comment.edited_at.isoformat() if comment.edited_at else None,
+                            'score': int(comment.score) if comment.score else 0,
+                            'ranking': float(comment.ranking) if comment.ranking else 0.0,
+                            'parent_id': int(comment.parent_id) if comment.parent_id else None,
+                            'distinguished': bool(comment.distinguished),
+                            'deleted': bool(comment.deleted),
+                            'deleted_by': int(comment.deleted_by) if comment.deleted_by else None,
+                            'user_id': int(comment.user_id) if comment.user_id else None,
+                            'depth': int(comment.depth) if comment.depth else 0,
+                            'language_id': int(comment.language_id) if comment.language_id else None,
+                            'replies_enabled': bool(comment.replies_enabled),
+                            'community_id': int(comment.community_id) if comment.community_id else None,
+                            'up_votes': int(comment.up_votes) if comment.up_votes else 0,
+                            'down_votes': int(comment.down_votes) if comment.down_votes else 0,
+                            'child_count': int(comment.child_count) if comment.child_count else 0,
+                            'path': list(comment.path) if comment.path else [],
+                            'answer': bool(comment.answer),
+                            'author_name': str(comment.author.display_name()) if comment.author and comment.author.display_name() else 'Unknown',
+                            'author_id': int(comment.author.id) if comment.author and comment.author.id else None,
+                            'author_indexable': bool(comment.author.indexable) if comment.author else True,
+                            'author_deleted': bool(comment.author.deleted) if comment.author else False,
+                            'author_user_name': comment.author.user_name if comment.author else False,
+                            'author_ap_id': comment.author.ap_id if comment.author else False,
+                            'author_ap_profile_id': comment.author.ap_profile_id if comment.author else False,
+                            'author_reputation': comment.author.reputation if comment.author else 0,
+                            'author_created': comment.author.created.isoformat() if comment.author else None,
+                            'author_ap_domain': comment.author.ap_domain if comment.author else '',
+                            'author_bot': comment.author.bot if comment.author else False,
+                            'author_banned': comment.author.banned if comment.author else False,
+                            'replies': serialize_tree(reply_dict['replies'])
+                        }
+                        result.append(serialized)
+                    return result
+
+                save_this['replies'] = serialize_tree(hot_replies)
+
+            if store_files_in_s3():
+                # upload orjson(save_this) to a file in S3 named f'archived/{filename}'
+                # save url to  new file into s3_url variable
+                s3_key = f'archived/{filename}.gz'
+                json_data = orjson.dumps(save_this)
+                compressed_data = gzip.compress(json_data)
+
+                s3_connection.put_object(
+                    Bucket=current_app.config['S3_BUCKET'],
+                    Key=s3_key,
+                    Body=compressed_data,
+                    ContentType='application/gzip',
+                    ContentEncoding='gzip'
                 )
 
-                for reply in session.query(PostReply).filter(PostReply.post_id == post.id).order_by(desc(PostReply.created_at)):
-                    session.add(ArchivedPostReply(user_id=reply.user_id, post_id=post.id, post_reply_id=reply.id,
-                                                  created_at=reply.created_at))
-                    if reply.id not in bookmarked_reply_ids:
-                        reply.delete_dependencies()
-                        session.delete(reply)
-                    session.commit()
+                s3_url = f"https://{current_app.config['S3_PUBLIC_URL']}/{s3_key}"
+
+                post.archived = s3_url
+            else:
+                ensure_directory_exists('app/static/media/archived')
+                file_path = f'app/static/media/archived/{filename}'
+                with gzip.open(file_path + '.gz', 'wb') as f:
+                    f.write(orjson.dumps(save_this))
+                post.archived = file_path + '.gz'
+
+            session.commit()
+
+            # Delete all post_replies associated with the post
+            # First, get all reply IDs that have bookmarks by users other than the reply author
+            bookmarked_reply_ids = set(
+                session.execute(text('''
+                    SELECT DISTINCT prb.post_reply_id
+                    FROM post_reply_bookmark prb
+                    JOIN post_reply pr ON prb.post_reply_id = pr.id
+                    WHERE pr.post_id = :post_id
+                '''), {'post_id': post.id}).scalars()
+            )
+
+            for reply in session.query(PostReply).filter(PostReply.post_id == post.id).order_by(desc(PostReply.created_at)):
+                session.add(ArchivedPostReply(user_id=reply.user_id, post_id=post.id, post_reply_id=reply.id,
+                                              created_at=reply.created_at))
+                if reply.id not in bookmarked_reply_ids:
+                    reply.delete_dependencies()
+                    session.delete(reply)
+                session.commit()
 
     except Exception:
         session.rollback()
@@ -4433,20 +4478,16 @@ def log_cron_task_to_db(task_name: str):
         task_name: The 'name' column in the database.
     """
 
-    stmt = pg_insert(CronJobLog).values(
-        name=task_name,
-        last_run=utcnow()
-    )
-    stmt = stmt.on_conflict_do_update(
-        index_elements=['name'],  # conflict target
-        set_=dict(last_run=stmt.excluded.last_run)  # what to update
-    )
-
     session = get_task_session()
     try:
-        with patch_db_session(session):
-            session.execute(stmt)
-            session.commit()
+        # Query for existing record
+        cron_log = session.query(CronJobLog).filter_by(name=task_name).first()
+        if cron_log:
+            cron_log.last_run = utcnow()
+        else:
+            cron_log = CronJobLog(name=task_name, last_run=utcnow())
+            session.add(cron_log)
+        session.commit()
     except Exception as e:
         logger.error(f"error while saving cron logs to db: {e}")
         session.rollback()
@@ -4465,6 +4506,7 @@ def display_back_button():
         return ''
 
 
+@cache.memoize(timeout=300)
 def is_invalid_get_request_uri(uri):
     if current_app.debug:
         return False
@@ -4486,9 +4528,16 @@ def is_invalid_get_request_uri(uri):
             ips = [ip]
         except ValueError:
             # otherwise, resolve hostname and check the IP(s) associated with that.
-            infos = socket.getaddrinfo(f.host, None)
-            ips = []
+            # Resolution can fail transiently (a single flaky/overloaded nameserver,
+            # packet loss, UDP rate-limiting). Don't let a momentary DNS blip mark a
+            # valid peer invalid: on a resolution failure, fail open (return False)
+            # rather than treating the URI as invalid.
+            try:
+                infos = socket.getaddrinfo(f.host, None)
+            except (socket.gaierror, socket.timeout) as e:
+                return False
 
+            ips = []
             for info in infos:
                 sockaddr = info[4]
                 ip_str = sockaddr[0]

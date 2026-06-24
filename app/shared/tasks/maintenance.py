@@ -18,7 +18,7 @@ from app.models import Notification, SendQueue, CommunityBan, CommunityMember, U
 from app.shared.post import delete_post
 from app.utils import get_task_session, download_defeds, instance_banned, get_request_instance, get_request, \
     shorten_string, patch_db_session, archive_post, get_setting, set_setting, communities_banned_from_all_users, \
-    banned_instances, blocked_or_banned_instances, get_emoji_replacements
+    banned_instances, blocked_or_banned_instances, get_emoji_replacements, store_files_in_s3
 
 
 @celery.task
@@ -250,12 +250,11 @@ def delete_old_soft_deleted_content():
                 )
 
                 for post_id in post_ids:
-                    with redis_client.lock(f"lock:post:{post_id}", timeout=30, blocking_timeout=30):
-                        post = session.query(Post).get(post_id)
-                        if post and (post.image_id is None or post.image_id not in images_used_by_many_posts):
-                            post.delete_dependencies()
-                            session.delete(post)
-                            session.commit()
+                    post = session.query(Post).get(post_id)
+                    if post and (post.image_id is None or post.image_id not in images_used_by_many_posts):
+                        post.delete_dependencies()
+                        session.delete(post)
+                        session.commit()
 
                 # Delete old post replies
                 post_reply_ids = list(
@@ -266,13 +265,12 @@ def delete_old_soft_deleted_content():
                 )
 
                 for post_reply_id in post_reply_ids:
-                    with redis_client.lock(f"lock:post_reply:{post_reply_id}", timeout=30, blocking_timeout=30):
-                        post_reply = session.query(PostReply).get(post_reply_id)
-                        if post_reply:  # Check if still exists
-                            post_reply.delete_dependencies()
-                            if not post_reply.has_replies(include_deleted=True):
-                                session.delete(post_reply)
-                                session.commit()
+                    post_reply = session.query(PostReply).get(post_reply_id)
+                    if post_reply:  # Check if still exists
+                        post_reply.delete_dependencies()
+                        if not post_reply.has_replies(include_deleted=True):
+                            session.delete(post_reply)
+                            session.commit()
 
         except Exception:
             session.rollback()
@@ -910,8 +908,21 @@ def archive_old_posts():
                   )
             '''
             post_ids = session.execute(text(sql), {'cutoff': cutoff}).scalars()
+            s3 = None
+            if store_files_in_s3():
+                boto3_session = boto3.session.Session()
+                s3 = boto3_session.client(
+                    service_name='s3',
+                    region_name=current_app.config['S3_REGION'],
+                    endpoint_url=current_app.config['S3_ENDPOINT'],
+                    aws_access_key_id=current_app.config['S3_ACCESS_KEY'],
+                    aws_secret_access_key=current_app.config['S3_ACCESS_SECRET'],
+                )
             for post_id in post_ids:
-                archive_post(post_id)
+                archive_post(post_id, s3)
+
+            if s3:
+                s3.close()
 
         except Exception:
             session.rollback()

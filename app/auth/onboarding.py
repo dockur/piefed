@@ -45,6 +45,7 @@ def filter_selection():
             return redirect(url_for('auth.choose_topics'))
         else:
             form.hide_nsfw.data = 0 if current_app.config['CONTENT_WARNING'] or g.site.enable_nsfw else 1
+            form.ignore_bots.data = 1
             return render_template('auth/filter_selection.html', form=form)
     else:
         return redirect(url_for('auth.choose_topics'))

@@ -53,7 +53,7 @@
         </form>
         <p class="mt-4">
             {% if not user.is_local() %}
-                <a href="{{ user.public_url() }}" class="btn btn-primary">{{ _('View original profile') }}</a>
+                <a href="{{ user.public_url() }}" class="btn btn-primary">{{ _('View on home server') }}</a>
             {% endif %}
         </p>
     </div>

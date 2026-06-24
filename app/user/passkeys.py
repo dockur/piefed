@@ -1,11 +1,10 @@
 from flask import redirect, url_for, flash, request, make_response, session, current_app, g, abort, jsonify
-from markupsafe import Markup
 import base64
 from webauthn import options_to_json, generate_registration_options, verify_registration_response
 from webauthn.helpers import parse_registration_credential_json
 from webauthn.helpers.exceptions import InvalidRegistrationResponse
 from webauthn.helpers.structs import PublicKeyCredentialDescriptor, \
-    AttestationConveyancePreference, AuthenticatorSelectionCriteria, AuthenticatorAttachment, ResidentKeyRequirement
+    AttestationConveyancePreference, AuthenticatorSelectionCriteria, ResidentKeyRequirement
 from flask_login import current_user
 
 from app import db, cache

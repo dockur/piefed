@@ -289,7 +289,7 @@ def send_post(post_id, edit=False, session=None):
               'cc': cc,
               '@context': default_context()
             }
-            for instance in community.following_instances():
+            for instance in set(community.following_instances() + user.following_instances(software='piefed')):
                 if instance.inbox and instance.online() and not user.has_blocked_instance(instance.id) and not instance_banned(instance.domain):
                     if instance.software in MICROBLOG_APPS:
                         if activity == 'create':
@@ -304,7 +304,7 @@ def send_post(post_id, edit=False, session=None):
             send_post_request(community.ap_inbox_url, create, user.private_key, user.public_url() + '#main-key')
             domains_sent_to.append(community.instance.domain)
 
-    # amend copy of the Create, for anyone Mentioned in post body or who is following the user, to a format more likely to be understood
+    # amend copy of the Create, for anyone Mentioned in post body or who is following the user, to a format more likely to be understood by Mastodon
     if '@context' not in create:
         create['@context'] = default_context()
     if 'name' in page:

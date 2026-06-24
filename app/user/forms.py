@@ -246,7 +246,7 @@ class RemoteFollowForm(FlaskForm):
 
 
 class UserNoteForm(FlaskForm):
-    note = StringField(_l('User note'), validators=[Optional(), Length(max=50)])
+    note = StringField(_l('Note'), validators=[Optional(), Length(max=50)], render_kw={'class': 'hide_label'})
     submit = SubmitField(_l('Save note'))
 
 

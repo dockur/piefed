@@ -26,7 +26,7 @@ from app.models import Post, Community, CommunityMember, User, PostReply, PostVo
 from app.shared.site import block_remote_instance
 from app.shared.tasks import task_selector
 from app.shared.upload import process_file_delete, process_upload
-from app.shared.user import subscribe_user, ban_user, unban_user
+from app.shared.user import subscribe_user, ban_user, unban_user, follow_user, unfollow_user
 from app.user import bp
 from app.user.forms import ProfileForm, SettingsForm, DeleteAccountForm, ReportUserForm, \
     FilterForm, KeywordFilterEditForm, RemoteFollowForm, ImportExportForm, UserNoteForm, BanUserForm, DeleteFileForm, \
@@ -658,7 +658,7 @@ def user_settings_import_export():
         # redirecting to the current page, so no
         # url_for needed here
         return send_file(buffer, download_name=f'{user.user_name}_piefed_settings.json', as_attachment=True,
-                         mimetype='application/json')
+                         mimetype='application/octet-stream')
     elif form.validate_on_submit():
         import_file = request.files['import_file']
         if import_file and import_file.filename != '':
@@ -1940,6 +1940,46 @@ def user_preview(user_id):
     return render_template('user/user_preview.html', user=user, return_to=return_to)
 
 
+@bp.route('/u/<actor>/follow', methods=['POST'])
+@login_required
+def user_follow(actor):
+    actor = actor.strip()
+    return_to = request.args.get('return_to', f'/u/{actor}').strip()
+    if return_to.startswith('http'):
+        abort(401)
+    if '@' in actor:
+        user: User = User.query.filter_by(ap_id=actor, deleted=False).first()
+    else:
+        user: User = User.query.filter_by(user_name=actor, deleted=False, ap_id=None).first()
+    if user is None:
+        abort(404)
+
+    follow_user(user.id, src=SRC_WEB)
+
+    flash(_('Follow request sent.'), 'success')
+    return redirect(return_to)
+
+
+@bp.route('/u/<actor>/unfollow', methods=['POST'])
+@login_required
+def user_unfollow(actor):
+    actor = actor.strip()
+    return_to = request.args.get('return_to', f'/u/{actor}').strip()
+    if return_to.startswith('http'):
+        abort(401)
+    if '@' in actor:
+        user: User = User.query.filter_by(ap_id=actor, deleted=False).first()
+    else:
+        user: User = User.query.filter_by(user_name=actor, deleted=False, ap_id=None).first()
+    if user is None:
+        abort(404)
+
+    unfollow_user(user.id, src=SRC_WEB)
+
+    flash(_('Unfollowed.'), 'success')
+    return redirect(return_to)
+
+
 @bp.route('/user/lookup/<person>/<domain>')
 def lookup(person, domain):
     if domain == current_app.config['SERVER_NAME']:
@@ -2158,25 +2198,25 @@ def user_file_upload():
                     db.session.commit()
 
         if form.file1.data:
-            process_upload(form.file1.data, user_id=current_user.id)
+            process_upload(form.file1.data, user=current_user)
         if form.file2.data:
-            process_upload(form.file2.data, user_id=current_user.id)
+            process_upload(form.file2.data, user=current_user)
         if form.file3.data:
-            process_upload(form.file3.data, user_id=current_user.id)
+            process_upload(form.file3.data, user=current_user)
         if form.file4.data:
-            process_upload(form.file4.data, user_id=current_user.id)
+            process_upload(form.file4.data, user=current_user)
         if form.file5.data:
-            process_upload(form.file5.data, user_id=current_user.id)
+            process_upload(form.file5.data, user=current_user)
         if form.file6.data:
-            process_upload(form.file6.data, user_id=current_user.id)
+            process_upload(form.file6.data, user=current_user)
         if form.file7.data:
-            process_upload(form.file7.data, user_id=current_user.id)
+            process_upload(form.file7.data, user=current_user)
         if form.file8.data:
-            process_upload(form.file8.data, user_id=current_user.id)
+            process_upload(form.file8.data, user=current_user)
         if form.file9.data:
-            process_upload(form.file9.data, user_id=current_user.id)
+            process_upload(form.file9.data, user=current_user)
         if form.file10.data:
-            process_upload(form.file10.data, user_id=current_user.id)
+            process_upload(form.file10.data, user=current_user)
 
         return redirect(form.referrer.data)
 

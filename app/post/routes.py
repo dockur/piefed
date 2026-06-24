@@ -62,7 +62,7 @@ from app.utils import render_template, markdown_to_html, validation_required, \
     total_comments_on_post_and_cross_posts, approval_required, libretranslate_string, user_in_restricted_country, \
     site_language_code, block_honey_pot, joined_communities, moderating_communities, user_pronouns, \
     instance_sticky_posts, instance_sticky_post_ids, user_access, show_reason_why_no_federation, \
-    community_membership_private
+    community_membership_private, user_ip_banned
 
 
 @login_required_if_private_instance
@@ -333,7 +333,8 @@ def show_post(post_id: int, sort, low_bandwidth, autoplay):
                                    recipient_language_code=recipient_language_code,
                                    recipient_language_name=recipient_language_name,
                                    author_banned=author_banned,
-                                   user_pronouns=user_pronouns()
+                                   user_pronouns=user_pronouns(),
+                                   hide_community_actions = community.name == 'microblogs',
                                    )
         response.headers.set('Link',
                              f'<https://{current_app.config["SERVER_NAME"]}/post/{post.id}>; rel="alternate"; type="application/activity+json"')
@@ -796,7 +797,7 @@ def continue_discussion_ajax(post_id, comment_id, nonce):
 @login_required
 def add_reply(post_id: int, comment_id: int):
     # this route is used when JS is disabled
-    if current_user.banned or current_user.ban_comments:
+    if current_user.banned or current_user.ban_comments or user_ip_banned():
         return show_ban_message()
     post = Post.query.get_or_404(post_id)
 
@@ -856,7 +857,7 @@ def add_reply_inline(post_id: int, comment_id: int, nonce):
     # this route is called by htmx and returns a html fragment representing a form that can be submitted to make a new reply
     # it also accepts the POST from that form and makes the reply. All the JS in the response needs a nonce from the parent page
     # to keep CSP happy and that nonce needs to be used by any replies to this reply so it's nonces all the way down.
-    if current_user.banned or current_user.ban_comments:
+    if current_user.banned or current_user.ban_comments or user_ip_banned():
         return _('You have been banned.')
     post = Post.query.get_or_404(post_id)
     if not can_create_post_reply(current_user, post.community):
@@ -1043,7 +1044,7 @@ def post_edit(post_id: int):
 
     if post.user_id == current_user.id:
 
-        if post.community.id in communities_banned_from(current_user.id):
+        if post.community.id in communities_banned_from(current_user.id) or user_ip_banned():
             abort(403)
 
         if g.site.enable_nsfl is False:
@@ -1148,7 +1149,7 @@ def post_delete(post_id: int):
     post = Post.query.get_or_404(post_id)
     community = post.community
     if post.user_id == current_user.id or community.is_moderator() or current_user.is_admin() or user_access('administer all communities', current_user.get_id()):
-        if post.community.id in communities_banned_from(current_user.id):
+        if post.community.id in communities_banned_from(current_user.id) or user_ip_banned():
             abort(403)
         form = DeleteConfirmationForm()
         if form.validate_on_submit():

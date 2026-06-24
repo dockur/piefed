@@ -2,7 +2,6 @@ from flask import Blueprint, current_app, jsonify, request
 from flask_smorest import Blueprint as ApiBlueprint
 from flask_limiter import RateLimitExceeded
 from sqlalchemy.orm.exc import NoResultFound
-from marshmallow import ValidationError
 import sentry_sdk
 from werkzeug.exceptions import UnprocessableEntity
 

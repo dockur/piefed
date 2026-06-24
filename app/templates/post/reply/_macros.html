@@ -6,14 +6,14 @@
         {% if disable_voting %}&nbsp;{% endif %}
         {% if (can_upvote_here or can_upvote(current_user, community, communities_banned_from_list)) and not disable_voting %}
                 <div class="upvote_button {{ 'voted_up' if in_sorted_list(recently_upvoted_replies, comment.id) }}" role="button" aria-label="{{ _('UpVote button.') }}" aria-live="assertive"
-                 hx-post="/comment/{{ comment.id }}/upvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
+                 hx-post="/comment/{{ comment.id }}/upvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" hx-indicator="closest .voting_buttons_new" tabindex="0">
                         <span class="fe {{ 'fe-arrow-up-circle' if in_sorted_list(recently_upvoted_replies, comment.id) else 'fe-arrow-up' }}"></span>
                 </div>
         {% endif %}
-        <span class="score" title="{{ comment.up_votes }}, {{ comment.down_votes }}" aria-live="assertive" aria-label="{{ _('Score: %(score)s', score=shorten_number(comment.up_votes - comment.down_votes)) }}.">{{ comment.up_votes - comment.down_votes }}</span>
+        <span class="score" title="{{ comment.up_votes }}, {{ comment.down_votes }}" aria-live="assertive" aria-label="{{ _('Score: %(score)s', score=shorten_number(comment.up_votes - comment.down_votes)) }}.">{{ comment.up_votes - comment.down_votes }}<img src="/static/images/spinner.svg" class="voting-spinner"></span>
         {% if (can_downvote_here or can_downvote(current_user, community, communities_banned_from_list)) and not disable_voting %}
                 <div class="downvote_button {{ 'voted_down' if in_sorted_list(recently_downvoted_replies, comment.id) }}" role="button" aria-label="{{ _('DownVote button.') }}" aria-live="assertive"
-                 hx-post="/comment/{{ comment.id }}/downvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
+                 hx-post="/comment/{{ comment.id }}/downvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" hx-indicator="closest .voting_buttons_new" tabindex="0">
                         <span class="fe {{ 'fe-arrow-down-circle' if in_sorted_list(recently_downvoted_replies, comment.id) else 'fe-arrow-down' }}"></span>
                 </div>
         {% endif %}

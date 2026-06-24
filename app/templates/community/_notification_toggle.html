@@ -1,5 +1,13 @@
+{% set is_fave = community.id in favorite_communities(current_user.get_id()) -%}
+<span id="community-{{ community.id }}-notification-toggle">
 <a href="/community/{{ community.id }}/notification" rel="nofollow" aria-live="assertive"
    aria-label="{{ 'Notify about new posts in this community' if community.notify_new_posts(current_user.id) else 'Do not notify about new posts' }}"
 class="fe {{ 'fe-bell' if community.notify_new_posts(current_user.id) else 'fe-no-bell' }} no-underline"
-hx-post="/community/{{ community.id }}/notification" hx-trigger="click throttle:1s" hx-swap="outerHTML"
+hx-post="/community/{{ community.id }}/notification" hx-trigger="click throttle:1s" hx-target="#community-{{ community.id }}-notification-toggle" hx-swap="innerHTML"
 title="{{ _('Notify about every new post. Not advisable in high traffic communities!') }}"></a>
+<a href="/community/{{ community.id }}/fave" rel="nofollow" aria-live="assertive"
+   aria-label="{{ 'Favorite this community to put it on the Explore menu' if is_fave else 'Do not feature this community on the Explore menu' }}"
+class="fe fe-star {{ 'selected' if is_fave else '' }} no-underline"
+hx-post="/community/{{ community.id }}/fave" hx-trigger="click throttle:1s" hx-target="#community-{{ community.id }}-notification-toggle" hx-swap="innerHTML"
+title="{{ _('Favorite this community to put it on the Explore menu') }}"></a>
+</span>

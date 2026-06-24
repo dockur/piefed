@@ -32,9 +32,9 @@ from app.community.util import search_for_community, actor_to_community, \
     community_theme_list, set_community_theme_allowed, get_community_theme_allowed
 from app.constants import SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, POST_TYPE_LINK, POST_TYPE_ARTICLE, POST_TYPE_IMAGE, \
     SUBSCRIPTION_PENDING, SUBSCRIPTION_MODERATOR, REPORT_STATE_NEW, REPORT_STATE_ESCALATED, REPORT_STATE_RESOLVED, \
-    REPORT_STATE_DISCARDED, POST_TYPE_VIDEO, NOTIF_COMMUNITY, NOTIF_POST, POST_TYPE_POLL, MICROBLOG_APPS, SRC_WEB, \
-    NOTIF_REPORT, NOTIF_NEW_MOD, NOTIF_BAN, NOTIF_UNBAN, NOTIF_REPORT_ESCALATION, NOTIF_MENTION, POST_STATUS_REVIEWING, \
-    POST_TYPE_EVENT, INVITE_MEMBERS_ONLY, INVITE_MODS_ONLY, INVITE_OWNER_ONLY, REPORT_TYPE_COMMUNITY
+    REPORT_STATE_DISCARDED, POST_TYPE_VIDEO, NOTIF_COMMUNITY, POST_TYPE_POLL, SRC_WEB, \
+    NOTIF_REPORT, NOTIF_BAN, NOTIF_UNBAN, NOTIF_REPORT_ESCALATION, NOTIF_MENTION, POST_STATUS_REVIEWING, \
+    POST_TYPE_EVENT, REPORT_TYPE_COMMUNITY
 from app.email import send_email
 from app.inoculation import inoculation
 from app.models import User, Community, CommunityMember, CommunityJoinRequest, CommunityBan, Post, Site, \
@@ -45,7 +45,7 @@ from app.models import User, Community, CommunityMember, CommunityJoinRequest, C
 from app.community import bp
 from app.post.util import tags_to_string
 from app.shared.community import invite_with_chat, invite_with_email, subscribe_community, add_mod_to_community, \
-    remove_mod_from_community, get_comm_flair_list
+    remove_mod_from_community, get_comm_flair_list, favorite_community
 from app.utils import get_setting, render_template, markdown_to_html, validation_required, \
     shorten_string, gibberish, community_membership, \
     request_etag_matches, return_304, can_upvote, can_downvote, user_filters_posts, \
@@ -58,7 +58,7 @@ from app.utils import get_setting, render_template, markdown_to_html, validation
     possible_communities, reported_posts, user_notes, login_required, get_task_session, patch_db_session, \
     approval_required, permission_required, aged_account_required, communities_banned_from_all_users, \
     moderating_communities_ids_all_users, block_honey_pot, user_pronouns, community_membership_private, \
-    show_reason_why_no_federation, can_upload_video, banned_instances, is_invalid_get_request_uri
+    show_reason_why_no_federation, can_upload_video, banned_instances, is_invalid_get_request_uri, user_ip_banned
 from app.shared.post import make_post, sticky_post
 from app.shared.tasks import task_selector
 from app.shared.community import leave_community
@@ -74,7 +74,7 @@ from datetime import timezone, timedelta
 @approval_required
 @aged_account_required
 def add_local():
-    if current_user.banned:
+    if current_user.banned or user_ip_banned():
         return show_ban_message()
 
     try:
@@ -177,7 +177,7 @@ def add_local():
 @validation_required
 @approval_required
 def add_remote():
-    if current_user.banned:
+    if current_user.banned or user_ip_banned():
         return show_ban_message()
     form = SearchRemoteCommunity()
     new_community = None
@@ -365,7 +365,7 @@ def show_community(community: Community):
     posts = None
     comments = None
     if content_type == 'posts' or content_type == 'events':
-        posts = Post.query.filter(Post.community_id == community.id)
+        posts = Post.query.filter(Post.community_id == community.id, Post.private == False)
 
         if content_type == 'events':
             posts = posts.filter(Post.type == POST_TYPE_EVENT)
@@ -653,7 +653,7 @@ def show_community(community: Community):
                                          community_flair=get_comm_flair_list(community),
                                          recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted,
                                          community_feeds=community_feeds,
-                                         user_pronouns=user_pronouns(),
+                                         user_pronouns=user_pronouns(), hide_community_actions=community.name == 'microblogs',
                                          canonical=community.profile_id(), can_upvote_here=can_upvote(user, community),
                                          can_downvote_here=can_downvote(user, community),
                                          rss_feed=f"{current_app.config['SERVER_URL']}/community/{community.link()}/feed",
@@ -699,7 +699,7 @@ def show_community_rss(actor):
         score = request.args.get('score', 0, int)
 
         posts = Post.query.filter(Post.community_id == community.id).filter(Post.from_bot == False, Post.deleted == False,
-                                  Post.status > POST_STATUS_REVIEWING)
+                                  Post.status > POST_STATUS_REVIEWING, Post.private == False)
         if score:
             posts = posts.filter(Post.score >= score)
 
@@ -996,7 +996,7 @@ def join_then_add(actor):
 @validation_required
 @approval_required
 def add_post(actor, type=None):
-    if current_user.banned or current_user.ban_posts:
+    if current_user.banned or current_user.ban_posts or user_ip_banned():
         return show_ban_message()
     if request.method == 'GET':
         community = actor_to_community(actor)
@@ -1695,11 +1695,20 @@ def community_unban_user(community_id: int, user_id: int):
         abort(403)
 
 
-@bp.route('/<int:community_id>/notification', methods=['GET', 'POST'])
+@bp.route('/<int:community_id>/notification', methods=['POST'])
 @login_required
 def community_notification(community_id: int):
     try:
         return subscribe_community(community_id, None, SRC_WEB)
+    except NoResultFound:
+        abort(404)
+
+
+@bp.route('/<int:community_id>/fave', methods=['POST'])
+@login_required
+def community_fave(community_id: int):
+    try:
+        return favorite_community(community_id, current_user.id, SRC_WEB)
     except NoResultFound:
         abort(404)
 
@@ -2609,7 +2618,8 @@ def check_url_already_posted():
     url = request.args.get('link_url')
     if url:
         url = remove_tracking_from_link(url.strip())
-        posts = Post.query.filter(Post.url == url, Post.deleted == False, Post.status > POST_STATUS_REVIEWING).all()
+        posts = Post.query.filter(Post.url == url, Post.deleted == False, Post.status > POST_STATUS_REVIEWING,
+                                  Post.microblog == False, Post.from_bot == False).all()
         title, description = retrieve_metadata_of_url(url)
         return flask.render_template('community/check_url_posted.html', posts=posts,
                                      title=title, description=description)

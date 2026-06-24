@@ -55,7 +55,17 @@
                 <a href="/u/{{ user.link() }}" class="btn btn-primary btn-sm">{{ _('View profile') }}</a>
             </div>
             {% if current_user.is_authenticated -%}
-                <div class="col-auto text-center">
+                <div class="col-auto text-center pl-0">
+                    {% set follow_state = current_user.is_following(user) -%}
+                    {% if follow_state == 'no' -%}
+                        <a class="btn btn-primary btn-sm send_post" href="#" data-url="{{ url_for('user.user_follow', actor=user.link(), return_to=return_to) }}" rel="nofollow">{{ _('Follow') }}</a>
+                    {% elif follow_state == 'pending' -%}
+                        <a class="btn btn-primary btn-sm send_post" href="#" data-url="{{ url_for('user.user_unfollow', actor=user.link(), return_to=return_to) }}" rel="nofollow">{{ _('Cancel follow request') }}</a>
+                    {% else -%}
+                        <a class="btn btn-primary btn-sm send_post" href="#" data-url="{{ url_for('user.user_unfollow', actor=user.link(), return_to=return_to) }}" rel="nofollow">{{ _('Unfollow') }}</a>
+                    {% endif -%}
+                </div>
+                <div class="col-auto text-center pl-0 pr-0">
                     <a href="{{ url_for('user.edit_user_note', actor=user.link(), return_to=return_to) }}" class="btn btn-primary btn-sm">{{ _('Edit note') }}</a>
                 </div>
             {% endif -%}

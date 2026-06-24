@@ -21,7 +21,7 @@ from app.utils import getmtime, gibberish, shorten_string, shorten_url, digits, 
     in_sorted_list, role_access, first_paragraph, person_link_to_href, feed_membership, html_to_text, remove_images, \
     notif_id_to_string, feed_link_to_href, get_setting, set_setting, show_explore, human_filesize, can_upload_video, \
     debug_checkpoint, compaction_level, humanize_number, round_invisible_digits, get_site_as_dict, localize_datetime, \
-    display_back_button
+    display_back_button, favorite_communities
 
 app = create_app()
 cli.register(app)
@@ -74,6 +74,7 @@ with app.app_context():
     app.jinja_env.globals['round_invisible_digits'] = round_invisible_digits
     app.jinja_env.globals['localize_datetime'] = localize_datetime
     app.jinja_env.globals['display_back_button'] = display_back_button
+    app.jinja_env.globals['favorite_communities'] = favorite_communities
     app.jinja_env.filters['community_links'] = community_link_to_href
     app.jinja_env.filters['feed_links'] = feed_link_to_href
     app.jinja_env.filters['person_links'] = person_link_to_href

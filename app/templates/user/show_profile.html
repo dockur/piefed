@@ -96,8 +96,13 @@
                     <a class="btn btn-primary" href="https://matrix.to/#/{{ user.matrix_user_id }}" rel="nofollow" aria-label="{{ _('Send message with matrix chat') }}">{{ _('Send message using Matrix') }}</a>
                 {% endif %}
 
-                {% if user.is_local() -%}
-                    <a class="btn btn-primary" href="{{ url_for('user.fediverse_redirect', actor=user.link()) }}" rel="nofollow"><img src="/static/images/fediverse_logo.svg" width="22" height="22"> {{ _('Follow') }}</a>
+                {% set follow_state = current_user.is_following(user) -%}
+                {% if follow_state == 'no' -%}
+                    <a class="btn btn-primary send_post" href="#" data-url="{{ url_for('user.user_follow', actor=user.link()) }}" rel="nofollow">{{ _('Follow') }}</a>
+                {% elif follow_state == 'pending' -%}
+                    <a class="btn btn-primary send_post" href="#" data-url="{{ url_for('user.user_unfollow', actor=user.link()) }}" rel="nofollow">{{ _('Cancel follow request') }}</a>
+                {% else -%}
+                    <a class="btn btn-primary send_post" href="#" data-url="{{ url_for('user.user_unfollow', actor=user.link()) }}" rel="nofollow">{{ _('Unfollow') }}</a>
                 {% endif -%}
 
                 <div class="dropdown display-inline">
@@ -112,7 +117,7 @@
                             </a>
                         </li>
                     {% endif -%}
-                    <li><a class="dropdown-item" href="{{ user.ap_profile_id }}" title="{{ _('View user profile on original server') }}" rel="nofollow"><span class="fe fe-external"></span>{{ _('View original profile') }}</a></li>
+                    <li><a class="dropdown-item" href="{{ user.ap_profile_id }}" title="{{ _('View on home server') }}" rel="nofollow"><span class="fe fe-external"></span>{{ _('View on home server') }}</a></li>
                     {% if current_user.has_blocked_user(user.id) -%}
                         <li><a class="dropdown-item" role="button" aria-label="{{ _('Unblock @%(user_name)s', user_name=user.display_name) }}"
                           hx-post="/u/{{ user.user_name if user.is_local() else user.ap_id }}/unblock" hx-trigger="click throttle:1s">{{ _('Unblock %(user_name)s', user_name=user.display_name()) }}</a></li>

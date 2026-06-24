@@ -22,7 +22,7 @@ from sqlalchemy import text, Integer, update
 from sqlalchemy.exc import IntegrityError
 
 from app import db, cache, celery, plugins
-from app.activitypub.signature import signed_get_request, send_post_request, default_context
+from app.activitypub.signature import signed_get_request, send_post_request, default_context, RsaKeys
 from app.constants import *
 from app.models import User, Post, Community, File, PostReply, Instance, utcnow, \
     PostVote, PostReplyVote, ActivityPubLog, Notification, Site, CommunityMember, InstanceRole, Report, Conversation, \
@@ -35,7 +35,7 @@ from app.utils import get_request, allowlist_html, get_setting, ap_datetime, mar
     moderating_communities, get_task_session, is_video_hosting_site, opengraph_parse, mastodon_extra_field_link, \
     blocked_users, piefed_markdown_to_lemmy_markdown, store_files_in_s3, guess_mime_type, get_recipient_language, \
     patch_db_session, to_srgb, communities_banned_from_all_users, blocked_communities, blocked_or_banned_instances, \
-    instance_community_ids, banned_instances, instance_banned, sanitize_svg_bytes
+    instance_community_ids, banned_instances, communities_run_by_bots
 
 
 def public_key():
@@ -905,6 +905,9 @@ def refresh_community_profile_task(community_id, activity_json):
                                     if post:
                                         post.sticky = True
                                         session.commit()
+
+                    community.un_moderated = community.id in communities_run_by_bots()
+                    session.commit()
 
     except Exception:
         session.rollback()
@@ -1984,6 +1987,7 @@ def delete_post_or_comment(deletor, to_delete, store_ap_json, request_json, reas
                 if not to_delete.author.bot:
                     with redis_client.lock(f"lock:post:{to_delete.id}", timeout=10, blocking_timeout=6):
                         to_delete.post.reply_count -= 1
+                        to_delete.post.reply_count_cross_posted -= 1
                         db.session.commit()
             with redis_client.lock(f"lock:community:{community.id}", timeout=10, blocking_timeout=6):
                 community.post_reply_count -= 1
@@ -3960,6 +3964,28 @@ def find_community(request_json):
                         return potential_community
 
     return None
+
+
+def find_microblogging_community():
+    """ Make a special community to put posts without a community into, e.g. microblog posts """
+    community = db.session.query(Community).filter(Community.instance_id == 1, Community.user_id == 1, Community.name == 'microblogs').first()
+    if community is None:
+        private_key, public_key = RsaKeys.generate_keypair()
+        community = Community(title=_('Microblogs'), name='microblogs',
+                              description=_('Microblog posts from around the fediverse.'),
+                              nsfw=False, private_key=private_key,
+                              public_key=public_key, description_html=markdown_to_html(_('Microblog posts from around the fediverse.')),
+                              local_only=False, show_popular=False, show_all=False,
+                              ap_profile_id='https://' + current_app.config['SERVER_NAME'] + '/c/microblogs',
+                              ap_public_url='https://' + current_app.config['SERVER_NAME'] + '/c/microblogs',
+                              ap_followers_url='https://' + current_app.config['SERVER_NAME'] + '/c/microblogs/followers',
+                              ap_moderators_url='https://' + current_app.config['SERVER_NAME'] + '/c/microblogs/moderators',
+                              ap_domain=current_app.config['SERVER_NAME'],
+                              subscriptions_count=0, instance_id=1, user_id=1, ai_generated=False,
+                              first_federated_at=utcnow())
+        db.session.add(community)
+        db.session.commit()
+    return community
 
 
 def normalise_actor_string(actor: str) -> Tuple[str, str]:

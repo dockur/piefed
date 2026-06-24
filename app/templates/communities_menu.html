@@ -12,8 +12,15 @@
             <li><a class="dropdown-item{% if active_child == 'list_communities' %} active{% endif %}" href="/communities">{{ _('All communities') }}</a></li>
             {% if default_user_add_remote or (is_staff or is_admin) %}            
                 <li><a class="dropdown-item" href="/community/add_remote">{{ _('Add remote community') }}</a></li>
-            {% endif %} 
-          {% if moderating_communities %}
+            {% endif -%}
+          {% if favorite_communities -%}
+            <li class="community-section" data-community-section="moderating"><h6 class="dropdown-header">{{ _('Favorites') }}</h6></li>
+            {% for community_menu_item in favorite_communities -%}
+                <li class="community-item" data-community-name="{{ community_menu_item.title.lower() }}"><a class="dropdown-item{% if community and community.id == community_menu_item.id%} active{% endif %}"
+                       href="/c/{{ community_menu_item.link() }}">{% if community_menu_item.is_duplicate %}{{ community_menu_item.title }}<span class="text-muted small">@{{ community_menu_item.ap_domain | shorten(13) }}</span>{% else %}{{ community_menu_item.title }}{% endif %}</a></li>
+            {% endfor -%}
+          {% endif -%}
+          {% if moderating_communities -%}
             <li class="community-section" data-community-section="moderating"><h6 class="dropdown-header">{{ _('Moderating') }}</h6></li>
             {% for community_menu_item in moderating_communities -%}
                 <li class="community-item" data-community-name="{{ community_menu_item.title.lower() }}"><a class="dropdown-item{% if community and community.id == community_menu_item.id%} active{% endif %}"

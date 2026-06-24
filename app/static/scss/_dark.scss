@@ -4,39 +4,40 @@
 @media (prefers-color-scheme: dark) {
 
   body {
-    background-color: $whitesmoke;
+    background-color: var(--whitesmoke);
   }
 
   body nav.navbar {
-    background-color: $whitesmoke !important;
+    background-color: var(--whitesmoke) !important;
   }
 
   .card {
-    background-color: $whitesmoke;
+    background-color: var(--whitesmoke);
   }
 
   .form-control, .dark-form-control {
-    border: $px1 solid $blue-rgba;
+    border: $px1 solid var(--blue-rgba);
     border-radius: var(--spacing-4);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     padding: var(--spacing-8) var(--spacing-12);
-    font-size: $fs0x9375rem;
+    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .form-control::placeholder {
-    color: $white;
+    color: var(--white);
   }
 
   .dropdown-menu {
-    background-color: $light-grey;
+    background-color: var(--light-grey);
   }
 
   .dropdown-header {
-    color: $white;
+    color: var(--white);
   }
 
   .table td {
-    border-top-color: $darker-grey;
+    border-top-color: var(--darker-grey);
   }
 
 }

@@ -42,7 +42,7 @@
                     <span class="warning_badge nsfl" title="{{ _('Not safe for life') }}">nsfl</span>
                 {% endif -%}
                 {% if current_user.is_authenticated -%}
-                    {% include 'community/_notification_toggle.html' -%}
+                    <span>{% include 'community/_notification_toggle.html' -%}</span>
                 {% endif -%}
             </h1>
             <p class="text-muted">{{ community.lemmy_link() }}</p>

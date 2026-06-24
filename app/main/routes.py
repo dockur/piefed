@@ -29,7 +29,6 @@ from sqlalchemy import desc, text
 from app.main.forms import ShareLinkForm
 from app.main.util import sidebar_active_communities, sidebar_new_instances, sidebar_upcoming_events, \
     sidebar_new_communities, _base_list_communities_context
-from app.post.routes import show_post
 from app.translation import LibreTranslateAPI
 from app.utils import render_template, get_setting, request_etag_matches, return_304, blocked_domains, \
     ap_datetime, shorten_string, user_filters_home, \
@@ -39,10 +38,10 @@ from app.utils import render_template, get_setting, request_etag_matches, return
     permission_required, debug_mode_only, ip_address, menu_instance_feeds, menu_my_feeds, menu_subscribed_feeds, \
     feed_tree_public, gibberish, get_deduped_post_ids, paginate_post_ids, post_ids_to_models, html_to_text, \
     get_redis_connection, subscribed_feeds, joined_or_modding_communities, login_required_if_private_instance, \
-    pending_communities, retrieve_image_hash, possible_communities, remove_tracking_from_link, reported_posts, \
+    retrieve_image_hash, possible_communities, remove_tracking_from_link, reported_posts, \
     moderating_communities_ids, user_notes, login_required, safe_order_by, filtered_out_communities, \
     num_topics, referrer, block_honey_pot, user_pronouns, get_instance_stickies, \
-    community_membership_private
+    community_membership_private, favorite_communities
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
     Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage, BannedInstances
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap, login_with_ldap
@@ -133,7 +132,8 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
     
     community_ids = list(community_ids)
 
-    post_ids = get_deduped_post_ids(result_id, community_ids, sort, tag)
+    post_ids = get_deduped_post_ids(result_id, community_ids, sort, tag,
+                                    include_following=view_filter == 'subscribed' and current_user.is_authenticated)
     has_next_page = len(post_ids) > page + 1 * page_length
     post_ids = paginate_post_ids(post_ids, page, page_length=page_length)
     posts = post_ids_to_models(post_ids, sort)
@@ -240,7 +240,7 @@ def add_post():
 @login_required_if_private_instance
 def list_communities():
     verification_warning()
-    search_param = request.args.get('search', '')
+    search_param = request.args.get('search', '').strip()
     home_select = request.args.get('home_select', 'any')
     subscribe_select = request.args.get('subscribe_select', 'any')
     topic_id = int(request.args.get('topic_id', 0))
@@ -780,12 +780,17 @@ And if you want to add your score to the database to help your fellow Bookworms 
 
 @bp.route('/communities_menu')
 def communities_menu():
+    if current_user.is_authenticated:
+        favorites = Community.query.filter(Community.id.in_(favorite_communities(current_user.id))).all()
+    else:
+        favorites = None
     return render_template('communities_menu.html',
                            moderating_communities=moderating_communities(current_user.get_id()),
                            joined_communities=joined_communities(current_user.get_id()),
                            is_admin=current_user.is_authenticated and current_user.is_admin(),
                            is_staff=current_user.is_authenticated and current_user.is_staff(),
-                           default_user_add_remote=get_setting("allow_default_user_add_remote_community", True)
+                           default_user_add_remote=get_setting("allow_default_user_add_remote_community", True),
+                           favorite_communities=favorites
                            )
 
 
@@ -794,7 +799,7 @@ def explore_menu():
     return render_template('explore_menu.html', menu_topics=menu_topics(),
                            menu_instance_feeds=menu_instance_feeds(),
                            menu_my_feeds=menu_my_feeds(current_user.id) if current_user.is_authenticated else None,
-                           menu_subscribed_feeds=menu_subscribed_feeds(current_user.id) if current_user.is_authenticated else None,
+                           menu_subscribed_feeds=menu_subscribed_feeds(current_user.id) if current_user.is_authenticated else None
                            )
 
 
@@ -834,9 +839,19 @@ def share():
         form.which_community.data = int(request.cookies.get('cross_post_community_id'))
 
     communities = Community.query.filter_by(banned=False).join(Post).filter(Post.url == url, Post.deleted == False,
-                                                                            Post.status > POST_STATUS_REVIEWING).all()
+                                                                            Post.status > POST_STATUS_REVIEWING,
+                                                                            Post.from_bot == False,
+                                                                            Community.name != 'microblogs').all()
+    posts_keyed_by_community = {}
+    if len(communities):
+        posts = Post.query.filter(Post.url == url, Post.deleted == False, Post.status > POST_STATUS_REVIEWING,
+                                  Post.microblog == False, Post.from_bot == False).all()
+        for post in posts:
+            posts_keyed_by_community[post.community_id] = post
 
-    return render_template('share.html', form=form, title=request.args.get('title'), communities=communities)
+    return render_template('share.html', form=form, title=request.args.get('title'), communities=communities,
+                           posts_keyed_by_community=posts_keyed_by_community)
+
 
 @bp.route('/protocol_handler')
 @login_required

@@ -9,55 +9,70 @@
 {% set POST_TYPE_VIDEO = 4 -%}
 {% set POST_TYPE_POLL = 5 -%}
 {% set POST_TYPE_EVENT = 6 -%}
-{% if embed -%}
-<div class="embed_logo">
-    <a href="/" target="_blank" title="{{ g.site.name }}"><img src="{{ g.site.logo if g.site.logo else '/static/images/piefed_logo_full_t_300x300.svg' }}" alt="Logo" width="40" height="40"></a>
-</div>
-{% endif -%}
-<h3 lang="{{ post.language_code() }}">{% if post.sticky -%}<span class="fe fe-sticky-left"></span>{% endif -%}<a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _external=embed) }}" {{ 'target="_blank"' if embed }} class="post_teaser_title_a" {% if not post.indexable %}rel="noindex"{% endif %} >{{ post.title }}</a>
-    {% if post.type == POST_TYPE_IMAGE -%}
-        <span class="fe fe-image" aria-hidden="true"> </span>
+{% if post.is_microblog() -%}
+    <div class="microblog_teaser_header">
+        <h3 lang="{{ post.language_code() }}" class="visually-hidden"><a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _external=embed) }}" {{ 'target="_blank"' if embed }} class="post_teaser_title_a" {% if not post.indexable %}rel="noindex"{% endif %} >{{ post.title }}</a></h3>
+        <div class="author">
+            {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
+            <div class="time small"><time datetime="{{ post.last_active }}" title="{{ post.last_active }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
+            {%- if user_flair and post.author.id in user_flair -%}
+                <span class="user_flair">{{ user_flair[post.author.id] }}</span>
+            {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() -%}
+                <span class="user_flair pronouns">{{ user_pronouns[post.author.id] }}</span>
+            {%- endif %}
+        </div>
+    </div>
+{% else -%}
+    {% if embed -%}
+    <div class="embed_logo">
+        <a href="/" target="_blank" title="{{ g.site.name }}"><img src="{{ g.site.logo if g.site.logo else '/static/images/piefed_logo_full_t_300x300.svg' }}" alt="Logo" width="40" height="40"></a>
+    </div>
     {% endif -%}
-    {% if post.type == POST_TYPE_EVENT -%}
-        <span class="fe fe-event" aria-hidden="true"> </span>
-    {% endif -%}
-    {% if post.domain_id and post.url -%}
-        {% if post.url.endswith('.mp3') -%}
-            <span class="fe fe-audio" aria-hidden="true"></span>
+    <h3 lang="{{ post.language_code() }}">{% if post.sticky -%}<span class="fe fe-sticky-left"></span>{% endif -%}<a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _external=embed) }}" {{ 'target="_blank"' if embed }} class="post_teaser_title_a" {% if not post.indexable %}rel="noindex"{% endif %} >{{ post.title }}</a>
+        {% if post.type == POST_TYPE_IMAGE -%}
+            <span class="fe fe-image" aria-hidden="true"> </span>
         {% endif -%}
-        {% if post.type == POST_TYPE_VIDEO -%}
-                <span class="fe fe-video" aria-hidden="true"></span>
+        {% if post.type == POST_TYPE_EVENT -%}
+            <span class="fe fe-event" aria-hidden="true"> </span>
         {% endif -%}
-        {% if post.type == POST_TYPE_LINK and not embed -%}
-            <span class="domain_link" aria-hidden="true">(<a href="/d/{{ post.domain_id }}">{{ post.domain.name }}</a>)
-            {% if post.domain.post_warning -%}
-                    <span class="fe {{ post.domain.type_to_class() }}" title="{{ post.domain.post_warning }}"></span>
+        {% if post.domain_id and post.url -%}
+            {% if post.url.endswith('.mp3') -%}
+                <span class="fe fe-audio" aria-hidden="true"></span>
             {% endif -%}
-            </span>
+            {% if post.type == POST_TYPE_VIDEO -%}
+                    <span class="fe fe-video" aria-hidden="true"></span>
+            {% endif -%}
+            {% if post.type == POST_TYPE_LINK and not embed -%}
+                <span class="domain_link" aria-hidden="true">(<a href="/d/{{ post.domain_id }}">{{ post.domain.name }}</a>)
+                {% if post.domain.post_warning -%}
+                        <span class="fe {{ post.domain.type_to_class() }}" title="{{ post.domain.post_warning }}"></span>
+                {% endif -%}
+                </span>
+            {% endif -%}
         {% endif -%}
-    {% endif -%}
-    {% for flair in post.flair -%}
-        <span class="post_flair" style="color: {{ flair.text_color}}; background-color: {{ flair.background_color }}" title="{{ _('Show only %(flair_name)s', flair_name=flair.flair) }}"><a href="/c/{{ post.community.link() }}?flair={{ flair.flair }}" style="color: {{ flair.text_color}}">{{ flair.flair }}</a></span>
-    {% endfor -%}
-    {% if post.nsfw -%}<span class="warning_badge nsfw" title="{{ _('Not safe for work') }}">{{ _('nsfw') }}</span>{% endif -%}
-    {% if post.nsfl -%}<span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">{{ _('nsfl') }}</span>{% endif -%}
-    {% if post.ai_generated and ((current_user.is_authenticated and current_user.hide_gen_ai == 2) or current_user.is_anonymous) -%}<span class="warning_badge ai_generated" title="{{ _('This post contains AI generated content') }}">{{ _('AI') }}</span>{% endif -%}
-    {% if post.id in reported_posts -%}
-    <a href="{{ '/' + post.community.link() + '/moderate' }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
-    {% endif -%}
-    {% if post.sticky -%}<span class="fe fe-sticky-right"></span>{% endif -%}
-    {% if post.deleted -%}<span class="red fe fe-delete" title="{{ _('Post deleted') }}"></span>{% endif -%}
-</h3>
-<div class="author small">{% if show_post_community -%}<a href="{{ (request.url_root + 'c/' + post.community.link() if embed else '/c/' + post.community.link()) }}" {{ 'target="_blank"' if embed }}>
-    {% if post.community.icon_id and not low_bandwidth %}<img class="community_icon_small rounded-circle" src="{{ post.community.icon_image('tiny') }}" alt="Community icon" loading="lazy" />{% endif -%}
-    c/{{ post.community.name }}</a><span class="community_instance text-muted {{ 'local' if post.community.is_local() }}">@{{ post.community.ap_domain }}</span> {% endif -%}
-    {{ _('by') }} {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
-    {%- if user_flair and post.author.id in user_flair -%}
-        <span class="user_flair">{{ user_flair[post.author.id] }}</span>
-    {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() -%}
-        <span class="user_flair pronouns">{{ user_pronouns[post.author.id] }}</span>
-    {%- endif %}
-    <time datetime="{{ post.last_active }}" title="{{ post.last_active }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
+        {% for flair in post.flair -%}
+            <span class="post_flair" style="color: {{ flair.text_color}}; background-color: {{ flair.background_color }}" title="{{ _('Show only %(flair_name)s', flair_name=flair.flair) }}"><a href="/c/{{ post.community.link() }}?flair={{ flair.flair }}" style="color: {{ flair.text_color}}">{{ flair.flair }}</a></span>
+        {% endfor -%}
+        {% if post.nsfw -%}<span class="warning_badge nsfw" title="{{ _('Not safe for work') }}">{{ _('nsfw') }}</span>{% endif -%}
+        {% if post.nsfl -%}<span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">{{ _('nsfl') }}</span>{% endif -%}
+        {% if post.ai_generated and ((current_user.is_authenticated and current_user.hide_gen_ai == 2) or current_user.is_anonymous) -%}<span class="warning_badge ai_generated" title="{{ _('This post contains AI generated content') }}">{{ _('AI') }}</span>{% endif -%}
+        {% if post.id in reported_posts -%}
+        <a href="{{ '/' + post.community.link() + '/moderate' }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
+        {% endif -%}
+        {% if post.sticky -%}<span class="fe fe-sticky-right"></span>{% endif -%}
+        {% if post.deleted -%}<span class="red fe fe-delete" title="{{ _('Post deleted') }}"></span>{% endif -%}
+    </h3>
+    <div class="author small">{% if show_post_community -%}<a href="{{ (request.url_root + 'c/' + post.community.link() if embed else '/c/' + post.community.link()) }}" {{ 'target="_blank"' if embed }}>
+        {% if post.community.icon_id and not low_bandwidth %}<img class="community_icon_small rounded-circle" src="{{ post.community.icon_image('tiny') }}" alt="Community icon" loading="lazy" />{% endif -%}
+        {{ post.community.name }}</a><span class="community_instance text-muted {{ 'local' if post.community.is_local() }}">@{{ post.community.ap_domain }}</span> {% endif -%}
+        {{ _('by') }} {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
+        {%- if user_flair and post.author.id in user_flair -%}
+            <span class="user_flair">{{ user_flair[post.author.id] }}</span>
+        {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() -%}
+            <span class="user_flair pronouns">{{ user_pronouns[post.author.id] }}</span>
+        {%- endif %}
+        <time datetime="{{ post.posted_at_formatted(sort) }}" title="{{ post.posted_at_formatted(sort) }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
+{% endif -%}
 {%- endmacro %}
 
 {% macro render_utilities_bar(post, sort=None, embed=False, low_bandwidth=False, current_user=None, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, moderated_community_ids=None) -%}
@@ -75,14 +90,14 @@
         {% if current_user.is_authenticated and current_user.verified -%}
                 {% if (can_upvote_here or can_upvote(current_user, post.community, communities_banned_from_list)) and not disable_voting -%}
                         <div class="upvote_button {{ 'voted_up' if in_sorted_list(recently_upvoted, post.id) }}" role="button" aria-label="{{ _('UpVote button.') }}" aria-live="assertive"
-                         hx-post="/post/{{ post.id }}/upvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
+                         hx-post="/post/{{ post.id }}/upvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" hx-indicator="closest .voting_buttons_new" tabindex="0">
                                 <span class="fe {{ 'fe-arrow-up-circle' if in_sorted_list(recently_upvoted, post.id) else 'fe-arrow-up' }}"></span>
                         </div>
                 {% endif -%}
-                <span class="score" title="{{ post.up_votes }}, {{ post.down_votes }}" aria-live="assertive" aria-label="{{ _('Score: %(score)s', score=shorten_number(post.up_votes - post.down_votes)) }}.">{{ shorten_number(post.up_votes - post.down_votes) }}</span>
+                <span class="score" title="{{ post.up_votes }}, {{ post.down_votes }}" aria-live="assertive" aria-label="{{ _('Score: %(score)s', score=shorten_number(post.up_votes - post.down_votes)) }}.">{{ shorten_number(post.up_votes - post.down_votes) }}<img src="/static/images/spinner.svg" class="voting-spinner"></span>
                 {%- if (can_downvote_here or can_downvote(current_user, post.community, communities_banned_from_list)) and not disable_voting -%}
                         <div class="downvote_button {{ 'voted_down' if in_sorted_list(recently_downvoted, post.id) }}" role="button" aria-label="{{ _('DownVote button.') }}" aria-live="assertive"
-                         hx-post="/post/{{ post.id }}/downvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" tabindex="0">
+                         hx-post="/post/{{ post.id }}/downvote/default" hx-trigger="click throttle:1s" hx-target="closest .voting_buttons_new" hx-indicator="closest .voting_buttons_new" tabindex="0">
                                 <span class="fe {{ 'fe-arrow-down-circle' if in_sorted_list(recently_downvoted, post.id) else 'fe-arrow-down' }}"></span>
                         </div>
                 {%- endif -%}
@@ -140,7 +155,7 @@
     {% endif -%}
     {% if not embed -%}
         <div class="post_options_link pull-right">
-            {% if current_user.is_authenticated and joined_communities and post.community_id not in joined_communities %}
+            {% if current_user.is_authenticated and joined_communities and post.community_id not in joined_communities and not post.is_microblog() %}
                 <a class="small" rel="nofollow" title="{{ _('Join this community') }}" aria-label="{{ _('Join this community') }}" href="{{ '/c/' + post.community.link() + '/subscribe' }}">{{ _('Join') }}</a>
             {% endif -%}
             {% if current_user.is_authenticated and current_user.language_id and post.language_id and (current_user.language_id != post.language_id or post.community.always_translate) -%}
@@ -288,7 +303,7 @@
 <div class="col post_teaser_body {{ 'reported' if post.id in reported_posts }}">
     {% if compact_thumbs and post.image_id -%}
         <div class="col_thumbnail thumbnail">
-            <a href="{{ post.image.view_url() }}" class="post_link" rel="nofollow ugc" aria-label="{{ _('View image') }}" target="_blank"><span class="fe fe-image"></span><img src="{{ post.image.medium_url() }}" decoding="async" referrerpolicy="no-referrer"
+            <a href="{{ post.image.view_url() }}" class="post_link" rel="nofollow ugc" aria-label="{{ _('View image') }}" target="_blank"><span class="fe fe-image"></span><img src="{{ post.image.thumbnail_url() }}" decoding="async" referrerpolicy="no-referrer"
                     alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.width }}" height="{{ post.image.height }}" /></a>
         </div>
     {% endif -%}

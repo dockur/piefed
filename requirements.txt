@@ -11,7 +11,7 @@ email-validator==2.0.0
 flask-mail~=0.10.0
 flask-babel~=4.0.0
 flask-bcrypt~=1.0.0
-psycopg2-binary
+psycopg2
 httpx[http2]~=0.28.0
 pyjwt==2.8.0
 SQLAlchemy-Searchable==2.1.0
