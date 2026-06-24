@@ -2216,16 +2216,6 @@ h1 .warning_badge {
   }
 }
 
-#post_reply_markdown_editor_enabler {
-  display: none;
-  position: absolute;
-  bottom: var(--spacing-4);
-  right: 0;
-  @include breakpoint(phablet) {
-    display: inline-block;
-  }
-}
-
 .create_post_markdown_editor_enabler {
   text-align: right;
   margin-bottom: var(--spacing-12);
