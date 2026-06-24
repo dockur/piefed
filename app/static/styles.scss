@@ -2517,20 +2517,6 @@ form {
   content: "…";
 }
 
-.option_list {
-  list-style-type: none;
-  margin-bottom: 0;
-
-  li {
-    margin-bottom: var(--spacing-8);
-
-    .fe {
-      position: relative;
-      top: var(--spacing-2);
-    }
-  }
-}
-
 .field_hint {
   margin-top: calc(-1 * var(--spacing-12));
   display: block;
