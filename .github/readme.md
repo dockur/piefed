@@ -37,7 +37,7 @@ much of the fediverse as possible.
 - see docs/project_management/* for a project roadmap, contributing guide and much more.
 
 ## Stars 🌟
-[![Stars](https://starchart.cc/dockur/piefed.svg?variant=adaptive)](https://starchart.cc/dockur/piefed)
+[![Stargazers](https://raw.githubusercontent.com/star-stats/stars/refs/heads/data/charts/dockur-piefed.svg)](https://github.com/dockur/piefed/stargazers)
 
 [build_url]: https://github.com/dockur/piefed
 [hub_url]: https://hub.docker.com/r/dockurr/piefed
