@@ -23,7 +23,7 @@ html {
 }
 
 body {
-  font-size: 16px; // will be overwritten by rem equivalent if browser supports it //
+  font-size: 16px; /* will be overwritten by rem equivalent if browser supports it */
   font-size: var(--font-size-16);
   --bs-body-font-family: system-ui,-apple-system,"Inter",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji";
 
@@ -142,6 +142,7 @@ tg-spoiler {
 
 div.navbar {
   min-height: 60px;
+  min-height: calc(var(--spacing-16) * 3.75); /* 60px */
   background-color: var(--bs-body-bg);
 
   @include breakpoint(tablet) {
@@ -172,7 +173,8 @@ div.navbar {
   .dropdown-menu {
     .dropdown-item {
       @include breakpoint(tablet) {
-        width: 200px;
+		width: 200px;
+        width: calc(var(--spacing-16) * 12.5); /* 200px */
       }
       white-space: break-spaces;
       break-inside: avoid;
@@ -233,11 +235,13 @@ div.navbar {
 .navbar-toggler {
   border: none;
   height: 48px;
+  height: calc(var(--spacing-16) * 3); /* 48px */
 }
 
 .navbar-light .navbar-toggler-icon {
   background-image: url(/static/images/menu.svg);
   width: 35px;
+  width: calc(var(--spacing-16) * 2.1875); /* 35px */
   height: var(--spacing-40);
   background-position: top;
 }
@@ -309,11 +313,13 @@ div.navbar {
 
   @include breakpoint(laptop) {
     left: -166px!important;
+    left: calc(var(--spacing-16) * -10.375); /* -166px */
   }
 
   .communities_menu_body {
     @include breakpoint(tablet) {
       columns: 200px 5;
+      columns: calc(var(--spacing-16) * 12.5) 5;
     }
   }
 
@@ -340,7 +346,9 @@ div.navbar {
     .fe-search {
       position: absolute;
       right: 27px;
+      right: calc(var(--spacing-16) * 1.6875); /* 27px */
       top: 11px;
+      top: calc(var(--spacing-16) * 0.6875); /* 11px */
     }
 
     @include breakpoint(laptop) {
@@ -416,6 +424,7 @@ form {
 
 .card {
   max-width: 380px;
+  max-width: calc(var(--spacing-16) * 23.75); /* 380px */
   margin-left: auto;
   margin-right: auto;
 
@@ -440,11 +449,13 @@ form {
 
     .breadcrumb-item {
       line-height: 33px;
+      line-height: calc(var(--spacing-16) * 2.0625); /* 33px */
       padding-left: 0;
       padding-right: 0;
       margin-bottom: 0;
       a {
         line-height: 33px;
+        line-height: calc(var(--spacing-16) * 2.0625); /* 33px */
         display: inline-block;
         border: 0;
         padding-right: var(--bs-breadcrumb-item-padding-x);
@@ -496,6 +507,7 @@ form {
     padding-top: var(--spacing-16) !important;
     @media (orientation: landscape) {
       height: 60px;
+      height: calc(var(--spacing-16) * 3.75); /* 60px */
       padding-top: var(--spacing-12) !important;
     }
   }
@@ -550,7 +562,7 @@ form {
 
     tr td {
       padding: var(--spacing-8) var(--spacing-4);
-      font-size: 12px; // will be overwritten by rem if browser supports it //
+      font-size: 12px; /* will be overwritten by rem if browser supports it */
       font-size: var(--font-size-12);
     }
   }
@@ -560,6 +572,7 @@ form {
   list-style-type: none;
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(152px, 1fr));
+  grid-template-columns: repeat(auto-fit,minmax(calc(var(--spacing-16) * 9.5), 1fr)); /* 152px, 1fr */
 
   > li {
     padding-bottom: var(--spacing-20);
@@ -572,12 +585,14 @@ form {
   background-size: cover;
   border-radius: var(--spacing-4) var(--spacing-4) 0 0;   /* top-left | top-right | bottom-right | bottom-left */
   height: 176px;
+  height: calc(var(--spacing-16) * 11); /* 176px */
   margin-left: calc(-1 * var(--spacing-12));
   margin-right: calc(-1 * var(--spacing-12));
   margin-top: calc(-1 * var(--spacing-8));
 
   @include breakpoint(tablet) {
     height: 240px;
+    height: calc(var(--spacing-16) * 15); /* 240px */
   }
 
   #breadcrumb_nav {
@@ -613,12 +628,14 @@ form {
 .event_banner {
   @include breakpoint(tablet) {
     height: 176px;
+    height: calc(var(--spacing-16) * 11); /* 176px */
   }
 }
 
 .community_header_no_background, .community_header {
   .community_icon {
     width: 120px;
+    width: calc(var(--spacing-16) * 7.5); /* 120px */
     height: auto;
   }
 }
@@ -639,6 +656,7 @@ form {
       vertical-align: center;
       label {
         height: 44px;
+        height: calc(var(--spacing-16) * 2.75); /* 44px */
       }
     }
   }
@@ -755,6 +773,7 @@ ul.form-multicheck-columns {
       position: relative;
       @include breakpoint(tablet) {
         width: 170px;
+        width: calc(var(--spacing-16) * 10.625); /* 170px */
       }
     }
 
@@ -764,12 +783,15 @@ ul.form-multicheck-columns {
       align-content: center;
       display: flex;
       height: 60px;
+      height: calc(var(--spacing-16) * 3.75); /* 60px */
       width: var(--spacing-72);
       overflow: hidden;
       @include breakpoint(tablet) {
         align-items: center;
         height: 90px;
+        height: calc(var(--spacing-16) * 5.625); /* 90px */
         width: 170px;
+        width: calc(var(--spacing-16) * 10.625); /* 170px */
         max-width: 100%;
       }
 
@@ -800,12 +822,16 @@ ul.form-multicheck-columns {
 
       img {
         height: 60px;
+        height: calc(var(--spacing-16) * 3.75); /* 60px */
         width: 60px;
+        width: calc(var(--spacing-16) * 3.75); /* 60px */
         border-radius: var(--spacing-4);
         object-fit: cover;
         @include breakpoint(tablet) {
           height: 90px;
+          height: calc(var(--spacing-16) * 5.625); /* 90px */
           width: 170px;
+          width: calc(var(--spacing-16) * 10.625); /* 170px */
           max-width: 100%;
         }
         &.blur {
@@ -857,6 +883,7 @@ ul.form-multicheck-columns {
 .post_teaser_article_preview, .post_teaser_link_preview {
   position: relative;
   max-height: 100px;
+  max-height: calc(var(--spacing-16) * 6.25); /* 100px */
   overflow: hidden;
   padding-left: var(--spacing-2);
   padding-right: var(--spacing-2);
@@ -888,13 +915,16 @@ ul.form-multicheck-columns {
   a {
     display: inline-block;
     max-width: 512px;
+    max-width: calc(var(--spacing-16) * 32); /* 512px */
     max-height: 575px;
+    max-height: calc(var(--spacing-16) * 35.9375); /* 575px */
     overflow: hidden;
     border-radius: var(--spacing-4);
   }
   img {
     max-width: 100%;
     min-width: 150px;
+    min-width: calc(var(--spacing-16) * 9.375); /* 150px */
     margin-right: var(--spacing-4);
     height: auto;
   }
@@ -967,6 +997,7 @@ time {
 
 .max_width_512 {
   max-width: 512px;
+  max-width: calc(var(--spacing-16) * 32); /* 512px */
   display: inline-block;
   width: 100%;
   overflow: hidden;
@@ -1051,6 +1082,7 @@ time {
     @container (width < 350px) {
       .voting_buttons_new .upvote_button, .voting_buttons_new .downvote_button {
         min-width: 34px;
+        min-width: calc(var(--spacing-16) * 2.125); /* 34px */
       }
       .voting_buttons_new .score {
         display: none;
@@ -1068,7 +1100,7 @@ time {
 
 
  .d-xl-none {
-      margin-top: var(--spacing-4); // add spacing to button bar above #masonry
+      margin-top: var(--spacing-4); /* add spacing to button bar above #masonry */
       margin-bottom: var(--spacing-4);
  }
 
@@ -1255,7 +1287,7 @@ details {
   }
 
   .text-muted {
-    font-size: 14px; // will be overwritten by rem if browser supports it //
+    font-size: 14px; /* will be overwritten by rem if browser supports it */
     font-size: var(--font-size-14);
   }
 }
@@ -1351,19 +1383,23 @@ details {
     min-width: $min-touch-target;
     min-height: $min-touch-target;
     span {
-      line-height: $min-touch-target;
+      line-height: 44px;
+      line-height: calc(var(--spacing-16) * 2.75); /* 44px */
     }
 
     &.digits_4 {
       width: 68px;
+      width: calc(var(--spacing-16) * 4.25); /* 68px */
     }
 
     &.digits_5 {
       width: 76px;
+      width: calc(var(--spacing-16) * 4.75); /* 76px */
     }
 
     &.digits_6 {
       width: 84px;
+      width: calc(var(--spacing-16) * 5.25); /* 84px */
     }
 
     &.voted_up {
@@ -1466,6 +1502,7 @@ details {
 
     @include breakpoint(laptop) {
       height: 23px;
+      height: calc(var(--spacing-16) * 1.4375); /* 23px */
       .fe-angles-down, .fe-angles-up {
         display: inline;
       }
@@ -1475,7 +1512,9 @@ details {
   .comment_author .author_link {
     img {
       width: 25px;
+      width: calc(var(--spacing-16) * 1.5625); /* 25px */
       height: 25px;
+      height: calc(var(--spacing-16) * 1.5625); /* 25px */
       border-radius: 50%;
       vertical-align: middle;
     }
@@ -1515,7 +1554,9 @@ details {
       &.comment_actions_link div > a {
 
           width: 44px;
+          width: calc(var(--spacing-16) * 2.75); /* 44px */
           height: 44px;
+          height: calc(var(--spacing-16) * 2.75); /* 44px */
           text-align: center;
           vertical-align: middle;
           line-height: var(--spacing-40);
@@ -1529,7 +1570,9 @@ details {
 
       a {
         width: 44px;
+        width: calc(var(--spacing-16) * 2.75); /* 44px */
         height: 44px;
+        height: calc(var(--spacing-16) * 2.75); /* 44px */
         text-align: center;
         vertical-align: middle;
         line-height: var(--spacing-40);
@@ -1552,6 +1595,7 @@ details {
     @container (max-width: 270px) {
       .post_replies_link a {
         width: 44px;
+        width: calc(var(--spacing-16) * 2.75); /* 44px */
       }
 
       .hide_skinny_mobile {
@@ -1658,7 +1702,9 @@ details {
     float: right;
     div > a {
       width: 44px;
+      width: calc(var(--spacing-16) * 2.75); /* 44px */
       height: 44px;
+      height: calc(var(--spacing-16) * 2.75); /* 44px */
       text-align: center;
       vertical-align: middle;
       line-height: var(--spacing-40);
@@ -1678,6 +1724,7 @@ details {
 #add_local_community_form, #new_feed_form {
   #url {
     width: 297px;
+    width: calc(var(--spacing-16) * 18.5625); /* 297px */
     display: inline-block;
     padding-left: var(--spacing-4);
   }
@@ -1689,6 +1736,7 @@ details {
   padding: 0;
   overflow-y: auto;
   height: 230px;
+  height: calc(var(--spacing-16) * 14.375); /* 230px */
 }
 
 .table {
@@ -1990,7 +2038,7 @@ a.unread, div.unread {
 }
 
 .warning_badge {
-  font-size: 12px; // will be overwritten by rem if browser supports it //
+  font-size: 12px; /* will be overwritten by rem if browser supports it */
   font-size: var(--font-size-12);
   border-radius: var(--border-2);
   margin-right: var(--spacing-2);
@@ -2128,6 +2176,7 @@ h1 .warning_badge {
 .language-float-right {
   @include breakpoint(phablet) {
       max-width: 150px;
+      max-width: calc(var(--spacing-16) * 9.375); /* 150px */
       float: right;
   }
 }
@@ -2204,6 +2253,7 @@ h1 .warning_badge {
 
   .url_thumbnail {
     width: 120px;
+    width: calc(var(--spacing-16) * 7.5); /* 120px */
     height: auto;
 
     img {
@@ -2285,9 +2335,13 @@ h1 .warning_badge {
   width: 20vw;
   height: 20vw;
   max-width: 120px;
+  max-width: calc(var(--spacing-16) * 7.5); /* 120px */
   max-height: 120px;
+  max-height: calc(var(--spacing-16) * 7.5); /* 120px */
   min-width: 80px;
+  min-width: calc(var(--spacing-16) * 5); /* 80px */
   min-height: 80px;
+  min-height: calc(var(--spacing-16) * 5); /* 80px */
   object-fit: cover;
   font-size: 0;
   
@@ -2315,21 +2369,28 @@ h1 .warning_badge {
 .bump_up {
   position: absolute;
   top: 54px;
+  top: calc(var(--spacing-16) * 3.375); /* 54px */
 
   @include breakpoint(phablet) {
     top: 43px;
+    top: calc(var(--spacing-16) * 2.6875); /* 43px */
   }
   @include breakpoint(tablet) {
     top: 105px;
+    top: calc(var(--spacing-16) * 6.5625); /* 105px */
   }
   @include breakpoint(laptop) {
     top: 102px;
+    top: calc(var(--spacing-16) * 6.375); /* 102px */
     left: 16px;
+    left: var(--spacing-16);
   }
 
   @include breakpoint(desktop) {
     top: 104px;
+    top: calc(var(--spacing-16) * 6.5); /* 104px */
     left: 16px;
+    left: var(--spacing-16);
   }
 
 }
@@ -2363,6 +2424,7 @@ form {
 
   &.tweak-top {
     top: -18px;
+    top: calc(var(--spacing-16) * -1.125); /* -18px */
   }
 }
 
@@ -2410,6 +2472,7 @@ form {
 
 #image_preview {
   max-width: 200px;
+  max-width: calc(var(--spacing-16) * 12.5); /* 200px */
   display: none;
   margin-top: calc(-1 * var(--spacing-8));
   margin-bottom: var(--spacing-8);
@@ -2417,12 +2480,13 @@ form {
 
 #image_preview_edit {
   max-width: 200px;
+  max-width: calc(var(--spacing-16) * 12.5); /* 200px */
   margin-top: calc(-1 * var(--spacing-8));
   margin-bottom: var(--spacing-8);
 }
 
 #search_community {
-  margin-top: 16px;
+  margin-top: var(--spacing-16);
 }
 
 .post_flair_sidepane {
@@ -2516,11 +2580,13 @@ form {
 
 #insertImageDialog {
   max-width: 1000px;
+  max-width: calc(var(--spacing-16) * 62.5); /* 1000px */
 }
 
 .media_list {
   .media_list_image {
     max-width: 150px;
+    max-width: calc(var(--spacing-16) * 9.375); /* 150px */
     aspect-ratio: 1 / 1;
   }
 
@@ -2567,9 +2633,12 @@ form {
 .display_back_button #navbar-back-ios {
   display: inline;
   font-size: 30px;
+  font-size: var(--font-size-30);
   line-height: 30px;
+  line-height: var(--font-size-30);
   position: relative;
   left: -6px;
+  left: calc(var(--spacing-16) * -0.375); /* -6px */
 }
 
 #loading_animation {
@@ -2593,7 +2662,9 @@ form {
 
   img {
     width: 30px;
+    width: calc(var(--spacing-16) * 1.875); /* 30px */
     height: 30px;
+    height: calc(var(--spacing-16) * 1.875); /* 30px */
   }
 }
 
@@ -2731,6 +2802,7 @@ form {
     background-color: var(--white);
     z-index: 20;
     width: 320px;
+    width: calc(var(--spacing-16) * 20); /* 320px */
 
     &:hover {
       display: block!important;
@@ -2739,9 +2811,10 @@ form {
 
   .user_preview .card {
     width: 300px;
+    width: calc(var(--spacing-16) * 18.75); /* 300px */
 
     p {
-      font-size: 14px; // will be overwritten by rem if browser supports it //
+      font-size: 14px; /* will be overwritten by rem if browser supports it */
       font-size: var(--font-size-14);
     }
 
@@ -2757,6 +2830,7 @@ form {
 
 .preview_avatar_image{
   max-width: 64px;
+  max-width: var(--spacing-64);
 }
 
 #preview:has(p, a, h1, h2, h3, ul, ol) {
@@ -2778,6 +2852,7 @@ form {
   border: var(--border-1) solid var(--bs-border-color);
   border-radius: var(--bs-border-radius);
   max-width: 345px;
+  max-width: calc(var(--spacing-16) * 21.5625); /* 345px */
   max-height: 90vh;
   padding: var(--spacing-16);
   box-shadow: var(--bs-box-shadow);
@@ -2793,7 +2868,9 @@ form {
 
 .options_fediverse_logo {
   width: 16px;
+  width: var(--spacing-16);
   height: 16px;
+  height: var(--spacing-16);
 }
 
 .voting_buttons_new {
@@ -2810,6 +2887,7 @@ form {
   color: var(--bs-body-color);
   padding: 0;
   max-width: 280px;
+  max-width: calc(var(--spacing-16) * 17.5); /* 280px */
   width: max-content;
 
   &::backdrop {
@@ -2858,6 +2936,7 @@ form {
         padding: var(--spacing-2) var(--spacing-4) var(--spacing-4) var(--spacing-2);
         box-sizing: border-box;
         min-width: 44px;
+        min-width: calc(var(--spacing-16) * 2.75); /* 44px */
         cursor: pointer;
         align-items: baseline;
         line-height: 1;
@@ -2987,7 +3066,9 @@ form {
   color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
   a svg {
     width: 16px;
+    width: var(--spacing-16);
     height: 16px;
+    height: var(--spacing-16);
   }
 }
 
@@ -3066,12 +3147,14 @@ form {
 .instance_chooser_results {
   .card .card-body {
     height: 95px;
+    height: calc(var(--spacing-16) * 5.9375); /* 95px */
     overflow-y: auto;
   }
 }
 
 .instance_name {
   max-width: 152px;
+  max-width: calc(var(--spacing-16) * 9.5); /* 152px */
   text-wrap: nowrap;
 }
 
@@ -3082,9 +3165,11 @@ form {
   border-radius: var(--spacing-4);
   box-shadow: 0 var(--spacing-2) var(--spacing-4) var(--black-tint-01);
   max-height: 300px;
+  max-height: calc(var(--spacing-16) * 18.75); /* 300px */
   overflow: hidden;
   z-index: 9999;
   min-width: 200px;
+  min-width: calc(var(--spacing-16) * 12.5); /* 200px */
 }
 
 #typeTab .nav-link {
@@ -3140,7 +3225,9 @@ label:has(+ input.hide_label) {
   top:50%;
   transform:translate(-50%,-50%);
   width:20px;
-  height:20px
+  width: calc(var(--spacing-16) * 1.25); /* 20px */
+  height:20px;
+  height: calc(var(--spacing-16) * 1.25); /* 20px */
 }
 
 .voting_buttons_new.htmx-request .voting-spinner { display: block; }
