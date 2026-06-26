@@ -25,6 +25,7 @@
                     <th>{{ _('About') }}</th>
                     <th>{{ _('Posts') }}</th>
                     <th>{{ _('Comments') }}</th>
+                    <th> </th>
                 </tr>
                 {% for person in people.items %}
                     <tr>
@@ -32,6 +33,17 @@
                         <td class="profile_bio">{{ person.about_html | safe if person.about_html }}</td>
                         <td valign="top">{{ person.post_count }}</td>
                         <td valign="top">{{ person.post_reply_count }}</td>
+                        <td>
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.get_id() != person.id -%}
+                                    {% if person.id in currently_following -%}
+                                        <a href="#" class="btn btn-primary btn-sm ms-auto" hx-post="{{ url_for('user.user_unfollow', actor=person.link()) }}" hx-trigger="click throttle:1s" hx-swap="outerHTML" rel="nofollow">{{ _('Unfollow') }}</a>
+                                    {%- else -%}
+                                        <a href="#" class="btn btn-primary btn-sm ms-auto" hx-post="{{ url_for('user.user_follow', actor=person.link()) }}" hx-trigger="click throttle:1s" hx-swap="outerHTML" rel="nofollow">{{ _('Follow') }}</a>
+                                    {% endif -%}
+                                {% endif -%}
+                            {% endif -%}
+                        </td>
                     </tr>
                 {% endfor %}
             </table>

@@ -132,7 +132,9 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 :root {
   --spacing-2: 0.125rem;
   --spacing-4: 0.25rem;
+  --spacing-6: 0.4rem;
   --spacing-8: 0.5rem;
+  --spacing-10: 0.6rem;
   --spacing-12: 0.75rem;
   --spacing-16: 1rem;
   --spacing-20: 1.25rem;
@@ -209,6 +211,7 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 :root {
   --font-size-10: 0.625rem;
   --font-size-12: 0.75rem;
+  --font-size-13: 0.8rem;
   --font-size-14: 0.875rem;
   --font-size-16: 1rem;
   --font-size-18: 1.125rem;
@@ -732,8 +735,8 @@ a.no-underline:hover {
 }
 
 .small, small {
-  font-size: 14px;
-  font-size: var(--font-size-14);
+  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 fieldset legend {
@@ -771,7 +774,7 @@ fieldset legend {
 .form-control {
   display: block;
   width: 100%;
-  padding: var(--spacing-8) var(--spacing-12);
+  padding: var(--spacing-6) var(--spacing-10);
   font-size: 16px;
   font-size: var(--font-size-16);
   line-height: var(--spacing-24);
@@ -840,7 +843,9 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 :root {
   --spacing-2: 0.125rem;
   --spacing-4: 0.25rem;
+  --spacing-6: 0.4rem;
   --spacing-8: 0.5rem;
+  --spacing-10: 0.6rem;
   --spacing-12: 0.75rem;
   --spacing-16: 1rem;
   --spacing-20: 1.25rem;
@@ -1206,14 +1211,6 @@ div.navbar {
 .communities_menu ul * > * {
   margin-left: 0 !important;
 }
-.communities_menu .jump_links {
-  float: left;
-  padding-left: var(--spacing-12);
-  padding-top: var(--spacing-2);
-}
-.communities_menu .jump_links a {
-  margin-right: var(--spacing-4);
-}
 .communities_menu .community_filter {
   position: relative;
   margin-left: var(--spacing-12);
@@ -1246,14 +1243,6 @@ div.navbar {
   display: block !important;
 }
 
-.topics_menu ul, .feeds_menu ul {
-  margin-left: 0;
-  list-style-type: none;
-  padding-left: 0;
-}
-.topics_menu ul .dropdown-header, .feeds_menu ul .dropdown-header {
-  padding-left: var(--spacing-4);
-}
 @media (min-width: 992px) {
   #outer_container {
     margin-top: var(--spacing-16);
@@ -1308,8 +1297,8 @@ form .mb-3.required > label:after {
 }
 
 #breadcrumb_nav {
-  font-size: 12px;
-  font-size: var(--font-size-12);
+  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 #breadcrumb_nav .breadcrumb {
   position: relative;
@@ -1590,17 +1579,6 @@ ul.form-multicheck-columns li {
   padding-bottom: var(--spacing-2);
   overflow: hidden;
 }
-.post_list .post_teaser .meta_row a, .post_list .post_teaser .main_row a, .post_list .post_teaser .utilities_row a {
-  text-decoration: none;
-}
-.post_list .post_teaser .main_row {
-  position: relative;
-}
-.post_list .post_teaser .main_row .author {
-  margin-bottom: var(--spacing-32);
-  display: inline-block;
-  max-width: 78%;
-}
 .post_list .post_teaser .col_thumbnail {
   float: right;
   width: var(--spacing-72);
@@ -1679,14 +1657,6 @@ ul.form-multicheck-columns li {
 }
 .post_list .post_teaser.blocked {
   opacity: var(--opacity-02);
-  font-size: 12px;
-  font-size: var(--font-size-12);
-}
-.post_list .post_teaser.blocked .voting_buttons {
-  width: 46px;
-  line-height: var(--spacing-24);
-}
-.post_list .post_teaser.blocked .voting_buttons .upvote_button, .post_list .post_teaser.blocked .voting_buttons .downvote_button {
   font-size: 12px;
   font-size: var(--font-size-12);
 }
@@ -2195,75 +2165,6 @@ details {
 }
 .voting_buttons_new .htmx-request.htmx-indicator {
   display: inline;
-}
-
-.voting_buttons {
-  float: right;
-  display: block;
-  min-width: 54px;
-  padding: 0 0 var(--spacing-4) var(--spacing-4);
-  line-height: var(--spacing-28);
-  font-size: 14px;
-  font-size: var(--font-size-14);
-}
-@media (min-width: 1280px) {
-  .voting_buttons {
-    line-height: 25px;
-  }
-}
-.voting_buttons div {
-  border: solid var(--border-1) var(--primary-colour);
-}
-.voting_buttons .upvote_button, .voting_buttons .downvote_button {
-  position: relative;
-  padding: 0 var(--spacing-2);
-  min-height: 44px;
-  min-width: 44px;
-  border-radius: var(--spacing-2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.voting_buttons .upvote_button.digits_4, .voting_buttons .downvote_button.digits_4 {
-  width: 68px;
-}
-.voting_buttons .upvote_button.digits_5, .voting_buttons .downvote_button.digits_5 {
-  width: 76px;
-}
-.voting_buttons .upvote_button.digits_6, .voting_buttons .downvote_button.digits_6 {
-  width: 84px;
-}
-.voting_buttons .upvote_button.voted_up, .voting_buttons .downvote_button.voted_up {
-  color: var(--green-html);
-  font-weight: bold;
-}
-.voting_buttons .upvote_button.voted_down, .voting_buttons .downvote_button.voted_down {
-  color: var(--darkred);
-  font-weight: bold;
-}
-.voting_buttons .downvote_button {
-  margin-top: var(--spacing-4);
-}
-.voting_buttons .htmx-indicator {
-  position: absolute;
-  width: var(--spacing-20);
-  height: 20px;
-}
-.voting_buttons .htmx-request .htmx-indicator {
-  display: inline;
-  position: absolute;
-  width: var(--spacing-20);
-  height: var(--spacing-20);
-  right: var(--spacing-16);
-  top: var(--spacing-4);
-  opacity: var(--opacity-10) !important;
-}
-.voting_buttons .htmx-request.htmx-indicator {
-  display: inline;
-}
-.voting_buttons a {
-  text-decoration: none;
 }
 
 .comment {
@@ -2839,18 +2740,6 @@ h1 .warning_badge {
   height: auto;
 }
 
-#post_reply_markdown_editor_enabler {
-  display: none;
-  position: absolute;
-  bottom: var(--spacing-4);
-  right: 0;
-}
-@media (min-width: 768px) {
-  #post_reply_markdown_editor_enabler {
-    display: inline-block;
-  }
-}
-
 .create_post_markdown_editor_enabler {
   text-align: right;
   margin-bottom: var(--spacing-12);
@@ -2874,17 +2763,6 @@ h1 .warning_badge {
 }
 .responsive-video.blur {
   filter: blur(var(--spacing-24));
-}
-
-@media (min-width: 768px) {
-  .post_language_chooser label {
-    display: none;
-  }
-  .post_language_chooser select {
-    max-width: 150px;
-    float: right;
-    margin-top: calc(-1 * var(--spacing-4));
-  }
 }
 
 @media (min-width: 768px) {
@@ -3085,13 +2963,6 @@ h1 .warning_badge {
   }
 }
 
-.external_link_icon {
-  width: 12px;
-  height: 12px;
-  margin-left: var(--spacing-4);
-  margin-bottom: var(--spacing-4);
-}
-
 form h5 {
   padding-top: var(--spacing-12);
 }
@@ -3233,18 +3104,6 @@ form h5 {
 
 .ellipsis::after {
   content: "…";
-}
-
-.option_list {
-  list-style-type: none;
-  margin-bottom: 0;
-}
-.option_list li {
-  margin-bottom: var(--spacing-8);
-}
-.option_list li .fe {
-  position: relative;
-  top: var(--spacing-2);
 }
 
 .field_hint {
@@ -3451,7 +3310,6 @@ form h5 {
   position: absolute;
   top: var(--spacing-20);
   left: 0;
-  background-color: var(--white);
   z-index: 20;
   width: 320px;
 }
@@ -3608,11 +3466,6 @@ form h5 {
 }
 .message_reactions .message_reaction .emoji img {
   margin-top: calc(var(--spacing-4) * -1);
-}
-.message_reactions .message_reaction .emoji_alt_code {
-  margin: var(--spacing-2) var(--spacing-4);
-  font-size: 14px;
-  font-size: var(--font-size-14);
 }
 .message_reactions .message_reaction_count {
   font-size: 14px;
@@ -3961,7 +3814,9 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 :root {
   --spacing-2: 0.125rem;
   --spacing-4: 0.25rem;
+  --spacing-6: 0.4rem;
   --spacing-8: 0.5rem;
+  --spacing-10: 0.6rem;
   --spacing-12: 0.75rem;
   --spacing-16: 1rem;
   --spacing-20: 1.25rem;
@@ -4082,10 +3937,10 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
   [data-bs-theme=dark] .domain_link, [data-bs-theme=dark] .domain_link a {
     color: var(--whitesmoke);
   }
-  .main_pane, .voting_buttons div {
+  .main_pane {
     border: solid var(--border-1) var(--darker-grey);
   }
-  [data-bs-theme=dark] .main_pane, [data-bs-theme=dark] .voting_buttons div {
+  [data-bs-theme=dark] .main_pane {
     border: solid var(--border-1) var(--white-fade);
   }
   div.navbar {
@@ -4240,7 +4095,7 @@ body.compact-max .post_teaser .post_utilities_bar .voting_buttons_new .upvote_bu
 }
 
 @media print {
-  #navbarSupportedContent, #side_pane, .voting_buttons, .comment_actions, footer, .post_reply_form, #post_replies .btn-group,
+  #navbarSupportedContent, #side_pane, .comment_actions, footer, .post_reply_form, #post_replies .btn-group,
   .navbar .nav-link, .post_utilities_bar, .community_header, .community_icon_big, .mobile_create_post {
     display: none;
   }

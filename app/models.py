@@ -994,6 +994,7 @@ class User(UserMixin, db.Model):
     bot_override = db.Column(db.Boolean, default=False, index=True)
     suppress_crossposts = db.Column(db.Boolean, default=False, index=True)
     vote_privately = db.Column(db.Boolean, default=False)
+    can_send_pm = db.Column(db.Boolean, default=True)
     finished_onboarding = db.Column(db.Boolean, default=False)
     ignore_bots = db.Column(db.Integer, default=0)
     unread_notifications = db.Column(db.Integer, default=0)
@@ -1452,6 +1453,8 @@ class User(UserMixin, db.Model):
         db.session.query(CommunityMember).filter(CommunityMember.user_id == self.id).delete()
         db.session.query(CommunityBlock).filter(CommunityBlock.user_id == self.id).delete()
         db.session.query(CommunityBan).filter(CommunityBan.user_id == self.id).delete()
+        db.session.query(BotChallenge).filter(BotChallenge.user_id == self.id).delete()
+        db.session.query(BotChallenge).filter(BotChallenge.sent_by == self.id).delete()
         db.session.query(CommunityJoinRequest).filter(CommunityJoinRequest.user_id == self.id).delete()
         db.session.query(ChatMessage).filter(or_(ChatMessage.sender_id == self.id, ChatMessage.recipient_id == self.id)).delete()
         db.session.query(UserBlock).filter(or_(UserBlock.blocker_id == self.id, UserBlock.blocked_id == self.id)).delete()
@@ -1557,12 +1560,13 @@ class User(UserMixin, db.Model):
         else:
             return ''
 
-    def can_send_pm(self, recipient):
+    def can_send_pm_to(self, recipient):
         if (
             self.created_very_recently()
             or self.reputation <= -10
             or self.banned
             or not self.verified
+            or not self.can_send_pm
         ) and not (self.is_admin_or_staff() or recipient.is_admin_or_staff()):
             return False
 
@@ -4191,6 +4195,15 @@ class RevokedToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(36), unique=True, index=True)  # JWT ID
     revoked_at = db.Column(db.DateTime, default=utcnow)
+
+
+class BotChallenge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(50), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    sent_at = db.Column(db.DateTime, default=utcnow)
+    sent_by = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    is_a_bot = db.Column(db.Boolean)        # null means waiting for response
 
 
 def _large_community_subscribers() -> float:

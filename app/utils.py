@@ -66,7 +66,7 @@ from app.models import CronJobLog, Settings, Domain, Instance, BannedInstances, 
     Site, Post, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic, UserBlock, Language, \
     File, ModLog, CommunityBlock, Feed, FeedMember, CommunityFlair, CommunityJoinRequest, Notification, UserNote, \
     PostReply, PostReplyBookmark, AllowedInstances, InstanceBan, Tag, Emoji, UserExtraField, ArchivedPostReply, \
-    RevokedToken, CommunityFavorite
+    RevokedToken, CommunityFavorite, UserFollower
 
 logger = logging.getLogger(__name__)
 
@@ -4322,6 +4322,22 @@ def user_pronouns() -> defaultdict:
             else:
                 result[pronoun.user_id] = pronoun.text
     return result
+
+
+def following_user_ids(user_id):
+    if user_id == 0:
+        return []
+    stmt = (
+        select(User.id)
+        .join(UserFollower, UserFollower.remote_user_id == User.id)
+        .where(
+            User.banned == False,
+            UserFollower.local_user_id == user_id,
+            UserFollower.is_inward == False
+        )
+    )
+
+    return db.session.execute(stmt).scalars().all()
 
 
 def expand_hex_color(text: str) -> str:

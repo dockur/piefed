@@ -15,6 +15,14 @@
         <meta name="MobileOptimized" content="320">
         <meta name="color-scheme" content="light dark">
         <meta name="csrf-token" content="{{ cs }}">
+        <script type="speculationrules" nonce="{{ nonce }}">
+            {"prefetch": [
+                {
+                  "where": { "href_matches": "/c/*"},
+                  "eagerness": "moderate"
+                }
+            ]}
+        </script>
         <link rel="expect" blocking="render" href="#navbarSupportedContent">
         {% if current_user.is_anonymous -%}
             <script rel="preload" src="/static/js/enable_low_bandwidth.js" type="text/javascript" fetchpriority="high" nonce="{{ nonce }}"></script>

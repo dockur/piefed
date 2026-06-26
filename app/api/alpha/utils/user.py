@@ -14,7 +14,8 @@ from app.api.alpha.views import user_view, reply_view, post_view, community_view
 from app.constants import *
 from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community, File, UserFlair, \
     user_file, UserExtraField, UserNote, RevokedToken, utcnow
-from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user
+from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user, follow_user, \
+    unfollow_user
 from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes
 
 
@@ -914,6 +915,22 @@ def post_user_set_flair(auth, data):
             db.session.commit()
 
     return user_view(user=user, variant=5, flair_community_id=community_id)
+
+
+def post_user_follow(auth, data):
+    to_follow = data['user_id']
+
+    follow_user(to_follow, SRC_API, auth)
+
+    return {'ok': 'ok'}
+
+
+def post_user_unfollow(auth, data):
+    unfollow_id = data['user_id']
+
+    unfollow_user(unfollow_id, SRC_API, auth)
+
+    return {'ok': 'ok'}
 
 
 def post_user_set_note(auth, data):

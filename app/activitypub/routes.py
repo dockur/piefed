@@ -1017,6 +1017,20 @@ def process_inbox_request(request_json, store_ap_json):
                                       "id": f"{current_app.config['SERVER_URL']}/activities/accept/" + gibberish(32)}
                             send_post_request(remote_user.ap_inbox_url, accept, local_user.private_key,
                                               f"{local_user.public_url()}#main-key")
+
+                            targets_data = {'gen': '0',
+                                            'author_id': remote_user.id,
+                                            'author_user_name': remote_user.ap_id if remote_user.ap_id else remote_user.user_name}
+                            new_notification = Notification(title=_('You have a new follower'),
+                                                            url=f"/user/{remote_user.id}",
+                                                            user_id=local_user.id, author_id=remote_user.id,
+                                                            notif_type=NOTIF_FOLLOW,
+                                                            subtype='new_follower',
+                                                            targets=targets_data)
+                            db.session.add(new_notification)
+                            local_user.unread_notifications += 1
+                            db.session.commit()
+
                             log_incoming_ap(id, APLOG_FOLLOW, APLOG_SUCCESS, saved_json)
                     return
 

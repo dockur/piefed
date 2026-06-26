@@ -36,7 +36,7 @@ from app.models import CronJobLog, Settings, BannedInstances, Role, User, RolePe
     Community, SendQueue, _store_files_in_s3, PostVote, Poll, \
     ActivityBatch, Reminder
 from app.shared.tasks import task_selector
-from app.shared.tasks.maintenance import add_remote_communities, remove_old_bot_content
+from app.shared.tasks.maintenance import add_remote_communities, remove_old_bot_content, pwn_bots
 from app.utils import retrieve_block_list, blocked_domains, retrieve_peertube_block_list, \
     shorten_string, get_request, blocked_communities, gibberish, \
     recently_upvoted_post_replies, recently_upvoted_posts, jaccard_similarity, \
@@ -476,6 +476,8 @@ def register(app):
         archive_old_posts()                 # 2 hours
         print(f'21 {datetime.now()}')
         archive_old_users()
+        print(f'22 {datetime.now()}')
+        pwn_bots()
         print(f'Finished {datetime.now()}')
 
         log_cron_task_to_db("daily_maintenance")
