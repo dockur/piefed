@@ -172,41 +172,8 @@
             {% endif %}
             {{ render_field(form.body) }}
 
-            {% if not low_bandwidth -%}
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <a href="#" 
-                                id="post_preview_btn" 
-                                class="btn btn-outline-secondary" 
-                                hx-post="{{ url_for('post.preview', type="post") }}" 
-                                hx-target="#preview">{{ _('Preview') }}
-                        </a>
-                        <a href="#" class="btn btn-outline-secondary {{ 'd-none' if markdown_editor }}" id="insertImage">{{ _('Insert image') }}</a>
-                    </div>
-                    <div class="col-6 text-right">
-                        {% if markdown_editor %}
-                            <script nonce="{{ nonce }}">
-                                window.addEventListener("load", function () {
-                                    var downarea = new DownArea({
-                                        elem: document.querySelector('#body'),
-                                        resize: DownArea.RESIZE_VERTICAL,
-                                        hide: ['heading', 'bold-italic'],
-                                        value: document.getElementById("body").value
-                                    });
-                                    setupAutoResize('body');
-                                });
-                            </script>
-                        {% else %}
-                            <a href="#" aria-hidden="true" class="markdown_editor_enabler create_post_markdown_editor_enabler" data-id="body">{{ _('Enable markdown editor') }}</a>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div id="preview"></div>
-                    </div>
-                </div>
-            {% endif -%}
+            {% set preview_type = "post" %}
+            {% include "community/_body_edit_preview.html" %}
 
             {{ render_field(form.language_id) }}
 
