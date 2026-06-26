@@ -5,14 +5,67 @@
 {% endif -%}
 {% from 'bootstrap5/form.html' import render_form, render_field %}
 
+{% block end_scripts -%}
+    <script src="{{ url_for('static', filename='js/media_library.js', changed=getmtime('js/media_library.js')) }}" nonce={{ nonce }}></script>
+{% endblock -%}
+
 {% block app_content %}
+<script nonce="{{ nonce }}">
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Initialize Media Library
+    const mediaLibrary = new MediaLibrary({
+        dialogId: 'insertImageDialog',
+        dialogCloseId: 'insert_image_dialog_close',
+        triggerLinkId: 'insertImage',
+        loadContainerId: 'loadImagesHere',
+        targetTextareaId: 'body',
+        uploadInputId: 'imageUploadInput',
+        uploadButtonId: 'imageUploadButton',
+        uploadStatusId: 'uploadStatus',
+        translations: {
+            loading: "{{ _("Loading...") }}",
+            noImages: "{{ _("No images found.") }}",
+            errorLoading: "{{ _("Error loading images.") }}",
+            insert: "{{ _("Insert") }}",
+            more: "{{ _("More") }}",
+            delete: "{{ _("Delete") }}",
+            confirmDelete: "{{ _("Are you sure you want to delete this image?") }}",
+            deleteError: "{{ _("Failed to delete image. Please try again.") }}",
+            selectFile: "{{ _("Please select a file.") }}",
+            selectImage: "{{ _("Please select an image file.") }}",
+            uploading: "{{ _("Uploading...") }}",
+            uploadSuccess: "{{ _("Upload successful!") }}",
+            uploadError: "{{ _("Upload failed. Please try again.") }}",
+            pasteUploadError: "{{ _("Failed to upload pasted image. Please try again.") }}"
+        }
+    });
+
+    {% if markdown_editor %}
+    // Override DownArea image button to use media library
+    mediaLibrary.overrideDownAreaImageButton('#body', 1500);
+    {% endif %}
+});
+</script>
 <div class="row">
     <main class="col-12 col-lg-8 position-relative main_pane">
         {% block title %}<h1>{{ title }}</h1>{% endblock %}
-        {{ render_form(form) }}
+        <form method="post">
+            {{ form.csrf_token() }}
+            {{ render_field(form.title) }}
+            {{ render_field(form.slug) }}
+            {{ render_field(form.body) }}
+            {% set preview_type = "wiki" %}
+            {% include "community/_body_edit_preview.html" %}
+
+            {{ render_field(form.who_can_edit) }}
+            {{ render_field(form.submit) }}
+        </form>
+        
     </main>
 
     {% include "_side_pane.html" %}
 
 </div>
+{% include "_insert_image_dialog.html" %}
 {% endblock %}

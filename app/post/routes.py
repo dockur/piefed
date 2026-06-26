@@ -2288,7 +2288,7 @@ def preview():
             target_id = "#textarea_in_reply_to_preview_"
             if preview_id:
                 target_id += preview_id
-    elif preview_type == "post":
+    elif preview_type == "post" or preview_type == "wiki":
         oob_target = "post_preview_btn"
         target_id = "#preview"
     
