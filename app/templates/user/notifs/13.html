@@ -1,0 +1,13 @@
+<tr class="align-middle">
+    <td width="*">
+        <div class="overflow-ellipses-parent text-truncate">
+            <div class="child my-1 {% if not notification.read %}unread{% endif %}">
+                {{ _('You have a new follower') }}
+                <a class="border border-0" href="/u/{{ notification.targets.author_user_name }}">
+                    {{ notification.targets.author_user_name }}
+                </a>
+            </div>
+        </div>
+    </td>
+    {% include "user/notifs/_time_and_buttons.html" %}
+</tr>

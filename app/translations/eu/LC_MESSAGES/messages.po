@@ -8,15 +8,16 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-04-05 10:54+1200\n"
-"PO-Revision-Date: 2026-01-13 09:47+0000\n"
+"PO-Revision-Date: 2026-04-11 11:47+0000\n"
 "Last-Translator: Thadah Denyse <thadahdenyse@protonmail.com>\n"
+"Language-Team: Basque <http://translate.piefed.social/projects/piefed/"
+"main-web-app/eu/>\n"
 "Language: eu\n"
-"Language-Team: Basque <http://translate.piefed.social/projects/piefed"
-"/main-web-app/eu/>\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: app/__init__.py:54
@@ -1264,7 +1265,7 @@ msgid "Results: %(results)s"
 msgstr "Emaitzak: %(results)s"
 
 #: app/admin/routes.py:478
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Subscription process for %(communities_to_add)d of "
 "%(parsed_communities_sorted)d community launched in background, check "
@@ -1275,12 +1276,15 @@ msgid_plural ""
 "admin/activities for details"
 msgstr[0] ""
 "%(parsed_communities_sorted)d komunitatetatik %(communities_to_add)d "
-"komunitateren harpidetza prozesua atzeko planoan abiarazi da, xehetasunak"
-" ikusteko, begiratu admin/jarduerak atala"
+"komunitateren harpidetza prozesua atzeko planoan abiarazi da, xehetasunak "
+"ikusteko, begiratu admin/jarduerak atala"
 msgstr[1] ""
+"%(parsed_communities_sorted)d komunitatetatik %(communities_to_add)d "
+"komunitateren harpidetza prozesua atzeko planoan abiarazi da, xehetasunak "
+"ikusteko, begiratu admin/jarduerak atala"
 
 #: app/admin/routes.py:791
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Based on current filters, the subscription process for "
 "%(communities_to_join)d of %(candidate_communities)d community launched "
@@ -1290,10 +1294,13 @@ msgid_plural ""
 "%(communities_to_join)d of %(candidate_communities)d communities launched"
 " in background, check admin/activities for details"
 msgstr[0] ""
-"Uneko iragazkietan oinarrituta, %(candidate_communities)d "
-"komunitateetatik %(communities_to_join)d-(r)en harpidetza prozesua atzeko"
-" planoan abiarazi da, egiaztatu admin/jarduerak xehetasunak ikusteko"
+"Uneko iragazkian oinarrituta, %(candidate_communities)d komunitateetatik "
+"%(communities_to_join)d-(r)en harpidetza prozesua atzeko planoan abiarazi "
+"da, egiaztatu admin/jarduerak xehetasunak ikusteko"
 msgstr[1] ""
+"Uneko iragazkietan oinarrituta, %(candidate_communities)d komunitateetatik "
+"%(communities_to_join)d-(r)en harpidetza prozesua atzeko planoan abiarazi "
+"da, egiaztatu admin/jarduerak xehetasunak ikusteko"
 
 #: app/admin/routes.py:819
 msgid "Ban imports started in a background process."
@@ -3057,6 +3064,9 @@ msgid ""
 "account. People on other instances will need to make an account here to "
 "participate."
 msgstr ""
+"Komunitate honetara %(domain)s kontua duten pertsonek bakarrik sar daitezke. "
+"Beste instantzietako pertsonek hemen kontu bat sortu beharko dute parte "
+"hartzeko."
 
 #: app/community/routes.py:2483
 msgid "Invite to community"
@@ -6544,6 +6554,9 @@ msgid ""
 "your subscriptions and settings and import then into another server if "
 "your original choice doesn't work out."
 msgstr ""
+"Erabaki honek ez du arrisku handirik - beti esporta ditzakezu zure "
+"harpidetza eta ezarpenak eta gero beste zerbitzari batera inportatu zure "
+"jatorrizko aukerak funtzionatzen ez badu."
 
 #: app/templates/auth/instance_chooser.html:150
 msgid ""
@@ -6568,6 +6581,8 @@ msgid ""
 "Age is how long the server has been online for. Generally older ones are "
 "more likely to be around for the long term."
 msgstr ""
+"Adina zerbitzaria sarean zenbat denbora egon den da. Orokorrean, zaharragoak "
+"epe luzera irauteko aukera gehiago dute."
 
 #: app/templates/auth/instance_chooser.html:154
 msgid ""
@@ -7201,6 +7216,8 @@ msgid ""
 "Are you sure you want to delete this community? This is irreversible and "
 "will delete all posts and comments associated with it."
 msgstr ""
+"Ziur zaude komunitate hau ezabatu nahi duzula? Hau itzulezina da eta harekin "
+"lotutako mezu eta iruzkin guztiak ezabatuko ditu."
 
 #: app/templates/community/community_delete.html:17
 #, fuzzy
@@ -8344,17 +8361,17 @@ msgid "View comments"
 msgstr "Ikusi iruzkinak"
 
 #: app/templates/post/_post_voting_buttons.html:3
-#, fuzzy, python-format
+#, python-format
 msgid "UpVote button, %(num)d upvote so far."
 msgid_plural "UpVote button, %(num)d upvotes so far."
-msgstr[0] "Alde bozkatu botoia, %(count)d boto alde orain arte."
+msgstr[0] "Alde bozkatu botoia, %(num)d boto alde orain arte."
 msgstr[1] ""
 
 #: app/templates/post/_post_voting_buttons.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "DownVote button, %(num)d downvote so far."
 msgid_plural "DownVote button, %(num)d downvotes so far."
-msgstr[0] "Kontra bozkatu botoia, %(count)d boto kontra orain arte."
+msgstr[0] "Kontra bozkatu botoia, %(num)d boto kontra orain arte."
 msgstr[1] ""
 
 #: app/templates/post/_post_voting_buttons_masonry.html:3
@@ -11300,4 +11317,3 @@ msgstr "Zure dohaintza bertan behera utzi da."
 
 #~ msgid "Warn me after using PieFed for this many hours per day"
 #~ msgstr ""
-

@@ -322,6 +322,7 @@ class EditUserForm(FlaskForm):
     banned = BooleanField(_l('Banned'))
     ban_posts = BooleanField(_l('Ban posts'))
     ban_comments = BooleanField(_l('Ban comments'))
+    can_send_pm = BooleanField(_l('Can send PMs'))
     hide_type_choices = [(0, _l('Show')),
                          (1, _l('Hide completely')),
                          (2, _l('Blur')),

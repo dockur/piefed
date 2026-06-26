@@ -37,7 +37,7 @@ from app.api.alpha.utils.user import get_user, post_user_block, get_user_unread_
     get_user_notifications, put_user_notification_state, get_user_notifications_count, \
     put_user_mark_all_notifications_read, post_user_verify_credentials, post_user_set_flair, get_user_details, \
     get_user_media, post_user_set_note, post_user_ban, post_user_unban, post_user_register, get_user_captcha, \
-    post_user_logout
+    post_user_logout, post_user_follow, post_user_unfollow
 from app.api.alpha.utils.admin import get_registration_list, put_registration_approve
 from app.constants import *
 from app.utils import orjson_response, get_setting
@@ -1467,6 +1467,33 @@ def post_alpha_user_set_flair(data):
     auth = request.headers.get('Authorization')
     resp = post_user_set_flair(auth, data)
     return UserSetFlairResponse().load(resp)
+
+
+@user_bp.route('/user/follow', methods=['POST'])
+@user_bp.doc(summary="Follow a user")
+@user_bp.arguments(UserFollowRequest)
+@user_bp.response(200, UserFollowResponse)
+@user_bp.alt_response(400, schema=DefaultError)
+def post_alpha_user_follow(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = post_user_follow(auth, data)
+    return resp
+
+
+@user_bp.route('/user/unfollow', methods=['POST'])
+@user_bp.doc(summary="Unfollow a user")
+@user_bp.arguments(UserUnfollowRequest)
+@user_bp.response(200, UserUnfollowResponse)
+@user_bp.alt_response(400, schema=DefaultError)
+def post_alpha_user_follow(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = post_user_unfollow(auth, data)
+    return resp
+
 
 @user_bp.route('/user/note', methods=['POST'])
 @user_bp.doc(summary="Set a note for a user")

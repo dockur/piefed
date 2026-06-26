@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-04-05 10:54+1200\n"
-"PO-Revision-Date: 2026-03-14 19:47+0000\n"
+"PO-Revision-Date: 2026-04-17 12:06+0000\n"
 "Last-Translator: Denys Nykula <nykula@ukr.net>\n"
+"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed/"
+"main-web-app/uk/>\n"
 "Language: uk\n"
-"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed"
-"/main-web-app/uk/>\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.10.4\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: app/__init__.py:54
@@ -270,9 +271,9 @@ msgstr ""
 " коментарів не буде туди надіслано."
 
 #: app/utils.py:4315
-#, fuzzy, python-format
+#, python-format
 msgid "You have been banned from %(instance_name)s which hosts this community."
-msgstr "Спільнота блокує вас."
+msgstr "Вас блокує сервер спільноти — %(instance_name)s."
 
 #: app/activitypub/routes.py:557 app/activitypub/routes.py:561
 msgid "Community not found on this instance"
@@ -458,7 +459,7 @@ msgstr "Пропонувати теми для підписки"
 
 #: app/admin/forms.py:56
 msgid "Filter setup during onboarding"
-msgstr ""
+msgstr "Параметри фільтрування при реєстрації"
 
 #: app/admin/forms.py:57
 msgid "Ignore registrations from these countries"
@@ -524,7 +525,7 @@ msgstr ""
 
 #: app/admin/forms.py:72
 msgid "Limit em dash reports to just the first occurence per user"
-msgstr ""
+msgstr "Сповіщати лише про перше використання тире користувачем"
 
 #: app/admin/forms.py:73
 msgid "Log ActivityPub JSON for debugging"
@@ -948,7 +949,7 @@ msgstr "Сховати з вибору сервера"
 
 #: app/admin/forms.py:210
 msgid "Communities become popular when added"
-msgstr ""
+msgstr "Показ допомагає популярності спільноти"
 
 #: app/admin/forms.py:212
 msgid "Notes about this instance (only visible to other admins)"
@@ -1053,19 +1054,16 @@ msgstr "Робити напівпрозорими"
 
 #: app/admin/forms.py:256 app/auth/forms.py:139 app/user/forms.py:63
 #: app/user/forms.py:204
-#, fuzzy
 msgid "Posts by bots"
 msgstr "Дописи ботів"
 
 #: app/admin/forms.py:258 app/admin/forms.py:321 app/auth/forms.py:141
 #: app/user/forms.py:64 app/user/forms.py:206
-#, fuzzy
 msgid "NSFW posts"
-msgstr "Показати дописи"
+msgstr "NSFW-дописи"
 
 #: app/admin/forms.py:260 app/admin/forms.py:323 app/auth/forms.py:143
 #: app/user/forms.py:65 app/user/forms.py:208
-#, fuzzy
 msgid "NSFL posts"
 msgstr "NSFL-дописи"
 
@@ -1738,7 +1736,6 @@ msgid "Label as AI"
 msgstr "Підписувати як «ШІ»"
 
 #: app/auth/forms.py:145 app/user/forms.py:210
-#, fuzzy
 msgid "AI-generated posts"
 msgstr "Дописи, згенеровані «ШІ»"
 
@@ -1787,13 +1784,12 @@ msgid "Which server do you want to join?"
 msgstr "До якого сервера ви хочете долучитись?"
 
 #: app/auth/onboarding.py:63
-#, fuzzy
 msgid ""
 "You have joined some communities relating to those interests. Find more "
 "on the Explore menu or browse the home page."
 msgstr ""
-"Ви долучилися до кількох спільнот за інтересами. Щоб знайти інші "
-"спільноти, скористайтеся меню «Теми» чи головною сторінкою."
+"Ви долучилися до кількох спільнот за інтересами. Щоб знайти інші спільноти, "
+"скористайтеся меню «Огляд» чи головною сторінкою."
 
 #: app/auth/onboarding.py:67 app/main/routes.py:293 app/main/routes.py:1293
 msgid ""
@@ -2091,9 +2087,8 @@ msgid "Report conversation"
 msgstr "Скарга на розмову"
 
 #: app/community/forms.py:31 app/community/forms.py:92
-#, fuzzy
 msgid "Community theme"
-msgstr "Учасники спільноти"
+msgstr "Оформлення спільноти"
 
 #: app/community/forms.py:32 app/community/forms.py:224 app/post/forms.py:93
 #: app/templates/auth/instance_chooser.html:45
@@ -3084,9 +3079,8 @@ msgid "This is a local community"
 msgstr "Це місцева спільнота"
 
 #: app/community/util.py:973
-#, fuzzy
 msgid "Disabled"
-msgstr "Нішеве"
+msgstr "Вимкнено"
 
 #: app/dev/forms.py:12
 msgid "Populate Communities"
@@ -3118,17 +3112,15 @@ msgstr[2] "Видалено %(num)d тестових спільнот"
 
 #: app/dev/routes.py:207
 msgid "ActivityPub has been sent to inbox."
-msgstr ""
+msgstr "ActivityPub надіслано до вхідних."
 
 #: app/dev/routes.py:209
-#, fuzzy
 msgid "Invalid json "
-msgstr "Хибний пароль"
+msgstr "Хибний JSON "
 
 #: app/dev/routes.py:211
-#, fuzzy
 msgid "Send ActivityPub to local inbox"
-msgstr "Журнал ActivityPub"
+msgstr "Надіслати ActivityPub у місцеві вхідні"
 
 #: app/domain/forms.py:7
 msgid "Warning on posts"
@@ -3320,16 +3312,15 @@ msgstr "Щоб підтвердити обліковий запис, натис�
 
 #: app/main/routes.py:1215
 msgid "<a href=\"/r/random\">Try another random community</a>"
-msgstr ""
+msgstr "<a href=\"/r/random\">Глянути іншу довільну спільноту</a>"
 
 #: app/main/routes.py:1218 app/main/routes.py:1246
-#, fuzzy
 msgid "No communities found."
-msgstr "Відомі спільноти"
+msgstr "Спільнот не знайдено."
 
 #: app/main/routes.py:1243
 msgid "<a href=\"/r/randnsfw\">Try another random community</a>"
-msgstr ""
+msgstr "<a href=\"/r/randnsfw\">Глянути іншу довільну спільноту</a>"
 
 #: app/main/routes.py:1257
 msgid "Content warning"
@@ -3701,9 +3692,8 @@ msgid "Cross post"
 msgstr "Перехресне розміщення"
 
 #: app/post/routes.py:2344
-#, fuzzy
 msgid "Set AI flag on this post"
-msgstr "Коментарі до цього допису вимкнено"
+msgstr "Позначити допис «ШІ»"
 
 #: app/post/routes.py:2360 app/post/routes.py:2393
 msgid "Not configured."
@@ -4741,9 +4731,8 @@ msgstr "Ваші спільноти"
 
 #: app/templates/communities_menu.html:30
 #: app/templates/communities_menu.html:39
-#, fuzzy
 msgid "Random community"
-msgstr "Блокувати в спільноті"
+msgstr "Довільна спільнота"
 
 #: app/templates/donate.html:16 app/templates/user/choose_plan.html:63
 msgid ""
@@ -5161,7 +5150,7 @@ msgstr "Видалити користувача"
 #: app/templates/community/community_moderate_subscribers.html:26
 #: app/templates/modlog.html:23
 msgid "Add moderator"
-msgstr "Додати модератоар"
+msgstr "Додати модератора"
 
 #: app/templates/modlog.html:24
 msgid "Remove moderator"
@@ -6969,25 +6958,23 @@ msgstr "Квадратне зображення, розбірливе при з�
 
 #: app/templates/community/add_local.html:31
 #: app/templates/community/community_edit.html:61
-#, fuzzy
 msgid "If you want to make your own theme,"
-msgstr "Неможливо відписатись від власної стрічки"
+msgstr "Щоб зробити власне оформлення,"
 
 #: app/templates/community/add_local.html:31
 #: app/templates/community/community_edit.html:61
 msgid "learn how to do it here "
-msgstr ""
+msgstr "прочитайте інструкції "
 
 #: app/templates/community/add_local.html:31
 #: app/templates/community/community_edit.html:61
-#, fuzzy
 msgid "and propose it to our "
-msgstr "Додати пост до спільноти"
+msgstr "і надішліть результат у наш "
 
 #: app/templates/community/add_local.html:31
 #: app/templates/community/community_edit.html:61
 msgid "Codeberg repository"
-msgstr ""
+msgstr "Codeberg-репозиторій"
 
 #: app/templates/community/add_local.html:34
 msgid "Do not publicize test communities."
@@ -7236,7 +7223,7 @@ msgstr "Скарг іще нема"
 #: app/templates/community/community_moderate_comments.html:30
 #, python-format
 msgid "Review comments in %(community)s"
-msgstr "Перевірити коментарі %(community)s"
+msgstr "Перевірте коментарі %(community)s"
 
 #: app/templates/community/community_moderate_comments.html:40
 #: app/templates/user/show_profile.html:270
@@ -7291,7 +7278,7 @@ msgstr "Блоковані люди"
 #: app/templates/community/community_moderate_subscribers.html:122
 #, python-format
 msgid "See and manage who is banned from %(community)s"
-msgstr "Переглянути блокування в %(community)s і керувати ними"
+msgstr "Можете переглянути блокування в %(community)s і керувати ними"
 
 #: app/templates/community/community_moderate_subscribers.html:152
 msgid "View local"
@@ -7312,7 +7299,7 @@ msgstr "Блокувати користувача"
 #: app/templates/community/community_moderate_subscribers.html:168
 #, python-format
 msgid "Create a ban from %(community)s"
-msgstr "Блокувати в %(community)s"
+msgstr "Можете блокувати в межах %(community)s"
 
 #: app/templates/community/community_modlog.html:24
 #, python-format
@@ -7321,7 +7308,7 @@ msgstr "Дії модераторів %(community)s"
 
 #: app/templates/community/community_modlog.html:26
 msgid "See things moderators have done in this community."
-msgstr "Переглянути роботу модераторів спільноти."
+msgstr "Можете переглянути роботу модераторів спільноти."
 
 #: app/templates/community/community_modlog.html:57
 msgid "This community has had no moderation actions yet."
@@ -9446,6 +9433,7 @@ msgid ""
 "This can override your user theme in communities, that have enabled this "
 "feature"
 msgstr ""
+"Спільноти, які ввімкнули цю функцію, можуть заміщати ваш вибір оформлення"
 
 #: app/templates/user/edit_settings.html:46
 msgid "Increase font size"
@@ -9679,16 +9667,15 @@ msgstr "Ви відписались від розсилки. Листи з ін�
 
 #: app/templates/user/notifications.html:19
 msgid "Mark all as read"
-msgstr "Позначити все прочитаним"
+msgstr "Усе прочитано"
 
 #: app/templates/user/notifications.html:23
 msgid "Filter notifications"
 msgstr "Фільтрувати сповіщення"
 
 #: app/templates/user/notifications.html:25
-#, fuzzy
 msgid "Unread"
-msgstr "Відхилено"
+msgstr "Непрочитане"
 
 #: app/templates/user/notifications.html:53
 msgid "No notifications to show."
@@ -10357,9 +10344,8 @@ msgid "Font"
 msgstr "Шрифт"
 
 #: app/user/forms.py:116
-#, fuzzy
 msgid "Allow community themes"
-msgstr "Усі спільноти"
+msgstr "Власне оформлення спільнот"
 
 #: app/user/forms.py:119
 msgid "Code syntax highlighting color scheme"
@@ -10374,33 +10360,28 @@ msgid "Accept private messages from"
 msgstr "Звідки приймати приватні повідомлення"
 
 #: app/user/forms.py:128
-#, fuzzy
 msgid "Stop me from using PieFed after this many hours per day"
-msgstr "Застерігати при використанні PieFed стільки годин на день"
+msgstr "Зупиняти моє використання PieFed після стількох годин на день"
 
 #: app/user/forms.py:129
 msgid "When changes to this limit will be possible"
-msgstr ""
+msgstr "Коли стане можливо змінити це обмеження"
 
 #: app/user/forms.py:131
-#, fuzzy
 msgid "Anytime"
-msgstr "Увесь час"
+msgstr "Будь-коли"
 
 #: app/user/forms.py:132
-#, fuzzy
 msgid "In 1 day"
-msgstr "1 день"
+msgstr "Через 1 день"
 
 #: app/user/forms.py:133
-#, fuzzy
 msgid "In 1 month"
-msgstr "1 місяць"
+msgstr "Через 1 місяць"
 
 #: app/user/forms.py:134
-#, fuzzy
 msgid "In 2 months"
-msgstr "2 місяці"
+msgstr "Через 2 місяці"
 
 #: app/user/forms.py:139 app/user/forms.py:215
 msgid "Save settings"
@@ -10653,7 +10634,7 @@ msgstr "Українська"
 #: app/user/routes.py:626
 #, python-format
 msgid "You cannot change the daily usage limit until %(date)s"
-msgstr ""
+msgstr "Обмеження щоденного використання стане можна змінити %(date)s"
 
 #: app/user/routes.py:722
 #, python-format
@@ -10910,4 +10891,3 @@ msgstr "Внесок скасовано."
 
 #~ msgid "1 = terrible, 3 = ok, 5 = best ever"
 #~ msgstr "1 = жах, 3 = норм, 5 = ліпше нікуди"
-

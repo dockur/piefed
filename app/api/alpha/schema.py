@@ -204,6 +204,7 @@ class LocalUser(DefaultSchema):
     show_nsfw = fields.Boolean(required=True, metadata={"description": "True for any visibility option other than Hide"})
     show_read_posts = fields.Boolean(required=True)
     show_scores = fields.Boolean(required=True)
+    manually_approves_followers = fields.Boolean()
 
 
 class LocalUserView(DefaultSchema):
@@ -2059,3 +2060,19 @@ class CaptchaFields(DefaultSchema):
 
 class FetchCaptchaResponse(DefaultSchema):
     ok = fields.List(fields.Nested(CaptchaFields))
+
+
+class UserFollowRequest(DefaultSchema):
+    user_id = fields.Integer(required=True)
+
+
+class UserFollowResponse(DefaultSchema):
+    ok = fields.String()
+
+
+class UserUnfollowRequest(DefaultSchema):
+    user_id = fields.Integer(required=True)
+
+
+class UserUnfollowResponse(DefaultSchema):
+    ok = fields.String()

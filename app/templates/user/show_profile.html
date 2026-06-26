@@ -189,6 +189,16 @@
           <li class="nav-item">
             <a href="#comments_tab" class="nav-link {{ 'active' if replies_prev_url is not none }}" id="comments-pill" data-bs-toggle="pill" role="tab">{{ _('Comments') }}</a>
           </li>
+          {% if len(following) %}
+              <li class="nav-item">
+                <a href="#following_tab" class="nav-link" id="following-pill" data-bs-toggle="pill" role="tab">{{ _('Following') }} ({{ len(following) }})</a>
+              </li>
+          {% endif %}
+          {% if len(followers) %}
+              <li class="nav-item">
+                <a href="#followers_tab" class="nav-link" id="followers-pill" data-bs-toggle="pill" role="tab">{{ _('Followers') }} ({{ len(followers) }})</a>
+              </li>
+          {% endif %}
         </ul>
         <div class="tab-content">
           {% if overview_items %}
@@ -299,6 +309,37 @@
                 {% endfor %}
             </ul>
           {% endif %}
+          {% if len(following) %}
+            <div class="tab-pane border-0 " id="following_tab" role="tabpanel" aria-labelled-by="post-pill" aria-labelledby="following-pill">
+                <h4 class="mt-2">{{ _('Following') }}</h4>
+                <ul class="list-group list-group-flush">
+                    {% for follow in following -%}
+                    <li class="list-group-item d-flex align-items-center">
+                        {{ render_username(follow) }}
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.get_id() == user.id -%}
+                                <a href="#" class="btn btn-primary btn-sm ms-auto" hx-post="{{ url_for('user.user_unfollow', actor=follow.link()) }}" hx-trigger="click throttle:1s" hx-swap="outerHTML" rel="nofollow">{{ _('Unfollow') }}</a>
+                            {% else %}
+                                {# todo: display follow or unfollow based on current user's existing follows #}
+                            {% endif -%}
+                        {% endif -%}
+                    </li>
+                    {%- endfor -%}
+                </ul>
+            </div>
+          {% endif %}
+          {% if len(followers) %}
+            <div class="tab-pane border-0 " id="followers_tab" role="tabpanel" aria-labelled-by="post-pill" aria-labelledby="followers-pill">
+                <h4 class="mt-2">{{ _('Followers') }}</h4>
+                <ul class="list-group list-group-flush">
+                    {% for user in followers -%}
+                    <li class="list-group-item">
+                        {{ render_username(user) }}
+                    </li>
+                    {%- endfor -%}
+                </ul>
+            </div>
+          {% endif %}
         </div>
     </main>
 
@@ -355,6 +396,19 @@
                                 <div class="col-4">
                                     <a class="w-100 btn btn-primary" href="/u/{{ user.link() }}/ban">{{ _('Ban') }}</a>
                                 </div>
+                                {% if bot_challenge is none %}
+                                    {% if not user.bot and not user.bot_override %}
+                                    <div class="col-4">
+                                        <a class="w-100 btn btn-primary confirm_first send_post" href="#" data-url="/u/{{ user.link() }}/bot_challenge">{{ _('Ask if bot') }}</a>
+                                    </div>
+                                    {% endif %}
+                                {% else %}
+                                    {% if bot_challenge.is_a_bot is none %}
+                                        {{ _('Bot challenge result pending') }}
+                                    {% elif bot_challenge.is_a_bot is false %}
+                                        {{ _('Not a bot') }}
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     </div>

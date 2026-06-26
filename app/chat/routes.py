@@ -20,6 +20,8 @@ from app.utils import render_template, login_required, trustworthy_account_requi
 def chat_home(conversation_id=None):
     form = AddReply()
     if form.validate_on_submit():
+        if current_user.banned or not current_user.verified or not current_user.can_send_pm:
+            return redirect(url_for('chat.denied'))
         send_message(form.message.data, conversation_id)
         return redirect(url_for('chat.chat_home', conversation_id=conversation_id, _anchor='message'))
     else:
@@ -72,7 +74,7 @@ def chat_home(conversation_id=None):
 def new_message(to):
     recipient = User.query.get_or_404(to)
 
-    if not current_user.can_send_pm(recipient):
+    if not current_user.can_send_pm_to(recipient):
         return redirect(url_for('chat.denied'))
     
     if recipient.has_blocked_user(current_user.id) or current_user.has_blocked_user(recipient.id):

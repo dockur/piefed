@@ -43,7 +43,7 @@ from app.utils import render_template, get_setting, request_etag_matches, return
     num_topics, referrer, block_honey_pot, user_pronouns, get_instance_stickies, \
     community_membership_private, favorite_communities
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
-    Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage, BannedInstances
+    Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage, BannedInstances, BotChallenge
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap, login_with_ldap
 
 
@@ -1237,6 +1237,23 @@ def content_warning():
     resp.headers.set('Vary', 'Accept, Cookie, Accept-Language')
     resp.headers.set('Cache-Control', 'private, max-age=1, must-revalidate')
     return resp
+
+
+@bp.route('/bot_challenge/<uuid>')
+@limiter.limit("20 per 1 minutes")
+def bot_challenge_result(uuid):
+    challenge = BotChallenge.query.filter(BotChallenge.uuid == uuid).first()
+    if challenge:
+        if challenge.is_a_bot is True:
+            return render_template('generic_message.html', title=_('Sorry'),
+                                   message=_("You took too long to respond so your account has been flagged as a bot."))
+        else:
+            challenge.is_a_bot = False
+            db.session.commit()
+            return render_template('generic_message.html', title=_('Thanks!'),
+                                   message=_("You have confirmed that your account is operated by a human."))
+    else:
+        abort(404)
 
 
 @bp.route('/my-year-in-review/<year>')

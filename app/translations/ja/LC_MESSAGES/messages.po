@@ -1,18 +1,18 @@
-
 msgid ""
 msgstr ""
-"Project-Id-Version:  piefed\n"
+"Project-Id-Version: piefed\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-04-05 10:54+1200\n"
-"PO-Revision-Date: 2026-04-02 13:47+0000\n"
+"PO-Revision-Date: 2026-06-16 20:22+0000\n"
 "Last-Translator: 鴉河雛 <takeuchinomori@gmail.com>\n"
+"Language-Team: Japanese <http://translate.piefed.social/projects/piefed/"
+"main-web-app/ja/>\n"
 "Language: ja\n"
-"Language-Team: Japanese <http://translate.piefed.social/projects/piefed"
-"/main-web-app/ja/>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.10.4\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: app/__init__.py:54
@@ -2340,7 +2340,7 @@ msgstr "未来の日付を設定してください。"
 
 #: app/community/forms.py:280
 msgid "Alt text (for links to images)"
-msgstr "代替テキスト(リンクのイメージ)"
+msgstr "代替テキスト(リンク先の概要)"
 
 #: app/community/forms.py:284 app/community/forms.py:288
 #: app/community/forms.py:397 app/community/forms.py:401
@@ -11021,4 +11021,3 @@ msgstr "寄付がキャンセルされました。"
 
 #~ msgid "1 = terrible, 3 = ok, 5 = best ever"
 #~ msgstr "1 = 最悪、3 = 普通、5 = 最高"
-

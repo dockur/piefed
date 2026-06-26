@@ -51,7 +51,7 @@ Disallow: /
 User-agent: Turnitin
 Disallow: /
 
-User-agent: Amazonbot
+User-agent: AmazonBot
 Disallow: /
 
 User-agent: barkrowler

@@ -14,7 +14,7 @@ from app.activitypub.util import find_actor_or_create, find_language_or_create, 
 from app.constants import NOTIF_UNBAN, SRC_WEB
 from app.models import Notification, SendQueue, CommunityBan, CommunityMember, User, Community, Post, PostReply, \
     DefederationSubscription, Instance, ActivityPubLog, InstanceRole, utcnow, InstanceChooser, \
-    InstanceBan, Emoji, RevokedToken
+    InstanceBan, Emoji, RevokedToken, BotChallenge
 from app.shared.post import delete_post
 from app.utils import get_task_session, download_defeds, instance_banned, get_request_instance, get_request, \
     shorten_string, patch_db_session, archive_post, get_setting, set_setting, communities_banned_from_all_users, \
@@ -1158,3 +1158,24 @@ def clean_up_tmp():
                         os.remove(file_path)
                     except Exception:
                         pass
+
+
+def pwn_bots():
+    """ Everyone who has not responded to a bot challenge within 24h is assumed to be a bot"""
+    session = get_task_session()
+    cut_off = utcnow() - timedelta(days=1)
+    try:
+        for expired_challenge in BotChallenge.query.filter(BotChallenge.sent_at < cut_off, BotChallenge.is_a_bot == None).all():
+            session.execute(text('UPDATE "user" SET bot = true, bot_override = true, suppress_crossposts = true WHERE id = :user_id'), {
+                'user_id': expired_challenge.user_id
+            })
+            session.execute(text('UPDATE "bot_challenge" SET is_a_bot = true WHERE id = :id'),
+                            {'id': expired_challenge.id})
+        session.commit()
+
+    except Exception:
+        session.rollback()
+        raise
+
+    finally:
+        session.close()

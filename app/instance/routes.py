@@ -12,7 +12,7 @@ from app.models import Instance, User, Post, read_posts, AllowedInstances, Banne
 from app.shared.site import block_remote_instance, unblock_remote_instance
 from app.utils import render_template, blocked_domains, \
     blocked_or_banned_instances, blocked_communities, blocked_users, user_filters_home, recently_upvoted_posts, \
-    recently_downvoted_posts, reported_posts, login_required, moderating_communities_ids
+    recently_downvoted_posts, reported_posts, login_required, moderating_communities_ids, following_user_ids
 
 
 @bp.route('/instances', methods=['GET'])
@@ -143,7 +143,7 @@ def instance_people(instance_domain):
                        instance_domain=instance_domain) if people.has_prev and page != 1 else None
 
     return render_template('instance/people.html', people=people, instance=instance, next_url=next_url,
-                           prev_url=prev_url,
+                           prev_url=prev_url, currently_following=following_user_ids(current_user.get_id()),
                            title=_('People from %(instance)s', instance=instance.domain),
                            )
 

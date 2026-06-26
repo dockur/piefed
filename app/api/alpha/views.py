@@ -453,7 +453,8 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
                     "federate_votes": not user.vote_privately == True,
                     "feed_auto_follow": user.feed_auto_follow,
                     "feed_auto_leave": user.feed_auto_leave,
-                    "ai_visibility": ai_visibility_options[user.hide_gen_ai]
+                    "ai_visibility": ai_visibility_options[user.hide_gen_ai],
+                    "manually_approves_followers": user.ap_manually_approves_followers
                 },
                 "person": {
                     "id": user.id,

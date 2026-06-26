@@ -195,13 +195,11 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
                                       Post.community_id.not_in(blocked_community_ids),
                                       or_(Post.domain_id == None, Post.domain_id.not_in(blocked_domain_ids)),
                                       Post.instance_id.not_in(blocked_instance_ids)). \
-                join(Community, Community.id == Post.community_id).filter(Community.show_all == True,
-                                                                          Community.name == name,
+                join(Community, Community.id == Post.community_id).filter(Community.name == name,
                                                                           Community.ap_domain == ap_domain,
                                                                           Community.instance_id.not_in(
                                                                               blocked_instance_ids))
-            
-            post_query_criteria.append('show_all is true')
+
             post_query_criteria.append('community_name = :community_name')
             post_query_criteria.append('ap_domain = :ap_domain')
             post_query_parameters.update({
@@ -751,8 +749,7 @@ def get_post_list2(auth, data, user_id=None, search_type='Posts') -> dict:
                                       Post.community_id.not_in(blocked_community_ids),
                                       or_(Post.domain_id == None, Post.domain_id.not_in(blocked_domain_ids)),
                                       Post.instance_id.not_in(blocked_instance_ids)). \
-                join(Community, Community.id == Post.community_id).filter(Community.show_all == True,
-                                                                          Community.name == name,
+                join(Community, Community.id == Post.community_id).filter(Community.name == name,
                                                                           Community.ap_domain == ap_domain,
                                                                           Community.instance_id.not_in(
                                                                               blocked_instance_ids))
