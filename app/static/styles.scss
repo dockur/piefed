@@ -1285,11 +1285,6 @@ details {
     vertical-align: bottom;
     object-fit: cover;
   }
-
-  .text-muted {
-    font-size: 14px; /* will be overwritten by rem if browser supports it */
-    font-size: var(--font-size-14);
-  }
 }
 
 .comments > .comment {
@@ -1895,6 +1890,11 @@ a.unread, div.unread {
 
     .author_link {
       line-height: var(--spacing-32);
+    }
+
+    .text-muted {
+      font-size: 14px; /* will be overwritten by rem if browser supports it */
+      font-size: var(--font-size-14);
     }
   }
 }

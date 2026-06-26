@@ -61,7 +61,7 @@
 
     <aside id="side_pane" class="col-12 col-lg-4 side_pane" role="complementary">
         {% if new_communities and len(new_communities) > 0 -%}
-        <div class="card mb-3">
+        <div id="new_communities_card" class="card mb-3">
             <div class="card-header">
                  <h2>{{ _('New communities') }}</h2>
             </div>
@@ -78,7 +78,7 @@
         </div>
         {% endif -%}
 
-        <div class="card">
+        <div id="active_communities_card" class="card">
             <div class="card-header">
                  <h2>{{ _('Active communities') }}</h2>
             </div>
@@ -99,7 +99,7 @@
         </div>
 
         {% if upcoming_events -%}
-        <div class="card mt-3" id="upcoming_events">
+        <div id="upcoming_events_card" class="card mt-3" id="upcoming_events">
             <div class="card-header">
                 <h2><span class="fe fe-event"></span> {{ _('Upcoming events') }}</h2>
             </div>
@@ -116,7 +116,7 @@
         </div>
         {% endif -%}
 
-        <div class="card mt-3">
+        <div id="about_card" class="card mt-3">
             <div class="card-header">
                  <h2>{{ _('About %(site_name)s', site_name=g.site.name) }}</h2>
             </div>
@@ -156,7 +156,7 @@
         </div>
 
         {% if new_instances and len(new_instances) > 0 -%}
-        <div class="card mb-3 mt-3">
+        <div id="new_instances_card" class="card mb-3 mt-3">
             <div class="card-header">
                  <h2>{{ _('New instances') }}</h2>
             </div>
