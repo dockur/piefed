@@ -19,6 +19,7 @@ body.compact-min {
     .post_teaser_image_preview {
       img {
         max-height: 170px;
+        max-height: calc(var(--spacing-16) * 10.625); /* 170px */
         width: auto;
         min-width: inherit;
       }
