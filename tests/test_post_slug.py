@@ -28,6 +28,7 @@ def test_generate_slug_basic(app):
         # Create a mock community
         community = Mock()
         community.name = "testcommunity"
+        community.link.return_value = "testcommunity"
         community.post_url_type = None
 
         # Create a mock post
@@ -71,6 +72,7 @@ def test_generate_slug_with_empty_string_slug(app):
     with app.app_context():
         community = Mock()
         community.name = "testcommunity"
+        community.link.return_value = "testcommunity"
         community.post_url_type = None
 
         post = Post()
@@ -90,6 +92,7 @@ def test_generate_slug_with_special_characters(app):
     with app.app_context():
         community = Mock()
         community.name = "testcommunity"
+        community.link.return_value = "testcommunity"
         community.post_url_type = None
 
         post = Post()
@@ -150,14 +153,15 @@ def test_generate_ap_id_basic(app):
             post.generate_ap_id(community)
 
         # Verify the AP ID was generated correctly
+        server_name = app.config["SERVER_NAME"]
         assert post.ap_id is not None
         assert post.ap_id.startswith("https://")
-        assert "/c/testcommunity/p/123/" in post.ap_id
+        assert f"/c/testcommunity@{server_name}/p/123/" in post.ap_id
         assert "this-is-a-test-post" in post.ap_id
 
         # Verify the slug was also set
         assert post.slug is not None
-        assert post.slug.startswith("/c/testcommunity/p/123/")
+        assert post.slug.startswith(f"/c/testcommunity@{server_name}/p/123/")
         assert "this-is-a-test-post" in post.slug
 
 
@@ -197,9 +201,10 @@ def test_generate_ap_id_with_empty_string(app):
         with patch.object(Post, 'get_by_ap_id', return_value=None):
             post.generate_ap_id(community)
 
+        server_name = app.config["SERVER_NAME"]
         assert post.ap_id != ""
         assert post.ap_id.startswith("https://")
-        assert "/c/testcommunity/p/222/" in post.ap_id
+        assert f"/c/testcommunity@{server_name}/p/222/" in post.ap_id
 
 
 def test_generate_ap_id_with_length_ten_string(app):
