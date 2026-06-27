@@ -217,8 +217,9 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
   --font-size-18: 1.125rem;
   --font-size-20: 1.25rem;
   --font-size-24: 1.5rem;
-  --font-size-28: 1.75;
+  --font-size-28: 1.75rem;
   --font-size-30: 1.875rem;
+  --font-size-31: 1.95rem;
   --font-size-32: 2rem;
   --font-size-40: 2.5rem;
   --font-size-52: 3.25rem;
@@ -3276,14 +3277,14 @@ form h5 {
 
 @media (min-width: 992px) {
   .h1, h1 {
-    font-size: var(--font-size-32);
-    line-height: 1.3;
+    font-size: var(--font-size-31);
+    line-height: 1.25;
   }
 }
 
 @media (min-width: 992px) {
   .h2, h2 {
-    font-size: var(--font-size-30);
+    font-size: var(--font-size-28);
   }
 }
 

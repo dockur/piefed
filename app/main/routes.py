@@ -180,13 +180,17 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
 
     rss_token = f'?token={current_user.rss_token}' if current_user.is_authenticated else ''
 
-    rss_feed = [
-        (_('Local posts'), f'index/feed/local{rss_token}'),
-        (_('Posts from popular communities'), f'index/feed/popular{rss_token}'),
-        (_('All posts'), f'index/feed/all{rss_token}'),
-    ]
-    if current_user.is_authenticated:
-        rss_feed.append((_('Posts from joined communities'), f'index/feed/subscribed{rss_token}'))
+    if current_user.is_anonymous:
+        rss_feed = [
+            (_('Local posts'), f'index/feed/local'),
+        ]
+    else:
+        rss_feed = [
+            (_('Posts from joined communities'), f'index/feed/subscribed{rss_token}'),
+            (_('Local posts'), f'index/feed/local{rss_token}'),
+            (_('Posts from popular communities'), f'index/feed/popular{rss_token}'),
+            (_('All posts'), f'index/feed/all{rss_token}'),
+        ]
 
     resp = make_response(render_template('index.html', posts=posts, active_communities=active_communities,
                            new_communities=new_communities, upcoming_events=upcoming_events,

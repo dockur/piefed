@@ -2686,7 +2686,7 @@ form {
 .h1, h1 {
   @include breakpoint(tablet) {
     font-size: $h1;
-    line-height: 1.3;
+    line-height: 1.25;
   }
 }
 

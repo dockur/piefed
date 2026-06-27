@@ -9,8 +9,9 @@
     --font-size-18: 1.125rem; // 18px, emoji font size styles.scss, post_teaser_body h3
     --font-size-20: 1.25rem; // 20px, communities_menu .dropdown-header, .card-title, .mobilenav .fe, .fe-answer, .fe-unanswer
     --font-size-24: 1.5rem; // 24px, equivalent to "x-large" named font size, .missing_thumbnail, .emoji-picker .emoji, .side-pane h2 _compact
-    --font-size-28: 1.75; // 28px, fe::before 
+    --font-size-28: 1.75rem; // 28px, fe::before
     --font-size-30: 1.875rem; // 30px, line height in _compact
+    --font-size-31: 1.95rem; // 31px
     --font-size-32: 2rem; // 32px
     --font-size-40: 2.5rem; // 40px, fe-external-noimg in _typography
     --font-size-52: 3.25rem; // 52px, fe-discussion, fe-poll, fe-link
@@ -21,8 +22,8 @@
 }
 
 // values in styles.scss
-$h1: var(--font-size-32);
-$h2: var(--font-size-30);
+$h1: var(--font-size-31);
+$h2: var(--font-size-28);
 $h3: var(--font-size-24);
 $h3post: var(--font-size-18);
 $h4: var(--font-size-20);
