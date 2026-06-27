@@ -10,7 +10,7 @@
             <div class="col mx-auto">
                 <div class="card mt-5">
                     <div class="card-body p-6">
-                        <div class="card-title">{{ _('Retrieve Remote Post') }}</div>
+                        <h1 class="card-title">{{ _('Retrieve Remote Post') }}</h1>
                         {% if community %}
                             <p>{{ _('Enter the full URL of the post submitted to %(community_name)s', community_name=community.ap_id) }}</p>
                         {% else %}
@@ -27,7 +27,7 @@
                 <div class="col mx-auto">
                     <div class="card mt-5">
                         <div class="card-body p-6">
-                            <div class="card-title">{{ _('Found a post:') }}</div>
+                            <h1 class="card-title">{{ _('Found a post:') }}</h1>
                             <div class="card-body">
                                 <p>
                                     {% if new_post.slug %}

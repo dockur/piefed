@@ -11,7 +11,7 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Report conversation with "%(member_names)s"', member_names=conversation.member_names(current_user.id)) }}</div>
+                    <h1 class="card-title">{{ _('Report conversation with "%(member_names)s"', member_names=conversation.member_names(current_user.id)) }}</h1>
                     <div class="card-body">
                         {{ render_form(form) }}
                     </div>

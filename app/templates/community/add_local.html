@@ -10,7 +10,7 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Create community') }}</div>
+                    <h1 class="card-title">{{ _('Create community') }}</h1>
                     <form method="post" enctype="multipart/form-data" id="add_local_community_form" role="form">
                         {{ form.csrf_token() }}
                         {{ render_field(form.community_name) }}

@@ -10,7 +10,7 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Copy Feed') }}</div>
+                    <h1 class="card-title">{{ _('Copy Feed') }}</h1>
                     <form method="post" enctype="multipart/form-data" id="new_feed_form" role="form">
                         {{ form.csrf_token() }}
                         {{ render_field(form.title) }}

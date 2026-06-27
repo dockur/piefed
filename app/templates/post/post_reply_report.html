@@ -10,8 +10,8 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Report comment on "%(post_title)s" by %(reply_name)s',
-                        post_title=post.title, reply_name=post_reply.author.link()) }}</div>
+                    <h1 class="card-title">{{ _('Report comment on "%(post_title)s" by %(reply_name)s',
+                        post_title=post.title, reply_name=post_reply.author.link()) }}</h1>
                     <div class="card-body">
                         {{ render_form(form) }}
                     </div>

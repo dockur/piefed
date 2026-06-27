@@ -10,7 +10,7 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Report "%(user_name)s"', user_name=user.display_name()) }}</div>
+                    <h1 class="card-title">{{ _('Report "%(user_name)s"', user_name=user.display_name()) }}</h1>
                     <div class="card-body">
                         {{ render_form(form) }}
                     </div>

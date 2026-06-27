@@ -10,7 +10,7 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Delete "%(community_title)s"', community_title=community.title) }}</div>
+                    <h1 class="card-title">{{ _('Delete "%(community_title)s"', community_title=community.title) }}</h1>
                     <div class="card-body">
                         <p class="card-text">{{ _('Are you sure you want to delete this community? This is irreversible and will delete all posts and comments associated with it.') }}</p>
                         {{ render_form(form) }}

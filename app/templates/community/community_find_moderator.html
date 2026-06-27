@@ -11,7 +11,7 @@
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6">
-                    <div class="card-title">{{ _('Add moderator to %(community)s', community=community.display_name()) }}</div>
+                    <h1 class="card-title">{{ _('Add moderator to %(community)s', community=community.display_name()) }}</h1>
                     {{ render_form(form) }}
                 </div>
             </div>
@@ -23,7 +23,7 @@
                 <div class="card mt-5">
                     <div class="card-body p-6">
                         {% if potential_moderators -%}
-                            <div class="card-title">{{ _('Found some people:') }}</div>
+                            <h1 class="card-title">{{ _('Found some people:') }}</h1>
                                 <table class="table table-striped">
                                     {% for user in potential_moderators -%}
                                         <tr>
@@ -40,7 +40,7 @@
                                 </table>
                             </div>
                         {% else -%}
-                            <div class="card-title">{{ _('No people found') }}</div>
+                            <h1 class="card-title">{{ _('No people found') }}</h1>
                         {% endif -%}
                     </div>
                 </div>
