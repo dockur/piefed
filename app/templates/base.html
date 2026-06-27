@@ -83,7 +83,13 @@
             <meta property="og:image" content="{{ g.site.logo if g.site.logo else '/static/images/piefed_logo_full_t_300x300.svg' }}" />
         {% endif -%}
         {% if rss_feed -%}
-            <link rel="alternate" type="application/rss+xml" title="{{ rss_feed_name }}" href="{{ rss_feed }}" />
+            {% if rss_feed is string -%}
+                <link rel="alternate" type="application/rss+xml" title="{{ rss_feed_name }}" href="{{ rss_feed }}" />
+            {% else -%}
+                {% for rss_name, rss_href in rss_feed -%}
+                    <link rel="alternate" type="application/rss+xml" title="{{ rss_name }}" href="{{ rss_href }}" />
+                {% endfor -%}
+            {% endif -%}
         {% endif -%}
         {% if noindex -%}
             <meta name="robots" content="noindex">

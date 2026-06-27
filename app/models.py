@@ -1031,6 +1031,7 @@ class User(UserMixin, db.Model):
     page_length = db.Column(db.Integer)
     num_following = db.Column(db.Integer, default=0)    # number of users being followed, not number of communities
     num_followers = db.Column(db.Integer, default=0)    # number of users that follow this user
+    rss_token = db.Column(db.String(20), index=True)
 
     avatar = db.relationship('File', lazy='joined', foreign_keys=[avatar_id], single_parent=True, cascade="all, delete-orphan")
     cover = db.relationship('File', lazy='joined', foreign_keys=[cover_id], single_parent=True, cascade="all, delete-orphan")

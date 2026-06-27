@@ -1,10 +1,11 @@
 import os.path
 import json
 import time
-from datetime import timedelta, datetime
+from datetime import timedelta, timezone
 from random import randint
 
 import flask
+from feedgen.feed import FeedGenerator
 from markupsafe import Markup
 from pyld import jsonld
 from sqlalchemy import or_, and_, func
@@ -41,7 +42,7 @@ from app.utils import render_template, get_setting, request_etag_matches, return
     retrieve_image_hash, possible_communities, remove_tracking_from_link, reported_posts, \
     moderating_communities_ids, user_notes, login_required, safe_order_by, filtered_out_communities, \
     num_topics, referrer, block_honey_pot, user_pronouns, get_instance_stickies, \
-    community_membership_private, favorite_communities
+    community_membership_private, favorite_communities, mimetype_from_url
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
     Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage, BannedInstances, BotChallenge
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap, login_with_ldap
@@ -100,6 +101,10 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
             private_communities = tuple([0, 0])
         else:
             private_communities = tuple(pc + [0])
+
+        if current_user.rss_token is None:  # set rss token to something so a private rss feed can be generated
+            current_user.rss_token = gibberish(20)
+            db.session.commit()
     else:
         modded_communities = []
         private_communities = ()
@@ -173,6 +178,16 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
     
     user_id = current_user.get_id()
 
+    rss_token = f'?token={current_user.rss_token}' if current_user.is_authenticated else ''
+
+    rss_feed = [
+        (_('Local posts'), f'index/feed/local{rss_token}'),
+        (_('Posts from popular communities'), f'index/feed/popular{rss_token}'),
+        (_('All posts'), f'index/feed/all{rss_token}'),
+    ]
+    if current_user.is_authenticated:
+        rss_feed.append((_('Posts from joined communities'), f'index/feed/subscribed{rss_token}'))
+
     resp = make_response(render_template('index.html', posts=posts, active_communities=active_communities,
                            new_communities=new_communities, upcoming_events=upcoming_events,
                            show_post_community=True, low_bandwidth=low_bandwidth, recently_upvoted=recently_upvoted,
@@ -192,7 +207,8 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
                            inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
                            enable_mod_filter=enable_mod_filter,
                            has_topics=num_topics() > 0, time=time,
-                           user_pronouns=user_pronouns()
+                           user_pronouns=user_pronouns(),
+                           rss_feed=rss_feed
                            ))
     if current_user.is_anonymous:
         resp.headers.set('ETag', f"{sort}_{view_filter}_{hash(str(g.site.last_active))}")
@@ -1168,6 +1184,111 @@ def explore():
     return render_template('explore.html', topics=topics, menu_instance_feeds=menu_instance_feeds(),
                            menu_my_feeds=menu_my_feeds(current_user.id) if current_user.is_authenticated else None,
                            menu_subscribed_feeds=menu_subscribed_feeds(current_user.id) if current_user.is_authenticated else None,)
+
+
+# RSS feed of the community
+@bp.route('/index/feed', methods=['GET'])
+@bp.route('/index/feed/<feed_type>', methods=['GET'])
+#@cache.cached(timeout=600, query_string=True)
+def index_rss(feed_type=None):
+
+    # If nothing has changed since their last visit, return HTTP 304
+    current_etag = f"home_{hash(g.site.last_active)}"
+    if request_etag_matches(current_etag):
+        return return_304(current_etag, 'application/rss+xml')
+
+    if g.site.private_instance:
+        abort(404)
+
+    current_user_is_authenticated = False
+    user = None
+    if rss_token := request.args.get('token'):
+        user = User.query.filter(User.rss_token == rss_token.strip()).first()
+        if user:
+            current_user_is_authenticated = True
+
+    community_ids = [-1]
+    low_quality_filter = 'AND c.low_quality is false' if current_user_is_authenticated and user.hide_low_quality else ''
+    if current_user_is_authenticated:
+        pc = community_membership_private(user.id)
+        if len(pc) == 0:  # tuples must have at least 2 elements, I think?
+            private_communities = tuple([0, 0])
+        else:
+            private_communities = tuple(pc + [0])
+    else:
+        private_communities = ()
+    if len(private_communities) == 0:
+        private_communities = tuple([0, 0])
+
+    if feed_type is None:
+        feed_type = 'local'
+
+    if feed_type == 'subscribed' and current_user_is_authenticated:
+        community_ids = db.session.execute(text(
+            'SELECT id FROM community as c INNER JOIN community_member as cm ON cm.community_id = c.id WHERE cm.is_banned is false AND cm.user_id = :user_id'),
+                                           {'user_id': current_user.id}).scalars()
+    elif feed_type == 'local' or not current_user_is_authenticated:
+        if not current_user_is_authenticated:
+            community_ids = db.session.execute(
+                text(f'SELECT id FROM community as c WHERE c.private is false and c.instance_id = 1 {low_quality_filter}')).scalars()
+        else:
+            community_ids = db.session.execute(
+                text(f'SELECT id FROM community as c WHERE (c.private is false OR c.id IN {private_communities}) AND c.instance_id = 1 {low_quality_filter}')).scalars()
+    elif feed_type == 'popular':
+        if not current_user_is_authenticated:
+            community_ids = db.session.execute(
+                text('SELECT id FROM community as c WHERE c.show_popular is true and c.private is false AND c.low_quality is false')).scalars()
+        else:
+            community_ids = db.session.execute(
+                text(f'SELECT id FROM community as c WHERE (c.private is false OR c.id IN {private_communities}) AND c.show_popular is true {low_quality_filter}')).scalars()
+    elif feed_type == 'all':
+        community_ids = [-1]  # Special value to indicate 'All'
+
+    community_ids = list(community_ids)
+
+    post_ids = get_deduped_post_ids(gibberish(15), community_ids, 'new',
+                                    include_following=feed_type == 'subscribed' and current_user_is_authenticated)
+    post_ids = paginate_post_ids(post_ids, 0, page_length=50)
+    posts = post_ids_to_models(post_ids, 'new')
+
+    description = shorten_string(g.site.description, 150) if g.site.description else None
+    og_image = g.site.logo if g.site.logo else None
+    fg = FeedGenerator()
+    fg.id(f"{current_app.config['SERVER_URL']}/{feed_type}{rss_token}")
+    fg.title(f'{g.site.name} - {feed_type.capitalize()}')
+    fg.link(href=f"{current_app.config['SERVER_URL']}", rel='alternate')
+    if og_image:
+        fg.logo(og_image)
+    else:
+        fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
+    if description:
+        fg.subtitle(description)
+    else:
+        fg.subtitle(' ')
+    fg.link(href=f"{current_app.config['SERVER_URL']}/feed", rel='self')
+    fg.language('en')
+
+    for post in posts:
+        fe = fg.add_entry()
+        fe.title(post.title)
+        if post.slug:
+            fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
+        else:
+            fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
+        if post.url:
+            type = mimetype_from_url(post.url)
+            if type and not type.startswith('text/'):
+                fe.enclosure(post.url, type=type)
+        fe.description(post.body_html)
+        fe.guid(post.profile_id(), permalink=True)
+        fe.author(name=post.author.user_name)
+        fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
+
+    response = make_response(fg.rss_str())
+    response.headers.set('Content-Type', 'application/rss+xml')
+    response.headers.add_header('ETag', f"home_{hash(g.site.last_active)}")
+    response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+    return response
 
 
 @bp.route('/r/random')
