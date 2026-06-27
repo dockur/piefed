@@ -122,6 +122,28 @@
                         {{ _('Options') }}
                     </button>
                     <ul class="dropdown-menu">
+                        {% if current_user.is_authenticated and community_membership(current_user, community) in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] -%}
+                            <li>
+                                <a class="dropdown-item" href="/community/{{ community.link() }}/unsubscribe" rel="nofollow">
+                                    {{ _('Leave') }}
+                                </a>
+                            </li>
+                        {% elif current_user.is_authenticated and community_membership(current_user, community) == SUBSCRIPTION_PENDING -%}
+                            <li>
+                                <a class="dropdown-item" href="/community/{{ community.link() }}/unsubscribe" rel="nofollow">
+                                    {{ _('Pending') }}
+                                </a>
+                            </li>
+                        {% else -%}
+                            {% if not community.instance.gone_forever %}
+                                <li>
+                                    <a class="dropdown-item" href="/community/{{ community.link() }}/subscribe" rel="nofollow">
+                                        {{ _('Join') }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endif -%}
+                        <div class="dropdown-divider"></div>
                         <form class="px-3 py-1">
                             <div class="mb-3">
                                 <label for="layout" class="form-label">
@@ -184,28 +206,6 @@
                                 {{ _('About community') }}
                             </a>
                         </li>
-                        <div class="dropdown-divider"></div>
-                        {% if current_user.is_authenticated and community_membership(current_user, community) in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] -%}
-                            <li>
-                                <a class="dropdown-item" href="/community/{{ community.link() }}/unsubscribe" rel="nofollow">
-                                    {{ _('Leave') }}
-                                </a>
-                            </li>
-                        {% elif current_user.is_authenticated and community_membership(current_user, community) == SUBSCRIPTION_PENDING -%}
-                            <li>
-                                <a class="dropdown-item" href="/community/{{ community.link() }}/unsubscribe" rel="nofollow">
-                                    {{ _('Pending') }}
-                                </a>
-                            </li>
-                        {% else -%}
-                            {% if not community.instance.gone_forever %}
-                                <li>
-                                    <a class="dropdown-item" href="/community/{{ community.link() }}/subscribe" rel="nofollow">
-                                        {{ _('Join') }}
-                                    </a>
-                                </li>
-                            {% endif %}
-                        {% endif -%}
                         {% if is_moderator or is_owner or is_admin -%}
                             <div class="dropdown-divider"></div>
                             <li>

@@ -1417,7 +1417,7 @@ form .mb-3.required > label:after {
   text-wrap: nowrap;
 }
 .communities_table tbody tr td {
-  padding: var(--spacing-8) var(--spacing-4);
+  padding: 0 var(--spacing-8);
   font-size: 12px; /* will be overwritten by rem if browser supports it */
   font-size: var(--font-size-12);
 }
@@ -3145,10 +3145,9 @@ form h5 {
 
 .communities_table tr td {
   vertical-align: middle;
-  padding-top: var(--spacing-8) var(--spacing-4);
 }
 .communities_table tr td:first-child {
-  padding-top: var(--spacing-8);
+  padding-top: var(--spacing-2);
 }
 
 .table tbody tr th a {
