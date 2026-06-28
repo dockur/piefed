@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-26 16:24+1200\n"
+"POT-Creation-Date: 2026-06-28 19:10+1200\n"
 "PO-Revision-Date: 2026-04-06 18:47+0000\n"
 "Last-Translator: Weblate Admin <rimu@rimu.geek.nz>\n"
 "Language: pl\n"
@@ -18,7 +18,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.12.1\n"
 
 #: app/__init__.py:54
 msgid "Please log in to access this page."
@@ -34,7 +34,7 @@ msgstr "Przypomnienie: %(title)s"
 msgid "Reminder: comment on %(title)s"
 msgstr "Przypomnienie: komentarz do %(title)s"
 
-#: app/cli.py:891 app/main/routes.py:766
+#: app/cli.py:891 app/main/routes.py:786
 msgid "[PieFed] You have unread notifications"
 msgstr "[PieFed] Masz nieprzeczytane powiadomienia"
 
@@ -43,7 +43,7 @@ msgstr "[PieFed] Masz nieprzeczytane powiadomienia"
 msgid "Replies to my post %(post_title)s"
 msgstr "Odpowiedzi na mój post %(post_title)s"
 
-#: app/cli.py:1092 app/models.py:2854 app/shared/reply.py:119
+#: app/cli.py:1092 app/models.py:2855 app/shared/reply.py:119
 #, python-format
 msgid "Replies to my comment on %(post_title)s"
 msgstr "Odpowiedzi na mój komentarz do %(post_title)s"
@@ -64,103 +64,103 @@ msgstr "[PieFed] Zweryfikuj swój adres email"
 msgid "Your application has been approved - welcome to PieFed"
 msgstr "Twoja rejestracja została zatwierdzona - witamy w PieFed"
 
-#: app/models.py:2773
+#: app/models.py:2774
 msgid "Comments are disabled on this post"
 msgstr "Komentarze zostały wyłączone dla tego posta"
 
-#: app/models.py:2776
+#: app/models.py:2777
 msgid "Banned from commenting"
 msgstr "Zablokowano możliwość komentowania"
 
-#: app/models.py:2806
+#: app/models.py:2807
 msgid "Blocked phrase in comment"
 msgstr "Użyto zakazanej frazy w komentarzu."
 
-#: app/models.py:2817
+#: app/models.py:2818
 msgid "Replier blocked"
 msgstr "Uzytkownik zablokowany"
 
-#: app/models.py:2820
+#: app/models.py:2821
 msgid "Duplicate reply"
 msgstr "Zduplikowana odpowiedź"
 
-#: app/models.py:2828
+#: app/models.py:2829
 msgid "Gif comment ignored"
 msgstr "Komentarz zawierający GIF zignorowany"
 
-#: app/models.py:2831
+#: app/models.py:2832
 msgid "Low quality reply"
 msgstr "Odpowiedź o niskiej jakości"
 
-#: app/models.py:3682
+#: app/models.py:3683
 msgid "Added moderator"
 msgstr "Dodano moderatora"
 
-#: app/models.py:3683
+#: app/models.py:3684
 msgid "Removed moderator"
 msgstr "Usunięto moderatora"
 
-#: app/models.py:3684
+#: app/models.py:3685
 msgid "Featured post"
 msgstr "Polecany post"
 
-#: app/models.py:3685
+#: app/models.py:3686
 msgid "Unfeatured post"
 msgstr "Niepolecany post"
 
-#: app/models.py:3686
+#: app/models.py:3687
 msgid "Deleted post"
 msgstr "Usunięto post"
 
-#: app/models.py:3687
+#: app/models.py:3688
 msgid "Un-deleted post"
 msgstr "Cofnięto usunięcie posta"
 
-#: app/models.py:3688
+#: app/models.py:3689
 msgid "Deleted comment"
 msgstr "Usunięto komentarz"
 
-#: app/models.py:3689
+#: app/models.py:3690
 msgid "Un-deleted comment"
 msgstr "Cofnięto usunięcie komentarza"
 
-#: app/models.py:3690
+#: app/models.py:3691
 msgid "Deleted community"
 msgstr "Usunięto społeczność"
 
-#: app/models.py:3691
+#: app/models.py:3692
 msgid "Deleted account"
 msgstr "Usunięto konto"
 
-#: app/models.py:3692
+#: app/models.py:3693
 msgid "Restored account"
 msgstr "Przywrócono konto"
 
-#: app/models.py:3693
+#: app/models.py:3694
 msgid "Banned account"
 msgstr "Zbanowano konto"
 
-#: app/models.py:3694
+#: app/models.py:3695
 msgid "Un-banned account"
 msgstr "Odbanowano konto"
 
-#: app/models.py:3695
+#: app/models.py:3696
 msgid "Lock post"
 msgstr "Zablokowano post"
 
-#: app/models.py:3696
+#: app/models.py:3697
 msgid "Un-lock post"
 msgstr "Odblokowano post"
 
-#: app/models.py:3697
+#: app/models.py:3698
 msgid "Lock comment"
 msgstr "Zablokowano komentarz"
 
-#: app/models.py:3698
+#: app/models.py:3699
 msgid "Un-lock comment"
 msgstr "Odblokowano komentarz"
 
-#: app/models.py:3699
+#: app/models.py:3700
 #, fuzzy
 msgid "Move post"
 msgstr "Czytaj post"
@@ -214,7 +214,7 @@ msgid "Chat"
 msgstr "Konwersacja"
 
 #: app/admin/forms.py:273 app/admin/forms.py:336 app/admin/routes.py:100
-#: app/templates/admin/permissions.html:22 app/templates/base.html:252
+#: app/templates/admin/permissions.html:22 app/templates/base.html:258
 #: app/templates/themes/dillo/base.html:143
 #: app/templates/user/show_profile.html:145
 #: app/templates/user/show_profile.html:146
@@ -337,7 +337,7 @@ msgid "Sidebar"
 msgstr "Panel boczny"
 
 #: app/admin/forms.py:21 app/templates/auth/instance_chooser.html:93
-#: app/templates/base.html:308 app/templates/instance/people.html:25
+#: app/templates/base.html:314 app/templates/instance/people.html:25
 #: app/templates/themes/dillo/base.html:184 app/templates/user/people.html:22
 msgid "About"
 msgstr "O nas"
@@ -875,7 +875,7 @@ msgid "Topic"
 msgstr "Tematyka"
 
 #: app/admin/forms.py:177 app/community/forms.py:120
-#: app/templates/community/_community_nav.html:132
+#: app/templates/community/_community_nav.html:154
 #: app/templates/community/_community_nav.html:363
 #: app/templates/community/_community_nav.html:493
 #: app/templates/feed/_feed_nav.html:125 app/templates/feed/_feed_nav.html:190
@@ -893,7 +893,7 @@ msgstr "Szeroki układ muru"
 #: app/admin/forms.py:180 app/community/forms.py:123
 #: app/templates/admin/communities.html:68
 #: app/templates/admin/communities.html:103
-#: app/templates/community/_community_nav.html:128
+#: app/templates/community/_community_nav.html:150
 #: app/templates/community/_community_nav.html:359
 #: app/templates/feed/_feed_nav.html:121
 msgid "Layout"
@@ -1343,7 +1343,7 @@ msgstr "%d z %d społeczności zostały wykluczone uwzględniając aktualny filt
 msgid "Results: %(results)s"
 msgstr "Wyniki: %(results)s"
 
-#: app/admin/routes.py:552
+#: app/admin/routes.py:555
 #, fuzzy, python-format
 msgid ""
 "Subscription process for %(communities_to_add)d of "
@@ -1365,7 +1365,7 @@ msgstr[2] ""
 msgid "Federation settings - preload"
 msgstr "Ustawienia federacji"
 
-#: app/admin/routes.py:875
+#: app/admin/routes.py:878
 #, fuzzy, python-format
 msgid ""
 "Based on current filters, the subscription process for "
@@ -1419,11 +1419,11 @@ msgstr "JSON aktywności"
 
 #: app/admin/routes.py:1204 app/community/routes.py:579
 #: app/community/routes.py:2015 app/community/routes.py:2067
-#: app/feed/forms.py:18 app/feed/forms.py:70 app/main/routes.py:409
+#: app/feed/forms.py:18 app/feed/forms.py:70 app/main/routes.py:429
 #: app/post/routes.py:224 app/post/routes.py:493 app/post/routes.py:2258
 #: app/templates/admin/_nav.html:9 app/templates/admin/_tabbed_nav.html:10
-#: app/templates/admin/instances.html:49 app/templates/base.html:186
-#: app/templates/base.html:198 app/templates/base.html:325
+#: app/templates/admin/instances.html:49 app/templates/base.html:192
+#: app/templates/base.html:204 app/templates/base.html:331
 #: app/templates/communities_menu.html:5
 #: app/templates/community/_community_nav.html:408
 #: app/templates/community/community_edit.html:14
@@ -1757,7 +1757,7 @@ msgstr ""
 msgid "Enter captcha code below"
 msgstr "Wpisz kod captcha"
 
-#: app/auth/forms.py:39 app/auth/util.py:361 app/templates/base.html:282
+#: app/auth/forms.py:39 app/auth/util.py:361 app/templates/base.html:288
 #: app/templates/themes/dillo/base.html:88
 msgid "Register"
 msgstr "Zarejestruj"
@@ -1880,7 +1880,7 @@ msgstr ""
 "Dołączyłeś do kilku społeczności związanych z tymi zainteresowaniami. "
 "Znajdź więcej w menu Tematów albo przeszukaj stronę główną."
 
-#: app/auth/onboarding.py:70 app/main/routes.py:262 app/main/routes.py:1302
+#: app/auth/onboarding.py:70 app/main/routes.py:282 app/main/routes.py:1427
 msgid ""
 "You did not choose any topics. Would you like to choose individual "
 "communities instead?"
@@ -1898,8 +1898,8 @@ msgstr ""
 msgid "Account under review"
 msgstr "Konto w trakcie weryfikacji"
 
-#: app/auth/routes.py:90 app/main/routes.py:1197 app/main/routes.py:1225
-#: app/main/routes.py:1248 app/templates/auth/permission_denied.html:12
+#: app/auth/routes.py:90 app/main/routes.py:1322 app/main/routes.py:1350
+#: app/main/routes.py:1373 app/templates/auth/permission_denied.html:12
 #: app/templates/chat/blocked.html:13 app/templates/chat/denied.html:14
 #: app/templates/topic/suggestion_denied.html:14
 msgid "Sorry"
@@ -2016,7 +2016,7 @@ msgstr "Wybacz, nie możez użyć tej nazwy użytkownika"
 msgid "Registration not allowed based on your referrer."
 msgstr "Rejestracja nie jest dozwolona ze względu na twoją stronę odsyłającą."
 
-#: app/auth/util.py:243
+#: app/auth/util.py:242
 #, python-format
 msgid "Your username contained special letters so it was changed to %(name)s."
 msgstr ""
@@ -2043,7 +2043,7 @@ msgstr "Niepoprawne hasło"
 msgid "Login failed"
 msgstr "Logowanie nie powiodło się"
 
-#: app/auth/util.py:522 app/templates/base.html:330
+#: app/auth/util.py:522 app/templates/base.html:336
 #: app/templates/user/edit_profile.html:28
 msgid "Login"
 msgstr "Zaloguj"
@@ -2060,7 +2060,7 @@ msgstr "Wpisz tutaj wiadomość..."
 msgid "Reply"
 msgstr "Odpowiedź"
 
-#: app/chat/forms.py:16 app/post/forms.py:29 app/templates/base.html:256
+#: app/chat/forms.py:16 app/post/forms.py:29 app/templates/base.html:262
 #: app/templates/themes/dillo/base.html:146 app/templates/user/user_ban.html:14
 #: app/user/forms.py:167
 msgid "Spam"
@@ -2355,8 +2355,8 @@ msgstr "Adres społeczności"
 #: app/templates/admin/instances.html:16 app/templates/admin/instances.html:17
 #: app/templates/admin/reports.html:32 app/templates/admin/users.html:19
 #: app/templates/admin/users.html:20
-#: app/templates/auth/instance_chooser.html:25 app/templates/base.html:279
-#: app/templates/base.html:326 app/templates/community/_community_nav.html:179
+#: app/templates/auth/instance_chooser.html:25 app/templates/base.html:285
+#: app/templates/base.html:332 app/templates/community/_community_nav.html:201
 #: app/templates/community/add_remote.html:14
 #: app/templates/community/community_moderate.html:34
 #: app/templates/community/community_moderate_subscribers.html:37
@@ -2844,7 +2844,7 @@ msgstr "Dodaj zdalną społeczność"
 msgid "This community is only visible to logged in users."
 msgstr "Ta społeczność jest widoczna tylko dla zalogowanych użytkowników."
 
-#: app/community/routes.py:336 app/post/routes.py:130
+#: app/community/routes.py:336 app/post/routes.py:131
 #, python-format
 msgid "You have been banned from this community until %(when)s."
 msgstr "Zostałeś zablokowany w tej społeczności do %(when)s."
@@ -2856,7 +2856,7 @@ msgstr "Zostałeś zablokowany w tej społeczności."
 #: app/community/routes.py:547 app/community/routes.py:1987
 #: app/community/routes.py:2039 app/instance/routes.py:214
 #: app/post/routes.py:193 app/post/routes.py:459 app/post/routes.py:2254
-#: app/templates/base.html:254 app/templates/base.html:321
+#: app/templates/base.html:260 app/templates/base.html:327
 #: app/templates/chat/conversation.html:36
 #: app/templates/community/community_edit.html:13
 #: app/templates/community/community_flair.html:13
@@ -2997,7 +2997,7 @@ msgstr ""
 "Społeczność musi mieć przynajmniej jednego właściciela. Wskaż innego "
 "właściciela przed usunięciem tego."
 
-#: app/community/routes.py:1514
+#: app/community/routes.py:1515
 #: app/templates/community/community_find_moderator.html:14
 #, python-format
 msgid "Add moderator to %(community)s"
@@ -3084,7 +3084,7 @@ msgstr "Zgłoszenie rozwiązane."
 msgid "Report ignored."
 msgstr "Zgłoszenie zignorowane."
 
-#: app/community/routes.py:2361
+#: app/community/routes.py:2362
 #, python-format
 msgid "Set your flair in %(community_name)s"
 msgstr "Ustaw swój styl w %(community_name)s"
@@ -3102,7 +3102,7 @@ msgstr "Styl dodany"
 msgid "Flair updated."
 msgstr "Styl zaktualizowany"
 
-#: app/community/routes.py:2426
+#: app/community/routes.py:2427
 #, python-format
 msgid "Edit %(flair_name)s in %(community_name)s"
 msgstr "Edytuj %(flair_name)s w %(community_name)s"
@@ -3402,7 +3402,7 @@ msgstr ""
 
 #: app/instance/routes.py:78 app/instance/routes.py:218
 #: app/templates/admin/_nav.html:27 app/templates/admin/_tabbed_nav.html:29
-#: app/templates/base.html:308 app/templates/instance/overview.html:14
+#: app/templates/base.html:314 app/templates/instance/overview.html:14
 #: app/templates/instance/people.html:15 app/templates/user/filters.html:83
 msgid "Instances"
 msgstr "Instancje"
@@ -3440,63 +3440,85 @@ msgstr "Społeczność żeby zapostować ten link"
 msgid "Next"
 msgstr "Następny"
 
-#: app/main/routes.py:214 app/templates/explore_menu.html:45
+#: app/main/routes.py:185 app/main/routes.py:190
+#, fuzzy
+msgid "Local posts"
+msgstr "Zablokowano post"
+
+#: app/main/routes.py:189 app/templates/_view_filter_nav.html:7
+#: app/templates/_view_filter_nav.html:20
+#: app/templates/themes/dillo/_view_filter_nav.html:4
+msgid "Posts from joined communities"
+msgstr "Posty z społeczności, do których dołączyłeś"
+
+#: app/main/routes.py:191 app/templates/_view_filter_nav.html:10
+#: app/templates/_view_filter_nav.html:24
+#: app/templates/themes/dillo/_view_filter_nav.html:11
+msgid "Posts from popular communities"
+msgstr "Posty z popularnych społeczności"
+
+#: app/main/routes.py:192
+#, fuzzy
+msgid "All posts"
+msgstr "Banuj posty"
+
+#: app/main/routes.py:234 app/templates/explore_menu.html:45
 #: app/templates/themes/dillo/base.html:73
 #: app/templates/themes/dillo/base.html:98 app/templates/topics_menu.html:9
 msgid "Browse by topic"
 msgstr "Przeglądaj według tematu"
 
-#: app/main/routes.py:493
+#: app/main/routes.py:513
 msgid "Moderation Log"
 msgstr "Log moderacji"
 
-#: app/main/routes.py:865
+#: app/main/routes.py:885
 #, python-format
 msgid "Failed to look up %(url)s"
 msgstr "Nie udało się sprawdzić %(url)s"
 
-#: app/main/routes.py:879
+#: app/main/routes.py:899
 msgid "Protocol handler"
 msgstr "Obsługa protokołów"
 
-#: app/main/routes.py:1014
+#: app/main/routes.py:1034
 msgid "Please click the link in your email inbox to verify your account."
 msgstr "Kliknij w link w mailu żeby zweryfikować konto"
 
-#: app/main/routes.py:1194
+#: app/main/routes.py:1319
 msgid "<a href=\"/r/random\">Try another random community</a>"
 msgstr ""
 
-#: app/main/routes.py:1197 app/main/routes.py:1225
+#: app/main/routes.py:1322 app/main/routes.py:1350
 #, fuzzy
 msgid "No communities found."
 msgstr "Znane społeczności"
 
-#: app/main/routes.py:1222
+#: app/main/routes.py:1347
 msgid "<a href=\"/r/randnsfw\">Try another random community</a>"
 msgstr ""
 
-#: app/main/routes.py:1236
+#: app/main/routes.py:1361
 msgid "Content warning"
 msgstr "Ostrzeżenie o zawartości"
 
-#: app/main/routes.py:1249
+#: app/main/routes.py:1374
 msgid "You took too long to respond so your account has been flagged as a bot."
 msgstr ""
 
-#: app/main/routes.py:1253
+#: app/main/routes.py:1378
 msgid "Thanks!"
 msgstr ""
 
-#: app/main/routes.py:1254
+#: app/main/routes.py:1379
 msgid "You have confirmed that your account is operated by a human."
 msgstr ""
 
-#: app/main/routes.py:1262
+#: app/main/routes.py:1387
 msgid "This page is intentionally left blank."
 msgstr ""
 
-#: app/main/routes.py:1262
+#: app/main/routes.py:1387
 msgid "We don't track you, so there's not much data to make graphs of."
 msgstr ""
 
@@ -3705,7 +3727,7 @@ msgstr "Przypomnienie ustawione na %(when)s"
 msgid "Creating a reminder about \"%(post_title)s\""
 msgstr "Tworzenie przypomnienia o \"%(post_title)s\""
 
-#: app/post/routes.py:1302
+#: app/post/routes.py:1303
 #, python-format
 msgid "Creating a reminder about comment by %(author)s on \"%(post_title)s\""
 msgstr ""
@@ -3987,7 +4009,7 @@ msgstr "Komentarz został zamknięty."
 msgid "Comment has been unlocked."
 msgstr "Komentarz został otwarty."
 
-#: app/shared/reply.py:515
+#: app/shared/reply.py:516
 #, python-format
 msgid "Your answer was chosen as an answer to %(post_title)s"
 msgstr "Twoja odpowiedź została wybrana jako odpowiedź do %(post_title)s"
@@ -4012,7 +4034,7 @@ msgstr "Usunięty użytkownik, był administratorem innej instancji."
 msgid "Purged user with role permissions."
 msgstr "Usunięto użytkownika z uprawnieniami."
 
-#: app/shared/user.py:171
+#: app/shared/user.py:172
 #, python-format
 msgid ""
 "%(actor)s has been banned, deleted and all their content deleted. This "
@@ -4257,8 +4279,8 @@ msgid "Rational Discourse Toolkit"
 msgstr "Narzędzia racjonalnego dyskursu"
 
 #: app/templates/_insert_image_dialog.html:4
+#: app/templates/community/_body_edit_preview.html:11
 #: app/templates/post/add_reply_inline.html:43 app/templates/post/post.html:119
-#: app/templates/post/post_edit.html:184
 #, fuzzy
 msgid "Insert image"
 msgstr "Obraz nagłówka"
@@ -4267,8 +4289,8 @@ msgstr "Obraz nagłówka"
 #: app/templates/auth/instance_chooser.html:78
 #: app/templates/auth/instance_chooser.html:132
 #: app/templates/auth/instance_chooser.html:144
-#: app/templates/auth/instance_chooser.html:160 app/templates/base.html:337
-#: app/templates/base.html:358
+#: app/templates/auth/instance_chooser.html:160 app/templates/base.html:343
+#: app/templates/base.html:364
 msgid "Close"
 msgstr "Zamknij"
 
@@ -4325,7 +4347,7 @@ msgid "User note: %(note)s"
 msgstr "Notka o użytkowniku: %(note)s"
 
 #: app/templates/_side_pane.html:11
-#: app/templates/community/_community_nav.html:168
+#: app/templates/community/_community_nav.html:190
 #: app/templates/community/_community_nav.html:398
 #: app/templates/community/add_post.html:3
 #: app/templates/feed/_feed_nav.html:142 app/templates/feed/show_feed.html:153
@@ -4335,7 +4357,7 @@ msgid "Create post"
 msgstr "Stwórz post"
 
 #: app/templates/_side_pane.html:16
-#: app/templates/community/_community_nav.html:191
+#: app/templates/community/_community_nav.html:128
 #: app/templates/community/_leave_button.html:3
 #: app/templates/community/add_remote.html:50
 #: app/templates/community/lookup_remote.html:21
@@ -4345,7 +4367,7 @@ msgid "Leave"
 msgstr "Opuść"
 
 #: app/templates/_side_pane.html:18
-#: app/templates/community/_community_nav.html:197
+#: app/templates/community/_community_nav.html:134
 #: app/templates/feed/_feed_nav.html:161
 #: app/templates/list_communities.html:291
 #: app/templates/themes/dillo/_side_pane.html:10
@@ -4354,7 +4376,7 @@ msgstr "Oczekujące"
 
 #: app/templates/_side_pane.html:21
 #: app/templates/auth/instance_chooser.html:342
-#: app/templates/community/_community_nav.html:204
+#: app/templates/community/_community_nav.html:141
 #: app/templates/community/_join_button.html:3
 #: app/templates/community/add_remote.html:53
 #: app/templates/community/lookup_remote.html:24
@@ -4365,8 +4387,8 @@ msgstr "Oczekujące"
 msgid "Join"
 msgstr "Dołącz"
 
-#: app/templates/_side_pane.html:31 app/templates/base.html:283
-#: app/templates/base.html:328
+#: app/templates/_side_pane.html:31 app/templates/base.html:289
+#: app/templates/base.html:334
 #: app/templates/community/_community_moderation_nav.html:4
 #: app/templates/community/_community_nav.html:220
 #: app/templates/community/community_edit.html:16
@@ -4405,7 +4427,7 @@ msgstr "Pokazuj tylko %(flair_name)s"
 msgid "Explore Tag Cloud"
 msgstr "Odkryj chmurę tagów"
 
-#: app/templates/_side_pane.html:69
+#: app/templates/_side_pane.html:69 app/templates/index.html:104
 msgid "Upcoming events"
 msgstr "Nadchodzące wydarzenia"
 
@@ -4427,7 +4449,7 @@ msgid "Set my flair"
 msgstr "Ustaw mój styl"
 
 #: app/templates/_side_pane.html:113 app/templates/admin/_nav.html:37
-#: app/templates/base.html:258 app/templates/base.html:308
+#: app/templates/base.html:264 app/templates/base.html:314
 #: app/templates/community/community_modlog.html:18
 #: app/templates/themes/dillo/base.html:147
 msgid "Modlog"
@@ -4503,11 +4525,13 @@ msgstr[0] "Zaloguj się by skomentować"
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/templates/_side_pane.html:163
+#: app/templates/_side_pane.html:163 app/templates/index.html:141
+#: app/templates/index.html:148
 msgid "Active users in the past 24 hours"
 msgstr "Aktywni użytkownicy w przeciągu ostatnich 24 godzin"
 
-#: app/templates/_side_pane.html:163
+#: app/templates/_side_pane.html:163 app/templates/index.html:141
+#: app/templates/index.html:148
 #, fuzzy, python-format
 msgid "%(count)s Daily User"
 msgid_plural "%(count)s Daily Users"
@@ -4515,11 +4539,13 @@ msgstr[0] "Użytkowników dziennie"
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/templates/_side_pane.html:164
+#: app/templates/_side_pane.html:164 app/templates/index.html:142
+#: app/templates/index.html:149
 msgid "Active users in the past 7 days"
 msgstr "Aktywni użytkownicy w przeciągu ostatnich 7 dni"
 
-#: app/templates/_side_pane.html:164
+#: app/templates/_side_pane.html:164 app/templates/index.html:142
+#: app/templates/index.html:149
 #, fuzzy, python-format
 msgid "%(count)s Weekly User"
 msgid_plural "%(count)s Weekly Users"
@@ -4527,11 +4553,13 @@ msgstr[0] "Użytkowników tygodniowo"
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/templates/_side_pane.html:165
+#: app/templates/_side_pane.html:165 app/templates/index.html:143
+#: app/templates/index.html:150
 msgid "Active users in the past month"
 msgstr "Aktywni użytkownicy w przeciągu ostatniego miesiąca"
 
-#: app/templates/_side_pane.html:165
+#: app/templates/_side_pane.html:165 app/templates/index.html:143
+#: app/templates/index.html:150
 #, fuzzy, python-format
 msgid "%(count)s Monthly User"
 msgid_plural "%(count)s Monthly Users"
@@ -4539,11 +4567,13 @@ msgstr[0] "Uzytkowników miesięcznie"
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/templates/_side_pane.html:166
+#: app/templates/_side_pane.html:166 app/templates/index.html:144
+#: app/templates/index.html:151
 msgid "Active users in the past 6 months"
 msgstr "Aktywni użytkownicy w przeciągu ostatnich 6 miesięcy"
 
-#: app/templates/_side_pane.html:166
+#: app/templates/_side_pane.html:166 app/templates/index.html:144
+#: app/templates/index.html:151
 #, fuzzy, python-format
 msgid "%(count)s User / 6 Months"
 msgid_plural "%(count)s Users / 6 Months"
@@ -4553,8 +4583,8 @@ msgstr[2] ""
 
 #: app/templates/_side_pane.html:170 app/templates/domain/domain.html:22
 #: app/templates/donate.html:37 app/templates/feed/show_feed.html:205
-#: app/templates/search/results.html:103 app/templates/tag/tag.html:81
-#: app/templates/themes/dillo/_side_pane.html:62
+#: app/templates/index.html:132 app/templates/search/results.html:103
+#: app/templates/tag/tag.html:81 app/templates/themes/dillo/_side_pane.html:62
 #: app/templates/themes/dillo/_side_pane.html:135
 #: app/templates/topic/show_topic.html:133
 #: app/templates/user/show_profile.html:247
@@ -4568,7 +4598,8 @@ msgid "Related communities"
 msgstr "Powiązane społeczności"
 
 #: app/templates/_side_pane.html:189 app/templates/explore.html:73
-#: app/templates/feed/show_feed.html:203 app/templates/list_topics.html:36
+#: app/templates/feed/show_feed.html:203 app/templates/index.html:41
+#: app/templates/index.html:93 app/templates/list_topics.html:36
 #: app/templates/search/results.html:86
 #: app/templates/themes/dillo/_side_pane.html:80
 #: app/templates/themes/dillo/_side_pane.html:120
@@ -4591,11 +4622,6 @@ msgstr "Posty ze społeczności, które moderujesz"
 msgid "Moderating"
 msgstr "Moderacja"
 
-#: app/templates/_view_filter_nav.html:7 app/templates/_view_filter_nav.html:20
-#: app/templates/themes/dillo/_view_filter_nav.html:4
-msgid "Posts from joined communities"
-msgstr "Posty z społeczności, do których dołączyłeś"
-
 #: app/templates/_view_filter_nav.html:7 app/templates/_view_filter_nav.html:21
 #: app/templates/list_communities.html:72
 #: app/templates/themes/dillo/_view_filter_nav.html:5 app/user/forms.py:95
@@ -4607,12 +4633,6 @@ msgstr "Subskrybowane"
 msgid "Posts on this instance"
 msgstr "Posty na tej instancji"
 
-#: app/templates/_view_filter_nav.html:10
-#: app/templates/_view_filter_nav.html:24
-#: app/templates/themes/dillo/_view_filter_nav.html:11
-msgid "Posts from popular communities"
-msgstr "Posty z popularnych społeczności"
-
 #: app/templates/_view_filter_nav.html:11
 #: app/templates/_view_filter_nav.html:26
 #: app/templates/themes/dillo/_view_filter_nav.html:14
@@ -4620,7 +4640,7 @@ msgid "No filter"
 msgstr "Bez filtra"
 
 #: app/templates/about.html:10 app/templates/donate.html:29
-#: app/templates/keyboard_shortcuts.html:63
+#: app/templates/index.html:121 app/templates/keyboard_shortcuts.html:63
 #: app/templates/search/results.html:94
 #: app/templates/themes/dillo/_side_pane.html:128
 #, python-format
@@ -4713,95 +4733,95 @@ msgstr "Nasza polityka prywatności"
 msgid "PieFed"
 msgstr "PieFed"
 
-#: app/templates/base.html:139 app/templates/themes/dillo/base.html:36
+#: app/templates/base.html:145 app/templates/themes/dillo/base.html:36
 #, fuzzy
 msgid "Skip to main content"
 msgstr "Przechowuj treść"
 
-#: app/templates/base.html:140 app/templates/themes/dillo/base.html:37
+#: app/templates/base.html:146 app/templates/themes/dillo/base.html:37
 #, fuzzy
 msgid "Go to side pane"
 msgstr "Idź do obrazka"
 
-#: app/templates/base.html:146 app/templates/themes/dillo/base.html:43
+#: app/templates/base.html:152 app/templates/themes/dillo/base.html:43
 msgid "To home page"
 msgstr "Do strony głównej"
 
-#: app/templates/base.html:157 app/templates/base.html:267
+#: app/templates/base.html:163 app/templates/base.html:273
 #: app/templates/themes/dillo/base.html:59
 #: app/templates/user/notifications.html:20 app/user/routes.py:1120
 msgid "Notifications"
 msgstr "Powiadomienia"
 
-#: app/templates/base.html:191 app/templates/base.html:203
-#: app/templates/base.html:323
+#: app/templates/base.html:197 app/templates/base.html:209
+#: app/templates/base.html:329
 msgid "Explore"
 msgstr "Odkrywaj"
 
-#: app/templates/base.html:195 app/templates/base.html:265
-#: app/templates/base.html:308 app/templates/donate.html:15
+#: app/templates/base.html:201 app/templates/base.html:271
+#: app/templates/base.html:314 app/templates/donate.html:15
 #: app/templates/themes/dillo/base.html:183 app/user/subscription.py:27
 #: app/user/subscription.py:31
 msgid "Donate"
 msgstr "Wspomóż"
 
-#: app/templates/base.html:209 app/templates/themes/dillo/base.html:128
+#: app/templates/base.html:215 app/templates/themes/dillo/base.html:128
 msgid "Account"
 msgstr "Konto"
 
-#: app/templates/base.html:213 app/templates/themes/dillo/base.html:130
+#: app/templates/base.html:219 app/templates/themes/dillo/base.html:130
 #: app/templates/user/user_preview.html:55
 msgid "View profile"
 msgstr "Zobacz profil"
 
-#: app/templates/base.html:216 app/templates/themes/dillo/base.html:131
+#: app/templates/base.html:222 app/templates/themes/dillo/base.html:131
 #: app/templates/user/edit_profile.html:20 app/user/routes.py:277
 msgid "Edit profile"
 msgstr "Edytuj profil"
 
-#: app/templates/base.html:219 app/templates/themes/dillo/base.html:132
+#: app/templates/base.html:225 app/templates/themes/dillo/base.html:132
 msgid "Chats"
 msgstr "Wiadomości"
 
-#: app/templates/base.html:222 app/templates/themes/dillo/base.html:133
+#: app/templates/base.html:228 app/templates/themes/dillo/base.html:133
 #: app/templates/user/bookmarks.html:17 app/templates/user/bookmarks.html:20
 #: app/templates/user/bookmarks_comments.html:17 app/user/routes.py:1659
 msgid "Bookmarks"
 msgstr "Zakładki"
 
-#: app/templates/base.html:225 app/templates/themes/dillo/base.html:134
+#: app/templates/base.html:231 app/templates/themes/dillo/base.html:134
 msgid "Activity Alerts"
 msgstr "Powiadomienia o aktywności"
 
-#: app/templates/base.html:228 app/templates/user/scheduled_posts.html:15
+#: app/templates/base.html:234 app/templates/user/scheduled_posts.html:15
 #: app/user/routes.py:1790
 msgid "Scheduled posts"
 msgstr "Zaplanowane posty"
 
-#: app/templates/base.html:231 app/templates/user/hidden_posts.html:15
+#: app/templates/base.html:237 app/templates/user/hidden_posts.html:15
 #: app/user/routes.py:1802
 #, fuzzy
 msgid "Hidden posts"
 msgstr "Najstarsze posty"
 
-#: app/templates/base.html:236
+#: app/templates/base.html:242
 msgid "Manage donations"
 msgstr "Zarządzaj wpłatami"
 
-#: app/templates/base.html:241 app/templates/themes/dillo/base.html:137
+#: app/templates/base.html:247 app/templates/themes/dillo/base.html:137
 msgid "Read Posts"
 msgstr "Czytaj posty"
 
-#: app/templates/base.html:245 app/templates/themes/dillo/base.html:139
+#: app/templates/base.html:251 app/templates/themes/dillo/base.html:139
 msgid "Log out"
 msgstr "Wyloguj"
 
-#: app/templates/admin/_nav.html:39 app/templates/base.html:260
+#: app/templates/admin/_nav.html:39 app/templates/base.html:266
 #: app/templates/dev/tools.html:10 app/templates/themes/dillo/base.html:149
 msgid "Dev Tools"
 msgstr "Narzędzia developerskie"
 
-#: app/templates/base.html:267
+#: app/templates/base.html:273
 #, fuzzy, python-format
 msgid "%(num)d unread notification"
 msgid_plural "%(num)d unread notifications"
@@ -4809,93 +4829,93 @@ msgstr[0] "%(num)d nieprzeczytanych powiadomień"
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/templates/base.html:280
+#: app/templates/base.html:286
 msgid "Color mode"
 msgstr "Tryb kolorystyczny"
 
-#: app/templates/base.html:280
+#: app/templates/base.html:286
 #, fuzzy
 msgid "Dark mode"
 msgstr "Tryb kolorystyczny"
 
-#: app/templates/base.html:280
+#: app/templates/base.html:286
 #, fuzzy
 msgid "Light mode"
 msgstr "Tryb testowy"
 
-#: app/templates/auth/login.html:15 app/templates/base.html:281
+#: app/templates/auth/login.html:15 app/templates/base.html:287
 #: app/templates/themes/dillo/base.html:87
 msgid "Log in"
 msgstr "Zaloguj się"
 
-#: app/templates/base.html:305
+#: app/templates/base.html:311
 msgid "Install PieFed app"
 msgstr "Zaintaluj aplikację PieFed"
 
-#: app/templates/auth/instance_chooser.html:123 app/templates/base.html:312
+#: app/templates/auth/instance_chooser.html:123 app/templates/base.html:318
 msgid "Terms of service"
 msgstr "Warunki korzystania z usługi"
 
-#: app/templates/base.html:314 app/templates/themes/dillo/base.html:187
+#: app/templates/base.html:320 app/templates/themes/dillo/base.html:187
 msgid "Privacy policy"
 msgstr "Polityka prywatności"
 
-#: app/templates/base.html:314 app/templates/keyboard_shortcuts.html:10
+#: app/templates/base.html:320 app/templates/keyboard_shortcuts.html:10
 #: app/templates/themes/dillo/base.html:185
 msgid "Keyboard shortcuts"
 msgstr "Skróty klawiszowe"
 
-#: app/templates/base.html:317 app/templates/themes/dillo/base.html:186
+#: app/templates/base.html:323 app/templates/themes/dillo/base.html:186
 #, python-format
 msgid "PieFed v%(version)s is free and open source"
 msgstr "PieFed v%(version)s jest darmowy i otwartoźródłowy"
 
-#: app/templates/base.html:317 app/templates/themes/dillo/base.html:186
+#: app/templates/base.html:323 app/templates/themes/dillo/base.html:186
 msgid ""
 "Please <a href=\"https://codeberg.org/rimu/pyfedi/issues\">report "
 "bugs</a> or <a href=\"https://join.piefed.social/get-involved/\">get "
 "involved</a>."
 msgstr ""
 
-#: app/templates/base.html:318
+#: app/templates/base.html:324
 msgid ""
 "This is how long you have spent using PieFed during this month. We hope "
 "this use of your time aligns with your priorities and values."
 msgstr ""
 
-#: app/templates/base.html:336
+#: app/templates/base.html:342
 msgid "Voting Options"
 msgstr "Opcje głosowania"
 
-#: app/templates/base.html:341
+#: app/templates/base.html:347
 msgid "Upvote (federated)"
 msgstr "Głos w górę (sfederowane)"
 
-#: app/templates/base.html:344
+#: app/templates/base.html:350
 msgid "Upvote (local)"
 msgstr "Głos w górę (lokalne)"
 
-#: app/templates/base.html:347
+#: app/templates/base.html:353
 msgid "Downvote (local)"
 msgstr "Głos w dół (lokalnie)"
 
-#: app/templates/base.html:350
+#: app/templates/base.html:356
 msgid "Downvote (federated)"
 msgstr "Głos w dół (sfederowane)"
 
-#: app/templates/base.html:353
+#: app/templates/base.html:359
 msgid "Local votes are a bit more private."
 msgstr "Lokalne głosy są trochę bardziej prywatne."
 
-#: app/templates/base.html:354
+#: app/templates/base.html:360
 msgid "Default mode: private."
 msgstr "Domyślny tryb: prywatny."
 
-#: app/templates/base.html:354
+#: app/templates/base.html:360
 msgid "Default mode: public."
 msgstr "Domyślny tryb: publiczy."
 
-#: app/templates/base.html:358
+#: app/templates/base.html:364
 msgid "React with an emoji"
 msgstr ""
 
@@ -4991,6 +5011,135 @@ msgstr "Dodaj zdalne treści"
 #: app/templates/themes/dillo/base.html:96 app/templates/topics_menu.html:7
 msgid "More topics"
 msgstr "Więcej tematów"
+
+#: app/templates/index.html:13
+msgid "Create an account to tailor this feed to your interests."
+msgstr ""
+
+#: app/templates/index.html:40 app/templates/themes/dillo/index.html:33
+msgid "No posts yet. Join some communities to see more."
+msgstr "Brak postów. Dołącz do jakichś społeczności by zobaczyć więcej."
+
+#: app/templates/admin/activities.html:61
+#: app/templates/admin/communities.html:116 app/templates/admin/content.html:53
+#: app/templates/admin/content.html:78 app/templates/admin/instances.html:107
+#: app/templates/admin/reports.html:39 app/templates/admin/users.html:121
+#: app/templates/community/community.html:176
+#: app/templates/community/community_moderate.html:78
+#: app/templates/community/community_moderate_subscribers.html:106
+#: app/templates/domain/domain.html:37 app/templates/domain/domains.html:48
+#: app/templates/domain/domains_blocked.html:54
+#: app/templates/feed/show_feed.html:122 app/templates/index.html:48
+#: app/templates/instance/list_instances.html:193
+#: app/templates/instance/people.html:50 app/templates/instance/posts.html:31
+#: app/templates/list_communities.html:340 app/templates/modlog.html:106
+#: app/templates/search/results.html:51 app/templates/tag/tag.html:29
+#: app/templates/tag/tags.html:48 app/templates/tag/tags_blocked.html:48
+#: app/templates/themes/dillo/index.html:38
+#: app/templates/topic/show_topic.html:74 app/templates/user/alerts.html:25
+#: app/templates/user/bookmarks.html:30
+#: app/templates/user/bookmarks_comments.html:34
+#: app/templates/user/files.html:48 app/templates/user/hidden_posts.html:33
+#: app/templates/user/read_posts.html:32
+#, fuzzy
+msgid "Pagination"
+msgstr "Paginacja postów"
+
+#: app/templates/admin/activities.html:64
+#: app/templates/admin/communities.html:119 app/templates/admin/content.html:56
+#: app/templates/admin/content.html:81 app/templates/admin/instances.html:110
+#: app/templates/admin/reports.html:42 app/templates/admin/users.html:124
+#: app/templates/community/community.html:179
+#: app/templates/community/community_moderate.html:81
+#: app/templates/community/community_moderate_comments.html:43
+#: app/templates/community/community_moderate_subscribers.html:109
+#: app/templates/domain/domain.html:40 app/templates/domain/domains.html:51
+#: app/templates/domain/domains_blocked.html:57
+#: app/templates/feed/show_feed.html:125 app/templates/index.html:51
+#: app/templates/instance/list_instances.html:196
+#: app/templates/instance/people.html:53 app/templates/instance/posts.html:34
+#: app/templates/list_communities.html:347 app/templates/modlog.html:109
+#: app/templates/search/results.html:54 app/templates/tag/tag.html:32
+#: app/templates/tag/tag_cloud.html:91 app/templates/tag/tags.html:51
+#: app/templates/tag/tags_blocked.html:51
+#: app/templates/themes/dillo/index.html:41
+#: app/templates/topic/show_topic.html:77 app/templates/user/alerts.html:28
+#: app/templates/user/bookmarks.html:33
+#: app/templates/user/bookmarks_comments.html:37
+#: app/templates/user/files.html:51 app/templates/user/hidden_posts.html:36
+#: app/templates/user/read_posts.html:35
+#: app/templates/user/show_profile.html:228
+#: app/templates/user/show_profile.html:259
+#: app/templates/user/show_profile.html:288
+msgid "Previous page"
+msgstr "Poprzednia strona"
+
+#: app/templates/admin/activities.html:69
+#: app/templates/admin/communities.html:124 app/templates/admin/content.html:61
+#: app/templates/admin/content.html:86 app/templates/admin/instances.html:115
+#: app/templates/admin/reports.html:47 app/templates/admin/users.html:129
+#: app/templates/community/community.html:184
+#: app/templates/community/community_moderate.html:86
+#: app/templates/community/community_moderate_comments.html:48
+#: app/templates/community/community_moderate_subscribers.html:114
+#: app/templates/domain/domain.html:45 app/templates/domain/domains.html:56
+#: app/templates/domain/domains_blocked.html:62
+#: app/templates/feed/show_feed.html:130 app/templates/index.html:56
+#: app/templates/instance/list_instances.html:201
+#: app/templates/instance/people.html:58 app/templates/instance/posts.html:39
+#: app/templates/list_communities.html:366 app/templates/modlog.html:114
+#: app/templates/search/results.html:59 app/templates/tag/tag.html:37
+#: app/templates/tag/tag_cloud.html:110 app/templates/tag/tags.html:56
+#: app/templates/tag/tags_blocked.html:56
+#: app/templates/themes/dillo/index.html:46
+#: app/templates/topic/show_topic.html:82 app/templates/user/alerts.html:33
+#: app/templates/user/bookmarks.html:38
+#: app/templates/user/bookmarks_comments.html:42
+#: app/templates/user/files.html:56 app/templates/user/hidden_posts.html:41
+#: app/templates/user/read_posts.html:40
+#: app/templates/user/show_profile.html:233
+#: app/templates/user/show_profile.html:264
+#: app/templates/user/show_profile.html:293
+msgid "Next page"
+msgstr "Następna strona"
+
+#: app/templates/index.html:66 app/templates/themes/dillo/_side_pane.html:108
+msgid "New communities"
+msgstr "Nowa społeczność"
+
+#: app/templates/index.html:76
+#, fuzzy
+msgid "More new communities"
+msgstr "Więcej społeczności"
+
+#: app/templates/index.html:83 app/templates/search/results.html:76
+#: app/templates/themes/dillo/_side_pane.html:116
+msgid "Active communities"
+msgstr "Aktywne społeczności"
+
+#: app/templates/index.html:95 app/templates/search/results.html:87
+#: app/templates/themes/dillo/_side_pane.html:121
+msgid "Browse topics"
+msgstr "Przeglądaj tematy"
+
+#: app/templates/index.html:139
+#, fuzzy
+msgid "This server"
+msgstr "Dołacz do serwera"
+
+#: app/templates/index.html:146
+msgid "Whole network"
+msgstr ""
+
+#: app/templates/index.html:161
+#, fuzzy
+msgid "New instances"
+msgstr "Instancje online"
+
+#: app/templates/index.html:171
+#, fuzzy
+msgid "More instances"
+msgstr "Główna instancja"
 
 #: app/templates/keyboard_shortcuts.html:11
 msgid "Most shortcuts are the same as what reddit has."
@@ -5172,7 +5321,7 @@ msgstr "Sortuj po liczbie postów"
 #: app/templates/admin/communities.html:52 app/templates/admin/content.html:29
 #: app/templates/admin/content.html:43 app/templates/admin/instances.html:51
 #: app/templates/admin/instances.html:91
-#: app/templates/community/_community_nav.html:148
+#: app/templates/community/_community_nav.html:170
 #: app/templates/community/_community_nav.html:379
 #: app/templates/community/_community_nav.html:473
 #: app/templates/instance/list_instances.html:168
@@ -5191,7 +5340,7 @@ msgstr "Posty"
 
 #: app/templates/admin/content.html:30 app/templates/admin/content.html:67
 #: app/templates/community/_community_moderation_nav.html:17
-#: app/templates/community/_community_nav.html:151
+#: app/templates/community/_community_nav.html:173
 #: app/templates/community/_community_nav.html:382
 #: app/templates/community/_community_nav.html:477
 #: app/templates/community/_community_nav.html:481
@@ -5235,89 +5384,6 @@ msgstr "Ranga"
 #, python-format
 msgid "Browse %(name)s"
 msgstr "Przeglądaj %(name)s"
-
-#: app/templates/admin/activities.html:61
-#: app/templates/admin/communities.html:116 app/templates/admin/content.html:53
-#: app/templates/admin/content.html:78 app/templates/admin/instances.html:107
-#: app/templates/admin/reports.html:39 app/templates/admin/users.html:121
-#: app/templates/community/community.html:176
-#: app/templates/community/community_moderate.html:78
-#: app/templates/community/community_moderate_subscribers.html:106
-#: app/templates/domain/domain.html:37 app/templates/domain/domains.html:48
-#: app/templates/domain/domains_blocked.html:54
-#: app/templates/feed/show_feed.html:122
-#: app/templates/instance/list_instances.html:193
-#: app/templates/instance/people.html:50 app/templates/instance/posts.html:31
-#: app/templates/list_communities.html:340 app/templates/modlog.html:106
-#: app/templates/search/results.html:51 app/templates/tag/tag.html:29
-#: app/templates/tag/tags.html:48 app/templates/tag/tags_blocked.html:48
-#: app/templates/themes/dillo/index.html:38
-#: app/templates/topic/show_topic.html:74 app/templates/user/alerts.html:25
-#: app/templates/user/bookmarks.html:30
-#: app/templates/user/bookmarks_comments.html:34
-#: app/templates/user/files.html:48 app/templates/user/hidden_posts.html:33
-#: app/templates/user/read_posts.html:32
-#, fuzzy
-msgid "Pagination"
-msgstr "Paginacja postów"
-
-#: app/templates/admin/activities.html:64
-#: app/templates/admin/communities.html:119 app/templates/admin/content.html:56
-#: app/templates/admin/content.html:81 app/templates/admin/instances.html:110
-#: app/templates/admin/reports.html:42 app/templates/admin/users.html:124
-#: app/templates/community/community.html:179
-#: app/templates/community/community_moderate.html:81
-#: app/templates/community/community_moderate_comments.html:43
-#: app/templates/community/community_moderate_subscribers.html:109
-#: app/templates/domain/domain.html:40 app/templates/domain/domains.html:51
-#: app/templates/domain/domains_blocked.html:57
-#: app/templates/feed/show_feed.html:125
-#: app/templates/instance/list_instances.html:196
-#: app/templates/instance/people.html:53 app/templates/instance/posts.html:34
-#: app/templates/list_communities.html:347 app/templates/modlog.html:109
-#: app/templates/search/results.html:54 app/templates/tag/tag.html:32
-#: app/templates/tag/tag_cloud.html:91 app/templates/tag/tags.html:51
-#: app/templates/tag/tags_blocked.html:51
-#: app/templates/themes/dillo/index.html:41
-#: app/templates/topic/show_topic.html:77 app/templates/user/alerts.html:28
-#: app/templates/user/bookmarks.html:33
-#: app/templates/user/bookmarks_comments.html:37
-#: app/templates/user/files.html:51 app/templates/user/hidden_posts.html:36
-#: app/templates/user/read_posts.html:35
-#: app/templates/user/show_profile.html:228
-#: app/templates/user/show_profile.html:259
-#: app/templates/user/show_profile.html:288
-msgid "Previous page"
-msgstr "Poprzednia strona"
-
-#: app/templates/admin/activities.html:69
-#: app/templates/admin/communities.html:124 app/templates/admin/content.html:61
-#: app/templates/admin/content.html:86 app/templates/admin/instances.html:115
-#: app/templates/admin/reports.html:47 app/templates/admin/users.html:129
-#: app/templates/community/community.html:184
-#: app/templates/community/community_moderate.html:86
-#: app/templates/community/community_moderate_comments.html:48
-#: app/templates/community/community_moderate_subscribers.html:114
-#: app/templates/domain/domain.html:45 app/templates/domain/domains.html:56
-#: app/templates/domain/domains_blocked.html:62
-#: app/templates/feed/show_feed.html:130
-#: app/templates/instance/list_instances.html:201
-#: app/templates/instance/people.html:58 app/templates/instance/posts.html:39
-#: app/templates/list_communities.html:366 app/templates/modlog.html:114
-#: app/templates/search/results.html:59 app/templates/tag/tag.html:37
-#: app/templates/tag/tag_cloud.html:110 app/templates/tag/tags.html:56
-#: app/templates/tag/tags_blocked.html:56
-#: app/templates/themes/dillo/index.html:46
-#: app/templates/topic/show_topic.html:82 app/templates/user/alerts.html:33
-#: app/templates/user/bookmarks.html:38
-#: app/templates/user/bookmarks_comments.html:42
-#: app/templates/user/files.html:56 app/templates/user/hidden_posts.html:41
-#: app/templates/user/read_posts.html:40
-#: app/templates/user/show_profile.html:233
-#: app/templates/user/show_profile.html:264
-#: app/templates/user/show_profile.html:293
-msgid "Next page"
-msgstr "Następna strona"
 
 #: app/templates/list_communities.html:389
 msgid "No communities match your search."
@@ -5709,6 +5775,7 @@ msgstr "Edytuj"
 #: app/templates/admin/communities.html:110 app/templates/admin/emoji.html:41
 #: app/templates/admin/topics.html:19 app/templates/admin/users.html:110
 #: app/templates/community/community_flair.html:41
+#: app/templates/community/community_wiki_edit.html:32
 #: app/templates/community/community_wiki_list.html:56
 #: app/templates/feed/_feed_table_row.html:28
 #: app/templates/post/add_reply_inline.html:96 app/templates/post/post.html:43
@@ -5793,8 +5860,8 @@ msgstr ""
 "zostanie zpaisana."
 
 #: app/templates/admin/cms_page_edit.html:38
+#: app/templates/community/_body_edit_preview.html:9
 #: app/templates/post/add_reply_inline.html:34 app/templates/post/post.html:118
-#: app/templates/post/post_edit.html:182
 msgid "Preview"
 msgstr "Podgląd"
 
@@ -6653,6 +6720,7 @@ msgid "No NSFW content"
 msgstr "Brak treści NFSW"
 
 #: app/templates/auth/instance_chooser.html:58
+#: app/templates/community/community_wiki_edit.html:27
 #: app/templates/post/add_reply_inline.html:91 app/templates/post/post.html:38
 #: app/templates/post/post_edit.html:100
 #, fuzzy
@@ -6771,6 +6839,7 @@ msgid "Click 'more' on a server to read a longer description of it."
 msgstr ""
 
 #: app/templates/auth/instance_chooser.html:352
+#: app/templates/community/community_wiki_edit.html:31
 #: app/templates/post/add_reply_inline.html:95 app/templates/post/post.html:42
 #: app/templates/post/post_edit.html:104
 #: app/templates/user/show_profile.html:110
@@ -7048,6 +7117,12 @@ msgstr ""
 msgid "Report conversation with \"%(member_names)s\""
 msgstr "Zgłoś konwersację z \"%(member_names)s\""
 
+#: app/templates/community/_body_edit_preview.html:27
+#: app/templates/post/add_reply.html:49 app/templates/post/post.html:160
+#: app/templates/user/edit_profile.html:52
+msgid "Enable markdown editor"
+msgstr "Włącz edytor markdown"
+
 #: app/templates/community/_community_moderation_nav.html:7
 #: app/templates/community/_community_nav.html:12
 #: app/templates/community/_community_nav.html:66
@@ -7147,41 +7222,41 @@ msgstr "Top roku"
 msgid "Top All Time"
 msgstr "Top wszech czasów"
 
-#: app/templates/community/_community_nav.html:135
+#: app/templates/community/_community_nav.html:157
 #: app/templates/community/_community_nav.html:366
 #: app/templates/community/_community_nav.html:496
 #: app/templates/feed/_feed_nav.html:130 app/templates/feed/_feed_nav.html:193
 msgid "Tile"
 msgstr "Pole"
 
-#: app/templates/community/_community_nav.html:138
+#: app/templates/community/_community_nav.html:160
 #: app/templates/community/_community_nav.html:369
 #: app/templates/community/_community_nav.html:499
 #: app/templates/feed/_feed_nav.html:135 app/templates/feed/_feed_nav.html:196
 msgid "Wide tile"
 msgstr "Szerokie pole"
 
-#: app/templates/community/_community_nav.html:144
+#: app/templates/community/_community_nav.html:166
 #: app/templates/community/_community_nav.html:375
 msgid "Content type"
 msgstr "Typ treści"
 
-#: app/templates/community/_community_nav.html:155
+#: app/templates/community/_community_nav.html:177
 #: app/templates/community/_community_nav.html:386
 #: app/templates/community/_community_nav.html:486
 msgid "Events"
 msgstr "Wydarzenia"
 
-#: app/templates/community/_community_nav.html:161
+#: app/templates/community/_community_nav.html:183
 #: app/templates/community/_community_nav.html:392
 msgid "Apply filters"
 msgstr "Zastosuj filtry"
 
-#: app/templates/community/_community_nav.html:174
+#: app/templates/community/_community_nav.html:196
 msgid "Invite people to join"
 msgstr "Zaproś użytkowników"
 
-#: app/templates/community/_community_nav.html:184
+#: app/templates/community/_community_nav.html:206
 msgid "About community"
 msgstr "O społeczności"
 
@@ -7674,6 +7749,77 @@ msgstr ""
 "Aktualizuj ogłoszenie w starej społeczności by zachęcić ludzi do "
 "dołączenia do nowej społeczności w "
 "<br>!%(community_name)s@%(instance_domain)s."
+
+#: app/templates/community/community_wiki_edit.html:28
+#: app/templates/post/add_reply_inline.html:92 app/templates/post/post.html:39
+#: app/templates/post/post_edit.html:101
+#, fuzzy
+msgid "No images found."
+msgstr "Nie znaleziono użytkowników"
+
+#: app/templates/community/community_wiki_edit.html:29
+#: app/templates/post/add_reply_inline.html:93 app/templates/post/post.html:40
+#: app/templates/post/post_edit.html:102
+#, fuzzy
+msgid "Error loading images."
+msgstr "Ładowanie komentarzy..."
+
+#: app/templates/community/community_wiki_edit.html:30
+#: app/templates/post/add_reply_inline.html:94 app/templates/post/post.html:41
+#: app/templates/post/post_edit.html:103
+#, fuzzy
+msgid "Insert"
+msgstr "Odpowiedź"
+
+#: app/templates/community/community_wiki_edit.html:33
+#: app/templates/post/add_reply_inline.html:97 app/templates/post/post.html:44
+#: app/templates/post/post_edit.html:106
+#, fuzzy
+msgid "Are you sure you want to delete this image?"
+msgstr "Jesteś pewny, że chcesz usunąć te stronę?"
+
+#: app/templates/community/community_wiki_edit.html:34
+#: app/templates/post/add_reply_inline.html:98 app/templates/post/post.html:45
+#: app/templates/post/post_edit.html:107
+msgid "Failed to delete image. Please try again."
+msgstr "Nie udało się usunąć obrazka. Prosimy spróbuj ponownie."
+
+#: app/templates/community/community_wiki_edit.html:35
+#: app/templates/post/add_reply_inline.html:99 app/templates/post/post.html:46
+#: app/templates/post/post_edit.html:108
+msgid "Please select a file."
+msgstr "Musisz wybrać plik."
+
+#: app/templates/community/community_wiki_edit.html:36
+#: app/templates/post/add_reply_inline.html:100 app/templates/post/post.html:47
+#: app/templates/post/post_edit.html:109
+msgid "Please select an image file."
+msgstr "Musisz wybrać plik, który jest obrazkiem."
+
+#: app/templates/community/community_wiki_edit.html:37
+#: app/templates/post/add_reply_inline.html:101 app/templates/post/post.html:48
+#: app/templates/post/post_edit.html:110
+#, fuzzy
+msgid "Uploading..."
+msgstr "Przesyłanie..."
+
+#: app/templates/community/community_wiki_edit.html:38
+#: app/templates/post/add_reply_inline.html:102 app/templates/post/post.html:49
+#: app/templates/post/post_edit.html:111
+msgid "Upload successful!"
+msgstr "Przesyłanie powiodło się!"
+
+#: app/templates/community/community_wiki_edit.html:39
+#: app/templates/post/add_reply_inline.html:103 app/templates/post/post.html:50
+#: app/templates/post/post_edit.html:112
+msgid "Upload failed. Please try again."
+msgstr "Przesyłanie nie powiodło się. Prosimy spróbuj ponownie."
+
+#: app/templates/community/community_wiki_edit.html:40
+#: app/templates/post/add_reply_inline.html:104 app/templates/post/post.html:51
+#: app/templates/post/post_edit.html:113
+msgid "Failed to upload pasted image. Please try again."
+msgstr "Nie udało się przesłać wklejonego obrazka. Prosimy spróbuj ponownie."
 
 #: app/templates/community/community_wiki_list.html:23
 #, python-format
@@ -8623,17 +8769,11 @@ msgstr ""
 "większość miejsc. Bądź miły.</a>.\""
 
 #: app/templates/post/add_reply.html:28 app/templates/post/post.html:106
-#: app/templates/post/post_edit.html:289
+#: app/templates/post/post_edit.html:256
 #: app/templates/post/post_reply_edit.html:27
 #: app/templates/search/_search_form.html:23
 msgid "More options"
 msgstr "Więcej opcji"
-
-#: app/templates/post/add_reply.html:49 app/templates/post/post.html:160
-#: app/templates/post/post_edit.html:200
-#: app/templates/user/edit_profile.html:52
-msgid "Enable markdown editor"
-msgstr "Włącz edytor markdown"
 
 #: app/templates/post/add_reply_inline.html:7 app/templates/post/post.html:99
 #, python-format
@@ -8651,66 +8791,6 @@ msgid ""
 msgstr ""
 "Użytkonwik któremu odpowiadasz został zbanowy więc może nie zobaczyć "
 "twojej odpowiedzi"
-
-#: app/templates/post/add_reply_inline.html:92 app/templates/post/post.html:39
-#: app/templates/post/post_edit.html:101
-#, fuzzy
-msgid "No images found."
-msgstr "Nie znaleziono użytkowników"
-
-#: app/templates/post/add_reply_inline.html:93 app/templates/post/post.html:40
-#: app/templates/post/post_edit.html:102
-#, fuzzy
-msgid "Error loading images."
-msgstr "Ładowanie komentarzy..."
-
-#: app/templates/post/add_reply_inline.html:94 app/templates/post/post.html:41
-#: app/templates/post/post_edit.html:103
-#, fuzzy
-msgid "Insert"
-msgstr "Odpowiedź"
-
-#: app/templates/post/add_reply_inline.html:97 app/templates/post/post.html:44
-#: app/templates/post/post_edit.html:106
-#, fuzzy
-msgid "Are you sure you want to delete this image?"
-msgstr "Jesteś pewny, że chcesz usunąć te stronę?"
-
-#: app/templates/post/add_reply_inline.html:98 app/templates/post/post.html:45
-#: app/templates/post/post_edit.html:107
-msgid "Failed to delete image. Please try again."
-msgstr "Nie udało się usunąć obrazka. Prosimy spróbuj ponownie."
-
-#: app/templates/post/add_reply_inline.html:99 app/templates/post/post.html:46
-#: app/templates/post/post_edit.html:108
-msgid "Please select a file."
-msgstr "Musisz wybrać plik."
-
-#: app/templates/post/add_reply_inline.html:100 app/templates/post/post.html:47
-#: app/templates/post/post_edit.html:109
-msgid "Please select an image file."
-msgstr "Musisz wybrać plik, który jest obrazkiem."
-
-#: app/templates/post/add_reply_inline.html:101 app/templates/post/post.html:48
-#: app/templates/post/post_edit.html:110
-#, fuzzy
-msgid "Uploading..."
-msgstr "Przesyłanie..."
-
-#: app/templates/post/add_reply_inline.html:102 app/templates/post/post.html:49
-#: app/templates/post/post_edit.html:111
-msgid "Upload successful!"
-msgstr "Przesyłanie powiodło się!"
-
-#: app/templates/post/add_reply_inline.html:103 app/templates/post/post.html:50
-#: app/templates/post/post_edit.html:112
-msgid "Upload failed. Please try again."
-msgstr "Przesyłanie nie powiodło się. Prosimy spróbuj ponownie."
-
-#: app/templates/post/add_reply_inline.html:104 app/templates/post/post.html:51
-#: app/templates/post/post_edit.html:113
-msgid "Failed to upload pasted image. Please try again."
-msgstr "Nie udało się przesłać wklejonego obrazka. Prosimy spróbuj ponownie."
 
 #: app/templates/post/continue_discussion.html:21
 #, fuzzy
@@ -8790,45 +8870,45 @@ msgid ""
 "like h.264 and mp3."
 msgstr ""
 
-#: app/templates/post/post_edit.html:215
+#: app/templates/post/post_edit.html:182
 msgid "Poll choices"
 msgstr "Opcje ankiety"
 
-#: app/templates/post/post_edit.html:217
+#: app/templates/post/post_edit.html:184
 #, fuzzy
 msgid "First choice"
 msgstr "Dodaj wybór"
 
-#: app/templates/post/post_edit.html:220
+#: app/templates/post/post_edit.html:187
 #, fuzzy
 msgid "Second choice"
 msgstr "Dodaj wybór"
 
-#: app/templates/post/post_edit.html:261
+#: app/templates/post/post_edit.html:228
 msgid "Add choice"
 msgstr "Dodaj wybór"
 
-#: app/templates/post/post_edit.html:286
+#: app/templates/post/post_edit.html:253
 msgid "Separate each tag with a comma."
 msgstr "Wstaw przecinek między tagami"
 
-#: app/templates/post/post_edit.html:303
+#: app/templates/post/post_edit.html:270
 msgid "Hey, did you know? Scheduled posts have a templating system for titles."
 msgstr "Cześć, wiedziałeś? Zaplanowane posty mają system szablonów dla tytułów."
 
-#: app/templates/post/post_edit.html:308
+#: app/templates/post/post_edit.html:275
 msgid "Tags available"
 msgstr "Dostępne tagi"
 
-#: app/templates/post/post_edit.html:309
+#: app/templates/post/post_edit.html:276
 msgid "Example"
 msgstr "Przykład"
 
-#: app/templates/post/post_edit.html:310
+#: app/templates/post/post_edit.html:277
 msgid "...will generate"
 msgstr "...wygeneruje"
 
-#: app/templates/post/post_edit.html:322
+#: app/templates/post/post_edit.html:289
 msgid ""
 "Drag this link to your bookmarks bar to create a quick way to share what "
 "you find"
@@ -8836,11 +8916,11 @@ msgstr ""
 "Przenieś ten link paska zakładek aby stworzyć szybki sposób udostępniania"
 " go"
 
-#: app/templates/post/post_edit.html:329
+#: app/templates/post/post_edit.html:296
 msgid "Drag this to your bookmarks bar"
 msgstr ""
 
-#: app/templates/post/post_edit.html:330
+#: app/templates/post/post_edit.html:297
 msgid "Share on PieFed"
 msgstr "Udostępnij w PieFed"
 
@@ -9213,16 +9293,6 @@ msgstr ""
 msgid "No posts match your search."
 msgstr "Brak dopasowań do wyszukiwania"
 
-#: app/templates/search/results.html:76
-#: app/templates/themes/dillo/_side_pane.html:116
-msgid "Active communities"
-msgstr "Aktywne społeczności"
-
-#: app/templates/search/results.html:87
-#: app/templates/themes/dillo/_side_pane.html:121
-msgid "Browse topics"
-msgstr "Przeglądaj tematy"
-
 #: app/templates/search/start.html:18
 msgid "Search for..."
 msgstr "Szukaj..."
@@ -9369,10 +9439,6 @@ msgstr ""
 msgid "Community Settings"
 msgstr "Ustawienia społeczności"
 
-#: app/templates/themes/dillo/_side_pane.html:108
-msgid "New communities"
-msgstr "Nowa społeczność"
-
 #: app/templates/themes/dillo/_view_filter_nav.html:1
 #: app/templates/themes/dillo/_view_filter_nav.html:2
 msgid "Post filters: "
@@ -9387,10 +9453,6 @@ msgstr "Nawigacja administratora"
 #, fuzzy
 msgid "Unread notifications"
 msgstr "%(num)d nieprzeczytanych powiadomień"
-
-#: app/templates/themes/dillo/index.html:33
-msgid "No posts yet. Join some communities to see more."
-msgstr "Brak postów. Dołącz do jakichś społeczności by zobaczyć więcej."
 
 #: app/templates/topic/_notification_toggle.html:5
 msgid "Notify about every new post. Not advisable in high traffic topics!"
@@ -11133,7 +11195,7 @@ msgstr "Polski"
 msgid "Ukrainian"
 msgstr ""
 
-#: app/user/routes.py:544
+#: app/user/routes.py:545
 #, python-format
 msgid "You cannot change the daily usage limit until %(date)s"
 msgstr ""
