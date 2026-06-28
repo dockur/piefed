@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import desc, or_, text, Integer
 
 from app import db, current_app
