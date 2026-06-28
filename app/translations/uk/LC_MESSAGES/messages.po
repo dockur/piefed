@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-06-26 16:24+1200\n"
-"PO-Revision-Date: 2026-04-17 12:06+0000\n"
+"PO-Revision-Date: 2026-06-27 22:19+0000\n"
 "Last-Translator: Denys Nykula <nykula@ukr.net>\n"
+"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed/"
+"main-web-app/uk/>\n"
 "Language: uk\n"
-"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed"
-"/main-web-app/uk/>\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.10.4\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: app/__init__.py:54
@@ -282,7 +283,7 @@ msgstr "Спільноти не знайдено на сервері"
 #: app/activitypub/routes.py:1024 app/shared/user.py:261
 #: app/templates/user/notifs/13.html:5
 msgid "You have a new follower"
-msgstr ""
+msgstr "У вас новий підписник"
 
 #: app/activitypub/util.py:2648
 #, python-format
@@ -303,13 +304,12 @@ msgid "A comment has been reported"
 msgstr "Надіслано скаргу про коментар"
 
 #: app/activitypub/util.py:3974
-#, fuzzy
 msgid "Microblogs"
-msgstr "Журнал модерування"
+msgstr "Мікроблоги"
 
 #: app/activitypub/util.py:3975 app/activitypub/util.py:3977
 msgid "Microblog posts from around the fediverse."
-msgstr ""
+msgstr "Дописи з мікроблогів федіверсу."
 
 #: app/admin/constants.py:16
 msgid "Post"
@@ -506,7 +506,7 @@ msgstr "Додатковий JS-код"
 
 #: app/admin/forms.py:64
 msgid "Trim read posts table after this many days"
-msgstr ""
+msgstr "Очищати таблицю прочитаних дописів через стільки днів"
 
 #: app/admin/forms.py:65 app/templates/_view_filter_nav.html:9
 #: app/templates/_view_filter_nav.html:23 app/templates/admin/reports.html:20
@@ -606,24 +606,20 @@ msgid "Allow federation with these instances"
 msgstr "Дозволити федерацію з серверами"
 
 #: app/admin/forms.py:99
-#, fuzzy
 msgid "Allowlist mode"
-msgstr "Світлий режим"
+msgstr "Режим списку дозволів"
 
 #: app/admin/forms.py:100
-#, fuzzy
 msgid "Weak"
-msgstr "Тиждень"
+msgstr "Слабко"
 
 #: app/admin/forms.py:101
-#, fuzzy
 msgid "Strong"
-msgstr "JSON"
+msgstr "Сильно"
 
 #: app/admin/forms.py:102
-#, fuzzy
 msgid "Intense"
-msgstr "Китайська"
+msgstr "Потужно"
 
 #: app/admin/forms.py:104
 msgid "Deny federation with these instances"
@@ -961,13 +957,12 @@ msgid "Show posts from child topics"
 msgstr "Показувати дописи з дочірніх тем"
 
 #: app/admin/forms.py:208 app/templates/admin/topics.html:39
-#, fuzzy
 msgid "Countries"
-msgstr "Спільноти"
+msgstr "Країни"
 
 #: app/admin/forms.py:208
 msgid "Use two-letter country codes, one per line."
-msgstr ""
+msgstr "Дволітерні коди країн — по одному на рядок."
 
 #: app/admin/forms.py:213 app/templates/admin/instances.html:24
 #: app/templates/admin/instances.html:99
@@ -993,9 +988,8 @@ msgstr "Довірене"
 #: app/admin/forms.py:216 app/templates/admin/instances.html:27
 #: app/templates/instance/list_instances.html:88
 #: app/templates/instance/list_instances.html:128
-#, fuzzy
 msgid "Silenced"
-msgstr "Надіслати"
+msgstr "Стишено"
 
 #: app/admin/forms.py:217
 msgid "Hide from instance chooser"
@@ -1179,7 +1173,7 @@ msgstr "Блокувати коментарі"
 
 #: app/admin/forms.py:325
 msgid "Can send PMs"
-msgstr ""
+msgstr "Може надсилати приватні повідомлення"
 
 #: app/admin/forms.py:339
 msgid "Remove avatar"
@@ -1350,9 +1344,8 @@ msgstr[2] ""
 "вкладці «Діяльність»"
 
 #: app/admin/routes.py:559
-#, fuzzy
 msgid "Federation settings - preload"
-msgstr "Параметри федерації"
+msgstr "Параметри федерації — попереднє завантаження"
 
 #: app/admin/routes.py:875
 #, python-format
@@ -1378,9 +1371,8 @@ msgstr[2] ""
 " на адміністративній вкладці «Діяльність»"
 
 #: app/admin/routes.py:882
-#, fuzzy
 msgid "Federation settings - remote scan"
-msgstr "Параметри федерації"
+msgstr "Параметри федерації — віддалене сканування"
 
 #: app/admin/routes.py:913
 msgid "Ban imports started in a background process."
@@ -1391,9 +1383,8 @@ msgid "Ban imports requested, but no json provided."
 msgstr "Запитано імпорт блокувань, але не надано JSON."
 
 #: app/admin/routes.py:980
-#, fuzzy
 msgid "Federation settings - ban lists"
-msgstr "Параметри федерації"
+msgstr "Параметри федерації — списки блокування"
 
 #: app/admin/routes.py:1116
 msgid ""
@@ -1906,9 +1897,8 @@ msgid "No user found with that email address."
 msgstr "Нема користувача з такою електронною поштою."
 
 #: app/auth/routes.py:120 app/auth/routes.py:147
-#, fuzzy
 msgid "If an account exists, a link has been sent"
-msgstr "Нема облікового запису з таким користувацьким іменем."
+msgstr "Якщо обліковий запис існує, посилання надіслано"
 
 #: app/auth/routes.py:123
 msgid "Problem sending email, please contact the administrator for support"
@@ -1919,9 +1909,8 @@ msgid "Sorry, you cannot use that email address."
 msgstr "На жаль, використати цю адресу електронної пошти не можна."
 
 #: app/auth/routes.py:144
-#, fuzzy
 msgid "If an account exists, a link has been sent."
-msgstr "Нема облікового запису з таким користувацьким іменем."
+msgstr "Якщо обліковий запис існує, посилання надіслано."
 
 #: app/auth/routes.py:148
 msgid "Reset Password"
@@ -2940,14 +2929,12 @@ msgid "Banner removed!"
 msgstr "Банери вилучено!"
 
 #: app/community/routes.py:1351 app/templates/_side_pane.html:150
-#, fuzzy
 msgid "Disable theme"
-msgstr "Вимкнено"
+msgstr "Вимкнути тему"
 
 #: app/community/routes.py:1356 app/templates/_side_pane.html:150
-#, fuzzy
 msgid "Enable theme"
-msgstr "Типова тема"
+msgstr "Увімкнути тему"
 
 #: app/community/routes.py:1407
 #: app/templates/community/community_mod_list.html:43
@@ -3216,23 +3203,20 @@ msgid "Warning on posts"
 msgstr "Засторога на дописах"
 
 #: app/domain/forms.py:8
-#, fuzzy
 msgid "Warning type"
-msgstr "Засторога"
+msgstr "Тип застороги"
 
 #: app/domain/forms.py:9 app/templates/admin/communities.html:83
 msgid "Warning"
 msgstr "Засторога"
 
 #: app/domain/forms.py:10
-#, fuzzy
 msgid "Helpful context"
-msgstr "Видалені дописи"
+msgstr "Корисний контекст"
 
 #: app/domain/forms.py:11
-#, fuzzy
 msgid "Recommendation"
-msgstr "Зберігання"
+msgstr "Рекомендація"
 
 #: app/domain/routes.py:220
 #, python-format
@@ -3437,14 +3421,15 @@ msgstr "Чутливий вміст"
 #: app/main/routes.py:1249
 msgid "You took too long to respond so your account has been flagged as a bot."
 msgstr ""
+"Ви надто довго не відповідали, тож ваш обліковий запис позначено як бота."
 
 #: app/main/routes.py:1253
 msgid "Thanks!"
-msgstr ""
+msgstr "Спасибі!"
 
 #: app/main/routes.py:1254
 msgid "You have confirmed that your account is operated by a human."
-msgstr ""
+msgstr "Ви підтвердили, що обліковим записом керує людина."
 
 #: app/main/routes.py:1262
 msgid "This page is intentionally left blank."
@@ -3485,9 +3470,8 @@ msgstr "Спільнота, з якою слід поділитись"
 
 #: app/post/forms.py:69 app/post/forms.py:137
 #: app/templates/search/_search_form.html:34
-#, fuzzy
 msgid "Enter a community name in the format community@server.name"
-msgstr "Введіть назву спільноти в форматі спільнота@сервер.домен"
+msgstr "Введіть назву спільноти в форматі спільнота@назва.сервера"
 
 #: app/post/forms.py:75 app/post/forms.py:81 app/post/forms.py:87
 #: app/templates/admin/instances.html:92 app/templates/admin/users.html:44
@@ -3976,7 +3960,7 @@ msgstr "%(actor)s блокується."
 
 #: app/shared/user.py:252
 msgid "Someone wants to follow you"
-msgstr ""
+msgstr "Хтось хоче на вас підписатись"
 
 #: app/shared/tasks/follows.py:65
 msgid "Community is on banned or blocked instance"
@@ -4476,7 +4460,7 @@ msgid "Active users in the past 6 months"
 msgstr "Користувачі, активні за минулі 6 місяців"
 
 #: app/templates/_side_pane.html:166
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s User / 6 Months"
 msgid_plural "%(count)s Users / 6 Months"
 msgstr[0] "%(count)s користувач за півроку"
@@ -4853,9 +4837,8 @@ msgid "All communities"
 msgstr "Усі спільноти"
 
 #: app/templates/communities_menu.html:17
-#, fuzzy
 msgid "Favorites"
-msgstr "Голоси"
+msgstr "Уподобане"
 
 #: app/templates/communities_menu.html:31 app/templates/topics_menu.html:21
 msgid "Joined communities"
@@ -5891,9 +5874,8 @@ msgstr "індексувати"
 
 #: app/templates/admin/edit_user.html:57
 #: app/templates/user/show_profile.html:120
-#, fuzzy
 msgid "View on home server"
-msgstr "Долучитися до сервера"
+msgstr "Переглянути на домашньому сервері"
 
 #: app/templates/admin/emoji.html:16
 msgid "Add new emoji"
@@ -5933,9 +5915,8 @@ msgid "Load communities from Lemmyverse data"
 msgstr "Завантажити спільноти з даних Lemmyverse"
 
 #: app/templates/admin/federation_ban_lists.html:15
-#, fuzzy
 msgid "Federation - ban lists"
-msgstr "Стан федерації"
+msgstr "Федерація — списки блокування"
 
 #: app/templates/admin/federation_ban_lists.html:16
 msgid ""
@@ -5958,9 +5939,8 @@ msgstr ""
 " лише щось одне."
 
 #: app/templates/admin/federation_preload.html:15
-#, fuzzy
 msgid "Bulk community import - from lemmyverse"
-msgstr "Завантажити спільноти з даних Lemmyverse"
+msgstr "Масовий імпорт спільнот — із lemmyverse"
 
 #: app/templates/admin/federation_preload.html:16
 msgid ""
@@ -5988,9 +5968,8 @@ msgstr ""
 "налаштувань мережі."
 
 #: app/templates/admin/federation_remote_scan.html:15
-#, fuzzy
 msgid "Federation - Remote server scan"
-msgstr "Сканувати віддалені сервери"
+msgstr "Федерація — сканування віддалених серверів"
 
 #: app/templates/admin/federation_remote_scan.html:16
 msgid ""
@@ -6480,16 +6459,20 @@ msgid ""
 "Bots automatically create posts from major news organisations, etc which "
 "can be annoying."
 msgstr ""
+"Боти автоматично створюють дописи від, наприклад, великих новинних "
+"організацій, що може набридати."
 
 #: app/templates/auth/filter_selection.html:21
 msgid ""
 "NSFL posts may contain gore, intense war footage or other disturbing "
 "content."
 msgstr ""
+"NSFL-дописи можуть містити розчленування, тяжкі воєнні хроніки чи інший "
+"хвилюючий вміст."
 
 #: app/templates/auth/filter_selection.html:23
 msgid "These posts were written using AI or link to articles made using AI."
-msgstr ""
+msgstr "Ці дописи написано «ШІ» або вони посилаються на статті, написані «ШІ»."
 
 #: app/templates/auth/filter_selection.html:26
 msgid "You will be able to change this later."
@@ -7112,7 +7095,7 @@ msgstr "Сповіщати про кожен допис. Не рекомендо
 
 #: app/templates/community/_notification_toggle.html:12
 msgid "Favorite this community to put it on the Explore menu"
-msgstr ""
+msgstr "Уподобайте цю спільноту, щоб вона з'явилась у меню «Огляд»"
 
 #: app/templates/community/add_local.html:25
 #: app/templates/community/community_edit.html:35
@@ -7232,14 +7215,12 @@ msgid "Found a community:"
 msgstr "Знайдено спільноту:"
 
 #: app/templates/community/check_url_posted.html:3
-#, fuzzy
 msgid "This link has already been posted elsewhere:"
-msgstr "Цим посиланням уже ділилися в спільнотах:"
+msgstr "Цим посиланням уже десь ділилися:"
 
 #: app/templates/community/check_url_posted.html:8
-#, fuzzy
 msgid "Post Title"
-msgstr "Назва допису: "
+msgstr "Назва допису"
 
 #: app/templates/community/community.html:39
 #: app/templates/community/community.html:76
@@ -7959,9 +7940,8 @@ msgid "Federated"
 msgstr "Федерація"
 
 #: app/templates/instance/list_instances.html:87
-#, fuzzy
 msgid "Silenced instances"
-msgstr "Блоковані сервери"
+msgstr "Стишені сервери"
 
 #: app/templates/instance/list_instances.html:150
 msgid "Heard from"
@@ -8001,9 +7981,8 @@ msgstr "Заблокувати всіх із %(instance_name)s"
 #: app/templates/user/show_profile.html:105
 #: app/templates/user/show_profile.html:321
 #: app/templates/user/user_preview.html:65
-#, fuzzy
 msgid "Unfollow"
-msgstr "Стежити"
+msgstr "Відписатися"
 
 #: app/templates/instance/people.html:42
 #: app/templates/user/show_profile.html:101
@@ -8155,9 +8134,8 @@ msgid "Join Mode"
 msgstr "Режим долучення"
 
 #: app/templates/post/_post_full.html:259
-#, fuzzy
 msgid "No paywall link"
-msgstr "Перейти за посиланням"
+msgstr "Посилання без пейволу"
 
 #: app/templates/post/_post_full.html:265
 msgid "Licence"
@@ -8639,14 +8617,12 @@ msgid "Poll choices"
 msgstr "Варіанти відповіді"
 
 #: app/templates/post/post_edit.html:217
-#, fuzzy
 msgid "First choice"
-msgstr "Додати варіант"
+msgstr "Перший варіант"
 
 #: app/templates/post/post_edit.html:220
-#, fuzzy
 msgid "Second choice"
-msgstr "Додати варіант"
+msgstr "Другий варіант"
 
 #: app/templates/post/post_edit.html:261
 msgid "Add choice"
@@ -9561,17 +9537,17 @@ msgid "Stop applying this filter after this date. Optional."
 msgstr "Фільтр припинить діяти після цієї дати. Необов'язково."
 
 #: app/templates/user/edit_note.html:13
-#, fuzzy, python-format
+#, python-format
 msgid "Edit private note for \"%(user_name)s\""
-msgstr "Редагувати нотатку про %(user_name)s"
+msgstr "Редагувати приватну нотатку про «%(user_name)s»"
 
 #: app/templates/user/edit_note.html:15
 msgid "Use an emoji for the note"
-msgstr ""
+msgstr "Використайте в нотатці емоджі"
 
 #: app/templates/user/edit_note.html:44
 msgid "or some text, below:"
-msgstr ""
+msgstr "або певний текст — унизу:"
 
 #: app/templates/user/edit_note.html:50
 msgid ""
@@ -10007,7 +9983,7 @@ msgstr "Надіслати повідомлення в Matrix"
 #: app/templates/user/show_profile.html:103
 #: app/templates/user/user_preview.html:63
 msgid "Cancel follow request"
-msgstr ""
+msgstr "Скасувати запит на підписку"
 
 #: app/templates/user/show_profile.html:116
 msgid "Edit user in admin panel"
@@ -10073,15 +10049,13 @@ msgstr "Огляд"
 
 #: app/templates/user/show_profile.html:194
 #: app/templates/user/show_profile.html:314
-#, fuzzy
 msgid "Following"
-msgstr "Перейти за посиланням"
+msgstr "Підписки"
 
 #: app/templates/user/show_profile.html:199
 #: app/templates/user/show_profile.html:333
-#, fuzzy
 msgid "Followers"
-msgstr "Стежити"
+msgstr "Підписники"
 
 #: app/templates/user/show_profile.html:211
 #, python-format
@@ -10111,9 +10085,8 @@ msgid "Comments by %(user_name)s"
 msgstr "Коментарі %(user_name)s"
 
 #: app/templates/user/show_profile.html:305
-#, fuzzy
 msgid "Archived comments"
-msgstr "Блоковані коментарі"
+msgstr "Архівні коментарі"
 
 #: app/templates/user/show_profile.html:370
 msgid "Same IP address"
@@ -10125,24 +10098,23 @@ msgstr "Модерувати користувача"
 
 #: app/templates/user/show_profile.html:402
 msgid "Ask if bot"
-msgstr ""
+msgstr "Запитати, чи бот"
 
 #: app/templates/user/show_profile.html:407
 msgid "Bot challenge result pending"
-msgstr ""
+msgstr "Перевірка на бота триває"
 
 #: app/templates/user/show_profile.html:409
-#, fuzzy
 msgid "Not a bot"
-msgstr "Дописи ботів"
+msgstr "Не бот"
 
 #: app/templates/user/show_profile.html:453
 #: app/templates/user/show_upvoted.html:35
 #: app/templates/user/show_upvoted.html:63
 #: app/templates/user/show_upvoted.html:78 app/user/routes.py:156
-#, fuzzy, python-format
+#, python-format
 msgid "Posts upvoted by %(user_name)s"
-msgstr "Дописи %(user_name)s"
+msgstr "Дописи, схвалені %(user_name)s"
 
 #: app/templates/user/stripe_redirect.html:10 app/user/subscription.py:87
 msgid "Please wait..."
@@ -10510,9 +10482,8 @@ msgid "Reply hide threshold"
 msgstr "Поріг ховання коментарів"
 
 #: app/user/forms.py:68
-#, fuzzy
 msgid "Posts per page"
-msgstr "Допис стерто."
+msgstr "Дописів на сторінці"
 
 #: app/user/forms.py:69
 msgid "Use markdown editor GUI when writing"
@@ -11056,18 +11027,19 @@ msgstr "Історію читання видалено"
 
 #: app/user/routes.py:1971
 msgid "Follow request sent."
-msgstr ""
+msgstr "Запит на підписку надіслано."
 
 #: app/user/routes.py:1994
-#, fuzzy
 msgid "Unfollowed."
-msgstr "Стежити"
+msgstr "Ви відписались."
 
 #: app/user/routes.py:2014
 msgid ""
 "Bot challenge was sent. If they do not respond within 48 hours their "
 "account will be flagged as a bot."
 msgstr ""
+"Перевірку на бота надіслано. За відсутності відповіді протягом 48 годин "
+"обліковий запис буде позначено як бота."
 
 #: app/user/routes.py:2040
 #, python-format
@@ -11180,4 +11152,3 @@ msgstr "Внесок скасовано."
 
 #~ msgid "User note"
 #~ msgstr "Нотатка про користувача"
-
