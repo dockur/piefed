@@ -1,4 +1,4 @@
-from flask import redirect, url_for, flash, current_app, abort, g
+from flask import redirect, url_for, flash, current_app, abort, g, request
 from flask_babel import _
 from flask_login import current_user, login_required
 
@@ -57,12 +57,14 @@ def choose_topics():
     mark_onboarding_as_finished()
     if get_setting('choose_topics', True) and num_topics() > 0:
         form = ChooseTopicsForm()
-        choices, selections = topics_for_form()
-        form.chosen_topics.choices = choices
+        topic_tree, selections = topics_for_form()
+        
         if form.validate_on_submit():
-            if form.chosen_topics.data:
-                for topic_id in form.chosen_topics.data:
-                    join_topic(topic_id)
+            # Handle form submission - get selected topics from request
+            chosen_topic_ids = request.form.getlist('chosen_topics')
+            if chosen_topic_ids:
+                for topic_id_str in chosen_topic_ids:
+                    join_topic(int(topic_id_str))
                 flash(_('You have joined some communities relating to those interests. Find more on the Explore menu or browse the home page.'))
                 cache.delete_memoized(joined_communities, current_user.id)
                 return redirect(url_for('main.index'))
@@ -70,9 +72,9 @@ def choose_topics():
                 flash(_('You did not choose any topics. Would you like to choose individual communities instead?'))
                 return redirect(url_for('main.list_communities'))
         else:
-            form.chosen_topics.data = selections    # topics that match the user's country are ticked by default
-            return render_template('auth/choose_topics.html', form=form,
-                                   )
+            # Set default selections based on user's country
+            form.chosen_topics.data = selections
+            return render_template('auth/choose_topics.html', form=form, topic_tree=topic_tree)
     else:
         flash(_('Please join some communities you\'re interested in and then go to the home page by clicking on the logo above.'))
         return redirect(url_for('main.list_communities'))
@@ -100,20 +102,49 @@ def join_topic(topic_id):
 
 
 def topics_for_form():
+    """Build a hierarchical topic tree with max 3 levels for the form.
+    
+    Returns:
+        list: Nested topic structure with depth info
+        list: Default selected topic IDs based on user's country
+    """
     topics = Topic.query.filter_by(parent_id=None).order_by(Topic.name).all()
-    result = []         # topics, arranged into a hierarchy
-    selections = []     # topic ids that match the user's country
     user_country = get_country(ip_address())
-    for topic in topics:
-        result.append((topic.id, topic.name))
-        if user_country and user_country in topic.countries:
-            selections.append(topic.id)
+    
+    def build_topic_tree(topic, depth=0):
+        """Recursively build topic tree, limiting to 3 levels max."""
+        if depth > 2:  # Max depth is 2 (0=root, 1=child, 2=grandchild)
+            return None
+            
+        node = {
+            'id': topic.id,
+            'name': topic.name,
+            'depth': depth,
+            'children': [],
+            'selected': user_country in topic.countries if user_country else False
+        }
+        
+        # Fetch children and build their trees
         sub_topics = Topic.query.filter_by(parent_id=topic.id).order_by(Topic.name).all()
         for sub_topic in sub_topics:
-            result.append((sub_topic.id, ' --- ' + sub_topic.name))
-            if user_country and user_country in sub_topic.countries:
-                selections.append(sub_topic.id)
-    return result, selections
+            child = build_topic_tree(sub_topic, depth + 1)
+            if child is not None:  # Only add if within depth limit
+                node['children'].append(child)
+        
+        return node
+    
+    # Build tree from root topics
+    topic_tree = []
+    selections = []
+    
+    for topic in topics:
+        node = build_topic_tree(topic)
+        if node is not None:
+            topic_tree.append(node)
+            if node['selected']:
+                selections.append(node['id'])
+    
+    return topic_tree, selections
 
 
 def send_community_follow(community_id: int, join_request_id: int, user_id: int):

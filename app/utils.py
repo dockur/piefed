@@ -3793,29 +3793,31 @@ def favorite_communities(user_id):
     )
 
 
-def communities_run_by_bots():
-    sql = """SELECT c.id
-            FROM community c
-            WHERE EXISTS (
-                    -- must have at least one moderator
-                    SELECT 1
-                    FROM community_member cm
-                    WHERE cm.community_id = c.id
-                      AND cm.is_banned = false
-                      AND (cm.is_moderator OR cm.is_owner)
-                  )
-              AND NOT EXISTS (
-                    -- ...and no moderator who is a human (non-bot)
-                    SELECT 1
-                    FROM community_member cm
-                    JOIN "user" u ON u.id = cm.user_id
-                    WHERE cm.community_id = c.id
-                      AND cm.is_banned = false
-                      AND (cm.is_moderator OR cm.is_owner)
-                      AND COALESCE(u.bot, false) = false
-                      AND COALESCE(u.bot_override, false) = false
-                  )"""
-    return db.session.execute(text(sql)).scalars().all()
+def communities_run_by_inactive_mods():
+    cutoff = utcnow() - timedelta(days=90)
+
+    sql = """
+        SELECT c.id
+        FROM community c
+        JOIN community_member cm
+          ON cm.community_id = c.id
+         AND cm.is_banned = false
+         AND (cm.is_moderator OR cm.is_owner)
+        JOIN "user" u
+          ON u.id = cm.user_id
+        GROUP BY c.id
+        HAVING COUNT(*) > 0
+           AND SUM(
+                CASE
+                    WHEN COALESCE(u.bot, false) = false
+                     AND COALESCE(u.bot_override, false) = false
+                     AND u.last_seen >= :cutoff
+                    THEN 1 ELSE 0
+                END
+           ) = 0
+    """
+
+    return db.session.execute(text(sql), {"cutoff": cutoff}).scalars().all()
 
 
 class SqlKeysetPagination:

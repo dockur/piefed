@@ -12,7 +12,7 @@
                 <div class="card mt-5">
                     <div class="card-body p-6" id="registration_form">
                         {% if site.registration_mode != 'Closed' %}
-                            <div class="card-title text-center">{{ _('Create new account') }}</div>
+                            <h1 class="card-title text-center">{{ _('Create new account') }}</h1>
                             {% if google_oauth -%}
                             <p align="center">
                                 <a href="/auth/google_login" class="btn btn-outline-primary">{{ _('Log in with Google') }}

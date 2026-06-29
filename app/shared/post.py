@@ -815,6 +815,9 @@ def report_post(post: Post, input, src, auth=None):
         notify_admins = ('5' in input.reasons.data or '6' in input.reasons.data or ('17' in input.reasons.data and post.community.instance.software.lower() != 'piefed'))
         report_remote = input.report_remote.data
 
+    if post.community.is_local() and post.community.un_moderated:
+        notify_admins = True
+
     targets_data = {
         'gen': '0',
         'suspect_post_id': post.id,
