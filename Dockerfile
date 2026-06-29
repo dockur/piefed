@@ -54,6 +54,6 @@ LABEL org.opencontainers.image.source="https://codeberg.org/rimu/pyfedi"
 LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
 LABEL org.opencontainers.image.description="A Lemmy/Mbin alternative written in Python with Flask."
 
-HEALTHCHECK --interval=60s --retries=2 --timeout=10s CMD curl -ILfSs http://localhost:5000/nodeinfo/2.1 >/dev/null || exit 1
+HEALTHCHECK --interval=60s --retries=2 --timeout=10s CMD curl -ILfSs http://localhost:5000/health >/dev/null || exit 1
 
 ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
