@@ -244,6 +244,7 @@ def send_post(post_id, edit=False, session=None):
         page['buyTicketsLink'] = event.buy_tickets_link
         page['feeCurrency'] = event.event_fee_currency
         page['feeAmount'] = event.event_fee_amount
+        page['location'] = event.location
 
     activity = 'create' if not edit else 'update'
     create_id = f"{current_app.config['SERVER_URL']}/activities/{activity}/{gibberish(15)}"

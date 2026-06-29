@@ -2109,7 +2109,8 @@ class Post(db.Model):
                               online=request_json['object']['isOnline'],
                               buy_tickets_link=request_json['object']['buyTicketsLink'],
                               event_fee_currency=request_json['object']['feeCurrency'],
-                              event_fee_amount=request_json['object']['feeAmount'])
+                              event_fee_amount=request_json['object']['feeAmount'],
+                              location=request_json['object']['location'])
                 db.session.add(event)
                 post.url = ''   # Mobilizon puts the AP ID in request_json['object']['url'] and any attached website links in a request_json['object']['attachment'] list
                 if ('attachment' in request_json['object'] and
