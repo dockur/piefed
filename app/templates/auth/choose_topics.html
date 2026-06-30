@@ -4,19 +4,98 @@
     {% extends "base.html" -%}
 {% endif -%}
 
-{% from 'bootstrap5/form.html' import render_form %}
+{% from 'bootstrap5/form.html' import render_form, render_field %}
+
+{% block styles %}
+    {{ super() }}
+    <style>
+        .topic-tree-container {
+            max-height: 60vh;
+            overflow-y: auto;
+            border: 1px solid var(--bs-border-color-translucent);
+            border-radius: 0.25rem;
+            padding: 1rem;
+        }
+        
+        .topic-tree-container ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        
+        .topic-item {
+            margin-bottom: 0;
+        }
+        
+        .topic-depth-0 .topic-checkbox {
+            padding-left: 0.5rem;
+        }
+        
+        .topic-depth-1 .topic-checkbox {
+            padding-left: 2rem;
+            border-left: 2px solid var(--bs-border-color);
+            margin-left: 0.5rem;
+        }
+        
+        .topic-depth-2 .topic-checkbox {
+            padding-left: 3.5rem;
+            border-left: 2px solid var(--bs-border-color);
+            margin-left: 0.5rem;
+        }
+        
+        .topic-checkbox {
+            margin-bottom: 0;
+        }
+        
+        .form-check-label {
+            cursor: pointer;
+            line-height: 30px;
+        }
+    </style>
+{% endblock %}
 
 {% block app_content %}
     <div class="row">
         <div class="col col-login mx-auto">
             <div class="card mt-5">
                 <div class="card-body p-6" id="choose_topics_card">
-                    <div class="card-title text-center">{{ _('Please choose at least 3 topics that interest you.') }}</div>
-                    <p><a href="{{ url_for('main.list_communities', prompt='true') }}">{{ _('Proceed without choosing any topics')  }}</a></p>
-                    {{ render_form(form) }}
+                    <h1 class="card-title text-center">{{ _('Please choose at least 3 topics that interest you.') }}</h1>
+                    <p><a href="{{ url_for('main.list_communities', prompt='true') }}">{{ _('Proceed without choosing any topics') }}</a></p>
+                    
+                    <form method="post" class="form">
+                        {{ form.hidden_tag() }}
+                        {{ form.csrf_token }}
+
+                        <h2 id="topics_heading" class="visually-hidden">{{ _('Topics') }}</h2>
+                        <div class="topic-tree-container mb-4" role="region" aria-describedby="topics_heading">
+                            {{ render_topic_tree(topic_tree, form) }}
+                        </div>
+                        
+                        {{ render_field(form.submit) }}
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
 {% endblock %}
+
+{% macro render_topic_tree(topics, form, depth=0) %}
+    {# Max depth is 2 (0=root, 1=child, 2=grandchild) #}
+    <ul class="list-unstyled m-0 p-0">
+        {% for topic in topics %}
+        <li class="topic-item topic-depth-{{ depth }}">
+            <div class="form-check topic-checkbox">
+                {% set is_checked = (topic.id in form.chosen_topics.data) if form.chosen_topics.data else topic.selected %}
+                <input type="checkbox" name="chosen_topics" value="{{ topic.id }}" id="topic_{{ topic.id }}" {% if is_checked %}checked{% endif %}>
+                <label class="form-check-label d-inline-block" for="topic_{{ topic.id }}">
+                    {{ topic.name }}
+                </label>
+                {% if depth < 2 and topic.children %}
+                    {{ render_topic_tree(topic.children, form, depth + 1) }}
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}

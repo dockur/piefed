@@ -99,6 +99,11 @@
                       {{ _('This community is private and only visible to members.') }}
                     </p>
                 {% endif -%}
+                {% if community.new_mods_wanted or (community.is_local() and community.un_moderated) -%}
+                    <p class="border bg-body-secondary border-secondary rounded-pill text-center px-3 py-1">
+                        {{ _('This community needs more moderators. Contact the %(instance_name)s admin team to apply.', instance_name=community.ap_domain) }}
+                    </p>
+                {% endif -%}
                 {{ community.description_html|community_links|feed_links|safe if community.description_html else '' }}
                 {% if current_user.is_authenticated or (community_flair and len(community_flair) > 0) -%}
                     <hr>

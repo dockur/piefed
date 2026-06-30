@@ -35,7 +35,7 @@ from app.utils import get_request, allowlist_html, get_setting, ap_datetime, mar
     moderating_communities, get_task_session, is_video_hosting_site, opengraph_parse, mastodon_extra_field_link, \
     blocked_users, piefed_markdown_to_lemmy_markdown, store_files_in_s3, guess_mime_type, get_recipient_language, \
     patch_db_session, to_srgb, communities_banned_from_all_users, blocked_communities, blocked_or_banned_instances, \
-    instance_community_ids, banned_instances, communities_run_by_bots
+    instance_community_ids, banned_instances, communities_run_by_inactive_mods
 
 
 def public_key():
@@ -208,6 +208,7 @@ def post_to_page(post: Post):
         activity_data['buyTicketsLink'] = event.buy_tickets_link
         activity_data['feeCurrency'] = event.event_fee_currency
         activity_data['feeAmount'] = event.event_fee_amount
+        activity_data['location'] = event.location
 
     if post.indexable:
         activity_data['searchableBy'] = 'https://www.w3.org/ns/activitystreams#Public'
@@ -906,7 +907,7 @@ def refresh_community_profile_task(community_id, activity_json):
                                         post.sticky = True
                                         session.commit()
 
-                    community.un_moderated = community.id in communities_run_by_bots()
+                    community.un_moderated = community.id in communities_run_by_inactive_mods()
                     session.commit()
 
     except Exception:
@@ -3305,6 +3306,20 @@ def process_report(user, reported, request_json, session):
                                         targets=targets_data)
             session.add(notification)
             already_notified.add(mod.user_id)
+
+        if reported.community.is_local() and reported.community.un_moderated:
+            # Notify site admin if community is un-moderated
+            already_notified = set()
+            for admin in Site.admins():
+                if admin.id not in already_notified:
+                    notify = Notification(title='Reported user', url='/admin/reports', user_id=admin.id,
+                                          author_id=user.id, notif_type=NOTIF_REPORT,
+                                          subtype='user_reported',
+                                          targets=targets_data)
+                    session.add(notify)
+                    admin.unread_notifications += 1
+                    session.commit()
+
         reported.reports += 1
         session.commit()
     elif isinstance(reported, PostReply):
@@ -3342,6 +3357,20 @@ def process_report(user, reported, request_json, session):
                                         targets=targets_data)
             session.add(notification)
             already_notified.add(mod.user_id)
+
+        if reported.community.is_local() and reported.community.un_moderated:
+            # Notify site admin if community is un-moderated
+            already_notified = set()
+            for admin in Site.admins():
+                if admin.id not in already_notified:
+                    notify = Notification(title='Reported user', url='/admin/reports', user_id=admin.id,
+                                          author_id=user.id, notif_type=NOTIF_REPORT,
+                                          subtype='user_reported',
+                                          targets=targets_data)
+                    session.add(notify)
+                    admin.unread_notifications += 1
+                    session.commit()
+
         reported.reports += 1
         session.commit()
     elif isinstance(reported, Community):
