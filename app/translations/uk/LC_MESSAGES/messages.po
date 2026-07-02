@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-06-28 19:10+1200\n"
-"PO-Revision-Date: 2026-06-27 22:19+0000\n"
+"PO-Revision-Date: 2026-06-29 11:28+0000\n"
 "Last-Translator: Denys Nykula <nykula@ukr.net>\n"
+"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed/"
+"main-web-app/uk/>\n"
 "Language: uk\n"
-"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed"
-"/main-web-app/uk/>\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.10.4\n"
 "Generated-By: Babel 2.12.1\n"
 
 #: app/__init__.py:54
@@ -3379,9 +3380,8 @@ msgid "Next"
 msgstr "Далі"
 
 #: app/main/routes.py:185 app/main/routes.py:190
-#, fuzzy
 msgid "Local posts"
-msgstr "Замикає допис"
+msgstr "Місцеві дописи"
 
 #: app/main/routes.py:189 app/templates/_view_filter_nav.html:7
 #: app/templates/_view_filter_nav.html:20
@@ -3396,9 +3396,8 @@ msgid "Posts from popular communities"
 msgstr "Дописи з популярних спільнот"
 
 #: app/main/routes.py:192
-#, fuzzy
 msgid "All posts"
-msgstr "Блокувати дописи"
+msgstr "Усі дописи"
 
 #: app/main/routes.py:234 app/templates/explore_menu.html:45
 #: app/templates/themes/dillo/base.html:73
@@ -4929,7 +4928,7 @@ msgstr "Більше тем"
 
 #: app/templates/index.html:13
 msgid "Create an account to tailor this feed to your interests."
-msgstr ""
+msgstr "Щоб налаштувати стрічку за інтересами, створіть обліковий запис."
 
 #: app/templates/index.html:40 app/templates/themes/dillo/index.html:33
 msgid "No posts yet. Join some communities to see more."
@@ -5022,9 +5021,8 @@ msgid "New communities"
 msgstr "Нові спільноти"
 
 #: app/templates/index.html:76
-#, fuzzy
 msgid "More new communities"
-msgstr "Більше спільнот"
+msgstr "Більше нових спільнот"
 
 #: app/templates/index.html:83 app/templates/search/results.html:76
 #: app/templates/themes/dillo/_side_pane.html:116
@@ -5037,23 +5035,20 @@ msgid "Browse topics"
 msgstr "Переглянути теми"
 
 #: app/templates/index.html:139
-#, fuzzy
 msgid "This server"
-msgstr "Долучитися до сервера"
+msgstr "Цей сервер"
 
 #: app/templates/index.html:146
 msgid "Whole network"
-msgstr ""
+msgstr "Уся мережа"
 
 #: app/templates/index.html:161
-#, fuzzy
 msgid "New instances"
-msgstr "Онлайн-сервери"
+msgstr "Нові сервери"
 
 #: app/templates/index.html:171
-#, fuzzy
 msgid "More instances"
-msgstr "Сервер джерела"
+msgstr "Більше серверів"
 
 #: app/templates/keyboard_shortcuts.html:11
 msgid "Most shortcuts are the same as what reddit has."
@@ -11212,4 +11207,3 @@ msgstr "Внесок скасовано."
 
 #~ msgid "User note"
 #~ msgstr "Нотатка про користувача"
-
