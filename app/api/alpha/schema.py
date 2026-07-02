@@ -204,7 +204,7 @@ class LocalUser(DefaultSchema):
     show_nsfw = fields.Boolean(required=True, metadata={"description": "True for any visibility option other than Hide"})
     show_read_posts = fields.Boolean(required=True)
     show_scores = fields.Boolean(required=True)
-    manually_approves_followers = fields.Boolean()
+    manually_approves_followers = fields.Boolean(allow_none=True)
 
 
 class LocalUserView(DefaultSchema):
