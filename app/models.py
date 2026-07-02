@@ -3768,7 +3768,7 @@ class Site(db.Model):
     show_inoculation_block = db.Column(db.Boolean, default=True)
     additional_css = db.Column(db.Text)
     additional_js = db.Column(db.Text)
-    private_instance = db.Column(db.Boolean, default=False)
+    private_instance = db.Column(db.Boolean, default=True)
     language_id = db.Column(db.Integer)
     honeypot = db.Column(db.Boolean, default=True)
     allowlist_mode = db.Column(db.Integer, default=0)   # 0 = weak, 1 = strong, 2 = intense
