@@ -3377,6 +3377,9 @@ form h5 {
 .render_username .author_link.donor img {
   box-shadow: var(--black-tint-01) 0px var(--spacing-2) var(--spacing-4);
 }
+.render_username .author_link .text-muted {
+  font-size: var(--font-size-13);
+}
 .render_username .author_link + .user_preview {
   position: absolute;
   top: var(--spacing-20);
