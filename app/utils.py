@@ -4569,10 +4569,6 @@ def is_invalid_get_request_uri(uri):
         return True
 
 
-def is_invalid_post_request_uri(uri):
-    return is_invalid_get_request_uri(uri)
-
-
 def sanitize_svg_bytes(svg_bytes: bytes) -> bytes:
     # Sanitize SVGs to remove potentially dangerous elements.
 
