@@ -3711,7 +3711,6 @@ def reported_posts(user_id: int, is_admin: bool) -> List[int]:
         return []
     if is_admin:
         post_ids = list(db.session.execute(text('SELECT id FROM "post" WHERE reports > 0')).scalars())
-        print(post_ids)
     else:
         community_ids = moderating_communities_ids(user_id)
         if len(community_ids) > 0:
