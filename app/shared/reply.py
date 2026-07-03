@@ -8,7 +8,7 @@ from sqlalchemy import text
 from app import db, limiter
 from app.constants import *
 from app.models import Notification, NotificationSubscription, Post, PostReply, PostReplyBookmark, Report, Site, User, \
-    utcnow, Instance
+    utcnow, Instance, votes_cast_today
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, add_to_modlog, can_create_post_reply, \
@@ -16,40 +16,42 @@ from app.utils import render_template, authorise_api_user, shorten_string, \
 
 
 def vote_for_reply(reply_id: int, vote_direction, federate: bool, emoji: str | None, src, auth=None):
-    with limiter.limit('120 per day'):
-        if src == SRC_API:
-            reply = db.session.query(PostReply).filter_by(id=reply_id).one()
-            user = authorise_api_user(auth, return_type='model')
-            if vote_direction == 'upvote' and not can_upvote(user, reply.community):
-                return user.id
-            elif vote_direction == 'downvote' and not can_downvote(user, reply.community):
-                return user.id
-        else:
-            reply = db.session.query(PostReply).get_or_404(reply_id)
-            user = current_user
-
-        if user.banned or user_ip_banned():
-            abort(403)
-
-        undo = reply.vote(user, vote_direction, emoji)
-
-        task_selector('vote_for_reply', user_id=user.id, reply_id=reply_id, vote_to_undo=undo,
-                      vote_direction=vote_direction, federate=federate, emoji=emoji)
-
-        if src == SRC_API:
+    if src == SRC_API:
+        reply = db.session.query(PostReply).filter_by(id=reply_id).one()
+        user = authorise_api_user(auth, return_type='model')
+        if vote_direction == 'upvote' and not can_upvote(user, reply.community):
             return user.id
-        else:
-            recently_upvoted = []
-            recently_downvoted = []
-            if vote_direction == 'upvote' and undo is None:
-                recently_upvoted = [reply_id]
-            elif vote_direction == 'downvote' and undo is None:
-                recently_downvoted = [reply_id]
+        elif vote_direction == 'downvote' and not can_downvote(user, reply.community):
+            return user.id
+    else:
+        reply = db.session.query(PostReply).get_or_404(reply_id)
+        user = current_user
 
-            return render_template('post/_comment_voting_buttons.html', comment=reply,
-                                   recently_upvoted_replies=recently_upvoted,
-                                   recently_downvoted_replies=recently_downvoted,
-                                   community=reply.community)
+    if user.banned or user_ip_banned():
+        abort(403)
+
+    if votes_cast_today(user.id) > VOTE_QUOTA:
+        abort(429)
+
+    undo = reply.vote(user, vote_direction, emoji)
+
+    task_selector('vote_for_reply', user_id=user.id, reply_id=reply_id, vote_to_undo=undo,
+                  vote_direction=vote_direction, federate=federate, emoji=emoji)
+
+    if src == SRC_API:
+        return user.id
+    else:
+        recently_upvoted = []
+        recently_downvoted = []
+        if vote_direction == 'upvote' and undo is None:
+            recently_upvoted = [reply_id]
+        elif vote_direction == 'downvote' and undo is None:
+            recently_downvoted = [reply_id]
+
+        return render_template('post/_comment_voting_buttons.html', comment=reply,
+                               recently_upvoted_replies=recently_upvoted,
+                               recently_downvoted_replies=recently_downvoted,
+                               community=reply.community)
 
 
 def bookmark_reply(reply_id: int, src, auth=None):

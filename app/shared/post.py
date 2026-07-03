@@ -18,7 +18,7 @@ from app.activitypub.util import make_image_sizes, notify_about_post
 from app.community.util import tags_from_string_old, end_poll_date, flair_from_form, flairs_from_string
 from app.constants import *
 from app.models import File, Notification, NotificationSubscription, Poll, PollChoice, Post, PostBookmark, PostVote, \
-    Report, Site, User, utcnow, Instance, Event, Community
+    Report, Site, User, utcnow, Instance, Event, Community, votes_cast_today
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, gibberish, ensure_directory_exists, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, fixup_url, domain_from_url, \
@@ -29,47 +29,49 @@ from app.utils import render_template, authorise_api_user, shorten_string, gibbe
 
 
 def vote_for_post(post_id: int, vote_direction, federate: bool, emoji: str, src, auth=None):
-    with limiter.limit('120 per day'):
-        if src == SRC_API:
-            post = db.session.query(Post).get(post_id)
-            user = authorise_api_user(auth, return_type='model')
-            if vote_direction == 'upvote' and not can_upvote(user, post.community):
-                return user.id
-            elif vote_direction == 'downvote' and not can_downvote(user, post.community):
-                return user.id
-        else:
-            post = db.session.query(Post).get_or_404(post_id)
-            user = current_user
-
-            if (vote_direction == 'upvote' and not can_upvote(user, post.community)) or (
-                    vote_direction == 'downvote' and not can_downvote(user, post.community)):
-                template = 'post/_post_voting_buttons.html' if request.args.get('style',
-                                                                                '') == '' else 'post/_post_voting_buttons_masonry.html'
-                return render_template(template, post=post, community=post.community, recently_upvoted=[],
-                                       recently_downvoted=[])
-
-        if user.banned or user_ip_banned():
-            abort(403)
-
-        undo = post.vote(user, vote_direction, emoji)
-
-        task_selector('vote_for_post', user_id=user.id, post_id=post_id, vote_to_undo=undo, vote_direction=vote_direction, federate=federate, emoji=emoji)
-
-        mark_post_read([post.id], True, user.id)
-
-        if src == SRC_API:
+    if src == SRC_API:
+        post = db.session.query(Post).get(post_id)
+        user = authorise_api_user(auth, return_type='model')
+        if vote_direction == 'upvote' and not can_upvote(user, post.community):
             return user.id
-        else:
-            recently_upvoted = []
-            recently_downvoted = []
-            if vote_direction == 'upvote' and undo is None:
-                recently_upvoted = [post_id]
-            elif vote_direction == 'downvote' and undo is None:
-                recently_downvoted = [post_id]
+        elif vote_direction == 'downvote' and not can_downvote(user, post.community):
+            return user.id
+    else:
+        post = db.session.query(Post).get_or_404(post_id)
+        user = current_user
 
-            template = 'post/_post_voting_buttons.html' if request.args.get('style', '') == '' else 'post/_post_voting_buttons_masonry.html'
-            return render_template(template, post=post, community=post.community, recently_upvoted=recently_upvoted,
-                                   recently_downvoted=recently_downvoted)
+        if (vote_direction == 'upvote' and not can_upvote(user, post.community)) or (
+                vote_direction == 'downvote' and not can_downvote(user, post.community)):
+            template = 'post/_post_voting_buttons.html' if request.args.get('style',
+                                                                            '') == '' else 'post/_post_voting_buttons_masonry.html'
+            return render_template(template, post=post, community=post.community, recently_upvoted=[],
+                                   recently_downvoted=[])
+
+    if user.banned or user_ip_banned():
+        abort(403)
+
+    if votes_cast_today(user.id) > VOTE_QUOTA:
+        abort(429)
+
+    undo = post.vote(user, vote_direction, emoji)
+
+    task_selector('vote_for_post', user_id=user.id, post_id=post_id, vote_to_undo=undo, vote_direction=vote_direction, federate=federate, emoji=emoji)
+
+    mark_post_read([post.id], True, user.id)
+
+    if src == SRC_API:
+        return user.id
+    else:
+        recently_upvoted = []
+        recently_downvoted = []
+        if vote_direction == 'upvote' and undo is None:
+            recently_upvoted = [post_id]
+        elif vote_direction == 'downvote' and undo is None:
+            recently_downvoted = [post_id]
+
+        template = 'post/_post_voting_buttons.html' if request.args.get('style', '') == '' else 'post/_post_voting_buttons_masonry.html'
+        return render_template(template, post=post, community=post.community, recently_upvoted=recently_upvoted,
+                               recently_downvoted=recently_downvoted)
 
 
 def bookmark_post(post_id: int, src, auth=None):

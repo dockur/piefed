@@ -27,7 +27,7 @@ from app.feed.routes import show_feed
 from app.models import User, Community, CommunityJoinRequest, CommunityMember, CommunityBan, ActivityPubLog, Post, \
     PostReply, Instance, AllowedInstances, BannedInstances, utcnow, Site, Notification, \
     ChatMessage, Conversation, UserFollower, UserBlock, Poll, PollChoice, Feed, FeedItem, FeedMember, FeedJoinRequest, \
-    IpBan, ActivityBatch, InstanceBan, UserFollowRequest
+    IpBan, ActivityBatch, InstanceBan, UserFollowRequest, votes_cast_today
 from app.post.routes import continue_discussion, show_post
 from app.shared.tasks import task_selector
 from app.user.routes import show_profile
@@ -2331,7 +2331,8 @@ def process_upvote(user, store_ap_json, request_json, announced):
         log_incoming_ap(id, APLOG_LIKE, APLOG_FAILURE, saved_json, 'Unfound object ' + ap_id)
         return
     if can_upvote(user, liked.community) and not instance_banned(user.instance.domain):
-        if isinstance(liked, (Post, PostReply)) and user.id not in blocked_users(liked.author.id):
+        if isinstance(liked, (Post, PostReply)) and user.id not in blocked_users(liked.author.id) and \
+                votes_cast_today(user.id) <= VOTE_QUOTA:
             liked.vote(user, 'upvote', emoji)
             log_incoming_ap(id, APLOG_LIKE, APLOG_SUCCESS, saved_json)
             if not announced:
@@ -2351,7 +2352,8 @@ def process_downvote(user, store_ap_json, request_json, announced):
         log_incoming_ap(id, APLOG_DISLIKE, APLOG_FAILURE, saved_json, 'Unfound object ' + ap_id)
         return
     if can_downvote(user, liked.community) and not instance_banned(user.instance.domain):
-        if isinstance(liked, (Post, PostReply)) and user.id not in blocked_users(liked.author.id):
+        if isinstance(liked, (Post, PostReply)) and user.id not in blocked_users(liked.author.id) and \
+                votes_cast_today(user.id) <= VOTE_QUOTA:
             liked.vote(user, 'downvote', None)
             log_incoming_ap(id, APLOG_DISLIKE, APLOG_SUCCESS, saved_json)
             if not announced:
