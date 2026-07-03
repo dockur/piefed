@@ -130,7 +130,7 @@ We have supplied a ruff.toml config file in the root of the project.
 ```bash
 git clone https://codeberg.org/rimu/pyfedi.git
 cd pyfedi
-git checkout v1.6.x
+git checkout v1.7.x
 ```
 
 Change the 'git checkout' line to be the latest release. Check the branch name to find what to use after 'checkout' by
