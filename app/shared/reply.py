@@ -30,7 +30,7 @@ def vote_for_reply(reply_id: int, vote_direction, federate: bool, emoji: str | N
     if user.banned or user_ip_banned():
         abort(403)
 
-    if votes_cast_today(user.id) > VOTE_QUOTA:
+    if votes_cast_today(user.id) > current_app.config['VOTE_QUOTA']:
         abort(429)
 
     undo = reply.vote(user, vote_direction, emoji)

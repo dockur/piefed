@@ -187,3 +187,5 @@ class Config(object):
     DETECT_AI_ENDPOINT = os.environ.get('DETECT_AI_ENDPOINT') or ''
 
     REDIS_MEMORY_LIMIT = int(os.environ.get('REDIS_MEMORY_LIMIT') or 200000000)
+
+    VOTE_QUOTA = int(os.environ.get('VOTE_QUOTA') or 240)

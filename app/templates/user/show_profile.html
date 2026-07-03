@@ -151,6 +151,9 @@
             {% if current_user.is_authenticated and current_user.get_id() in admin_ids and user.reputation %}{{ _('Reputation') }}: <span title="{{ _('Reputation: The Karma of the account. Total up votes minus down votes they got.') }}">{{ user.reputation | round | int }}</span><br />{% endif %}
             {{ _('Posts') }}: {{ user.post_count }}<br />
             {{ _('Comments') }}: {{ user.post_reply_count }}<br />
+            {% if vote_quota_used -%}
+            {{ _('Vote quota used') }} <progress value="{{ vote_quota_used | round(precision=2) }}"></progress><br />
+            {% endif -%}
             {% if current_user.is_authenticated and current_user.get_id() in admin_ids -%}
                 {{ _('Votes') }}: {{ user.get_num_upvotes() }} / {{ user.get_num_downvotes() }}<br />
                 {% if user.referrer %}{{ _('Referer') }}: <span title="{{ _('Which website linked to PieFed when the user initially registered.') }}">{{ user.referrer }}</span><br />{% endif %}
