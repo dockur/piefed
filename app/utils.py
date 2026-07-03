@@ -3711,7 +3711,6 @@ def reported_posts(user_id: int, is_admin: bool) -> List[int]:
         return []
     if is_admin:
         post_ids = list(db.session.execute(text('SELECT id FROM "post" WHERE reports > 0')).scalars())
-        print(post_ids)
     else:
         community_ids = moderating_communities_ids(user_id)
         if len(community_ids) > 0:
@@ -4568,10 +4567,6 @@ def is_invalid_get_request_uri(uri):
 
     except Exception:
         return True
-
-
-def is_invalid_post_request_uri(uri):
-    return is_invalid_get_request_uri(uri)
 
 
 def sanitize_svg_bytes(svg_bytes: bytes) -> bytes:

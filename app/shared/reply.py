@@ -4,12 +4,11 @@ from flask import current_app, flash, abort
 from flask_babel import _, force_locale, gettext
 from flask_login import current_user
 from sqlalchemy import text
-from sqlalchemy.orm import joinedload
 
-from app import db
+from app import db, limiter
 from app.constants import *
 from app.models import Notification, NotificationSubscription, Post, PostReply, PostReplyBookmark, Report, Site, User, \
-    utcnow, Instance
+    utcnow, Instance, votes_cast_today
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, add_to_modlog, can_create_post_reply, \
@@ -30,6 +29,9 @@ def vote_for_reply(reply_id: int, vote_direction, federate: bool, emoji: str | N
 
     if user.banned or user_ip_banned():
         abort(403)
+
+    if votes_cast_today(user.id) > VOTE_QUOTA:
+        abort(429)
 
     undo = reply.vote(user, vote_direction, emoji)
 

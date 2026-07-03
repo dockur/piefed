@@ -924,6 +924,7 @@ def register(app):
                     inbox_user = current_app.config['BOUNCE_USERNAME']
                     inbox_pass = current_app.config['BOUNCE_PASSWORD']
                     something_deleted = False
+                    emails = set()
 
                     if bounce_host:
 
@@ -938,8 +939,6 @@ def register(app):
 
                             tmp, data = imap.search(None, 'ALL')
                             rgx = r'[\w\.-]+@[\w\.-]+'
-
-                            emails = set()
 
                             for num in data[0].split():
                                 tmp, data = imap.fetch(num, '(RFC822)')
@@ -977,7 +976,6 @@ def register(app):
                             pop3.pass_(inbox_pass)
 
                             rgx = r'[\w\.-]+@[\w\.-]+'
-                            emails = set()
 
                             # Get message count
                             tmp = pop3.list()
@@ -1007,7 +1005,7 @@ def register(app):
 
                         # Keep track of how many times email to an account has bounced. After 2 bounces, disable email sending to them
                         for bounced_email in emails:
-                            bounced_accounts = User.query.filter_by(email=bounced_email.strip()).all()
+                            bounced_accounts = session.query(User).filter_by(email=bounced_email.strip()).all()
                             for account in bounced_accounts:
                                 if account.bounces is None:
                                     account.bounces = 0
@@ -1016,7 +1014,7 @@ def register(app):
                                     account.email_unread = False
                                 else:
                                     account.bounces += 1
-                            db.session.commit()
+                                session.commit()
             except Exception:
                 session.rollback()
                 raise

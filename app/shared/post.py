@@ -13,12 +13,12 @@ from flask_login import current_user
 from pillow_heif import register_heif_opener
 from sqlalchemy import text, Integer
 
-from app import db, cache, plugins
+from app import db, cache, plugins, limiter
 from app.activitypub.util import make_image_sizes, notify_about_post
 from app.community.util import tags_from_string_old, end_poll_date, flair_from_form, flairs_from_string
 from app.constants import *
 from app.models import File, Notification, NotificationSubscription, Poll, PollChoice, Post, PostBookmark, PostVote, \
-    Report, Site, User, utcnow, Instance, Event, Community
+    Report, Site, User, utcnow, Instance, Event, Community, votes_cast_today
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, gibberish, ensure_directory_exists, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, fixup_url, domain_from_url, \
@@ -49,6 +49,9 @@ def vote_for_post(post_id: int, vote_direction, federate: bool, emoji: str, src,
 
     if user.banned or user_ip_banned():
         abort(403)
+
+    if votes_cast_today(user.id) > VOTE_QUOTA:
+        abort(429)
 
     undo = post.vote(user, vote_direction, emoji)
 

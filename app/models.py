@@ -6,7 +6,7 @@ import os
 import uuid
 import re
 import unicodedata
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from time import time
 from typing import List, Union
 from urllib.parse import urlparse, parse_qs, urlencode
@@ -42,6 +42,14 @@ def utcnow(naive=True):
     if naive:
         return datetime.now(ZoneInfo('UTC')).replace(tzinfo=None)
     return datetime.now(ZoneInfo('UTC'))
+
+
+def votes_cast_today(user_id: int) -> int:
+    from app import redis_client
+    num = redis_client.get(f'votes_cast_{date.today()}_{user_id}')
+    if num is None:
+        return 0
+    return int(num)
 
 
 class PostReplyValidationError(Exception):
@@ -2635,6 +2643,13 @@ class Post(db.Model):
                     db.session.commit()
                 db.session.add(vote)
 
+                # keep track of how many votes this user has cast today
+                votes_cast = votes_cast_today(user.id)
+                if votes_cast == 0:
+                    redis_client.set(f'votes_cast_{date.today()}_{user.id}', 1, ex=86400)
+                else:
+                    redis_client.incr(f'votes_cast_{date.today()}_{user.id}')
+
             if emoji or emoji == '-1':
                 db.session.commit()
                 self.update_reaction_cache()
@@ -2644,6 +2659,7 @@ class Post(db.Model):
             self.ranking_scaled = int(self.ranking + self.community.scale_by())
 
             db.session.commit()
+
             if user.is_local():
                 with redis_client.lock(f"lock:user:{user.id}", timeout=10, blocking_timeout=6):
                     user.last_seen = utcnow()
@@ -3169,6 +3185,14 @@ class PostReply(db.Model):
                                        {'effect': effect, 'user_id': self.user_id})
                     db.session.commit()
                 db.session.add(vote)
+
+                # keep track of how many votes this user has cast today
+                votes_cast = votes_cast_today(user.id)
+                if votes_cast == 0:
+                    redis_client.set(f'votes_cast_{date.today()}_{user.id}', 1, ex=86400)
+                else:
+                    redis_client.incr(f'votes_cast_{date.today()}_{user.id}')
+
             if emoji or emoji == '-1':
                 db.session.commit()
                 self.update_reaction_cache()
@@ -3768,7 +3792,7 @@ class Site(db.Model):
     show_inoculation_block = db.Column(db.Boolean, default=True)
     additional_css = db.Column(db.Text)
     additional_js = db.Column(db.Text)
-    private_instance = db.Column(db.Boolean, default=False)
+    private_instance = db.Column(db.Boolean, default=True)
     language_id = db.Column(db.Integer)
     honeypot = db.Column(db.Boolean, default=True)
     allowlist_mode = db.Column(db.Integer, default=0)   # 0 = weak, 1 = strong, 2 = intense

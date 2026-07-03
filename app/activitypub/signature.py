@@ -48,10 +48,10 @@ from furl import furl
 from pyld import jsonld
 from sqlalchemy import text
 
-from app import db, celery, httpx_client
+from app import celery, httpx_client
 from app.constants import DATETIME_MS_FORMAT
 from app.models import utcnow, ActivityPubLog, Community, Instance, CommunityMember, User, SendQueue
-from app.utils import get_task_session, is_invalid_post_request_uri, is_invalid_get_request_uri
+from app.utils import get_task_session, is_invalid_get_request_uri
 
 
 def http_date(epoch_seconds=None):
@@ -95,8 +95,6 @@ def send_post_request(uri: str, body: dict | None, private_key: str, key_id: str
 def post_request(uri: str, body: dict | None, private_key: str, key_id: str,
                  content_type: str = "application/activity+json",
                  method: Literal["get", "post"] = "post", timeout: int = 10, retries: int = 0):
-    if is_invalid_post_request_uri(uri):
-        return
     session = get_task_session()
     try:
         if '@context' not in body:  # add a default json-ld context if necessary
