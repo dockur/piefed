@@ -891,7 +891,7 @@ class Community(db.Model):
     def delete_dependencies(self):
         from app import redis_client
         for post in db.session.query(Post).filter_by(community_id=self.id):
-            with redis_client.lock(f"lock:post:{post.id}", timeout=10, blocking_timeout=6):
+            with redis_client.lock(f"lock:post:{post.id}", timeout=30, blocking_timeout=30):
                 post.delete_dependencies()
                 db.session.delete(post)
                 db.session.commit()
