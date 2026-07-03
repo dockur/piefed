@@ -1588,7 +1588,8 @@ class User(UserMixin, db.Model):
 
     def is_following(self, other_user) -> str:
         user_follow = db.session.query(UserFollower).filter(UserFollower.local_user_id == self.id,
-                                                            UserFollower.remote_user_id == other_user.id).first()
+                                                            UserFollower.remote_user_id == other_user.id,
+                                                            UserFollower.is_inward == False).first()
         if user_follow:
             if user_follow.is_accepted is True:
                 return 'following'
