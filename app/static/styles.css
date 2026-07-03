@@ -214,6 +214,7 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
   --font-size-13: 0.8rem;
   --font-size-14: 0.875rem;
   --font-size-16: 1rem;
+  --font-size-17: 1.060rem;
   --font-size-18: 1.125rem;
   --font-size-20: 1.25rem;
   --font-size-24: 1.5rem;
@@ -1592,7 +1593,7 @@ ul.form-multicheck-columns li {
   background-color: color-mix(in srgb, var(--bs-secondary-bg) 30%, var(--bs-body-bg));
 }
 .post_list .post_teaser h3 {
-  font-size: var(--font-size-18);
+  font-size: var(--font-size-17);
   margin-top: var(--spacing-4);
   margin-bottom: 0;
   padding-bottom: var(--spacing-2);
