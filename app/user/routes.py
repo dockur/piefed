@@ -119,7 +119,7 @@ def show_profile(user):
                                 overview_page=overview_page - 1) if overview_page != 1 else None
 
     if current_user.is_authenticated:
-        vote_quota_used = votes_cast_today(current_user.get_id()) / current_app.config['VOTE_QUOTA']
+        vote_quota_used = votes_cast_today(user.id) / current_app.config['VOTE_QUOTA']
     else:
         vote_quota_used = 0
 
