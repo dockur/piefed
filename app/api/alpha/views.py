@@ -1360,6 +1360,8 @@ def cached_modlist_for_community(community_id):
 
 @cache.memoize(timeout=3000)
 def cached_modlist_for_user(user):
+    if user is None:
+        return []
     community_ids = db.session.execute(
         text('SELECT community_id FROM "community_member" WHERE user_id = :user_id and (is_moderator = True or is_owner = True)'),
         {'user_id': user.id}).scalars()

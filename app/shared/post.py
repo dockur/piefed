@@ -50,7 +50,7 @@ def vote_for_post(post_id: int, vote_direction, federate: bool, emoji: str, src,
     if user.banned or user_ip_banned():
         abort(403)
 
-    if votes_cast_today(user.id) > VOTE_QUOTA:
+    if votes_cast_today(user.id) > current_app.config['VOTE_QUOTA']:
         abort(429)
 
     undo = post.vote(user, vote_direction, emoji)

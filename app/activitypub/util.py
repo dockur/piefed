@@ -2827,7 +2827,7 @@ def update_post_reply_from_activity(reply: PostReply, request_json: dict):
 
 def update_post_from_activity(post: Post, request_json: dict):
     from app import redis_client
-    with redis_client.lock(f"lock:post:{post.id}", timeout=30, blocking_timeout=30):
+    with redis_client.lock(f"lock:post:{post.id}", timeout=60, blocking_timeout=60):
         # redo body without checking if it's changed
         if 'content' in request_json['object'] and request_json['object']['content'] is not None:
             # prefer Markdown in 'source' in provided

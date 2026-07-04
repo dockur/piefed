@@ -2332,7 +2332,7 @@ def process_upvote(user, store_ap_json, request_json, announced):
         return
     if can_upvote(user, liked.community) and not instance_banned(user.instance.domain):
         if isinstance(liked, (Post, PostReply)) and user.id not in blocked_users(liked.author.id) and \
-                votes_cast_today(user.id) <= VOTE_QUOTA:
+                votes_cast_today(user.id) <= current_app.config['VOTE_QUOTA']:
             liked.vote(user, 'upvote', emoji)
             log_incoming_ap(id, APLOG_LIKE, APLOG_SUCCESS, saved_json)
             if not announced:
@@ -2353,7 +2353,7 @@ def process_downvote(user, store_ap_json, request_json, announced):
         return
     if can_downvote(user, liked.community) and not instance_banned(user.instance.domain):
         if isinstance(liked, (Post, PostReply)) and user.id not in blocked_users(liked.author.id) and \
-                votes_cast_today(user.id) <= VOTE_QUOTA:
+                votes_cast_today(user.id) <= current_app.config['VOTE_QUOTA']:
             liked.vote(user, 'downvote', None)
             log_incoming_ap(id, APLOG_DISLIKE, APLOG_SUCCESS, saved_json)
             if not announced:

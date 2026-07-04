@@ -19,23 +19,22 @@ from app.community.util import save_icon_file, save_banner_file, retrieve_mods_a
 from app.constants import *
 from app.email import send_verification_email
 from app.ldap_utils import sync_user_to_ldap
-from app.models import Post, Community, CommunityMember, User, PostReply, PostVote, Notification, utcnow, File, Site, \
+from app.models import Post, Community, CommunityMember, User, PostReply, Notification, utcnow, File, Site, \
     Instance, Report, UserBlock, CommunityBan, CommunityJoinRequest, CommunityBlock, Filter, Domain, DomainBlock, \
     InstanceBlock, NotificationSubscription, PostBookmark, PostReplyBookmark, read_posts, Topic, UserNote, \
-    UserExtraField, Feed, FeedMember, IpBan, user_file, ArchivedPostReply, UserFollower, BotChallenge
+    UserExtraField, Feed, FeedMember, user_file, UserFollower, BotChallenge, votes_cast_today
 from app.shared.site import block_remote_instance
-from app.shared.tasks import task_selector
 from app.shared.upload import process_file_delete, process_upload
 from app.shared.user import subscribe_user, ban_user, unban_user, follow_user, unfollow_user, bot_challenge_user
 from app.user import bp
 from app.user.forms import ProfileForm, SettingsForm, DeleteAccountForm, ReportUserForm, \
     FilterForm, KeywordFilterEditForm, RemoteFollowForm, ImportExportForm, UserNoteForm, BanUserForm, DeleteFileForm, \
     UploadFileForm, BlockUserForm, BlockCommunityForm, BlockDomainForm, BlockInstanceForm, UnsubAllForm
-from app.user.utils import purge_user_then_delete, unsubscribe_from_community, search_for_user, _get_user_moderates, \
+from app.user.utils import unsubscribe_from_community, search_for_user, _get_user_moderates, \
     _get_user_upvoted_posts, _get_user_subscribed_communities, _get_user_posts, _get_user_post_replies, \
     _get_user_archived_replies, _get_user_posts_and_replies, _get_user_same_ip
 from app.utils import render_template, markdown_to_html, user_access, markdown_to_text, shorten_string, \
-    gibberish, file_get_contents, community_membership, user_filters_home, \
+    gibberish, community_membership, user_filters_home, \
     user_filters_posts, user_filters_replies, theme_list, \
     blocked_users, add_to_modlog, \
     blocked_communities, piefed_markdown_to_lemmy_markdown, \
@@ -43,8 +42,8 @@ from app.utils import render_template, markdown_to_html, user_access, markdown_t
     login_required_if_private_instance, recently_upvoted_posts, recently_downvoted_posts, recently_upvoted_post_replies, \
     recently_downvoted_post_replies, reported_posts, user_notes, login_required, get_setting, filtered_out_communities, \
     moderating_communities_ids, is_valid_xml_utf8, blocked_or_banned_instances, blocked_domains, get_task_session, \
-    patch_db_session, user_in_restricted_country, referrer, user_pronouns, community_membership_private, \
-    intlist_to_strlist, permission_required
+    patch_db_session, user_in_restricted_country, referrer, user_pronouns, \
+    permission_required
 
 
 @bp.route('/people', methods=['GET', 'POST'])
@@ -119,6 +118,11 @@ def show_profile(user):
                                 actor=user.ap_id if user.ap_id is not None else user.user_name,
                                 overview_page=overview_page - 1) if overview_page != 1 else None
 
+    if current_user.is_authenticated:
+        vote_quota_used = votes_cast_today(user.id) / current_app.config['VOTE_QUOTA']
+    else:
+        vote_quota_used = 0
+
     return render_template('user/show_profile.html', user=user, posts=posts, post_replies=post_replies,
                            moderates=moderates, canonical=canonical, title=_('Posts by %(user_name)s',
                                                                              user_name=user.user_name),
@@ -137,7 +141,7 @@ def show_profile(user):
                            overview_prev_url=overview_prev_url, same_ip_address=same_ip_address,
                            archived_post_replies=archived_post_replies,
                            followers=followers, following=following,
-                           bot_challenge=bot_challenge)
+                           bot_challenge=bot_challenge, vote_quota_used=vote_quota_used)
 
 
 @bp.route('/u/<actor>/upvotes')

@@ -1,0 +1,37 @@
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/static/fonts/opendyslexic/OpenDyslexic-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/static/fonts/opendyslexic/OpenDyslexic-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/static/fonts/opendyslexic/OpenDyslexic-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+html body, .form-control {
+  font-family: "OpenDyslexic", Arial, sans-serif, "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji";
+  font-size-adjust: 0.5;
+}
+
+.btn {
+  padding-left: var(--spacing-8);
+  padding-right: var(--spacing-8);
+  padding-top: var(--spacing-6);
+  padding-bottom: var(--spacing-6);
+  font-size-adjust: 0.4;
+}
+
+.fe {
+  font-size: 1.6rem;
+}

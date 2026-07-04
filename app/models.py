@@ -891,7 +891,7 @@ class Community(db.Model):
     def delete_dependencies(self):
         from app import redis_client
         for post in db.session.query(Post).filter_by(community_id=self.id):
-            with redis_client.lock(f"lock:post:{post.id}", timeout=10, blocking_timeout=6):
+            with redis_client.lock(f"lock:post:{post.id}", timeout=30, blocking_timeout=30):
                 post.delete_dependencies()
                 db.session.delete(post)
                 db.session.commit()
@@ -1235,12 +1235,6 @@ class User(UserMixin, db.Model):
         if self.created_recently() and self.reputation < 100:
             return False
         return True
-
-    def cannot_vote(self):
-        if self.is_local():
-            return False
-        return self.post_count == 0 and self.post_reply_count == 0 and len(
-            self.user_name) == 8  # most vote manipulation bots have 8 character user names and never post any content
 
     def link(self) -> str:
         if self.is_local():
@@ -1594,7 +1588,8 @@ class User(UserMixin, db.Model):
 
     def is_following(self, other_user) -> str:
         user_follow = db.session.query(UserFollower).filter(UserFollower.local_user_id == self.id,
-                                                            UserFollower.remote_user_id == other_user.id).first()
+                                                            UserFollower.remote_user_id == other_user.id,
+                                                            UserFollower.is_inward == False).first()
         if user_follow:
             if user_follow.is_accepted is True:
                 return 'following'
@@ -2552,11 +2547,16 @@ class Post(db.Model):
                 return None
         with redis_client.lock(f"lock:post:{self.id}", timeout=10, blocking_timeout=6):
             existing_vote = PostVote.query.filter_by(user_id=user.id, post_id=self.id).first()
-            if existing_vote and vote_direction == 'reversal':  # api receives '1' for upvote, '-1' for downvote, and '0' for reversal
-                if existing_vote.effect == 1:
-                    vote_direction = 'upvote'
-                elif existing_vote.effect == -1:
-                    vote_direction = 'downvote'
+            if vote_direction == 'reversal':
+                if existing_vote:  # api receives '1' for upvote, '-1' for downvote, and '0' for reversal
+                    if existing_vote.effect == 1:
+                        vote_direction = 'upvote'
+                    elif existing_vote.effect == -1:
+                        vote_direction = 'downvote'
+                    else:
+                        return None  # no point reversing a vote with no effect. There shouldn't be any more of these anyway, now that the vote manipulation bot detection code is removed.
+                else:
+                    return None      # cannot reverse non-existent vote
             assert vote_direction == 'upvote' or vote_direction == 'downvote'
             undo = None
             if existing_vote:
@@ -2616,8 +2616,6 @@ class Post(db.Model):
                         spicy_effect = effect * current_app.config['SPICY_UNDER_30']
                     elif self.up_votes + self.down_votes <= 60:
                         spicy_effect = effect * current_app.config['SPICY_UNDER_60']
-                    if user.cannot_vote():
-                        effect = spicy_effect = 0
                     self.up_votes += 1
                     self.score += spicy_effect  # score + (+1) = score+1
                 else:
@@ -2629,8 +2627,7 @@ class Post(db.Model):
                         spicy_effect *= current_app.config['SPICY_UNDER_30']
                     elif self.up_votes + self.down_votes <= 60:
                         spicy_effect *= current_app.config['SPICY_UNDER_60']
-                    if user.cannot_vote():
-                        effect = spicy_effect = 0
+                    effect = spicy_effect = 0
                     self.score += spicy_effect  # score + (-1) = score-1
                 vote = PostVote(user_id=user.id, post_id=self.id, author_id=self.author.id,
                                 effect=effect, emoji=emoji)
@@ -3168,10 +3165,7 @@ class PostReply(db.Model):
                         self.down_votes -= 1
                         self.score += 2
             else:
-                if user.cannot_vote():
-                    effect = 0
-                else:
-                    effect = 1
+                effect = 1
                 if vote_direction == 'upvote':
                     self.up_votes += 1
                 else:
@@ -3371,10 +3365,11 @@ class CommunityWikiPageRevision(db.Model):
 
 
 class UserFollower(db.Model):
-    local_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    remote_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    local_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    remote_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     is_accepted = db.Column(db.Boolean)              # None = request sent. True = accepted. False = Rejected
-    is_inward = db.Column(db.Boolean, default=True)  # true = remote user is following a local one
+    is_inward = db.Column(db.Boolean, default=True, index=True)  # true = remote user is following a local one
     created_at = db.Column(db.DateTime, default=utcnow)
 
 
@@ -3458,7 +3453,7 @@ class PostVote(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete='CASCADE'), index=True)
     effect = db.Column(db.Float, index=True)
-    emoji = db.Column(db.String(20))
+    emoji = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=utcnow)
 
     __table_args__ = (
@@ -3477,7 +3472,7 @@ class PostReplyVote(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)  # the author of the reply voted on - who's reputation is affected
     post_reply_id = db.Column(db.Integer, db.ForeignKey('post_reply.id', ondelete='CASCADE'), index=True)
     effect = db.Column(db.Float)
-    emoji = db.Column(db.String(20))
+    emoji = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=utcnow)
 
     __table_args__ = (
@@ -4178,7 +4173,7 @@ class Reminder(db.Model):
 class Emoji(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(1024))
-    token = db.Column(db.String(20), index=True)
+    token = db.Column(db.String(50), index=True)
     category = db.Column(db.String(20))
     aliases = db.Column(db.String(100), index=True)
     instance_id = db.Column(db.Integer, index=True)

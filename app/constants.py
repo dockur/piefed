@@ -1,4 +1,4 @@
-VERSION = '1.7.0-dev'
+VERSION = '1.8.0-dev'
 
 POST_TYPE_LINK = 1
 POST_TYPE_ARTICLE = 2
@@ -139,5 +139,3 @@ INVITE_OWNER_ONLY = 4
 ALLOWLIST_WEAK = 0      # A weak allowlist only has the effect of stopping people from adding remote communities from instances outside the list.
 ALLOWLIST_STRONG = 1    # Strong allowlists drop activities from instances not on the list.
 ALLOWLIST_INTENSE = 2   # As above but also drops activities originally authored by non-allowlist instances and relayed on via allowed instances. See can_create_post() for usage.
-
-VOTE_QUOTA = 240

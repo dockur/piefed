@@ -37,6 +37,10 @@
         {% elif current_user.font == 'roboto' -%}
             <link rel="preload" href="/static/fonts/roboto/Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
             <link rel="preload" href="/static/fonts/roboto/Roboto-Bold.woff2" as="font" type="font/woff2" crossorigin>
+        {% elif current_user.font == 'dyslexic' -%}
+            <link rel="preload" href="/static/fonts/opendyslexic/OpenDyslexic-Regular.woff2" as="font" type="font/woff2" crossorigin>
+            <link rel="preload" href="/static/fonts/opendyslexic/OpenDyslexic-Italic.woff2" as="font" type="font/woff2" crossorigin>
+            <link rel="preload" href="/static/fonts/opendyslexic/OpenDyslexic-Bold.woff2" as="font" type="font/woff2" crossorigin>
         {% endif -%}
         {% block styles -%}
             {{ bootstrap.load_css() }}
@@ -139,6 +143,8 @@
                 {% include 'fonts/atkinson.css' %}
             {% elif current_user.font == 'roboto' %}
                 {% include 'fonts/roboto.css' %}
+            {% elif current_user.font == 'dyslexic' %}
+                {% include 'fonts/dyslexic.css' %}
             {% endif %}
         </style>
     {% endif -%}

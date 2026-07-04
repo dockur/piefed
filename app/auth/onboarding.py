@@ -121,7 +121,7 @@ def topics_for_form():
             'name': topic.name,
             'depth': depth,
             'children': [],
-            'selected': user_country in topic.countries if user_country else False
+            'selected': user_country in topic.countries if user_country and topic.countries else False
         }
         
         # Fetch children and build their trees
