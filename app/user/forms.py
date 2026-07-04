@@ -109,6 +109,7 @@ class SettingsForm(FlaskForm):
     compaction = SelectField(_l('Compact UI'), choices=compact_levels, coerce=str, render_kw={'class': 'form-select'})
     fonts = [('', _l('Theme default - fastest')),
              ('atkinson', _l('Atkinson Hyperlegible - low vision')),
+             ('dyslexic', _l('OpenDyslexic')),
              ('inter', _l('Inter - pretty')),
              ('roboto', _l('Roboto - pretty')),
              ]
