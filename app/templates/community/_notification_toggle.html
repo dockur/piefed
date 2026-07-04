@@ -6,8 +6,8 @@ class="fe {{ 'fe-bell' if community.notify_new_posts(current_user.id) else 'fe-n
 hx-post="/community/{{ community.id }}/notification" hx-trigger="click throttle:1s" hx-target="#community-{{ community.id }}-notification-toggle" hx-swap="innerHTML"
 title="{{ _('Notify about every new post. Not advisable in high traffic communities!') }}"></a>
 <a href="/community/{{ community.id }}/fave" rel="nofollow" aria-live="assertive"
-   aria-label="{{ 'Favorite this community to put it on the Explore menu' if is_fave else 'Do not feature this community on the Explore menu' }}"
+   aria-label="{{ 'Favorite this community to find it more easily' if is_fave else 'Do not feature this community on the Communities menu' }}"
 class="fe fe-star {{ 'selected' if is_fave else '' }} no-underline"
 hx-post="/community/{{ community.id }}/fave" hx-trigger="click throttle:1s" hx-target="#community-{{ community.id }}-notification-toggle" hx-swap="innerHTML"
-title="{{ _('Favorite this community to put it on the Explore menu') }}"></a>
+title="{{ _('Favorite this community to find it more easily') }}"></a>
 </span>

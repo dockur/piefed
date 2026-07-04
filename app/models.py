@@ -2378,8 +2378,8 @@ class Post(db.Model):
             if self.ap_id is None or self.ap_id == '' or len(self.ap_id) == 10:
                 slug = slugify(self.title, max_length=100 - len(current_app.config["SERVER_NAME"]))
                 if slug:
-                    self.ap_id = f'{current_app.config["SERVER_URL"]}/c/{community.name}@{current_app.config["SERVER_NAME"]}/p/{self.id}/{slug}'
-                    self.slug = f'/c/{community.name}@{current_app.config["SERVER_NAME"]}/p/{self.id}/{slug}'
+                    self.ap_id = f'{current_app.config["SERVER_URL"]}/c/{community.name}@{community.ap_domain}/p/{self.id}/{slug}'
+                    self.slug = f'/c/{community.name}@{community.ap_domain}/p/{self.id}/{slug}'
                 else:
                     # Post title can't be slugified, fall back to old url structure
                     self.ap_id = f'{current_app.config["SERVER_URL"]}/post/{self.id}'
