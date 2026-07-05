@@ -13,7 +13,7 @@ from ua_parser import parse as uaparse
 
 from app import db, cache, limiter, plugins
 from app.activitypub.util import users_total, active_month, local_posts, local_communities, \
-    lemmy_site_data, is_activitypub_request
+    lemmy_site_data, is_activitypub_request, find_microblogging_community
 from app.activitypub.signature import default_context, LDSignature, HttpSignature
 from app.admin.util import topics_for_form
 from app.api.alpha.utils.misc import get_resolve_object
@@ -117,12 +117,13 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
             'SELECT id FROM community as c INNER JOIN community_member as cm ON cm.community_id = c.id WHERE cm.is_banned is false AND cm.user_id = :user_id'),
                                            {'user_id': current_user.id}).scalars()
     elif view_filter == 'local':
+        microblog_community = find_microblogging_community()
         if current_user.is_anonymous:
             community_ids = db.session.execute(
-                text(f'SELECT id FROM community as c WHERE c.private is false and c.instance_id = 1 {low_quality_filter}')).scalars()
+                text(f'SELECT id FROM community as c WHERE c.private is false and c.instance_id = 1 and c.id != {microblog_community.id} {low_quality_filter}')).scalars()
         else:
             community_ids = db.session.execute(
-                text(f'SELECT id FROM community as c WHERE (c.private is false OR c.id IN {private_communities}) AND c.instance_id = 1 {low_quality_filter}')).scalars()
+                text(f'SELECT id FROM community as c WHERE (c.private is false OR c.id IN {private_communities}) and c.id != {microblog_community.id} AND c.instance_id = 1 {low_quality_filter}')).scalars()
     elif view_filter == 'popular':
         if current_user.is_anonymous:
             community_ids = db.session.execute(
