@@ -1,6 +1,6 @@
 <h1 align="center">PieFed<br />
 <div align="center">
-<a href="https://github.com/dockur/piefed"><img src="https://raw.githubusercontent.com/dockur/piefed/master/.github/logo.png" title="Logo" style="max-width:100%;" width="128" /></a>
+<a href="https://github.com/dockur/piefed"><img src="https://raw.githubusercontent.com/dockur/piefed/master/.github/logo.png" title="Logo" style="max-width:100%;" width="96" /></a>
 </div>
 <div align="center">
 
@@ -14,9 +14,12 @@
 
 Docker container of [PieFed](https://join.piefed.social/), a Lemmy/Mbin alternative written in Python with Flask.
 
- - Clean, simple code that is easy to understand and contribute to. No fancy design patterns or algorithms.
- - Easy setup, easy to manage - few dependencies and extra software required.
- - [First class moderation tools](https://join.piefed.social/2024/06/22/piefed-features-for-growing-healthy-communities/).
+## Features ✨
+
+- Provides a federated discussion and link aggregation platform
+- Compatible with Lemmy, Mbin, and the wider Fediverse
+- Includes first-class moderation tools
+- Lightweight Alpine-based image
 
 ## Project goals
 
