@@ -1780,14 +1780,18 @@ class Post(db.Model):
         microblog = False
         private = False
         if 'name' not in request_json['object']:  # Microblog posts
+            private = True
             if 'content' in request_json['object'] and request_json['object']['content'] is not None:
                 title = ""
                 microblog = True
             else:
                 return None
-            if 'to' in request_json and len(request_json['to']) == 1:
-                if request_json['to'][0].endswith('/followers'):  # Mastodon followers-only posts are private
-                    private = True
+            if 'to' in request_json and len(request_json['to']) >= 1:
+                if 'https://www.w3.org/ns/activitystreams#Public' in request_json['to']:
+                    private = False
+            if 'cc' in request_json and len(request_json['cc']) >= 1:
+                if 'https://www.w3.org/ns/activitystreams#Public' in request_json['cc']:
+                    private = False
         else:
             title = request_json['object']['name'].strip()
         nsfl_in_title = '[NSFL]' in title.upper() or '(NSFL)' in title.upper() or '[COMBAT]' in title.upper()
