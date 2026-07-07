@@ -1658,6 +1658,7 @@ class Post(db.Model):
     repeat = db.Column(db.String(20), default='')  # 'daily', 'weekly', 'monthly'. Empty string = no repeat, just post once.
     stop_repeating = db.Column(db.DateTime, index=True)  # No more repeats after this datetime
     emoji_reactions = db.Column(db.JSON)            # a cache of the emoji reactions a post has received, to avoid joins
+    post_boosts = db.Column(db.JSON)                # a cache of the boosts(retweets) a microblog post has received, to avoid joins
     tags = db.relationship('Tag', lazy='joined', secondary=post_tag, backref=db.backref('posts', lazy='dynamic'))
     timezone = db.Column(db.String(30))
     archived = db.Column(db.String(100))
@@ -1680,6 +1681,7 @@ class Post(db.Model):
     licence = db.relationship('Licence', foreign_keys=[licence_id])
     modlog = db.relationship('ModLog', lazy='dynamic', foreign_keys="ModLog.post_id", back_populates='post')
     event = db.relationship('Event', uselist=False, backref='post', lazy='select', cascade='all, delete-orphan')
+    boosts = db.relationship('PostBoost', backref='post', lazy='dynamic', cascade='all, delete-orphan')
     gallery = db.relationship('File', secondary=post_file, lazy='dynamic')
     votes = db.relationship('PostVote', lazy='dynamic', backref='post', cascade='all, delete-orphan', passive_deletes=True)
     bookmarks = db.relationship('PostBookmark', backref='post', lazy='dynamic', cascade='all, delete-orphan')
@@ -1778,14 +1780,18 @@ class Post(db.Model):
         microblog = False
         private = False
         if 'name' not in request_json['object']:  # Microblog posts
+            private = True
             if 'content' in request_json['object'] and request_json['object']['content'] is not None:
                 title = ""
                 microblog = True
             else:
                 return None
-            if 'to' in request_json and len(request_json['to']) == 1:
-                if request_json['to'][0].endswith('/followers'):  # Mastodon followers-only posts are private
-                    private = True
+            if 'to' in request_json and len(request_json['to']) >= 1:
+                if 'https://www.w3.org/ns/activitystreams#Public' in request_json['to']:
+                    private = False
+            if 'cc' in request_json and len(request_json['cc']) >= 1:
+                if 'https://www.w3.org/ns/activitystreams#Public' in request_json['cc']:
+                    private = False
         else:
             title = request_json['object']['name'].strip()
         nsfl_in_title = '[NSFL]' in title.upper() or '(NSFL)' in title.upper() or '[COMBAT]' in title.upper()
@@ -4225,6 +4231,13 @@ class BotChallenge(db.Model):
     sent_at = db.Column(db.DateTime, default=utcnow)
     sent_by = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     is_a_bot = db.Column(db.Boolean)        # null means waiting for response
+
+
+class PostBoost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), index=True)
+    created_at = db.Column(db.DateTime, default=utcnow, index=True)
 
 
 def _large_community_subscribers() -> float:

@@ -5,4 +5,8 @@ Here's some notifications you've missed since your last visit:
     - {{ notification.title }} - {{ url_for('user.notification_goto', notification_id=notification.id, _external=True) }}
     {% endfor %}
 
+{% if user.verification_token %}
 Unsubscribe from these emails at {{ url_for('user.user_email_notifs_unsubscribe', user_id=user.id, token=user.verification_token, _external=True) }}.
+{% else %}
+To unsubscribe from these emails, please log in to your account and update your notification settings.
+{% endif %}

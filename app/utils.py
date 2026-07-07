@@ -3194,9 +3194,9 @@ def paginate_post_ids(post_ids, page: int, page_length: int):
     return post_ids[start:end]
 
 
-def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, hashtag: str = '', include_following=False) -> List[int]:
+def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, hashtag: str = '', include_following=False, community_sql: str = None) -> List[int]:
     from app import redis_client
-    if community_ids is None or len(community_ids) == 0:
+    if not community_sql and (community_ids is None or len(community_ids) == 0):
         return []
     if result_id:
         if redis_client.exists(result_id):
@@ -3204,24 +3204,19 @@ def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, ha
 
     params = {}                 # parameters provided to the SQL query
     sources = []                # communities and possibly followers as well
-    if community_ids[0] == -1:  # A special value meaning to get posts from all communities
-        post_id_sql = 'SELECT p.id, p.cross_posts, p.user_id, p.reply_count FROM "post" as p\nINNER JOIN "community" as c on p.community_id = c.id\n'
+    post_id_sql = 'SELECT p.id, p.cross_posts, p.user_id, p.reply_count FROM "post" as p\nINNER JOIN "community" as c on p.community_id = c.id\n'
+    if community_sql:
+        sources.append(community_sql)
+    elif community_ids[0] == -1:  # A special value meaning to get posts from all communities
         sources.append('c.show_all is true')
-        if current_user.is_authenticated and current_user.num_following and include_following:
-            sources.append("""EXISTS (SELECT 1
-                                    FROM user_follower uf
-                                    WHERE uf.local_user_id = :local_user_id
-                                      AND uf.remote_user_id = p.user_id AND is_inward is false)""")
-            params['local_user_id'] = current_user.id
     else:
-        post_id_sql = 'SELECT p.id, p.cross_posts, p.user_id, p.reply_count FROM "post" as p\nINNER JOIN "community" as c on p.community_id = c.id\n'
         sources.append('c.id IN :community_ids')
-        if current_user.is_authenticated and current_user.num_following and include_following:
-            sources.append("""EXISTS (SELECT 1 FROM user_follower uf
-                                      WHERE uf.local_user_id = :local_user_id
-                                      AND uf.remote_user_id = p.user_id AND is_inward is false)""")
-            params['local_user_id'] = current_user.id
         params['community_ids'] = tuple(community_ids)
+    if current_user.is_authenticated and current_user.num_following and include_following:
+        sources.append("""EXISTS (SELECT 1 FROM user_follower uf
+                                  WHERE uf.local_user_id = :local_user_id
+                                  AND uf.remote_user_id = p.user_id AND is_inward is false)""")
+        params['local_user_id'] = current_user.id
 
     post_id_where = ["(" + " OR ".join(sources) + ")", 'c.banned is false']
     if current_user.is_authenticated and current_user.hide_low_quality and community_ids[0] == -1:

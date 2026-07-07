@@ -15,4 +15,8 @@
 {% endfor %}
 </ul>
 {% endif %}
-<p><small><a href="{{ url_for('user.user_email_notifs_unsubscribe', user_id=user.id, token=user.verification_token, _external=True) }}">Unsubscribe from these emails</a></small></p>
+{% if user.verification_token %}
+    <p><small><a href="{{ url_for('user.user_email_notifs_unsubscribe', user_id=user.id, token=user.verification_token, _external=True) }}">Unsubscribe from these emails</a></small></p>
+{% else %}
+    <p><small>To unsubscribe from these emails, please log in to your account and update your notification settings.</small></p>
+{% endif %}
