@@ -50,3 +50,44 @@
     </main>
 </div>
 {% endblock %}
+
+{% block side_panel %}
+    {% if new_communities and len(new_communities) > 0 -%}
+    <h2 class="mt-0" style="border: none; padding-left: 0; margin-top: 0;">{{ _('New communities') }}</h2>
+        {% for community in new_communities %}
+                <p>{{ render_communityname(community) }}</p>
+        {% endfor %}
+    <hr>
+    {% endif -%}
+    
+    {% if active_communities -%}
+    <h2 style="border: none; padding-left: 0;">{{ _('Active communities') }}</h2>
+                {% for community in active_communities %}
+                    <p>{{ render_communityname(community) }}</p>
+                {% endfor %}
+            <p class="mt-4"><a class="btn btn-primary" href="/communities">{{ _('More communities') }}</a> |
+                <a class="btn btn-primary" href="/topics">{{ _('Browse topics') }}</a>
+            </p>
+        </div>
+    </div>
+    <hr>
+    {% endif -%}
+
+    <h2 style="border: none; padding-left: 0;">{{ _('About %(site_name)s', site_name=g.site.name) }}</h2>
+        <p><strong>{{ g.site.description|safe }}</strong></p>
+        {% if g.site.sidebar_html -%}
+            <p>{{ g.site.sidebar_html|safe }}</p>
+        {% endif -%}
+        {% if rss_feed %}
+            <ul class="list-group list-group-flush mt-4">
+            {% for name, path in rss_feed %}
+                <li class="list-group-item">
+                    <a class="no-underline" href="{{ path }}" rel="nofollow"><span class="fe fe-rss"></span> {{ name }}</a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    
+    <hr>
+    {% include "_inoculation_links.html" %}
+{% endblock %}

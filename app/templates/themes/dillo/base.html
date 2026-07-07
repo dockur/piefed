@@ -173,7 +173,9 @@
             </td>
             <!-- right column - sidebar -->
             <td valign="top" width="10%">
-                {% include "themes/dillo/_side_pane.html" %}
+                {% block side_panel %}
+                    {% include "themes/dillo/_side_pane.html" %}
+                {% endblock %}
             </td>
         </tr>
         <tr>
