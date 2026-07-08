@@ -345,7 +345,7 @@ def send_post(post_id, edit=False, session=None):
             create['cc'].append(user_details.public_url())
 
     for instance in user.following_instances():
-        if instance.domain not in domains_sent_to and instance.id != 1:
+        if instance.domain not in domains_sent_to and instance.id != 1 and instance.software != 'piefed':
             send_post_request(instance.inbox, create, user.private_key, user.public_url() + '#main-key')
 
 

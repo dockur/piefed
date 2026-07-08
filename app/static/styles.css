@@ -959,10 +959,6 @@ a {
   border: solid var(--border-2) transparent;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  letter-spacing: -0.2px;
-}
-
 tg-spoiler {
   border-style: solid;
   border-color: var(--bs-warning);
