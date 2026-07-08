@@ -1000,7 +1000,7 @@ def process_inbox_request(request_json, store_ap_json):
                                             'Follow request for remote user received')
                             return
                         existing_follower = session.query(UserFollower).filter_by(local_user_id=local_user.id,
-                                                                         remote_user_id=remote_user.id).first()
+                                                                         remote_user_id=remote_user.id, is_inward=True).first()
                         if not existing_follower:
                             auto_accept = not local_user.ap_manually_approves_followers
                             new_follower = UserFollower(local_user_id=local_user.id, remote_user_id=remote_user.id,
@@ -2205,6 +2205,8 @@ def activity_result(id):
 
 
 def process_new_content(user, community, store_ap_json, request_json, announced):
+    if user.user_name == 'rimu':
+        pass
     saved_json = request_json if store_ap_json else None
     id = request_json['id']
     if not announced:

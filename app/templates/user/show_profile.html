@@ -304,13 +304,13 @@
             </div>
           {% endif %}
 
-          {% if archived_post_replies %}
+          {% if archived_post_replies %}<!--
             <h4 class="mt-2">{{ _('Archived comments') }}</h4>
             <ul>
                 {% for post_reply in archived_post_replies %}
                     <li><a href="/post/{{ post_reply.post_id }}#comment_{{ post_reply.post_reply_id }}">{{ post_reply.created_at }}</a></li>
                 {% endfor %}
-            </ul>
+            </ul>-->
           {% endif %}
           {% if len(following) %}
             <div class="tab-pane border-0 " id="following_tab" role="tabpanel" aria-labelled-by="post-pill" aria-labelledby="following-pill">

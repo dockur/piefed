@@ -151,7 +151,7 @@ def send_post(post_id, edit=False, session=None):
 
     # local_only communities can also be used to send activity to User Followers
     # return now though, if there aren't any
-    followers = session.query(UserFollower).filter_by(local_user_id=post.user_id).all()
+    followers = session.query(UserFollower).filter_by(local_user_id=post.user_id, is_inward=True).all()
     if not followers and community.local_only:
         return
 
@@ -343,10 +343,9 @@ def send_post(post_id, edit=False, session=None):
         user_details = session.query(User).get(follower.remote_user_id)
         if user_details:
             create['cc'].append(user_details.public_url())
-    instances = session.query(Instance).join(User, User.instance_id == Instance.id).join(UserFollower, UserFollower.remote_user_id == User.id)
-    instances = instances.filter(UserFollower.local_user_id == post.user_id).filter(Instance.gone_forever == False)
-    for instance in instances:
-        if instance.domain not in domains_sent_to:
+
+    for instance in user.following_instances():
+        if instance.domain not in domains_sent_to and instance.id != 1:
             send_post_request(instance.inbox, create, user.private_key, user.public_url() + '#main-key')
 
 

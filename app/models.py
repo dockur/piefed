@@ -1578,10 +1578,11 @@ class User(UserMixin, db.Model):
     # instances that have users which follow this user. (excluding the current instance)
     def following_instances(self, include_dormant=False, software='') -> List[Instance]:
         instances = db.session.query(Instance).join(User, User.instance_id == Instance.id).\
-            join(UserFollower, UserFollower.remote_user_id == User.id).filter(UserFollower.local_user_id == self.id)
+            join(UserFollower, UserFollower.remote_user_id == User.id).filter(UserFollower.local_user_id == self.id,
+                                                                              UserFollower.is_inward == True)
         if not include_dormant:
             instances = instances.filter(Instance.dormant == False)
-        instances = instances.filter(Instance.id != 1, Instance.gone_forever == False, UserFollower.is_inward == True)
+        instances = instances.filter(Instance.id != 1, Instance.gone_forever == False)
         if software:
             instances = instances.filter(Instance.software == software)
         return instances.distinct().all()
