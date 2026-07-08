@@ -59,7 +59,7 @@ def choose_topics():
         form = ChooseTopicsForm()
         topic_tree, selections = topics_for_form()
         
-        if form.validate_on_submit():
+        if request.method == 'POST':
             # Handle form submission - get selected topics from request
             chosen_topic_ids = request.form.getlist('chosen_topics')
             if chosen_topic_ids:
