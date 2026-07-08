@@ -1648,8 +1648,8 @@ class Post(db.Model):
     ip = db.Column(db.String(50))
     up_votes = db.Column(db.Integer, default=0)
     down_votes = db.Column(db.Integer, default=0)
-    ranking = db.Column(db.Integer, default=0, index=True)  # used for 'hot' ranking
-    ranking_scaled = db.Column(db.Integer, default=0, index=True)  # used for 'scaled' ranking
+    ranking = db.Column(db.Float, default=0.0, index=True)  # used for 'hot' ranking
+    ranking_scaled = db.Column(db.Float, default=0.0, index=True)  # used for 'scaled' ranking
     edited_at = db.Column(db.DateTime)
     reports = db.Column(db.Integer, default=0)  # how many times this post has been reported. Set to -1 to ignore reports
     language_id = db.Column(db.Integer, db.ForeignKey('language.id'), index=True)
@@ -2659,7 +2659,7 @@ class Post(db.Model):
 
             # Calculate new ranking values
             self.ranking = self.post_ranking(self.score + self.reply_count, self.created_at)
-            self.ranking_scaled = int(self.ranking + self.community.scale_by())
+            self.ranking_scaled = self.ranking + self.community.scale_by()
 
             db.session.commit()
 

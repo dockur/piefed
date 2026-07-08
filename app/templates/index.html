@@ -128,9 +128,13 @@
                     <p>{{ g.site.sidebar_html|safe }}</p>
                 {% endif -%}
                 {% if rss_feed %}
-                <p class="mt-4">
-                    <a class="no-underline" href="{{ rss_feed }}" rel="nofollow"><span class="fe fe-rss"></span> {{ _('RSS feed') }}</a>
-                </p>
+                    <ul class="list-group list-group-flush mt-4">
+                    {% for name, path in rss_feed %}
+                        <li class="list-group-item">
+                            <a class="no-underline" href="{{ path }}" rel="nofollow"><span class="fe fe-rss"></span> {{ name }}</a>
+                        </li>
+                    {% endfor %}
+                    </ul>
                 {% endif -%}
                 {% cache 60*5, g.locale %}
                     {% set active_monthly = g.site.active_monthly() -%}
