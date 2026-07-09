@@ -3406,6 +3406,14 @@ def process_quote_boost(core_activity: dict, post_ap: str, their_post_ap: str):
             send_post_request(to.instance.inbox, accept_activity, post.author.private_key, post.author.public_url() + '#main-key')
 
 
+def process_microblog_announce(request_json, id, store_ap_json):
+    post_data = remote_object_to_json(request_json['object'])
+    if not post_data:
+        return None
+
+
+
+
 def lemmy_site_data():
     site = g.site
     logo = site.logo if site.logo else '/static/images/piefed_logo_icon_t_75.png'
