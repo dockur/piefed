@@ -959,10 +959,6 @@ a {
   border: solid var(--border-2) transparent;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  letter-spacing: -0.2px;
-}
-
 tg-spoiler {
   border-style: solid;
   border-color: var(--bs-warning);
@@ -2669,6 +2665,10 @@ a.unread:before, div.unread:before {
   display: block;
   margin: 0 auto var(--spacing-12) auto;
   float: none;
+}
+
+.comment_body img {
+  max-height: 40vh;
 }
 
 .skip-link:focus {
