@@ -1471,16 +1471,12 @@ function setupFederationModeToggle() {
 }
 
 function getCurrentFontSize() {
-    const fontSize = getComputedStyle(document.body).fontSize;
-    return parseFloat(fontSize) / parseFloat(getComputedStyle(document.documentElement).fontSize);
+    return parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
 }
 
-// Apply font size to target elements
+// Scale the whole UI by resizing the root element. All rem-based styles follow.
 function applyFontSize(sizeRem) {
-    document.body.style.fontSize = sizeRem + 'rem';
-    document.querySelectorAll('.form-control').forEach(el => {
-        el.style.fontSize = sizeRem + 'rem';
-    });
+    document.documentElement.style.fontSize = (sizeRem * 100) + '%';
 }
 
 

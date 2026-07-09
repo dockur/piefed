@@ -130,8 +130,8 @@
     {%- include "svg_sprites.html" -%}
     {% if 'fontSize' in request.cookies -%}
         <style>
-            body, .form-control, .btn, .dropdown-item {
-                font-size: {{ request.cookies.get('fontSize') }}rem;
+            :root {
+                font-size: {{ (request.cookies.get('fontSize')|float * 100)|round(2) }}%;
             }
         </style>
     {% endif -%}
