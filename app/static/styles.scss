@@ -2014,6 +2014,10 @@ a.unread, div.unread {
   }
 }
 
+.comment_body img {
+  max-height: 40vh;
+}
+
 .skip-link:focus {
   top: 0;
 }

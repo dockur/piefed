@@ -2667,6 +2667,10 @@ a.unread:before, div.unread:before {
   float: none;
 }
 
+.comment_body img {
+  max-height: 40vh;
+}
+
 .skip-link:focus {
   top: 0;
 }
