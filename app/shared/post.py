@@ -50,14 +50,14 @@ def vote_for_post(post_id: int, vote_direction, federate: bool, emoji: str, src,
     if user.banned or user_ip_banned():
         abort(403)
 
+    mark_post_read([post.id], True, user.id)
+
     if votes_cast_today(user.id) > current_app.config['VOTE_QUOTA']:
         abort(429)
 
     undo = post.vote(user, vote_direction, emoji)
 
     task_selector('vote_for_post', user_id=user.id, post_id=post_id, vote_to_undo=undo, vote_direction=vote_direction, federate=federate, emoji=emoji)
-
-    mark_post_read([post.id], True, user.id)
 
     if src == SRC_API:
         return user.id
