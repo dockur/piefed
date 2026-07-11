@@ -2,7 +2,7 @@
 {% if community %}
     {% block community_actions %}
         {% if not hide_community_actions -%}
-        <div class="card">
+        <div class="card" id="community_actions">
             <div class="card-body">
                 <div class="row mb-2">
                     {% if not banned_from_community -%}
@@ -179,7 +179,7 @@
             </div>
         </div>
         {% if related_communities -%}
-        <div class="card mt-3">
+        <div class="card mt-3" id="related_communities">
             <div class="card-header">
                  <h2>{{ _('Related communities') }}</h2>
             </div>
@@ -196,7 +196,7 @@
         </div>
         {% endif -%}
         {% if community_feeds -%}
-            <div class="card mt-3">
+            <div class="card mt-3" id="community_feeds">
                 <div class="card-header">
                      <h2>{{ _('Feeds') }}</h2>
                 </div>
