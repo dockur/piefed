@@ -2304,6 +2304,9 @@ def process_new_content(user, community, store_ap_json, request_json, announced)
                         if not announced:
                             announce_activity_to_followers(community, user, request_json)
                     else:  # The reply was not allowed - send a 'Delete' to remove it from the remote instance
+                        # OR the reply might be a mastodon post - we should retrieve the parent post.
+                        # we need a way to differentiate between rejected replies (because of blocking) or cases where
+                        # a reply is coming in through mastodon.
                         if community.is_local():
                             proactively_delete_content(community, ap_id)
                     return
