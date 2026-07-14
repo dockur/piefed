@@ -473,6 +473,7 @@ def user_settings():
         ('', _l('Auto-detect')),
         ('eu', _l('Basque')),
         ('ca', _l('Catalan')),
+        ('ceb', _l('Cebuano')),
         ('zh', _l('Chinese')),
         ('en', _l('English')),
         ('fi', _l('Finnish')),
@@ -481,6 +482,7 @@ def user_settings():
         ('hi', _l('Hindi')),
         ('ja', _l('Japanese')),
         ('es', _l('Spanish')),
+        ('tl', _l('Tagalog')),
         ('pl', _l('Polish')),
         ('uk', _l('Ukrainian')),
     ]
