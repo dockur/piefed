@@ -32,7 +32,7 @@ from app.user.forms import ProfileForm, SettingsForm, DeleteAccountForm, ReportU
     UploadFileForm, BlockUserForm, BlockCommunityForm, BlockDomainForm, BlockInstanceForm, UnsubAllForm
 from app.user.utils import unsubscribe_from_community, search_for_user, _get_user_moderates, \
     _get_user_upvoted_posts, _get_user_subscribed_communities, _get_user_posts, _get_user_post_replies, \
-    _get_user_archived_replies, _get_user_posts_and_replies, _get_user_same_ip
+    _get_user_archived_replies, _get_user_posts_and_replies, _get_user_same_ip, insert_or_update_user_note
 from app.utils import render_template, markdown_to_html, user_access, markdown_to_text, shorten_string, \
     gibberish, community_membership, user_filters_home, \
     user_filters_posts, user_filters_replies, theme_list, \
@@ -1921,13 +1921,11 @@ def edit_user_note(actor):
     form = UserNoteForm()
     if form.validate_on_submit() and not current_user.banned:
         text = form.note.data.strip()
-        usernote = UserNote.query.filter(UserNote.target_id == user.id, UserNote.user_id == current_user.id).first()
-        if usernote:
-            usernote.body = text
+        if form.apply_all.data:
+            for u in User.query.filter(User.user_name == user.user_name).all():
+                insert_or_update_user_note(text, u)
         else:
-            usernote = UserNote(target_id=user.id, user_id=current_user.id, body=text)
-            db.session.add(usernote)
-        db.session.commit()
+            insert_or_update_user_note(text, user)
         from app.api.alpha.views import user_view
         cache.delete_memoized(user_view)
         cache.delete_memoized(user_notes, current_user.id)
@@ -1939,6 +1937,8 @@ def edit_user_note(actor):
             return redirect(f'/u/{actor}')
 
     elif request.method == 'GET':
+        if User.query.filter(User.user_name == user.user_name).count() == 1:
+            form.apply_all.render_kw = {'class': 'hide_field'}
         form.note.data = user.get_note(current_user)
 
     return render_template('user/edit_note.html', title=_('Edit note'), form=form, user=user, return_to=return_to)
