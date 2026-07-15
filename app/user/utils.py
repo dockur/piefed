@@ -10,7 +10,7 @@ from app.activitypub.signature import signed_get_request, send_post_request
 from app.activitypub.util import actor_json_to_model
 from app.constants import POST_STATUS_REVIEWING
 from app.models import User, CommunityMember, Community, Site, BannedInstances, Post, \
-    PostVote, ArchivedPostReply, PostReply
+    PostVote, ArchivedPostReply, PostReply, UserNote
 from app.shared.tasks import task_selector
 from app.utils import gibberish, get_request, get_task_session, patch_db_session, \
     intlist_to_strlist, community_membership_private
@@ -284,3 +284,13 @@ def _get_user_subscribed_communities(user):
                                           or user.show_subscribed_communities):
         return Community.query.filter_by(banned=False).join(CommunityMember).filter(CommunityMember.user_id == user.id).order_by(Community.name).all()
     return []
+
+
+def insert_or_update_user_note(text, user):
+    usernote = UserNote.query.filter(UserNote.target_id == user.id, UserNote.user_id == current_user.id).first()
+    if usernote:
+        usernote.body = text
+    else:
+        usernote = UserNote(target_id=user.id, user_id=current_user.id, body=text)
+        db.session.add(usernote)
+    db.session.commit()

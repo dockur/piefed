@@ -3220,6 +3220,11 @@ label:has(+ input.hide_label) {
     display: none;
 }
 
+/* hide entire fields, not just label */
+div:has(> input.hide_field) {
+    display: none;
+}
+
 .voting-spinner {
   display:none;
   position:absolute;
