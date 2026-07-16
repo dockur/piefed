@@ -14,7 +14,7 @@
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
             <li class="breadcrumb-item"><a href="/communities">{{ _('Communities') }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('activitypub.community_profile', actor=community.ap_id if community.ap_id is not none else community.name) }}">{{ (community.title + '@' + community.ap_domain)|shorten }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('activitypub.community_profile', actor=community.link()) }}">{{ (community.title + '@' + community.ap_domain)|shorten }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ _('Moderation') }}</li>
           </ol>
         </nav>

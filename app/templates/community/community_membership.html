@@ -1,0 +1,45 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_field %}
+
+{% block app_content %}
+<div class="row">
+    <main class="col-12 col-lg-8 position-relative main_pane">
+        <nav id="breadcrumb_nav" aria-label="{{ _('Breadcrumbs') }}">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+                <li class="breadcrumb-item"><a href="/communities">{{ _('Communities') }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('activitypub.community_profile', actor=community.link()) }}">{{ (community.title + '@' + community.ap_domain)|shorten }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ _('Membership') }}</li>
+            </ol>
+        </nav>
+        <h1 class="mt-2">
+            {{ _('Membership of %(community)s', community=community.display_name()) }}
+        </h1>
+        <form method="post" enctype="multipart/form-data" id="add_local_community_form" role="form">
+            {{ form.csrf_token() }}
+            {{ render_field(form.block_flair) }}
+
+            <div class="row mb-4 mt-4">
+                <div class="col-auto">
+                    {{ render_field(form.submit) }}
+                </div>
+            </div>
+            <hr>
+            <div class="row mb-4 mt-4">
+                <div class="col-auto">
+                    {% if current_user.is_authenticated and community_membership(current_user, community) in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] -%}
+                        <a class="btn btn-warning" href="/community/{{ community.link() }}/unsubscribe" rel="nofollow" style="float: right;">{{ _('Leave') }}</a>
+                    {% elif current_user.is_authenticated and community_membership(current_user, community) == SUBSCRIPTION_PENDING -%}
+                        <a class="btn btn-outline-secondary" href="/community/{{ community.link() }}/unsubscribe" rel="nofollow" style="float: right;">{{ _('Pending') }}</a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </form>
+    </main>
+</div>
+{% endblock %}

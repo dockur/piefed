@@ -4110,6 +4110,13 @@ class CommunityFlair(db.Model):
         return self.ap_id
 
 
+class CommunityFlairBlock(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    community_id = db.Column(db.Integer, db.ForeignKey('community.id'), index=True)
+    community_flair_id = db.Column(db.Integer, db.ForeignKey('community_flair.id'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+
+
 class UserFlair(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)

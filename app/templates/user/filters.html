@@ -81,6 +81,8 @@
                     type="button" role="tab" aria-controls="image-tab-pane" aria-selected="false">{{ _('Domains') }}</button>
             <button class="nav-link" id="poll-tab" data-bs-toggle="tab" data-bs-target="#instances-tab-pane"
                         type="button" role="tab" aria-controls="poll-tab-pane" aria-selected="false">{{ _('Instances') }}</button>
+            <button class="nav-link" id="flair-tab" data-bs-toggle="tab" data-bs-target="#flair-tab-pane"
+                        type="button" role="tab" aria-controls="flair-tab-pane" aria-selected="false">{{ _('Flair') }}</button>
           </div>
         </nav>
         <div class="tab-content" id="myTabContent">
@@ -166,6 +168,26 @@
                 </table>
               {% else %}
                 <p>{{ _('No blocked instances') }}</p>
+              {% endif %}
+          </div>
+          <div class="tab-pane fade show" id="flair-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+              {% if blocked_flair %}
+                <table class="table table-responsive">
+                    <tr>
+                        <th>{{ _('Name') }}</th>
+                        <th>{{ _('Community') }}</th>
+                        <th>{{ _('Unblock') }}</th>
+                    </tr>
+                {% for flair in blocked_flair %}
+                    <tr>
+                        <td>{{ flair.flair }}</td>
+                        <td><a href="{{ url_for('activitypub.community_profile', actor=flair.community.ap_id if flair.community.ap_id is not none else flair.community.name) }}">{{ flair.community.title }}</a></td>
+                        <td><a class="no-underline confirm_first send_post" role="button" aria-label="{{ _('Unblock %(flair)s', flair=flair.flair) }}" hx-post="/user/flair/{{ flair.id }}/unblock" hx-trigger="click throttle:1s"tabindex="0"><span class="fe fe-delete"></span> {{ _('Unblock') }}</a></td>
+                    </tr>
+                {% endfor %}
+                </table>
+              {% else %}
+                <p>{{ _('No blocked flair') }}</p>
               {% endif %}
           </div>
         </div>

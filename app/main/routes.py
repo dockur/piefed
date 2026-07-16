@@ -48,10 +48,10 @@ from app.models import Community, CommunityMember, Post, Site, User, utcnow, Top
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap, login_with_ldap
 
 
-@bp.route('/', methods=['HEAD', 'GET', 'POST'])
-@bp.route('/home', methods=['GET', 'POST'])
-@bp.route('/home/<sort>', methods=['GET', 'POST'])
-@bp.route('/home/<sort>/<view_filter>', methods=['GET', 'POST'])
+@bp.route('/', methods=['HEAD', 'GET'])
+@bp.route('/home', methods=['GET'])
+@bp.route('/home/<sort>', methods=['GET'])
+@bp.route('/home/<sort>/<view_filter>', methods=['GET'])
 @login_required_if_private_instance
 def index(sort=None, view_filter=None):
     if 'application/ld+json' in request.headers.get('Accept', '') or 'application/activity+json' in request.headers.get(

@@ -583,3 +583,9 @@ class EditCommunityFlairForm(FlaskForm):
     background_color = StringField(_l('Background color'), render_kw={"type": "color"})
     blur_images = BooleanField(_l('Blur images and thumbnails for posts with this flair'))
     submit = SubmitField(_l('Save'))
+
+
+class EditCommunityMembership(FlaskForm):
+    block_flair = MultiCheckboxField(_l('Block posts with this flair'), coerce=int, validators=[Optional()],
+                                        render_kw={'class': 'form-multicheck-columns'})
+    submit = SubmitField(_l('Save'))
