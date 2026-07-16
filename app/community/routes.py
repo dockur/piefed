@@ -941,6 +941,8 @@ def unsubscribe(actor):
 
                 db.session.query(CommunityMember).filter_by(user_id=current_user.id, community_id=community.id).delete()
                 db.session.query(CommunityJoinRequest).filter_by(user_id=current_user.id, community_id=community.id).delete()
+                db.session.query(CommunityFlairBlock).filter_by(user_id=current_user.id, community_id=community.id).delete()
+
                 community.subscriptions_count -= 1
                 db.session.commit()
 
@@ -2449,6 +2451,7 @@ def community_flair_delete(community_id, flair_id):
 
     if community.is_moderator() or current_user.is_admin():
         db.session.execute(text('DELETE FROM "post_flair" WHERE flair_id = :flair_id'), {'flair_id': flair_id})
+        db.session.query(CommunityFlairBlock).filter(CommunityFlairBlock.community_flair_id == flair_id).delete()
         db.session.query(CommunityFlair).filter(CommunityFlair.id == flair_id).delete()
         db.session.commit()
 

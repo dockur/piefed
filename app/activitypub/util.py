@@ -3407,6 +3407,20 @@ def process_quote_boost(core_activity: dict, post_ap: str, their_post_ap: str):
 
 
 def process_microblog_announce(request_json, id, store_ap_json):
+    """
+    if post / comment already exists locally
+	    update post announce data
+    else
+        retrieve post
+        if is top-level note
+            create post
+            update post announce data
+        else - it's a reply
+            retrieve context
+            make sure all notes and posts in context exist
+            find comment
+                update comment post announce data
+    """
     post_data = remote_object_to_json(request_json['object'])
     if not post_data:
         return None
