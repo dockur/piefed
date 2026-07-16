@@ -13,7 +13,7 @@
                         {% endif -%}
                         <div class="col-6">
                             {% if current_user.is_authenticated and community_membership(current_user, community) in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] -%}
-                                <a class="w-100 btn btn-warning" href="{{ url_for('community.community_membership', community_id=community.id) }}" rel="nofollow">{{ _('Membership') }}</a>
+                                <a class="w-100 btn btn-warning" href="{{ url_for('community.community_membership_manage', community_id=community.id) }}" rel="nofollow">{{ _('Membership') }}</a>
                             {% elif current_user.is_authenticated and community_membership(current_user, community) == SUBSCRIPTION_PENDING -%}
                                 <a class="w-100 btn btn-outline-secondary" href="/community/{{ community.link() }}/unsubscribe" rel="nofollow">{{ _('Pending') }}</a>
                             {% else -%}

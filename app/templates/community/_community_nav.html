@@ -124,7 +124,7 @@
                     <ul class="dropdown-menu">
                         {% if current_user.is_authenticated and community_membership(current_user, community) in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] -%}
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('community.community_membership', community_id=community.id) }}" rel="nofollow">
+                                <a class="dropdown-item" href="{{ url_for('community.community_membership_manage', community_id=community.id) }}" rel="nofollow">
                                     {{ _('Membership') }}
                                 </a>
                             </li>

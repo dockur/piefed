@@ -2653,7 +2653,7 @@ def community_changed():
 
 @bp.route('/<int:community_id>/membership', methods=['GET', 'POST'])
 @login_required
-def community_membership(community_id: int):
+def community_membership_manage(community_id: int):
     community = Community.query.get_or_404(community_id)
     form = EditCommunityMembership()
 
