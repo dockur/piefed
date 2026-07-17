@@ -12,7 +12,7 @@ from app.models import Notification, NotificationSubscription, Post, PostReply, 
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, add_to_modlog, can_create_post_reply, \
-    can_upvote, can_downvote, get_recipient_language, user_ip_banned
+    can_upvote, can_downvote, get_recipient_language, user_ip_banned, ip_address
 
 
 def vote_for_reply(reply_id: int, vote_direction, federate: bool, emoji: str | None, src, auth=None):
@@ -184,6 +184,7 @@ def make_reply(input, post, parent_id, src, auth=None):
                           language_id=language_id, distinguished=distinguished, answer=answer)
 
     user.language_id = language_id
+    user.ip_address = ip_address()
     reply.ap_id = reply.profile_id()
     db.session.commit()
     if src == SRC_WEB:

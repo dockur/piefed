@@ -16,7 +16,7 @@ from app.chat.util import send_message
 from app.constants import *
 from app.email import send_email
 from app.models import CommunityBlock, CommunityMember, Notification, NotificationSubscription, User, Conversation, \
-    Community, Language, File, CommunityFlair, utcnow, CommunityInvitation, CommunityFavorite
+    Community, Language, File, CommunityFlair, utcnow, CommunityInvitation, CommunityFavorite, CommunityFlairBlock
 from app.shared.tasks import task_selector
 from app.shared.upload import process_upload
 from app.user.utils import search_for_user
@@ -61,6 +61,8 @@ def leave_community(community_id: int, src, auth=None, bulk_leave=False):
         task_selector('leave_community', user_id=user_id, community_id=community_id)
 
         db.session.query(CommunityMember).filter_by(user_id=user_id, community_id=community_id).delete()
+        db.session.query(CommunityFlairBlock).filter_by(user_id=user_id, community_id=community_id).delete()
+
         db.session.commit()
 
         if src == SRC_WEB and not bulk_leave:

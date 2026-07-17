@@ -66,7 +66,7 @@ from app.models import CronJobLog, Settings, Domain, Instance, BannedInstances, 
     Site, Post, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic, UserBlock, Language, \
     File, ModLog, CommunityBlock, Feed, FeedMember, CommunityFlair, CommunityJoinRequest, Notification, UserNote, \
     PostReply, PostReplyBookmark, AllowedInstances, InstanceBan, Tag, Emoji, UserExtraField, ArchivedPostReply, \
-    RevokedToken, CommunityFavorite, UserFollower
+    RevokedToken, CommunityFavorite, UserFollower, CommunityFlairBlock
 
 logger = logging.getLogger(__name__)
 
@@ -3276,28 +3276,30 @@ def get_deduped_post_ids(result_id: str, community_ids: List[int], sort: str, ha
         post_id_where.append('p.deleted is false AND p.status > 0 ')
 
         # filter blocked domains and instances
-        domains_ids = blocked_domains(current_user.id)
-        if domains_ids:
+        if domains_ids := blocked_domains(current_user.id):
             post_id_where.append('(p.domain_id NOT IN :domain_ids OR p.domain_id is null) ')
             params['domain_ids'] = tuple(domains_ids)
-        instance_ids = blocked_or_banned_instances(current_user.id)
-        if instance_ids:
+        if instance_ids := blocked_or_banned_instances(current_user.id):
             post_id_where.append('(p.instance_id NOT IN :instance_ids OR p.instance_id is null) ')
             params['instance_ids'] = tuple(instance_ids)
-        blocked_community_ids = blocked_communities(current_user.id)
-        if blocked_community_ids:
+        if blocked_community_ids := blocked_communities(current_user.id):
             post_id_where.append('p.community_id NOT IN :blocked_community_ids ')
             params['blocked_community_ids'] = tuple(blocked_community_ids)
         # filter blocked users
-        blocked_accounts = blocked_users(current_user.id)
-        if blocked_accounts:
+        if blocked_accounts := blocked_users(current_user.id):
             post_id_where.append('p.user_id NOT IN :blocked_accounts ')
             params['blocked_accounts'] = tuple(blocked_accounts)
         # filter communities banned from
-        banned_from = communities_banned_from(current_user.id)
-        if banned_from:
+        if banned_from := communities_banned_from(current_user.id):
             post_id_where.append('p.community_id NOT IN :banned_from ')
             params['banned_from'] = tuple(banned_from)
+        if community_ids[0] != -1:
+            blocked_flair = CommunityFlairBlock.query.filter(CommunityFlairBlock.user_id == current_user.id,
+                                                             CommunityFlairBlock.community_id.in_(community_ids)).all()
+            if blocked_flair:
+                blocked_flair_ids = [bf.community_flair_id for bf in blocked_flair]
+                post_id_where.append('p.id NOT IN (SELECT post_id FROM "post_flair" WHERE flair_id IN :blocked_flair_ids) ')
+                params['blocked_flair_ids'] = tuple(blocked_flair_ids)
 
     # sorting
     post_id_sort = ''

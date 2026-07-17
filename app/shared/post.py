@@ -25,7 +25,7 @@ from app.utils import render_template, authorise_api_user, shorten_string, gibbe
     opengraph_parse, url_to_thumbnail_file, can_create_post, is_video_hosting_site, recently_upvoted_posts, \
     is_image_url, add_to_modlog, store_files_in_s3, guess_mime_type, retrieve_image_hash, \
     hash_matches_blocked_image, can_upvote, can_downvote, get_recipient_language, to_srgb, can_upload_video, \
-    is_video_url, sanitize_svg, user_ip_banned
+    is_video_url, sanitize_svg, user_ip_banned, ip_address
 
 
 def vote_for_post(post_id: int, vote_direction, federate: bool, emoji: str, src, auth=None):
@@ -219,6 +219,7 @@ def make_post(input, community, type, src, auth=None, uploaded_file=None):
     community.last_active = g.site.last_active = utcnow()
     user.post_count += 1
     user.last_seen = utcnow()
+    user.ip_address = ip_address()
 
     post.generate_ap_id(community)
 

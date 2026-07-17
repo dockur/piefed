@@ -48,6 +48,15 @@ Disallow: /
 User-agent: ClaudeBot
 Disallow: /
 
+User-agent: Claude-SearchBot
+Disallow: /
+
+User-agent: LinkupBot
+Disallow: /
+
+User-agent: SleepBot
+Disallow: /
+
 User-agent: Turnitin
 Disallow: /
 

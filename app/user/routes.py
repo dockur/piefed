@@ -22,7 +22,8 @@ from app.ldap_utils import sync_user_to_ldap
 from app.models import Post, Community, CommunityMember, User, PostReply, Notification, utcnow, File, Site, \
     Instance, Report, UserBlock, CommunityBan, CommunityJoinRequest, CommunityBlock, Filter, Domain, DomainBlock, \
     InstanceBlock, NotificationSubscription, PostBookmark, PostReplyBookmark, read_posts, Topic, UserNote, \
-    UserExtraField, Feed, FeedMember, user_file, UserFollower, BotChallenge, votes_cast_today
+    UserExtraField, Feed, FeedMember, user_file, UserFollower, BotChallenge, votes_cast_today, \
+    CommunityFlair, CommunityFlairBlock
 from app.shared.site import block_remote_instance
 from app.shared.upload import process_file_delete, process_upload
 from app.shared.user import subscribe_user, ban_user, unban_user, follow_user, unfollow_user, bot_challenge_user
@@ -1014,6 +1015,31 @@ def user_community_unblock(community_id):
     return redirect(goto)
 
 
+@bp.route('/user/flair/<int:flair_id>/unblock', methods=['POST'])
+@login_required
+def user_flair_unblock(flair_id):
+    flair = CommunityFlair.query.get_or_404(flair_id)
+    existing_block = CommunityFlairBlock.query.filter_by(user_id=current_user.id, community_flair_id=flair.id).first()
+    if existing_block:
+        db.session.delete(existing_block)
+        db.session.commit()
+        flash(_('%(flair_name)s has been unblocked.', flair_name=flair.flair))
+
+    if request.headers.get('HX-Request'):
+        resp = make_response()
+        curr_url = request.headers.get('HX-Current-Url')
+
+        if "/user/" in curr_url:
+            resp.headers['HX-Redirect'] = curr_url
+        else:
+            resp.headers['HX-Redirect'] = url_for("main.index")
+
+        return resp
+
+    goto = request.args.get('redirect') if 'redirect' in request.args else url_for('user.user_settings_filters')
+    return redirect(goto)
+
+
 @bp.route('/delete_account', methods=['GET', 'POST'])
 @login_required
 def delete_account():
@@ -1390,10 +1416,13 @@ def user_settings_filters():
         filter(DomainBlock.user_id == current_user.id).order_by(Domain.name).all()
     blocked_instances = Instance.query.join(InstanceBlock, InstanceBlock.instance_id == Instance.id). \
         filter(InstanceBlock.user_id == current_user.id).order_by(Instance.domain).all()
+    blocked_flair = CommunityFlair.query.join(CommunityFlairBlock, CommunityFlairBlock.community_flair_id == CommunityFlair.id). \
+        filter(CommunityFlairBlock.user_id == current_user.id).order_by(CommunityFlair.flair).all()
 
     return render_template('user/filters.html', title=_('Filters'), form=form, filters=filters, user=current_user,
                            blocked_users=blocked_users, blocked_communities=blocked_communities,
-                           blocked_domains=blocked_domains, blocked_instances=blocked_instances)
+                           blocked_domains=blocked_domains, blocked_instances=blocked_instances,
+                           blocked_flair=blocked_flair)
 
 
 @bp.route('/user/settings/filters/add', methods=['GET', 'POST'])

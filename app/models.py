@@ -898,6 +898,7 @@ class Community(db.Model):
         db.session.query(FeedItem).filter(FeedItem.community_id == self.id).delete()
         db.session.query(CommunityBan).filter(CommunityBan.community_id == self.id).delete()
         db.session.query(CommunityBlock).filter(CommunityBlock.community_id == self.id).delete()
+        db.session.query(CommunityFlairBlock).filter(CommunityFlairBlock.community_id == self.id).delete()
         db.session.query(CommunityJoinRequest).filter(CommunityJoinRequest.community_id == self.id).delete()
         db.session.query(CommunityMember).filter(CommunityMember.community_id == self.id).delete()
         db.session.query(CommunityFavorite).filter(CommunityFavorite.community_id == self.id).delete()
@@ -1455,6 +1456,7 @@ class User(UserMixin, db.Model):
         db.session.query(CommunityFavorite).filter(CommunityFavorite.user_id == self.id).delete()
         db.session.query(CommunityMember).filter(CommunityMember.user_id == self.id).delete()
         db.session.query(CommunityBlock).filter(CommunityBlock.user_id == self.id).delete()
+        db.session.query(CommunityFlairBlock).filter(CommunityFlairBlock.user_id == self.id).delete()
         db.session.query(CommunityBan).filter(CommunityBan.user_id == self.id).delete()
         db.session.query(BotChallenge).filter(BotChallenge.user_id == self.id).delete()
         db.session.query(BotChallenge).filter(BotChallenge.sent_by == self.id).delete()
@@ -4108,6 +4110,13 @@ class CommunityFlair(db.Model):
         self.ap_id = community.local_url() + f"/tag/{self.id}"
         db.session.commit()
         return self.ap_id
+
+
+class CommunityFlairBlock(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    community_id = db.Column(db.Integer, db.ForeignKey('community.id'), index=True)
+    community_flair_id = db.Column(db.Integer, db.ForeignKey('community_flair.id'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
 
 
 class UserFlair(db.Model):
