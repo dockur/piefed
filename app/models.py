@@ -2636,7 +2636,6 @@ class Post(db.Model):
                         spicy_effect *= current_app.config['SPICY_UNDER_30']
                     elif self.up_votes + self.down_votes <= 60:
                         spicy_effect *= current_app.config['SPICY_UNDER_60']
-                    effect = spicy_effect = 0
                     self.score += spicy_effect  # score + (-1) = score-1
                 vote = PostVote(user_id=user.id, post_id=self.id, author_id=self.author.id,
                                 effect=effect, emoji=emoji)

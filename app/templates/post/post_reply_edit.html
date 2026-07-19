@@ -6,6 +6,10 @@
 {% from 'bootstrap5/form.html' import render_field %}
 {% from "_macros.html" import render_username, render_communityname, render_feedname -%}
 
+{% block end_scripts -%}
+    <script src="{{ url_for('static', filename='js/media_library.js', changed=getmtime('js/media_library.js')) }}" nonce={{ nonce }}></script>
+{% endblock -%}
+
 {% block app_content %}
 <script src="/static/js/coolfieldset.js?v=3" nonce={{ nonce }}></script>
 <div class="row">
@@ -29,11 +33,62 @@
                     {{ render_field(form.distinguished) }}
                     {{ render_field(form.language_id) }}
                 </fieldset>
-                {{ render_field(form.submit) }}
+                <table>
+                    <tr>
+                        <td>{{ render_field(form.submit) }}</td>
+                        <td>&nbsp;<a href="#"
+                                    id="comment_preview_{{ comment.id }}"
+                                    class="btn btn-outline-secondary"
+                                    hx-post="{{ url_for('post.preview', type="comment", id=comment.id) }}"
+                                    hx-target="#textarea_in_reply_to_preview_{{ comment.id }}">
+                                {{ _('Preview') }}
+                            </a> <a href="#" id="insertImage" class="btn btn-outline-secondary {{ 'd-none' if markdown_editor }}">{{ _('Insert image') }}</a></td>
+                    </tr>
+                </table>
             </form>
 
+            <div class="row">
+                <div class="col">
+                    <div id="textarea_in_reply_to_preview_{{ comment.id }}" class="reply_preview"></div>
+                </div>
+            </div>
+
+            <script nonce="{{ nonce }}">
+                document.addEventListener("DOMContentLoaded", function () {
+                    // Initialize Media Library
+                    const mediaLibrary = new MediaLibrary({
+                        dialogId: 'insertImageDialog',
+                        dialogCloseId: 'insert_image_dialog_close',
+                        triggerLinkId: 'insertImage',
+                        loadContainerId: 'loadImagesHere',
+                        targetTextareaId: 'body',
+                        uploadInputId: 'imageUploadInput',
+                        uploadButtonId: 'imageUploadButton',
+                        uploadStatusId: 'uploadStatus',
+                        translations: {
+                            loading: "{{ _("Loading...") }}",
+                            noImages: "{{ _("No images found.") }}",
+                            errorLoading: "{{ _("Error loading images.") }}",
+                            insert: "{{ _("Insert") }}",
+                            more: "{{ _("More") }}",
+                            delete: "{{ _("Delete") }}",
+                            confirmDelete: "{{ _("Are you sure you want to delete this image?") }}",
+                            deleteError: "{{ _("Failed to delete image. Please try again.") }}",
+                            selectFile: "{{ _("Please select a file.") }}",
+                            selectImage: "{{ _("Please select an image file.") }}",
+                            uploading: "{{ _("Uploading...") }}",
+                            uploadSuccess: "{{ _("Upload successful!") }}",
+                            uploadError: "{{ _("Upload failed. Please try again.") }}",
+                            pasteUploadError: "{{ _("Failed to upload pasted image. Please try again.") }}"
+                        }
+                    });
+
+                    {% if markdown_editor %}
+                    // Override DownArea image button to use media library
+                    mediaLibrary.overrideDownAreaImageButton('#body', 1500);
+                    {% endif %}
+                });
             {% if markdown_editor %}
-                <script nonce="{{ nonce }}">
                     window.addEventListener("load", function () {
                         var downarea = new DownArea({
                             elem: document.querySelector('#body'),
@@ -43,13 +98,13 @@
                         });
                         setupAutoResize('body');
                     });
-                </script>
-            {% endif %}
+                {% endif %}
+            </script>
         </div>
     </main>
     {% with community = post.community -%}
         {% include "_side_pane.html" %}
     {% endwith -%}
 </div>
-
+{% include "_insert_image_dialog.html" %}
 {% endblock %}
