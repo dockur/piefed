@@ -3,7 +3,7 @@ from flask_babel import _
 from flask_login import current_user
 from sqlalchemy import text
 
-from app import db, cache
+from app import db, cache, plugins
 from app.constants import *
 from app.models import UserBlock, NotificationSubscription, User, IpBan, UserFollower, Notification, BotChallenge, \
     Conversation
@@ -204,6 +204,9 @@ def ban_user(input, src, auth=None):
             db.session.commit()
 
     task_selector('ban_from_site', user_id=to_ban.id, mod_id=user.id, expiry=None, reason=reason, remove_data=purge_content and to_ban.is_local())
+
+    # Fire plugin hook for ban
+    plugins.fire_hook("ban_user", to_ban)
 
 
 def unban_user(input, src, auth=None):
