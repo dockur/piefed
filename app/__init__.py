@@ -27,11 +27,13 @@ from config import Config
 def get_locale():
     try:
         if current_user.is_authenticated and current_user.interface_language:
+            print(f'user language {current_user.interface_language}')
             return current_user.interface_language
         elif session.get('ui_language', None):
             return session['ui_language']
         else:
             try:
+                print(f"Best match {request.accept_languages.best_match(current_app.config['LANGUAGES'])}")
                 return request.accept_languages.best_match(current_app.config['LANGUAGES'])
             except:
                 return 'en'
