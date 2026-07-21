@@ -1,18 +1,18 @@
-
 msgid ""
 msgstr ""
-"Project-Id-Version:  piefed\n"
+"Project-Id-Version: piefed\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-06-28 19:10+1200\n"
-"PO-Revision-Date: 2026-05-24 02:56+0000\n"
-"Last-Translator: M33 <m33_piefedsocial@tok715.net>\n"
+"PO-Revision-Date: 2026-07-19 06:49+0000\n"
+"Last-Translator: Snoopy <snoopy@users.noreply.translate.piefed.social>\n"
+"Language-Team: French <http://translate.piefed.social/projects/piefed/"
+"main-web-app/fr/>\n"
 "Language: fr\n"
-"Language-Team: French <http://translate.piefed.social/projects/piefed"
-"/main-web-app/fr/>\n"
-"Plural-Forms: nplurals=2; plural=n > 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 5.10.4\n"
 "Generated-By: Babel 2.12.1\n"
 
 #: app/__init__.py:54
@@ -280,8 +280,9 @@ msgstr "Communauté non trouvée sur cette instance"
 
 #: app/activitypub/routes.py:1024 app/shared/user.py:261
 #: app/templates/user/notifs/13.html:5
+#, fuzzy
 msgid "You have a new follower"
-msgstr ""
+msgstr "Vous avez un nouvel abonné"
 
 #: app/activitypub/util.py:2648
 #, python-format
@@ -302,9 +303,8 @@ msgid "A comment has been reported"
 msgstr "Un commentaire a été signalé"
 
 #: app/activitypub/util.py:3974
-#, fuzzy
 msgid "Microblogs"
-msgstr "Journal de modération"
+msgstr "Microblogues"
 
 #: app/activitypub/util.py:3975 app/activitypub/util.py:3977
 msgid "Microblog posts from around the fediverse."
@@ -11899,4 +11899,3 @@ msgstr "Votre don a été annulé."
 
 #~ msgid "User note"
 #~ msgstr "Note de l'utilisateurice"
-

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-07-02 19:10+1200\n"
-"PO-Revision-Date: 2026-07-14 07:49+0000\n"
+"PO-Revision-Date: 2026-07-20 10:54+0000\n"
 "Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
 "Language-Team: Tagalog <http://translate.piefed.social/projects/piefed/"
 "main-web-app/tl/>\n"
@@ -82,7 +82,7 @@ msgstr "Naka-block ang pagre-reply"
 
 #: app/models.py:2822
 msgid "Duplicate reply"
-msgstr ""
+msgstr "Doble na tugon"
 
 #: app/models.py:2830
 msgid "Gif comment ignored"
@@ -114,15 +114,15 @@ msgstr "Dinelete na post"
 
 #: app/models.py:3689
 msgid "Un-deleted post"
-msgstr "Hindi natanggal na post"
+msgstr "Hindi nadelete na post"
 
 #: app/models.py:3690
 msgid "Deleted comment"
-msgstr "Dinelete na comment"
+msgstr "Dinelete na komento"
 
 #: app/models.py:3691
 msgid "Un-deleted comment"
-msgstr ""
+msgstr "Hindi nadelete na komento"
 
 #: app/models.py:3692
 msgid "Deleted community"
@@ -341,7 +341,7 @@ msgstr ""
 #: app/templates/base.html:314 app/templates/instance/people.html:25
 #: app/templates/themes/dillo/base.html:184 app/templates/user/people.html:22
 msgid "About"
-msgstr ""
+msgstr "Tungkol sa amin"
 
 #: app/admin/forms.py:22
 msgid "Announcement at top of home page"
@@ -396,7 +396,7 @@ msgstr "Mga komunidad ng meme = mababang kalidad"
 
 #: app/admin/forms.py:35
 msgid "Allow local image posts"
-msgstr ""
+msgstr "Payagan ang mga lokal na pag-post ng larawan"
 
 #: app/admin/forms.py:36 app/templates/admin/users.html:45
 #: app/templates/list_communities.html:172
@@ -1236,7 +1236,7 @@ msgstr ""
 
 #: app/admin/forms.py:355
 msgid "Set new owner"
-msgstr ""
+msgstr "Itakda ang bagong may-ari"
 
 #: app/admin/forms.py:356 app/dev/forms.py:29
 #: app/templates/list_communities.html:83
@@ -1246,11 +1246,11 @@ msgstr "Ipasa"
 
 #: app/admin/forms.py:361
 msgid "A local community at that url already exists"
-msgstr ""
+msgstr "Ang isang lokal na komunidad sa URL na iyon ay mayroon na."
 
 #: app/admin/forms.py:365
 msgid "URL path"
-msgstr ""
+msgstr "landas ng URL"
 
 #: app/admin/forms.py:366
 msgid "e.g., /about-us"
@@ -1258,78 +1258,80 @@ msgstr ""
 
 #: app/admin/forms.py:367
 msgid "Page title"
-msgstr ""
+msgstr "Pamagat ng pahina"
 
 #: app/admin/forms.py:368
 msgid "Content (Markdown)"
-msgstr ""
+msgstr "Nilalaman (Markdown)"
 
 #: app/admin/forms.py:369
 msgid "Write your content in Markdown format..."
-msgstr ""
+msgstr "Isulat ang iyong nilalaman sa format na Markdown..."
 
 #: app/admin/forms.py:383
 msgid "A page with this URL already exists."
-msgstr ""
+msgstr "May umiiral nang pahina na may ganitong URL."
 
 #: app/admin/forms.py:387
 msgid "Token or character"
-msgstr ""
+msgstr "Token o karakter"
 
 #: app/admin/forms.py:388
 msgid "e.g., :happy: or a single character like 👍"
-msgstr ""
+msgstr "hal., :happy: o isang solong karakter tulad ng 👍"
 
 #: app/admin/forms.py:389 app/community/forms.py:275 app/community/forms.py:294
 #: app/templates/admin/cms_pages.html:25 app/templates/admin/emoji.html:25
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: app/admin/forms.py:390
 msgid "e.g. https://..."
-msgstr ""
+msgstr "hal. https://..."
 
 #: app/admin/forms.py:391 app/templates/admin/emoji.html:27
 #: app/templates/user/filters.html:48
 msgid "Keywords"
-msgstr ""
+msgstr "Mga keyword"
 
 #: app/admin/forms.py:392 app/templates/admin/emoji.html:26
 msgid "Category"
-msgstr ""
+msgstr "Kategorya"
 
 #: app/admin/routes.py:66
 msgid "Storage used"
-msgstr ""
+msgstr "Ginamit na storage"
 
 #: app/admin/routes.py:236 app/admin/routes.py:268 app/admin/routes.py:313
 #: app/feed/routes.py:158
 msgid "Settings saved."
-msgstr ""
+msgstr "Nai-save ang mga setting."
 
 #: app/admin/routes.py:246 app/templates/admin/_nav.html:5
 #: app/templates/admin/site.html:16
 msgid "Site profile"
-msgstr ""
+msgstr "Profile ng site"
 
 #: app/admin/routes.py:352 app/admin/routes.py:374
 #: app/templates/admin/_nav.html:6 app/templates/admin/misc.html:19
 msgid "Misc settings"
-msgstr ""
+msgstr "Mga karagdagang setting"
 
 #: app/admin/routes.py:366
 msgid ""
 "Settings saved. It might take up to 24 hours before other instances show "
 "your changes."
 msgstr ""
+"Nai-save ang mga setting. Maaaring tumagal ng hanggang 24 na oras bago "
+"makita ng ibang mga instance ang iyong mga pagbabago."
 
 #: app/admin/routes.py:417
 msgid "Admin settings saved"
-msgstr ""
+msgstr "Nai-save ang mga setting ng admin"
 
 #: app/admin/routes.py:433
 msgid "Federation settings"
-msgstr ""
+msgstr "Mga setting ng pederasyon"
 
 #: app/admin/routes.py:498
 #, python-format
@@ -1355,8 +1357,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: app/admin/routes.py:559
+#, fuzzy
 msgid "Federation settings - preload"
-msgstr ""
+msgstr "Mga setting ng Federation - paunang pagkarga"
 
 #: app/admin/routes.py:875
 #, python-format
@@ -1373,11 +1376,11 @@ msgstr[1] ""
 
 #: app/admin/routes.py:882
 msgid "Federation settings - remote scan"
-msgstr ""
+msgstr "Mga setting ng pederasyon - remote scan"
 
 #: app/admin/routes.py:913
 msgid "Ban imports started in a background process."
-msgstr ""
+msgstr "Ang pag-import ay sinimulan sa isang prosesong naka-background."
 
 #: app/admin/routes.py:916
 msgid "Ban imports requested, but no json provided."
@@ -1385,7 +1388,7 @@ msgstr ""
 
 #: app/admin/routes.py:980
 msgid "Federation settings - ban lists"
-msgstr ""
+msgstr "Mga setting ng pederasyon - mga listahan ng na-ban"
 
 #: app/admin/routes.py:1116
 msgid ""
@@ -1395,7 +1398,7 @@ msgstr ""
 
 #: app/admin/routes.py:1139
 msgid "ActivityPub Log"
-msgstr ""
+msgstr "Log ng ActivityPub"
 
 #: app/admin/routes.py:1168 app/templates/admin/activity_json.html:13
 msgid "Activity JSON"
@@ -1433,11 +1436,11 @@ msgstr "Mga Komunidad"
 
 #: app/admin/routes.py:1225
 msgid "Communities with no topic"
-msgstr ""
+msgstr "Mga komunidad na walang paksa"
 
 #: app/admin/routes.py:1247
 msgid "Communities with low_quality == True"
-msgstr ""
+msgstr "Mga komunidad na may low_quality == True"
 
 #: app/admin/routes.py:1319 app/admin/routes.py:1427 app/admin/routes.py:1454
 #: app/admin/routes.py:1728 app/admin/routes.py:2011 app/admin/routes.py:2043
@@ -1446,21 +1449,23 @@ msgstr ""
 #: app/community/routes.py:2128 app/community/routes.py:2356
 #: app/domain/routes.py:44
 msgid "Saved"
-msgstr ""
+msgstr "Nai-save na"
 
 #: app/admin/routes.py:1323
 msgid ""
 "This is a remote community - most settings here will be regularly "
 "overwritten with data from the original server."
 msgstr ""
+"Ito ay isang malayuang komunidad—ang karamihan sa mga setting dito ay "
+"regular na mapapalitan ng data mula sa orihinal na server."
 
 #: app/admin/routes.py:1347 app/community/routes.py:1308
 msgid "Edit community"
-msgstr ""
+msgstr "I-edit ang komunidad"
 
 #: app/admin/routes.py:1362 app/community/routes.py:1384
 msgid "Community deleted"
-msgstr ""
+msgstr "Tinanggal ng komunidad"
 
 #: app/admin/routes.py:1405 app/community/routes.py:564
 #: app/community/routes.py:2002 app/community/routes.py:2054
@@ -1473,90 +1478,94 @@ msgstr ""
 #: app/templates/topic/show_topic.html:17
 #: app/templates/user/alerts/_type.html:5
 msgid "Topics"
-msgstr ""
+msgstr "Mga Paksa"
 
 #: app/admin/routes.py:1430 app/templates/admin/topics.html:38
 msgid "Add topic"
-msgstr ""
+msgstr "Magdagdag ng paksa"
 
 #: app/admin/routes.py:1463
 msgid "Edit topic"
-msgstr ""
+msgstr "I-edit ang paksa"
 
 #: app/admin/routes.py:1474
 msgid "Topic deleted"
-msgstr ""
+msgstr "Paksa na-delete na"
 
 #: app/admin/routes.py:1476
 msgid "Cannot delete topic with communities assigned to it."
-msgstr ""
+msgstr "Hindi ma-delete ang paksa dahil may mga komunidad na naka-assign dito."
 
 #: app/admin/routes.py:1522 app/templates/admin/_nav.html:13
 #: app/templates/admin/_tabbed_nav.html:14
 #: app/templates/admin/instances.html:50 app/templates/admin/users.html:15
 #: app/templates/user/alerts/_type.html:7
 msgid "Users"
-msgstr ""
+msgstr "Mga gumagamit"
 
 #: app/admin/routes.py:1541
 msgid "Bad / Most downvoted"
-msgstr ""
+msgstr "Masama / Pinakamaraming ibinoto pababa"
 
 #: app/admin/routes.py:1551
 msgid "Likely spam"
-msgstr ""
+msgstr "Malamang na spam"
 
 #: app/admin/routes.py:1563
 msgid "Deleted content"
-msgstr ""
+msgstr "Tinanggal na nilalaman"
 
 #: app/admin/routes.py:1636
 msgid "Registration approved."
-msgstr ""
+msgstr "Naaprubahan ang pagpaparehistro."
 
 #: app/admin/routes.py:1672
 msgid "Registration denied. User removed from the database."
-msgstr ""
+msgstr "Rehistrasyon tinanggihan. Alisin ang user sa database."
 
 #: app/admin/routes.py:1714
 msgid ""
 "Permissions are cached for 50 seconds so new admin roles won't take "
 "effect immediately."
 msgstr ""
+"Ang mga pahintulot ay naka-cache sa loob ng 50 segundo, kaya hindi agad "
+"magkakabisa ang mga bagong tungkulin ng admin."
 
 #: app/admin/routes.py:1732
 msgid ""
 "This is a remote user - most settings here will be regularly overwritten "
 "with data from the original server."
 msgstr ""
+"Ito ay isang remote na user—ang karamihan sa mga setting dito ay regular na "
+"mapapalitan ng data mula sa orihinal na server."
 
 #: app/admin/routes.py:1747
 msgid "Edit user"
-msgstr ""
+msgstr "I-edit ang user"
 
 #: app/admin/routes.py:1766
 msgid "Verification email sent!"
-msgstr ""
+msgstr "Naipadala na ang email para sa pag-verify!"
 
 #: app/admin/routes.py:1768
 msgid "Problem sending email: "
-msgstr ""
+msgstr "Problema sa pagpapadala ng email: "
 
 #: app/admin/routes.py:1825
 msgid "User added"
-msgstr ""
+msgstr "Idinagdag ng user"
 
 #: app/admin/routes.py:1828
 msgid "Add user"
-msgstr ""
+msgstr "Magdagdag ng user"
 
 #: app/admin/routes.py:1836
 msgid "This user cannot be deleted."
-msgstr ""
+msgstr "Hindi maaaring tanggalin ang user na ito."
 
 #: app/admin/routes.py:1859
 msgid "User deleted"
-msgstr ""
+msgstr "Tinanggal ng user"
 
 #: app/admin/routes.py:1888 app/templates/admin/reports.html:15
 #: app/templates/admin/users.html:66 app/templates/admin/users.html:104
@@ -1564,32 +1573,32 @@ msgstr ""
 #: app/templates/community/community_moderate.html:22
 #: app/templates/community/community_moderate_subscribers.html:135
 msgid "Reports"
-msgstr ""
+msgstr "Mga report"
 
 #: app/admin/routes.py:1899
 msgid "Newsletter sent"
-msgstr ""
+msgstr "Naipadala na ang newsletter"
 
 #: app/admin/routes.py:1923
 msgid "Settings saved"
-msgstr ""
+msgstr "Nai-save na ang mga setting"
 
 #: app/admin/routes.py:1928 app/templates/user/show_profile.html:146
 msgid "Role permissions"
-msgstr ""
+msgstr "Mga pahintulot sa tungkulin"
 
 #: app/admin/routes.py:2027
 msgid "Edit instance"
-msgstr ""
+msgstr "I-edit ang instance"
 
 #: app/admin/routes.py:2045
 msgid "Problem adding instance to database"
-msgstr ""
+msgstr "Problema sa pagdaragdag ng instance sa database"
 
 #: app/admin/routes.py:2060
 #, python-format
 msgid "Set community owner to %(user_name)s"
-msgstr ""
+msgstr "Itakda ang may-ari ng komunidad sa %(user_name)s"
 
 #: app/admin/routes.py:2099
 #, python-format
@@ -1597,18 +1606,20 @@ msgid ""
 "%(community_name)s is now %(new_url)s. Contact the initiator of this "
 "request to let them know."
 msgstr ""
+"Ang %(community_name)s ay ngayon %(new_url)s. Makipag-ugnayan sa "
+"tagapagpasimula ng kahilingang ito upang ipaalam sa kanila."
 
 #: app/admin/routes.py:2102
 msgid "Ensure this community has the right moderators."
-msgstr ""
+msgstr "Tiyakin na ang komunidad na ito ay may tamang mga moderator."
 
 #: app/admin/routes.py:2107
 msgid "Move community"
-msgstr ""
+msgstr "Ilipat ang komunidad"
 
 #: app/admin/routes.py:2117 app/templates/admin/_nav.html:35
 msgid "Blocked images"
-msgstr ""
+msgstr "Mga naka-block na larawan"
 
 #: app/admin/routes.py:2140
 msgid "Edit blocked image"
@@ -1619,84 +1630,86 @@ msgid ""
 "Provide the url of an image or the hash (and file name) of it, but not "
 "both."
 msgstr ""
+"Magbigay ng URL ng isang larawan o ang hash (at pangalan ng file) nito, "
+"ngunit hindi pareho."
 
 #: app/admin/routes.py:2166 app/templates/admin/blocked_images.html:14
 #: app/templates/admin/edit_blocked_image.html:15
 msgid "Add blocked image"
-msgstr ""
+msgstr "Magdagdag ng naka-block na larawan"
 
 #: app/admin/routes.py:2180 app/post/routes.py:2128
 #, python-format
 msgid "%(count)s posts deleted."
-msgstr ""
+msgstr "Ang mga post ni %(count)s ay tinanggal."
 
 #: app/admin/routes.py:2186 app/post/routes.py:2140
 #: app/templates/post/post_block_image_purge_posts.html:15
 msgid "Posts containing blocked images"
-msgstr ""
+msgstr "Mga post na naglalaman ng mga naka-block na larawan"
 
 #: app/admin/routes.py:2199
 msgid "Blocked image deleted"
-msgstr ""
+msgstr "Nabura ang naka-block na larawan"
 
 #: app/admin/routes.py:2210
 msgid "CMS Pages"
-msgstr ""
+msgstr "Mga Pahina ng CMS"
 
 #: app/admin/routes.py:2223 app/admin/routes.py:2244
 msgid "Page saved."
-msgstr ""
+msgstr "Nai-save na ang pahina."
 
 #: app/admin/routes.py:2226
 msgid "Add CMS Page"
-msgstr ""
+msgstr "Magdagdag ng Pahina ng CMS"
 
 #: app/admin/routes.py:2247
 msgid "Edit page"
-msgstr ""
+msgstr "I-edit ang pahina"
 
 #: app/admin/routes.py:2257
 msgid "Page deleted."
-msgstr ""
+msgstr "Nabura na ang pahina."
 
 #: app/admin/routes.py:2267 app/templates/admin/_nav.html:25
 #: app/templates/admin/_tabbed_nav.html:27 app/templates/admin/emoji.html:15
 msgid "Emoji"
-msgstr ""
+msgstr "Emoji"
 
 #: app/admin/routes.py:2281 app/admin/routes.py:2301
 msgid "Emoji saved."
-msgstr ""
+msgstr "Nai-save ang emoji."
 
 #: app/admin/routes.py:2284
 msgid "Add Emoji"
-msgstr ""
+msgstr "Magdagdag ng Emoji"
 
 #: app/admin/routes.py:2304
 msgid "Edit Emoji"
-msgstr ""
+msgstr "I-edit ang Emoji"
 
 #: app/admin/routes.py:2315
 msgid "Emoji deleted."
-msgstr ""
+msgstr "Emoji nadelete."
 
 #: app/admin/util.py:96
 msgid "No recipients"
-msgstr ""
+msgstr "Walang mga tatanggap"
 
 #: app/admin/util.py:120 app/community/forms.py:232 app/feed/util.py:18
 #: app/templates/admin/activities.html:52 app/user/forms.py:123
 msgid "None"
-msgstr ""
+msgstr "Wala"
 
 #: app/auth/forms.py:17
 msgid "or email"
-msgstr ""
+msgstr "o email"
 
 #: app/auth/forms.py:19 app/auth/forms.py:31 app/auth/forms.py:33
 #: app/user/forms.py:15
 msgid "Minimum length 8, maximum 128"
-msgstr ""
+msgstr "Minimum na haba na 8, maximum na 128"
 
 #: app/auth/forms.py:20 app/user/forms.py:70
 msgid "Low bandwidth mode"
@@ -1704,7 +1717,7 @@ msgstr ""
 
 #: app/auth/forms.py:22
 msgid "Log In"
-msgstr ""
+msgstr "Mag-log in"
 
 #: app/auth/forms.py:28 app/auth/forms.py:29 app/auth/forms.py:109
 #: app/auth/forms.py:120 app/auth/forms.py:156
@@ -1712,152 +1725,165 @@ msgstr ""
 #: app/templates/admin/approve_registrations.html:80
 #: app/templates/admin/edit_user.html:18
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: app/auth/forms.py:34
 msgid "Why would you like to join this site?"
-msgstr ""
+msgstr "Bakit mo gustong sumali sa site na ito?"
 
 #: app/auth/forms.py:35
 msgid "I agree to the terms of service & privacy policy (see links in footer)"
 msgstr ""
+"Sumasang-ayon ako sa mga tuntunin ng serbisyo at patakaran sa privacy ("
+"tingnan ang mga link sa ibaba)."
 
 #: app/auth/forms.py:36
 msgid "Enter captcha code below"
-msgstr ""
+msgstr "I-enter ang captcha code sa ibaba"
 
 #: app/auth/forms.py:39 app/auth/util.py:361 app/templates/base.html:288
 #: app/templates/themes/dillo/base.html:88
 msgid "Register"
-msgstr ""
+msgstr "Magrehistro"
 
 #: app/auth/forms.py:54
 msgid "User names cannot contain spaces."
-msgstr ""
+msgstr "Ang mga pangalan ng user ay hindi maaaring maglaman ng mga puwang."
 
 #: app/auth/forms.py:60
 msgid "User names can only contain letters, numbers, and underscores."
 msgstr ""
+"Ang mga username ay maaari lamang maglaman ng mga titik, numero, at "
+"salungguhit."
 
 #: app/auth/forms.py:72 app/auth/forms.py:76 app/community/forms.py:77
 #: app/community/forms.py:81 app/feed/forms.py:47
 msgid "This name is in use already."
-msgstr ""
+msgstr "Ang pangalang ito ay kasalukuyang ginagamit na."
 
 #: app/auth/forms.py:86
 msgid "Maximum password length is 128 characters."
-msgstr ""
+msgstr "Ang maximum na haba ng password ay 128 character."
 
 #: app/auth/forms.py:110
 msgid "Request password reset"
-msgstr ""
+msgstr "Humiling ng pag-reset ng password"
 
 #: app/auth/forms.py:116
 msgid "Set password"
-msgstr ""
+msgstr "Itakda ang password"
 
 #: app/auth/forms.py:121 app/auth/routes.py:126
 #: app/templates/admin/edit_user.html:36
 #: app/templates/auth/resend_email_request.html:13
 msgid "Resend verification email"
-msgstr ""
+msgstr "Ipadala muli ang email sa pag-verify"
 
 #: app/auth/forms.py:125
 msgid "Please make it stop"
-msgstr ""
+msgstr "Pakiusap, tigilan ito."
 
 #: app/auth/forms.py:126
 msgid "A little is ok"
-msgstr ""
+msgstr "Ang kaunti ay okay lang."
 
 #: app/auth/forms.py:127
 msgid "Bring it on"
-msgstr ""
+msgstr "Halina, subukan mo."
 
 #: app/auth/forms.py:129
 msgid "How tired of Trump and Musk news are you?"
-msgstr ""
+msgstr "Gaano ka napapagod sa mga balita tungkol kina Trump at Musk?"
 
 #: app/auth/forms.py:133 app/user/forms.py:199
 msgid "Blur thumbnail"
-msgstr ""
+msgstr "I-blur ang thumbnail"
 
 #: app/auth/forms.py:134 app/auth/forms.py:138 app/user/forms.py:200
 #: app/user/forms.py:204
 msgid "Make post semi-transparent"
-msgstr ""
+msgstr "Gawing bahagyang transparent ang post"
 
 #: app/auth/forms.py:137 app/user/forms.py:203
 msgid "Label as AI"
-msgstr ""
+msgstr "Lagyan ng label bilang AI"
 
 #: app/auth/forms.py:145 app/user/forms.py:211
 msgid "AI-generated posts"
-msgstr ""
+msgstr "Mga post na ginawa gamit ang AI"
 
 #: app/auth/forms.py:151
 msgid "Choose some topics you are interested in"
-msgstr ""
+msgstr "Pumili ng ilang mga paksang interesado ka"
 
 #: app/auth/forms.py:152 app/post/forms.py:125
 msgid "Choose"
-msgstr ""
+msgstr "Pumili"
 
 #: app/auth/forms.py:157
 msgid "Set email"
-msgstr ""
+msgstr "Itakda ang email"
 
 #: app/auth/oauth_util.py:38
 msgid ""
 "An account with this email already exists, please login and connect this "
 "account over \"Connect OAuth\" setting."
 msgstr ""
+"Mayroon nang account na may ganitong email. Mangyaring mag-log in at "
+"ikonekta ang account na ito sa pamamagitan ng setting na “Connect OAuth”."
 
 #: app/auth/oauth_util.py:128 app/auth/oauth_util.py:131
 msgid "Account registrations are currently closed."
-msgstr ""
+msgstr "Kasalukuyang sarado ang mga pagpaparehistro ng account."
 
 #: app/auth/oauth_util.py:134 app/auth/oauth_util.py:135 app/auth/util.py:169
 msgid "Application declined"
-msgstr ""
+msgstr "Tinanggihan ang aplikasyon"
 
 #: app/auth/oauth_util.py:136 app/auth/util.py:170
 msgid "Sorry, we are not accepting registrations from your country."
 msgstr ""
+"Paumanhin, hindi kami tumatanggap ng mga pagpaparehistro mula sa iyong bansa."
 
 #: app/auth/oauth_util.py:146
 msgid "Login failed due to a problem with the OAuth server."
-msgstr ""
+msgstr "Nabigo ang pag-login dahil sa isang problema sa OAuth server."
 
 #: app/auth/oauth_util.py:162 app/auth/routes.py:296 app/auth/util.py:440
 msgid "This account has been deleted."
-msgstr ""
+msgstr "Ang account na ito ay tinanggal na."
 
 #: app/auth/onboarding.py:23
 msgid "Which server do you want to join?"
-msgstr ""
+msgstr "Aling server ang nais mong salihan?"
 
 #: app/auth/onboarding.py:68
 msgid ""
 "You have joined some communities relating to those interests. Find more "
 "on the Explore menu or browse the home page."
 msgstr ""
+"Sumali ka sa ilang komunidad na may kaugnayan sa mga interes na iyon. "
+"Maghanap pa sa menu na “Explore” o mag-browse sa home page."
 
 #: app/auth/onboarding.py:72 app/main/routes.py:282 app/main/routes.py:1427
 msgid ""
 "You did not choose any topics. Would you like to choose individual "
 "communities instead?"
 msgstr ""
+"Wala kang piniling anumang paksa. Gusto mo bang pumili na lang ng mga "
+"indibidwal na komunidad?"
 
 #: app/auth/onboarding.py:79
 msgid ""
 "Please join some communities you're interested in and then go to the home"
 " page by clicking on the logo above."
 msgstr ""
+"Mangyaring sumali sa ilang komunidad na interesado ka, at pagkatapos ay "
+"pumunta sa home page sa pamamagitan ng pag-click sa logo sa itaas."
 
 #: app/auth/routes.py:85
 msgid "Account under review"
-msgstr ""
+msgstr "Ang Account na ito sinusuri pa"
 
 #: app/auth/routes.py:90 app/main/routes.py:1322 app/main/routes.py:1350
 #: app/main/routes.py:1373 app/templates/auth/permission_denied.html:12
@@ -1871,6 +1897,8 @@ msgid ""
 "You are not able to do this action due to being a very new account or "
 "because of a low reputation."
 msgstr ""
+"Hindi mo magagawa ang pagkilos na ito dahil sa pagiging bagong account pa "
+"lamang o dahil sa mababang reputasyon."
 
 #: app/auth/routes.py:95 app/templates/auth/check_email.html:12
 msgid "Check your email"
@@ -1878,27 +1906,29 @@ msgstr "Icheck ang email mo"
 
 #: app/auth/routes.py:109
 msgid "No user found with that email address."
-msgstr ""
+msgstr "Walang nahanap na user na may email address na iyon."
 
 #: app/auth/routes.py:120 app/auth/routes.py:147
 msgid "If an account exists, a link has been sent"
-msgstr ""
+msgstr "Kung mayroon nang account, naipadala na ang link"
 
 #: app/auth/routes.py:123
 msgid "Problem sending email, please contact the administrator for support"
 msgstr ""
+"May problema sa pagpapadala ng email. Mangyaring makipag-ugnayan sa "
+"administrator para sa suporta."
 
 #: app/auth/routes.py:139
 msgid "Sorry, you cannot use that email address."
-msgstr ""
+msgstr "Paumanhin, hindi mo magagamit ang email address na iyon."
 
 #: app/auth/routes.py:144
 msgid "If an account exists, a link has been sent."
-msgstr ""
+msgstr "Kung mayroon nang account, naipadala na ang link."
 
 #: app/auth/routes.py:148
 msgid "Reset Password"
-msgstr ""
+msgstr "I-reset ang Password"
 
 #: app/auth/routes.py:162
 #, python-format
@@ -1906,27 +1936,29 @@ msgid ""
 "Your password has been reset. Please use it to log in with user name of "
 "%(name)s."
 msgstr ""
+"Na-reset ang iyong password. Mangyaring gamitin ito upang mag-log in gamit "
+"ang username na %(name)s."
 
 #: app/auth/routes.py:176 app/auth/routes.py:192
 msgid "Thank you for verifying your email address."
-msgstr ""
+msgstr "Salamat sa pag-verify ng iyong email address."
 
 #: app/auth/routes.py:194
 msgid "Email address validation failed."
-msgstr ""
+msgstr "Nabigo ang pagpapatunay ng email address."
 
 #: app/auth/routes.py:258
 msgid "This Google account is already connected to another user."
-msgstr ""
+msgstr "Ang Google account na ito ay nakakonekta na sa ibang user."
 
 #: app/auth/routes.py:265
 msgid "Your Google account has been connected successfully."
-msgstr ""
+msgstr "Ang iyong Google account ay matagumpay na nakakonekta."
 
 #: app/auth/routes.py:268
 #, python-format
 msgid "Failed to connect Google account: %(error)s"
-msgstr ""
+msgstr "Nabigong kumonekta sa Google account: %(error)s"
 
 #: app/auth/routes.py:346
 msgid "This Mastodon account is already connected to another user."
@@ -2840,8 +2872,9 @@ msgstr ""
 #: app/templates/themes/dillo/base.html:104
 #: app/templates/user/alerts/_type.html:6
 #: app/templates/user/edit_settings.html:78
+#, fuzzy
 msgid "Feeds"
-msgstr ""
+msgstr "Mga feed"
 
 #: app/community/routes.py:636 app/post/routes.py:300
 msgid ""
