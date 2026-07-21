@@ -16,6 +16,8 @@ Plugins can have their code executed by adding a @hook decorator to a function. 
 
   - `after_post_create` - this is run after a post is created and the `Post` object is passed as a parameter.
 
+  - `ban_user` - when a user is banned. The `User` object is passed as a parameter.
+
   - `cron_often` - is run at a periodic interval. The frequency is determined by how often the send_queue runs. The cron hooks are executed from a CLI task and do not run in a request context.
 
   - `cron_daily` - is run once a day in the daily_maintenance_task.
