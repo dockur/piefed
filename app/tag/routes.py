@@ -368,7 +368,7 @@ def tag_posts(tag_id):
             posts = posts.filter(Post.user_id.not_in(blocked_accounts))
 
         # filter language
-        if len(current_user.read_language_ids):
+        if current_user.read_language_ids:
             posts = posts.filter(Post.language_id.in_(tuple(current_user.read_language_ids)))
 
     if community_id := request.args.get('community_id'):
