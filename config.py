@@ -33,7 +33,7 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or None
     MAIL_FROM = os.environ.get('MAIL_FROM') or 'noreply@' + os.environ.get('SERVER_NAME')
     ERRORS_TO = os.environ.get('ERRORS_TO') or ''
-    LANGUAGES = ['ca', 'de', 'en', 'es', 'fr', 'ja', 'uk', 'zh']
+    LANGUAGES = ['ca', 'ceb', 'de', 'en', 'es', 'fil', 'fr', 'ja', 'uk', 'zh']
     FULL_AP_CONTEXT = bool(int(os.environ.get('FULL_AP_CONTEXT', 0)))
     CACHE_TYPE = os.environ.get('CACHE_TYPE') or 'FileSystemCache'
     CACHE_REDIS_URL = os.environ.get('CACHE_REDIS_URL') or 'redis://localhost:6379/1'

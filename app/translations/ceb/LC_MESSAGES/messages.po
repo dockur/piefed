@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-07-02 19:09+1200\n"
-"PO-Revision-Date: 2026-07-14 07:49+0000\n"
+"PO-Revision-Date: 2026-07-21 08:02+0000\n"
 "Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
 "Language-Team: Cebuano <http://translate.piefed.social/projects/piefed/"
 "main-web-app/ceb/>\n"
@@ -74,7 +74,7 @@ msgstr "Bawal nga mo-komento"
 
 #: app/models.py:2808
 msgid "Blocked phrase in comment"
-msgstr ""
+msgstr "Nablock nga hugpong sa pulong sa komento"
 
 #: app/models.py:2819
 msgid "Replier blocked"
@@ -82,11 +82,11 @@ msgstr "Ang pag-reply gibabagan"
 
 #: app/models.py:2822
 msgid "Duplicate reply"
-msgstr ""
+msgstr "Dobleha ang tubag"
 
 #: app/models.py:2830
 msgid "Gif comment ignored"
-msgstr ""
+msgstr "Gif na komento gi-ignore"
 
 #: app/models.py:2833
 msgid "Low quality reply"
@@ -102,7 +102,7 @@ msgstr "Gitangtang ang moderator"
 
 #: app/models.py:3686
 msgid "Featured post"
-msgstr ""
+msgstr "Nagtampok nga post"
 
 #: app/models.py:3687
 msgid "Unfeatured post"
@@ -118,7 +118,7 @@ msgstr "Gipapas nga post nga wala pa matangtang"
 
 #: app/models.py:3690
 msgid "Deleted comment"
-msgstr "Gipapas nga comment"
+msgstr "Gipapas nga komento"
 
 #: app/models.py:3691
 msgid "Un-deleted comment"
@@ -251,7 +251,7 @@ msgstr "Tanan"
 
 #: app/community/forms.py:58 app/utils.py:3859
 msgid "- cannot be in Url. Use _ instead?"
-msgstr ""
+msgstr "- Dili mahimo nga naa sa URL. imbis, gamita ang _"
 
 #: app/utils.py:3875
 msgid "Feed urls can only contain letters, numbers, and underscores."
@@ -259,7 +259,7 @@ msgstr ""
 
 #: app/utils.py:3885
 msgid "A Feed with this url already exists."
-msgstr ""
+msgstr "Na'ay feed nga adunay niini nga URL."
 
 #: app/utils.py:4479
 #, python-format
@@ -267,6 +267,8 @@ msgid ""
 "You have blocked %(instance_name)s which hosts this community so none of "
 "your posts or comments will be sent there."
 msgstr ""
+"Giblock nimo ang %(instance_name)s nga nag-host niini nga komunidad, mao nga "
+"wala’y ipadalang nga bisan unsang imong mga post o komento didto."
 
 #: app/utils.py:4484
 #, python-format
@@ -327,7 +329,7 @@ msgstr ""
 
 #: app/admin/forms.py:18
 msgid "Icon"
-msgstr ""
+msgstr "Ikon"
 
 #: app/admin/forms.py:20
 msgid "Sidebar"
@@ -349,7 +351,7 @@ msgstr "Legal nga impormasyon"
 
 #: app/admin/forms.py:24
 msgid "Terms of service url"
-msgstr ""
+msgstr "Mga termino sa serbisyo nga URL"
 
 #: app/admin/forms.py:25
 msgid "General instance contact email address"
@@ -460,7 +462,7 @@ msgstr "Sirado"
 
 #: app/admin/forms.py:51
 msgid "Registration mode"
-msgstr ""
+msgstr "Pagrehistro nga mode"
 
 #: app/admin/forms.py:52
 msgid "Question to ask people applying for an account"
@@ -536,7 +538,7 @@ msgstr ""
 
 #: app/admin/forms.py:71
 msgid "Cache remote images locally"
-msgstr ""
+msgstr "I-cache ang mga remote nga imaheng lokal"
 
 #: app/admin/forms.py:72
 msgid ""
@@ -547,6 +549,8 @@ msgstr ""
 #: app/admin/forms.py:73
 msgid "Limit em dash reports to just the first occurence per user"
 msgstr ""
+"Limitahan ang mga report nga adunay em dash ngadto sa unang higayon ra matag "
+"user"
 
 #: app/admin/forms.py:74
 msgid "Log ActivityPub JSON for debugging"
@@ -554,47 +558,47 @@ msgstr ""
 
 #: app/admin/forms.py:75
 msgid "Show moderation actions publicly"
-msgstr ""
+msgstr "Ipakita ang mga aksyon sa pag-moderate sa publiko"
 
 #: app/admin/forms.py:76
 msgid "Private instance - require login to browse"
-msgstr ""
+msgstr "Pribadong instance - kinahanglan ang pag-login aron makabrowse"
 
 #: app/admin/forms.py:77
 msgid "Show Rational Discourse Toolkit in sidebar"
-msgstr ""
+msgstr "Ipakita ang Rational Discourse Toolkit sa sidebar"
 
 #: app/admin/forms.py:78
 msgid "Allow non-admins to add remote communities"
-msgstr ""
+msgstr "Sugtan ang mga dili admin nga makadugang ug mga layo nga komunidad"
 
 #: app/admin/forms.py:79
 msgid "Honeypot to block bad crawlers"
-msgstr ""
+msgstr "Honeypot aron babagan ang mga dautang crawler"
 
 #: app/admin/forms.py:85
 msgid "Enable instance chooser"
-msgstr ""
+msgstr "I-enable ang tigpili sa instance"
 
 #: app/admin/forms.py:86
 msgid "One-sentence elevator pitch"
-msgstr ""
+msgstr "Usa ka pulong nga elevator pitch"
 
 #: app/admin/forms.py:87
 msgid "Number of admins with emergency access"
-msgstr ""
+msgstr "Gidaghanon sa mga admin nga adunay emergency access"
 
 #: app/admin/forms.py:88
 msgid "Non-admins donate enough to pay for hosting"
-msgstr ""
+msgstr "Ang mga dili admin nagdonar ug igo nga pabayran ang pag-hosting"
 
 #: app/admin/forms.py:89
 msgid "This instance has automated daily backups"
-msgstr ""
+msgstr "Kini nga instance adunay awtomatikong adlaw-adlaw nga backup"
 
 #: app/admin/forms.py:94
 msgid "Federation mode"
-msgstr ""
+msgstr "Mode sa Pederasyon"
 
 #: app/admin/forms.py:95
 msgid "Blocklist - deny federation with specified instances"
@@ -602,27 +606,27 @@ msgstr ""
 
 #: app/admin/forms.py:96
 msgid "Allowlist - only allow federation with specified instances"
-msgstr ""
+msgstr "Allowlist - tugoti lamang ang pag-federate sa mga tinukoy nga instance"
 
 #: app/admin/forms.py:98
 msgid "Allow federation with these instances"
-msgstr ""
+msgstr "Tugtan ang pederasyon niini nga mga instance"
 
 #: app/admin/forms.py:99
 msgid "Allowlist mode"
-msgstr ""
+msgstr "Mode sa pag-allowlist"
 
 #: app/admin/forms.py:100
 msgid "Weak"
-msgstr ""
+msgstr "Mahuyang"
 
 #: app/admin/forms.py:101
 msgid "Strong"
-msgstr ""
+msgstr "Lig-on"
 
 #: app/admin/forms.py:102
 msgid "Intense"
-msgstr ""
+msgstr "Grabe kaayo"
 
 #: app/admin/forms.py:104
 msgid "Deny federation with these instances"
@@ -631,6 +635,7 @@ msgstr ""
 #: app/admin/forms.py:105
 msgid "Auto-defederate from any instance defederated by"
 msgstr ""
+"Awtomatikong i-defederate gikan sa bisan unsang instance nga gi-defederate na"
 
 #: app/admin/forms.py:106
 msgid "Discard all posts, comments and PMs with these phrases (one per line)"
@@ -654,23 +659,23 @@ msgstr ""
 
 #: app/admin/forms.py:114
 msgid "Closing down announcement for home page"
-msgstr ""
+msgstr "Pahibalo sa pagsira alang sa home page"
 
 #: app/admin/forms.py:115
 msgid "Yes, close my instance"
-msgstr ""
+msgstr "Oo, isira ang akong instance"
 
 #: app/admin/forms.py:119 app/admin/forms.py:125
 msgid "Number of Communities to add"
-msgstr ""
+msgstr "Gidaghanon sa mga Komunidad nga idugang"
 
 #: app/admin/forms.py:120
 msgid "Add Communities"
-msgstr ""
+msgstr "Dugang mga Komunidad"
 
 #: app/admin/forms.py:124
 msgid "Remote Server"
-msgstr ""
+msgstr "Layo nga Server"
 
 #: app/admin/forms.py:126
 msgid "Communities must have at least this many posts"
@@ -686,7 +691,7 @@ msgstr ""
 
 #: app/admin/forms.py:129
 msgid "Scan"
-msgstr ""
+msgstr "I-scan"
 
 #: app/admin/forms.py:133
 msgid "Import Bans List Json File"
@@ -1443,7 +1448,7 @@ msgstr ""
 #: app/templates/topic/show_topic.html:17
 #: app/templates/user/alerts/_type.html:5
 msgid "Topics"
-msgstr ""
+msgstr "Mga topic"
 
 #: app/admin/routes.py:1430 app/templates/admin/topics.html:38
 msgid "Add topic"
@@ -3425,7 +3430,7 @@ msgstr ""
 #: app/templates/admin/instances.html:92 app/templates/admin/users.html:44
 #: app/templates/list_communities.html:169
 msgid "Yes"
-msgstr ""
+msgstr "Oo"
 
 #: app/post/forms.py:86
 msgid "Also delete replies to this comment"
@@ -3940,7 +3945,7 @@ msgstr ""
 #: app/templates/themes/dillo/_home_nav.html:10 app/user/forms.py:81
 #: app/user/forms.py:90
 msgid "New"
-msgstr ""
+msgstr "Bag-o"
 
 #: app/templates/_home_nav.html:9 app/templates/_home_nav.html:97
 #: app/templates/user/_read_posts_nav.html:5
@@ -4137,7 +4142,7 @@ msgstr ""
 #: app/templates/post/post_embed.html:13
 #: app/templates/themes/dillo/_macros.html:16
 msgid "New account"
-msgstr ""
+msgstr "Bag-ong account"
 
 #: app/templates/_macros.html:43
 #: app/templates/post/add_reply_inline_result.html:25
@@ -4608,17 +4613,17 @@ msgstr ""
 
 #: app/templates/base.html:231 app/templates/themes/dillo/base.html:134
 msgid "Activity Alerts"
-msgstr ""
+msgstr "Mga Alerto sa Aktibidad"
 
 #: app/templates/base.html:234 app/templates/user/scheduled_posts.html:15
 #: app/user/routes.py:1790
 msgid "Scheduled posts"
-msgstr ""
+msgstr "Mga naka-iskedyul nga post"
 
 #: app/templates/base.html:237 app/templates/user/hidden_posts.html:15
 #: app/user/routes.py:1802
 msgid "Hidden posts"
-msgstr ""
+msgstr "Mga tago nga post"
 
 #: app/templates/base.html:242
 msgid "Manage donations"
@@ -4739,14 +4744,14 @@ msgstr ""
 #: app/templates/communities_menu.html:11
 #: app/templates/communities_menu.html:43
 msgid "Local communities"
-msgstr ""
+msgstr "Mga lokal nga komunidad"
 
 #: app/templates/communities_menu.html:12
 #: app/templates/communities_menu.html:44 app/templates/modlog.html:38
 #: app/templates/themes/dillo/base.html:75
 #: app/templates/themes/dillo/base.html:100 app/templates/topics_menu.html:11
 msgid "All communities"
-msgstr ""
+msgstr "Tanan nga mga komunidad"
 
 #: app/templates/communities_menu.html:17
 msgid "Favorites"
@@ -4759,7 +4764,7 @@ msgstr ""
 #: app/templates/communities_menu.html:37
 #: app/templates/communities_menu.html:46
 msgid "Random community"
-msgstr ""
+msgstr "Random nga komunidad"
 
 #: app/templates/donate.html:16 app/templates/user/choose_plan.html:63
 msgid ""
@@ -4910,7 +4915,7 @@ msgstr ""
 
 #: app/templates/index.html:66 app/templates/themes/dillo/_side_pane.html:108
 msgid "New communities"
-msgstr ""
+msgstr "Bag-ong mga komunidad"
 
 #: app/templates/index.html:76
 msgid "More new communities"
@@ -4936,7 +4941,7 @@ msgstr ""
 
 #: app/templates/index.html:161
 msgid "New instances"
-msgstr ""
+msgstr "Bag-ong mga instance"
 
 #: app/templates/index.html:171
 msgid "More instances"
@@ -5617,7 +5622,7 @@ msgstr ""
 
 #: app/templates/admin/cms_page_delete.html:46
 msgid "Yes, Delete This Page"
-msgstr ""
+msgstr "Oo, I-delete Kini nga Pahina"
 
 #: app/templates/admin/cms_page_delete.html:47
 #: app/templates/post/add_reply_inline.html:41
@@ -6396,7 +6401,7 @@ msgstr ""
 
 #: app/templates/auth/instance_chooser.html:38
 msgid "Newbies"
-msgstr ""
+msgstr "Mga bag-o pa lang"
 
 #: app/templates/auth/instance_chooser.html:40
 msgid "Newbie-friendly"
@@ -10380,11 +10385,12 @@ msgstr ""
 
 #: app/user/forms.py:150
 msgid "Yes, delete my account"
-msgstr ""
+msgstr "Oo, I-delete akong account"
 
 #: app/user/forms.py:154
 msgid "Yes, unsubscribe from all communities I am not moderating"
 msgstr ""
+"Oo, i-unsubscribe ko sa tanan nga mga komunidad nga wala nako gi-moderate"
 
 #: app/user/forms.py:159
 msgid "Ban IP address"
