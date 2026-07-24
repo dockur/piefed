@@ -18,6 +18,12 @@
     {%- endif %}
 {% endblock %}
 
+{% block end_scripts -%}
+    {% if current_user.is_authenticated and current_user.is_admin() and user.post_count and posting_pattern_labels %}
+        <script src="{{ url_for('static', filename='js/chart.js', changed=getmtime('js/chart.js')) }}" nonce={{ nonce }}></script>
+    {% endif %}
+{% endblock -%}
+
 {% block app_content %}
 <div class="row">
     <main class="col-12 col-lg-8 position-relative main_pane">
@@ -454,6 +460,67 @@
                 </div>
                 <div class="card-body">
                     <a href="{{ user.link() }}/upvotes">{{ _('Posts upvoted by %(user_name)s', user_name=user.user_name) }}</a>
+                </div>
+            </div>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.is_admin() and user.post_count and posting_pattern_labels %}
+            <div class="card mb-3">
+                <div class="card-header">
+                     <h2>{{ _('Posting pattern') }}</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="posting_pattern"></canvas>
+                    <script nonce="{{ nonce }}">
+                        document.addEventListener("DOMContentLoaded", () => {
+                            new Chart(document.getElementById('posting_pattern'), {
+                                type: 'bar',
+                                data: {
+                                    labels: {{ posting_pattern_labels|tojson }},
+                                    datasets: [{
+                                        label: 'Posts',
+                                        data: {{ posting_pattern_values|tojson }}
+                                    }]
+                                },
+                                options: {
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            title: {
+                                                display: true,
+                                                text: 'Hour of day',
+                                                font: {
+                                                    size: 12
+                                                }
+                                            },
+                                            ticks: {
+                                                font: {
+                                                    size: 10
+                                                }
+                                            },
+                                            grid: {
+                                                display: false
+                                            }
+                                        },
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                font: {
+                                                    size: 10
+                                                }
+                                            },
+                                            grid: {
+                                                display: false
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         {% endif %}
