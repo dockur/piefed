@@ -208,6 +208,10 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
   margin-right: auto;
 }
 
+.float-right {
+  float: right;
+}
+
 :root {
   --font-size-10: 0.625rem;
   --font-size-12: 0.75rem;
@@ -919,6 +923,10 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 
 .mr-auto {
   margin-right: auto;
+}
+
+.float-right {
+  float: right;
 }
 
 @view-transition {
@@ -3984,6 +3992,10 @@ other bootstrap classes in use from Reboot Bootstrap class and other bootstrap f
 
 .mr-auto {
   margin-right: auto;
+}
+
+.float-right {
+  float: right;
 }
 
 @media (prefers-contrast: more) {
