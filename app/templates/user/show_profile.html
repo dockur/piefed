@@ -524,6 +524,67 @@
                 </div>
             </div>
         {% endif %}
+        {% if current_user.is_authenticated and current_user.is_admin() and user.post_reply_count and comment_pattern_labels %}
+            <div class="card mb-3">
+                <div class="card-header">
+                     <h2>{{ _('Commenting pattern') }}</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="comment_pattern"></canvas>
+                    <script nonce="{{ nonce }}">
+                        document.addEventListener("DOMContentLoaded", () => {
+                            new Chart(document.getElementById('comment_pattern'), {
+                                type: 'bar',
+                                data: {
+                                    labels: {{ comment_pattern_labels|tojson }},
+                                    datasets: [{
+                                        label: 'Posts',
+                                        data: {{ comment_pattern_values|tojson }}
+                                    }]
+                                },
+                                options: {
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            title: {
+                                                display: true,
+                                                text: 'Hour of day',
+                                                font: {
+                                                    size: 12
+                                                }
+                                            },
+                                            ticks: {
+                                                font: {
+                                                    size: 10
+                                                }
+                                            },
+                                            grid: {
+                                                display: false
+                                            }
+                                        },
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                font: {
+                                                    size: 10
+                                                }
+                                            },
+                                            grid: {
+                                                display: false
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        {% endif %}
         {% if user_has_public_feeds %}
             <div class="card mb-3" id="public_feeds">
                 <div class="card-header">
