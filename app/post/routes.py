@@ -45,7 +45,8 @@ from app.shared.post import edit_post, sticky_post, lock_post, bookmark_post, re
     vote_for_post, mark_post_read, report_post, delete_post, mod_remove_post, restore_post, mod_restore_post, \
     vote_for_poll, hide_post, move_post
 from app.shared.reply import make_reply, edit_reply, bookmark_reply, remove_bookmark_reply, subscribe_reply, \
-    delete_reply, mod_remove_reply, vote_for_reply, lock_post_reply, report_reply, choose_answer, unchoose_answer
+    delete_reply, mod_remove_reply, vote_for_reply, lock_post_reply, report_reply, choose_answer, unchoose_answer, \
+    set_collapse_post_reply
 from app.shared.site import block_remote_instance
 from app.shared.community import get_comm_flair_list
 from app.shared.tasks import task_selector
@@ -1650,6 +1651,13 @@ def post_lock(post_id: int, mode):
 @login_required
 def post_reply_lock(post_id: int, post_reply_id: int, mode):
     lock_post_reply(post_reply_id, mode == 'yes', SRC_WEB)
+    return redirect(referrer(url_for('activitypub.post_ap', post_id=post_id, _anchor=f'comment_{post_reply_id}')))
+
+
+@bp.route('/post/<int:post_id>/<int:post_reply_id>/collapse/<mode>', methods=['POST'])
+@login_required
+def post_reply_collapse(post_id: int, post_reply_id: int, mode):
+    set_collapse_post_reply(post_reply_id, mode == 'yes', SRC_WEB)
     return redirect(referrer(url_for('activitypub.post_ap', post_id=post_id, _anchor=f'comment_{post_reply_id}')))
 
 
