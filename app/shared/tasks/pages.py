@@ -149,10 +149,8 @@ def send_post(post_id, edit=False, session=None):
     if not community.instance.online():
         return
 
-    # local_only communities can also be used to send activity to User Followers
-    # return now though, if there aren't any
-    followers = session.query(UserFollower).filter_by(local_user_id=post.user_id, is_inward=True).all()
-    if not followers and community.local_only:
+    # local_only communities do not federate
+    if community.local_only or community.private:
         return
 
     banned = session.query(CommunityBan).filter_by(user_id=user.id, community_id=community.id).first()
@@ -335,6 +333,7 @@ def send_post(post_id, edit=False, session=None):
                 send_post_request(recipient.instance.inbox, create, user.private_key, user.public_url() + '#main-key')
                 domains_sent_to.append(recipient.instance.domain)
 
+    followers = session.query(UserFollower).filter_by(local_user_id=post.user_id, is_inward=True).all()
     if not followers:
         return
 

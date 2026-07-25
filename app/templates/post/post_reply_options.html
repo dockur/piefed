@@ -153,6 +153,23 @@
                 </a>
             </li>
         {% endif -%}
+        {% if post_reply.collapsible -%}
+            <li>
+                <a href="#" data-url="{{ url_for('post.post_reply_collapse', post_id=post_reply.post_id, post_reply_id=post_reply.id, mode='no') }}"
+                        style="white-space: normal" class="send_post dropdown-item no-underline" rel="nofollow noindex">
+                    <span class="fe fe-collapse"></span>
+                    {{ _('Exempt from auto-collapse') }}
+                </a>
+            </li>
+        {% else -%}
+            <li>
+                <a href="#" data-url="{{ url_for('post.post_reply_collapse', post_id=post_reply.post_id, post_reply_id=post_reply.id, mode='yes') }}"
+                        style="white-space: normal" class="send_post dropdown-item no-underline" rel="nofollow noindex">
+                    <span class="fe fe-collapse"></span>
+                    {{ _('Allow auto-collapse') }}
+                </a>
+            </li>
+        {% endif -%}
         {% if len(post_reply.body) >= 100 and can_detect_ai -%}
             <li>
                 <a href="#" hx-post="{{ url_for('post.post_reply_check_ai', post_reply_id=post_reply.id) }}"

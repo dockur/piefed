@@ -118,9 +118,49 @@ def show_profile(user):
     overview_prev_url = url_for('activitypub.user_profile',
                                 actor=user.ap_id if user.ap_id is not None else user.user_name,
                                 overview_page=overview_page - 1) if overview_page != 1 else None
-
+    posting_pattern_labels = []
+    posting_pattern_values = []
+    comment_pattern_labels = []
+    comment_pattern_values = []
     if current_user.is_authenticated:
         vote_quota_used = votes_cast_today(user.id) / current_app.config['VOTE_QUOTA']
+
+        # Generate graph of which hours of the day the user posts at. Bots tend to have a distinctive look.
+        sql = """select
+                    h.hour_of_day,
+                    count(p.id) as post_count
+                from generate_series(0, 23) as h(hour_of_day)
+                left join post p
+                    on extract(hour from p.created_at) = h.hour_of_day
+                    and p.created_at >= now() - interval '1 month'
+                    and p.user_id in (
+                        select id
+                        from "user"
+                        where user_name = :user_name
+                    )
+                group by h.hour_of_day
+                order by h.hour_of_day;"""
+        posting_pattern = db.session.execute(text(sql), {'user_name': user.user_name}).all()
+        posting_pattern_labels = [x for x, y in posting_pattern]
+        posting_pattern_values = [y for x, y in posting_pattern]
+
+        sql = """select
+                            h.hour_of_day,
+                            count(p.id) as post_count
+                        from generate_series(0, 23) as h(hour_of_day)
+                        left join post_reply p
+                            on extract(hour from p.created_at) = h.hour_of_day
+                            and p.created_at >= now() - interval '1 month'
+                            and p.user_id in (
+                                select id
+                                from "user"
+                                where user_name = :user_name
+                            )
+                        group by h.hour_of_day
+                        order by h.hour_of_day;"""
+        comment_pattern = db.session.execute(text(sql), {'user_name': user.user_name}).all()
+        comment_pattern_labels = [x for x, y in comment_pattern]
+        comment_pattern_values = [y for x, y in comment_pattern]
     else:
         vote_quota_used = 0
 
@@ -128,7 +168,9 @@ def show_profile(user):
                            moderates=moderates, canonical=canonical, title=_('Posts by %(user_name)s',
                                                                              user_name=user.user_name),
                            description=description, subscribed=subscribed, disable_voting=True,
-                           user_notes=user_notes(current_user.get_id()),
+                           user_notes=user_notes(current_user.get_id()), posting_pattern_labels=posting_pattern_labels,
+                           posting_pattern_values=posting_pattern_values, comment_pattern_labels=comment_pattern_labels,
+                           comment_pattern_values=comment_pattern_values,
                            post_next_url=post_next_url, post_prev_url=post_prev_url,
                            replies_next_url=replies_next_url, replies_prev_url=replies_prev_url,
                            noindex=not user.indexable, show_post_community=True, hide_vote_buttons=True,

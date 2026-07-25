@@ -506,6 +506,31 @@ def lock_post_reply(post_reply_id, locked, src, auth=None):
         return user.id, post_reply
 
 
+def set_collapse_post_reply(post_reply_id, collapsible, src, auth=None):
+    if src == SRC_API:
+        user = authorise_api_user(auth, return_type='model')
+        post_reply = db.session.query(PostReply).filter_by(id=post_reply_id).one()
+    else:
+        user = current_user
+        post_reply = db.session.query(PostReply).get(post_reply_id)
+
+    if post_reply.community.is_moderator(user) or post_reply.community.is_instance_admin(user) or user.is_admin_or_staff():
+        post_reply.collapsible = collapsible
+        db.session.commit()
+
+        if collapsible:
+            if src == SRC_WEB:
+                flash(_('Comment is collapsible.'))
+            #task_selector('lock_post_reply', user_id=user.id, post_reply_id=post_reply_id)
+        else:
+            if src == SRC_WEB:
+                flash(_('Comment will not be collapsed when loading the post.'))
+            #task_selector('unlock_post_reply', user_id=user.id, post_reply_id=post_reply_id)
+
+    if src == SRC_API:
+        return user.id, post_reply
+
+
 def choose_answer(post_reply_id, src, auth=None):
     if src == SRC_API:
         user = authorise_api_user(auth, return_type='model')

@@ -714,7 +714,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
 
     db.session.commit()
 
-    if post.status < POST_STATUS_PUBLISHED:
+    if post.status < POST_STATUS_PUBLISHED or post.community.local_only or post.community.private:
         federate = False
 
     if from_scratch:

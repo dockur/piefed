@@ -158,7 +158,7 @@ def post_replies(post: Post, sort_by: str, viewer: User, db_only=False) -> List[
         if blocked_accounts:
             comments = comments.filter(PostReply.user_id.not_in(blocked_accounts))
         if viewer.reply_hide_threshold and not (viewer.is_admin_or_staff() or post.community.is_moderator()):
-            comments = comments.filter(PostReply.score > viewer.reply_hide_threshold)
+            comments = comments.filter(or_(PostReply.score > viewer.reply_hide_threshold, PostReply.collapsible == False))
         if viewer.read_language_ids and len(viewer.read_language_ids) > 0:
             comments = comments.filter(
                 or_(PostReply.language_id.in_(tuple(viewer.read_language_ids)), PostReply.language_id == None))

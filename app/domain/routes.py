@@ -5,7 +5,7 @@ from feedgen.feed import FeedGenerator
 from flask import redirect, url_for, flash, request, make_response, current_app, abort, g
 from flask_babel import _
 from flask_login import current_user, login_required
-from sqlalchemy import desc, or_
+from sqlalchemy import desc, or_, text
 
 from app import db, constants, cache, limiter
 from app.constants import POST_STATUS_REVIEWING, SRC_WEB
@@ -191,8 +191,6 @@ def domains():
 @bp.route('/domains/banned', methods=['GET'])
 @login_required
 def domains_blocked_list():
-    if not current_user.trustworthy():
-        abort(404)
 
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search', '')
@@ -208,6 +206,16 @@ def domains_blocked_list():
 
     return render_template('domain/domains_blocked.html', title='Domains blocked on this instance', domains=domains,
                            next_url=next_url, prev_url=prev_url, search=search)
+
+
+@bp.route('/domains/unban_all', methods=['POST'])
+@login_required
+@permission_required('manage users')
+def unban_all():
+    db.session.execute(text('UPDATE "domain" SET banned = false'))
+    db.session.commit()
+    flash(_('All domains have been unbanned.'))
+    return redirect(url_for('domain.domains_blocked_list'))
 
 
 @bp.route('/d/<int:domain_id>/block', methods=['POST'])
