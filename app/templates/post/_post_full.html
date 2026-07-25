@@ -17,7 +17,7 @@
                     <a href="{{ url_for('community.community_moderate', actor=post.community.link()) }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
                 {% endif -%}
                 {% if post.edited_at -%}
-                    <div class="time text-muted small">edited <time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.edited_at, locale) }}</time></div>
+                    <div class="time text-muted small">edited <time datetime="{{ pendulum.instance(post.edited_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.edited_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.edited_at, locale) }}</time></div>
                 {% else %}
                     <div class="time text-muted small"><time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.posted_at, locale) }}</time></div>
                 {% endif -%}
