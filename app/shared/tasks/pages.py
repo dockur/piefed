@@ -345,7 +345,8 @@ def send_post(post_id, edit=False, session=None):
 
     for instance in user.following_instances():
         if instance.domain not in domains_sent_to and instance.id != 1 and instance.software != 'piefed':
-            send_post_request(instance.inbox, create, user.private_key, user.public_url() + '#main-key')
+            if instance.inbox and instance.online() and not user.has_blocked_instance(instance.id) and not instance_banned(instance.domain):
+                send_post_request(instance.inbox, create, user.private_key, user.public_url() + '#main-key')
 
 
 

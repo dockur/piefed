@@ -41,6 +41,10 @@ class Config(object):
     CACHE_DEFAULT_TIMEOUT = 300
     CACHE_THRESHOLD = 1000
     CACHE_KEY_PREFIX = 'pyfedi'
+    COMPRESS_ALGORITHM = 'gzip'  # one variant only - br/zstd as well would fragment nginx's proxy_cache
+    COMPRESS_LEVEL = 6
+    COMPRESS_MIN_SIZE = 4096
+    COMPRESS_STREAMS = False
     CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL') or 'redis://localhost:6379/0'
     RESULT_BACKEND = os.environ.get('RESULT_BACKEND') or 'redis://localhost:6379/0'
     SQLALCHEMY_ECHO = False     # set to true to see SQL in console

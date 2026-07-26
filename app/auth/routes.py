@@ -41,7 +41,7 @@ from app.utils import (
 
 
 @bp.route("/login", methods=["GET", "POST"])
-@limiter.limit("100 per day;20 per 5 minutes", methods=["GET", "POST"])
+@limiter.limit("30 per day;10 per 5 minutes", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
         return redirect_next_page()
@@ -62,7 +62,7 @@ def logout():
 
 
 @bp.route("/register", methods=["GET", "POST"])
-@limiter.limit("100 per day;20 per 5 minutes", methods=["POST"])
+@limiter.limit("100 per day;10 per 5 minutes", methods=["POST"])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
