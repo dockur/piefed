@@ -23,6 +23,7 @@ boto3~=1.39.0
 markdown2==2.5.3
 beautifulsoup4==4.12.2
 flask-caching~=2.3.0
+flask-compress~=1.24
 Pillow
 pillow-heif
 pillow-avif-plugin

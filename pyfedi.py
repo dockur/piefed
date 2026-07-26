@@ -174,7 +174,9 @@ def after_request(response):
         else:
             # Don't let flask set a session cookie for logged out users
             flask.session.modified = False
-        response.headers.setdefault('Vary', 'Accept-Language, Cookie')
+        # Merge rather than setdefault: views like return_304() set their own Vary, and Flask-Compress
+        # appends Accept-Encoding after this runs. Overwriting either way would break nginx's proxy_cache.
+        response.vary.update(('Accept-Language', 'Cookie'))
     return response
 
 
