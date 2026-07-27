@@ -43,7 +43,7 @@
             {% endif -%}
             <span class="comment_time">{% if has_continued %}<a href="{{ url_for('post.continue_discussion', post_id=post_reply.post.id, comment_id=post_reply.id) }}">{% else %}<a href="/post/{{ post_reply.post_id }}#comment_{{ post_reply.id }}">{% endif %}
                 {% if post_reply.edited_at -%}
-                    {{ _('edited') }} <time datetime="{{ localize_datetime(post_reply.posted_at) }}" title="{{ localize_datetime(post_reply.posted_at) }}">{{ localize_datetime(post_reply.edited_at, locale) }}</time>
+                    {{ _('edited') }} <time datetime="{{ pendulum.instance(post_reply.edited_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post_reply.edited_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post_reply.edited_at, locale) }}</time>
                 {% else -%}
                     <time datetime="{{ pendulum.instance(post_reply.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post_reply.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post_reply.posted_at, locale) }}</time>
                 {% endif -%}
