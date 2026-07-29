@@ -18,11 +18,12 @@ from app.utils import render_template, permission_required, user_filters_posts, 
     blocked_or_banned_instances, \
     recently_upvoted_posts, recently_downvoted_posts, mimetype_from_url, request_etag_matches, \
     return_304, joined_or_modding_communities, login_required_if_private_instance, reported_posts, \
-    moderating_communities_ids, block_honey_pot, user_pronouns, community_membership_private
+    moderating_communities_ids, block_honey_pot, user_pronouns, community_membership_private, check_anoobis
 
 
 @bp.route('/d/<domain_id>', methods=['GET', 'POST'])
 @login_required_if_private_instance
+@check_anoobis
 def show_domain(domain_id):
     block_honey_pot()
     with limiter.limit('60/minute'):

@@ -1,0 +1,14 @@
+<html>
+<head>
+    <script src="/static/js/scripts.js" nonce="{{ nonce }}"></script>
+    <script nonce="{{ nonce }}">
+        document.addEventListener("DOMContentLoaded", function () {
+            setCookie('anoobis', 'ok', 1000);
+            location.href = '{{ next }}';
+        });
+    </script>
+</head>
+<body>
+    <p>Redirecting, please wait...</p>
+</body>
+</html>

@@ -1540,6 +1540,16 @@ def login_required_if_private_instance(func):
     return decorated_view
 
 
+def check_anoobis(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if current_app.config['ANOOBIS'] and request.cookies.get('anoobis') is None:
+            return redirect(url_for('main.anoobis', next=request.path))
+        return func(*args, **kwargs)
+
+    return decorated_view
+
+
 def permission_required(permission):
     def decorator(func):
         @wraps(func)

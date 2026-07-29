@@ -23,11 +23,12 @@ from app.utils import render_template, user_filters_posts, validation_required, 
     recently_upvoted_posts, recently_downvoted_posts, blocked_or_banned_instances, blocked_users, \
     joined_or_modding_communities, \
     login_required_if_private_instance, communities_banned_from, reported_posts, user_notes, moderating_communities_ids, \
-    approval_required, block_honey_pot, user_pronouns, community_membership_private
+    approval_required, block_honey_pot, user_pronouns, community_membership_private, check_anoobis
 
 
 @bp.route('/topic/<path:topic_path>', methods=['GET'])
 @login_required_if_private_instance
+@check_anoobis
 def show_topic(topic_path):
     block_honey_pot()
     page = request.args.get('page', 0, type=int)
