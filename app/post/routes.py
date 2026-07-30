@@ -63,10 +63,11 @@ from app.utils import render_template, markdown_to_html, validation_required, \
     total_comments_on_post_and_cross_posts, approval_required, libretranslate_string, user_in_restricted_country, \
     site_language_code, block_honey_pot, joined_communities, moderating_communities, user_pronouns, \
     instance_sticky_posts, instance_sticky_post_ids, user_access, show_reason_why_no_federation, \
-    community_membership_private, user_ip_banned
+    community_membership_private, user_ip_banned, check_anoobis
 
 
 @login_required_if_private_instance
+@check_anoobis
 def show_post(post_id: int, sort, low_bandwidth, autoplay):
     with limiter.limit('30/minute'):
         post = Post.query.get_or_404(post_id)
@@ -640,6 +641,7 @@ def poll_vote(post_id):
 
 @bp.route('/post/<int:post_id>/comment/<int:comment_id>')
 @login_required_if_private_instance
+@check_anoobis
 def continue_discussion(post_id, comment_id):
     block_honey_pot()
 
@@ -2083,6 +2085,7 @@ def post_reply_notification(post_reply_id: int):
 
 @bp.route('/post/<int:post_id>/cross_posts', methods=['GET'])
 @login_required_if_private_instance
+@check_anoobis
 def post_cross_posts(post_id: int):
     post = Post.query.get_or_404(post_id)
     if post.cross_posts:

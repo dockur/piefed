@@ -193,3 +193,5 @@ class Config(object):
     REDIS_MEMORY_LIMIT = int(os.environ.get('REDIS_MEMORY_LIMIT') or 200000000)
 
     VOTE_QUOTA = int(os.environ.get('VOTE_QUOTA') or 240)
+
+    ANOOBIS = os.environ.get('ANOOBIS') or False

@@ -44,7 +44,7 @@ from app.utils import render_template, markdown_to_html, user_access, markdown_t
     recently_downvoted_post_replies, reported_posts, user_notes, login_required, get_setting, filtered_out_communities, \
     moderating_communities_ids, is_valid_xml_utf8, blocked_or_banned_instances, blocked_domains, get_task_session, \
     patch_db_session, user_in_restricted_country, referrer, user_pronouns, \
-    permission_required
+    permission_required, check_anoobis
 
 
 @bp.route('/people', methods=['GET', 'POST'])
@@ -61,6 +61,7 @@ def show_profile_by_id(user_id):
 
 
 @login_required_if_private_instance
+@check_anoobis
 def show_profile(user):
     if (user.deleted or user.banned) and current_user.is_anonymous:
         abort(404)
