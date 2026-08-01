@@ -1375,6 +1375,7 @@ def anoobis():
     if next and (f.host is None or f.host == current_app.config['SERVER_NAME']) and (f.scheme is None or f.scheme.startswith('http')):
         return render_template('anoobis.html', next=next)
     else:
+        raise Exception(f'Anoobis error: {f.host} != {current_app.config["SERVER_NAME"]}')
         abort(403)
 
 
