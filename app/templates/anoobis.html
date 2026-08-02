@@ -4,11 +4,13 @@
     <script nonce="{{ nonce }}">
         document.addEventListener("DOMContentLoaded", function () {
             setCookie('anoobis', 'ok', 1000);
-            location.href = '{{ next }}';
+            setTimeout(function () {
+                location.href = '{{ next }}';
+            }, 2000);
         });
     </script>
 </head>
-<body>
-    <p>Redirecting, please wait...</p>
+<body bgcolor="black">
+    <p style="color: white;" align="center">Redirecting, please wait...</p>
 </body>
 </html>
