@@ -20,8 +20,8 @@ import flask
 import redis
 from flask import json, current_app
 from flask_babel import _, force_locale
-from sqlalchemy import or_, desc, text
-from sqlalchemy.dialects.postgresql import insert
+from furl import furl
+from sqlalchemy import or_, desc, text, create_engine
 
 from app import db, plugins
 from app.activitypub.signature import RsaKeys, send_post_request, default_context
@@ -29,7 +29,7 @@ from app.activitypub.util import extract_domain_and_actor, notify_about_post
 from app.auth.util import random_token
 from app.community.util import is_bad_name
 from app.constants import NOTIF_COMMUNITY, NOTIF_POST, NOTIF_REPLY, POST_STATUS_SCHEDULED, POST_STATUS_PUBLISHED, \
-    POST_TYPE_LINK, POST_TYPE_POLL, POST_TYPE_IMAGE, NOTIF_REMINDER
+    POST_TYPE_LINK, POST_TYPE_POLL, POST_TYPE_IMAGE, NOTIF_REMINDER, POST_TYPE_VIDEO, POST_TYPE_ARTICLE
 from app.email import send_email
 from app.models import CronJobLog, Settings, BannedInstances, Role, User, RolePermission, Domain, ActivityPubLog, \
     utcnow, Site, Instance, File, Notification, Post, CommunityMember, NotificationSubscription, PostReply, Language, \
@@ -43,7 +43,7 @@ from app.utils import retrieve_block_list, blocked_domains, retrieve_peertube_bl
     get_redis_connection, instance_online, instance_gone_forever, find_next_occurrence, \
     guess_mime_type, ensure_directory_exists, \
     render_from_tpl, get_task_session, patch_db_session, get_setting, get_recipient_language, \
-    log_cron_task_to_db
+    log_cron_task_to_db, allowlist_html, markdown_to_html
 
 logger = logging.getLogger(__name__)
 
@@ -270,6 +270,465 @@ def register(app):
         db.session.commit()
         print('Password has been set.')
 
+    @app.cli.command("lemmy-import")
+    def lemmy_import():
+        """Import data from a Lemmy database."""
+        lemmy_db = input("Lemmy DB connection: ")
+        if not lemmy_db.startswith('postgresql://'):
+            print('Connection should be something like "postgresql://lemmy:eeeee@127.0.0.1:5434/lemmy"')
+            return
+
+        with app.app_context():
+
+
+            # Test the Lemmy DB connection
+            try:
+                lemmy_engine = create_engine(lemmy_db)
+                with lemmy_engine.connect() as conn:
+                    conn.execute(text("SELECT 1"))
+                print("Successfully connected to Lemmy database.")
+            except Exception as e:
+                print(f"Error connecting to Lemmy database: {e}")
+                return
+
+            # Get the local instance
+            local_instance = Instance.query.filter_by(domain=current_app.config['SERVER_NAME']).first()
+            if not local_instance:
+                print("Error: Local instance not found. Make sure the database is initialized.")
+                return
+
+            # Get the Admin role for assigning to Lemmy admins
+            admin_role = Role.query.filter_by(name='Admin').first()
+
+            print("\nImporting users...")
+            with lemmy_engine.connect() as lemmy_conn:
+                # Get all instances
+                result = lemmy_conn.execute(text('SELECT id, domain FROM "instance"'))
+
+                for row in result:
+                    if row.id != 1:
+                        existing_instance = Instance.query.get(row.id)
+
+                        if existing_instance:
+                            existing_instance.domain = row.domain
+                        else:
+                            instance = Instance(id=row.id, domain=row.domain)
+                            db.session.add(instance)
+                            db.session.flush()
+
+                # Get all users with their person data
+                result = lemmy_conn.execute(text("""
+                    SELECT 
+                        p.id as person_id, p.name, p.display_name, p.avatar, p.bio,
+                        p.published, p.updated, p.actor_id, p.banned, p.deleted,
+                        p.private_key, p.public_key, p.matrix_user_id, p.bot_account,
+                        p.ban_expires, p.instance_id,
+                        lu.email, lu.password_encrypted, lu.email_verified,
+                        lu.admin, lu.totp_2fa_secret
+                    FROM person p
+                    LEFT JOIN local_user lu ON p.id = lu.person_id
+                    WHERE p.deleted = false
+                """))
+
+                users_imported = 0
+                person_to_user_map = {}
+                
+                for row in result:
+                    # Check if user exists, update or create
+                    existing_user = User.query.get(row.person_id)
+                    
+                    if existing_user:
+                        existing_user.user_name = row.name
+                        existing_user.alt_user_name = row.display_name or row.name
+                        existing_user.banned = row.banned if row.banned else False
+                        existing_user.about = row.bio or ""
+                        existing_user.public_key = row.public_key
+                        existing_user.matrix_user_id = row.matrix_user_id
+                        existing_user.bot = row.bot_account if row.bot_account else False
+                        existing_user.instance_id = row.instance.id
+                        existing_user.ap_id = actor_id_to_ap_id(row.actor_id)
+                        existing_user.ap_profile_id = row.actor_id
+                        existing_user.ap_public_url = row.actor_id
+                        existing_user.created = row.published if row.published else utcnow()
+                        existing_user.last_seen = row.updated if row.updated else utcnow()
+                        
+                        # Update email/password/verified only if this is a local user
+                        if row.password_encrypted:
+                            existing_user.email = row.email
+                            existing_user.password_hash = row.password_encrypted
+                            existing_user.private_key = row.private_key
+                            existing_user.ap_id = None
+                            existing_user.verified = row.email_verified if row.email_verified else False
+                            # Assign admin role for local users
+                            if row.admin and admin_role and existing_user.id != 1:
+                                if admin_role not in existing_user.roles:
+                                    existing_user.roles.append(admin_role)
+                        
+                        person_to_user_map[row.person_id] = existing_user.id
+                    else:
+                        # Create new user - for remote users, password will be null
+                        user = User(
+                            id=row.person_id,
+                            user_name=row.name,
+                            alt_user_name=row.display_name or row.name,
+                            email=row.email or "",
+                            password_hash=row.password_encrypted or "",
+                            verified=row.email_verified if row.email_verified else False,
+                            banned=row.banned if row.banned else False,
+                            about=row.bio or "",
+                            public_key=row.public_key,
+                            private_key=row.private_key,
+                            matrix_user_id=row.matrix_user_id,
+                            bot=row.bot_account if row.bot_account else False,
+                            instance_id=row.instance_id,
+                            ap_id=None if row.instance_id == 1 else actor_id_to_ap_id(row.actor_id),
+                            ap_profile_id=row.actor_id,
+                            ap_public_url=row.actor_id,
+                            created=row.published if row.published else utcnow(),
+                            last_seen=row.updated if row.updated else utcnow()
+                        )
+                        db.session.add(user)
+                        db.session.flush()
+                        person_to_user_map[row.person_id] = user.id
+                        
+                        # Assign admin role for local users
+                        if row.email and row.admin and admin_role and user.id != 1:
+                            user.roles.append(admin_role)
+                    
+                    users_imported += 1
+
+                print(f"  Imported {users_imported} users")
+                db.session.commit()
+
+                # Import communities
+                print("\nImporting communities...")
+                result = lemmy_conn.execute(text("""
+                    SELECT 
+                        id, name, title, description, published, updated, deleted, removed,
+                        nsfw, actor_id, local, private_key, public_key, icon, banner,
+                        inbox_url, shared_inbox_url, followers_url, moderators_url,
+                        featured_url, visibility, posting_restricted_to_mods, hidden, instance_id
+                    FROM community
+                    WHERE deleted = false AND removed = false
+                """))
+
+                communities_imported = 0
+                community_to_community_map = {}
+                
+                for row in result:
+                    # Use admin (user 1) as placeholder creator for all communities
+                    # since we can't easily determine the actual creator from Lemmy schema
+                    creator_id = 1
+
+                    existing_community = Community.query.get(row.id)
+                    
+                    if existing_community:
+                        existing_community.name = row.name
+                        existing_community.title = row.title or row.name
+                        existing_community.description = row.description or ""
+                        existing_community.instance_id = row.instance_id
+                        existing_community.user_id = creator_id
+                        existing_community.created_at = row.published if row.published else utcnow()
+                        existing_community.last_active = row.updated if row.updated else utcnow()
+                        existing_community.nsfw = row.nsfw if row.nsfw else False
+                        existing_community.public_key = row.public_key
+                        existing_community.private_key = row.private_key
+                        existing_community.ap_id = None if row.instance_id == 1 else actor_id_to_ap_id(row.actor_id)
+                        existing_community.ap_profile_id = row.actor_id
+                        existing_community.ap_public_url = row.actor_id
+                        existing_community.ap_inbox_url = row.inbox_url
+                        existing_community.ap_followers_url = row.followers_url
+                        existing_community.ap_outbox_url = row.shared_inbox_url or row.inbox_url
+                        existing_community.restricted_to_mods = row.posting_restricted_to_mods if row.posting_restricted_to_mods else False
+                        
+                        community_to_community_map[row.id] = existing_community.id
+                    else:
+                        community = Community(
+                            id=row.id,
+                            name=row.name,
+                            title=row.title or row.name,
+                            description=row.description or "",
+                            instance_id=row.instance_id,
+                            user_id=creator_id,
+                            created_at=row.published if row.published else utcnow(),
+                            last_active=row.updated if row.updated else utcnow(),
+                            nsfw=row.nsfw if row.nsfw else False,
+                            public_key=row.public_key,
+                            private_key=row.private_key,
+                            ap_id=None if row.instance_id == 1 else actor_id_to_ap_id(row.actor_id) ,
+                            ap_profile_id=row.actor_id,
+                            ap_public_url=row.actor_id,
+                            ap_inbox_url=row.inbox_url,
+                            ap_followers_url=row.followers_url,
+                            ap_outbox_url=row.shared_inbox_url or row.inbox_url,
+                            restricted_to_mods=row.posting_restricted_to_mods if row.posting_restricted_to_mods else False
+                        )
+                        db.session.add(community)
+                        db.session.flush()
+                        community_to_community_map[row.id] = community.id
+                    
+                    communities_imported += 1
+
+                print(f"  Imported {communities_imported} communities")
+                db.session.commit()
+
+                # Import community memberships
+                print("\nImporting community memberships...")
+                
+                # Delete existing memberships for communities we're importing
+                for community_id in community_to_community_map.values():
+                    CommunityMember.query.filter_by(community_id=community_id).delete()
+                
+                db.session.flush()
+
+                # Import followers
+                result = lemmy_conn.execute(text("""
+                    SELECT person_id, community_id
+                    FROM community_follower
+                """))
+
+                memberships_imported = 0
+                for row in result:
+                    user_id = person_to_user_map.get(row.person_id)
+                    community_id = community_to_community_map.get(row.community_id)
+                    
+                    if user_id and community_id:
+                        member = CommunityMember(
+                            user_id=user_id,
+                            community_id=community_id,
+                            is_moderator=False,
+                            is_owner=False,
+                            created_at=utcnow()
+                        )
+                        db.session.add(member)
+                        memberships_imported += 1
+
+                # Import moderators
+                result = lemmy_conn.execute(text("""
+                    SELECT person_id, community_id
+                    FROM community_moderator
+                """))
+
+                mod_imported = 0
+                for row in result:
+                    user_id = person_to_user_map.get(row.person_id)
+                    community_id = community_to_community_map.get(row.community_id)
+                    
+                    if user_id and community_id:
+                        member = CommunityMember.query.filter_by(
+                            user_id=user_id, community_id=community_id
+                        ).first()
+                        
+                        if member:
+                            member.is_moderator = True
+                            if mod_imported == 0:
+                                member.is_owner = True
+                        else:
+                            member = CommunityMember(
+                                user_id=user_id,
+                                community_id=community_id,
+                                is_moderator=True,
+                                is_owner=(mod_imported == 0),
+                                created_at=utcnow()
+                            )
+                            db.session.add(member)
+                        mod_imported += 1
+
+                print(f"  Imported {memberships_imported} memberships and {mod_imported} moderators")
+                db.session.commit()
+
+                # Import posts
+                print("\nImporting posts...")
+                result = lemmy_conn.execute(text("""
+                    SELECT 
+                        id, name, url, body, creator_id, community_id,
+                        published, updated, deleted, removed, nsfw, ap_id, local,
+                        embed_title, embed_description, thumbnail_url, language_id,
+                        embed_video_url
+                    FROM post
+                    WHERE deleted = false AND removed = false
+                """))
+
+                posts_imported = 0
+                lemmy_to_piefed_post = {}
+                
+                for row in result:
+                    user_id = person_to_user_map.get(row.creator_id)
+                    community_id = community_to_community_map.get(row.community_id)
+                    
+                    if not user_id or not community_id:
+                        print(f"  Skipping post {row.id} - missing user or community")
+                        continue
+
+                    # Determine post type
+                    if row.url:
+                        if row.thumbnail_url:
+                            post_type = POST_TYPE_IMAGE
+                        elif row.embed_video_url and row.embed_video_url.strip():
+                            post_type = POST_TYPE_VIDEO
+                        else:
+                            post_type = POST_TYPE_LINK
+                    else:
+                        post_type = POST_TYPE_ARTICLE
+
+                    existing_post = Post.query.get(row.id)
+                    
+                    if existing_post:
+                        existing_post.user_id = user_id
+                        existing_post.community_id = community_id
+                        existing_post.title = row.name or ""
+                        existing_post.url = row.url or ""
+                        existing_post.body = row.body or ""
+                        existing_post.body_html=markdown_to_html(row.body or "")
+                        existing_post.type = post_type
+                        existing_post.created_at = row.published if row.published else utcnow()
+                        existing_post.posted_at = row.published if row.published else utcnow()
+                        existing_post.last_active = row.updated if row.updated else utcnow()
+                        existing_post.nsfw = row.nsfw if row.nsfw else False
+                        existing_post.ap_id = row.ap_id
+                        existing_post.language_id = row.language_id if row.language_id else 2
+                        existing_post.status = POST_STATUS_PUBLISHED
+                        existing_post.instance_id = row.instance_id
+                        
+                        lemmy_to_piefed_post[row.id] = existing_post.id
+                    else:
+                        post = Post(
+                            id=row.id,
+                            user_id=user_id,
+                            community_id=community_id,
+                            title=row.name or "",
+                            url=row.url or "",
+                            body=row.body or "",
+                            body_html=markdown_to_html(row.body or ""),
+                            type=post_type,
+                            created_at=row.published if row.published else utcnow(),
+                            posted_at=row.published if row.published else utcnow(),
+                            last_active=row.updated if row.updated else utcnow(),
+                            nsfw=row.nsfw if row.nsfw else False,
+                            ap_id=row.ap_id,
+                            language_id=row.language_id if row.language_id else 2,
+                            status=POST_STATUS_PUBLISHED,
+                            instance_id=row.instance_id
+                        )
+                        db.session.add(post)
+                        db.session.flush()
+                        lemmy_to_piefed_post[row.id] = post.id
+                    
+                    posts_imported += 1
+
+                print(f"  Imported {posts_imported} posts")
+                db.session.commit()
+
+                # Import comments
+                print("\nImporting comments...")
+                
+                # Delete existing comments for posts we're importing
+                for post_id in lemmy_to_piefed_post.values():
+                    PostReply.query.filter_by(post_id=post_id).delete()
+                
+                db.session.flush()
+
+                result = lemmy_conn.execute(text("""
+                    SELECT 
+                        id, creator_id, post_id, content, published, updated,
+                        deleted, removed, ap_id, local, path, distinguished, language_id
+                    FROM comment
+                    WHERE deleted = false AND removed = false
+                    ORDER BY id ASC
+                """))
+
+                comments_imported = 0
+                lemmy_to_piefed_comment = {}
+                
+                for row in result:
+                    user_id = person_to_user_map.get(row.creator_id)
+                    piefed_post_id = lemmy_to_piefed_post.get(row.post_id)
+                    
+                    if not user_id or not piefed_post_id:
+                        print(f"  Skipping comment {row.id} - missing user or post")
+                        continue
+
+                    post = Post.query.get(piefed_post_id)
+                    if not post:
+                        print(f"  Skipping comment {row.id} - post {piefed_post_id} not found")
+                        continue
+
+                    # Parse ltree path
+                    path_parts = row.path.split('.') if row.path else []
+                    parent_lemmy_id = int(path_parts[-2]) if len(path_parts) > 1 else None
+                    parent_piefed_id = lemmy_to_piefed_comment.get(parent_lemmy_id) if parent_lemmy_id else None
+                    
+                    # Build PieFed path array
+                    piefed_path = []
+                    if len(path_parts) > 1:
+                        for lemmy_ancestor_id in path_parts[1:-1]:
+                            if lemmy_ancestor_id != '0':
+                                piefed_ancestor_id = lemmy_to_piefed_comment.get(int(lemmy_ancestor_id))
+                                if piefed_ancestor_id:
+                                    piefed_path.append(piefed_ancestor_id)
+                    
+                    depth = len(piefed_path)
+                    
+                    # Set root_id
+                    if depth == 0 and parent_lemmy_id:
+                        root_id = None
+                    elif len(path_parts) > 1:
+                        root_lemmy_id = int(path_parts[1]) if len(path_parts) > 1 else None
+                        root_id = lemmy_to_piefed_comment.get(root_lemmy_id)
+                    else:
+                        root_id = None
+
+                    existing_comment = PostReply.query.get(row.id)
+                    
+                    if existing_comment:
+                        existing_comment.user_id = user_id
+                        existing_comment.post_id = piefed_post_id
+                        existing_comment.community_id = post.community_id
+                        existing_comment.body = row.content or ""
+                        existing_comment.body_html = markdown_to_html(row.content or "")
+                        existing_comment.parent_id = parent_piefed_id
+                        existing_comment.root_id = root_id
+                        existing_comment.depth = depth
+                        existing_comment.path = piefed_path
+                        existing_comment.created_at = row.published if row.published else utcnow()
+                        existing_comment.posted_at = row.published if row.published else utcnow()
+                        existing_comment.distinguished = row.distinguished if row.distinguished else False
+                        existing_comment.ap_id = row.ap_id
+                        existing_comment.language_id = row.language_id if row.language_id else 2
+                        existing_comment.instance_id = row.instance_id
+                        existing_comment.domain_id = None
+                        
+                        lemmy_to_piefed_comment[row.id] = existing_comment.id
+                    else:
+                        comment = PostReply(
+                            id=row.id,
+                            user_id=user_id,
+                            post_id=piefed_post_id,
+                            community_id=post.community_id,
+                            body=row.content or "",
+                            body_html=markdown_to_html(row.content or ""),
+                            parent_id=parent_piefed_id,
+                            root_id=root_id,
+                            depth=depth,
+                            path=piefed_path,
+                            created_at=row.published if row.published else utcnow(),
+                            posted_at=row.published if row.published else utcnow(),
+                            distinguished=row.distinguished if row.distinguished else False,
+                            ap_id=row.ap_id,
+                            language_id=row.language_id if row.language_id else 2,
+                            instance_id=row.instance_id,
+                            domain_id=None
+                        )
+                        db.session.add(comment)
+                        db.session.flush()
+                        lemmy_to_piefed_comment[row.id] = comment.id
+                    
+                    comments_imported += 1
+
+                print(f"  Imported {comments_imported} comments")
+                db.session.commit()
+
+                print("\nImport completed successfully!")
 
     @app.cli.command('testing')
     def testing():
@@ -1561,3 +2020,11 @@ def parse_communities(interests_source, segment):
             output.append(line)
 
     return "\n".join(output)
+
+
+def actor_id_to_ap_id(actor_id) -> str:
+    # turn a string like https://example.com/u/username into username@example.com
+    host = furl(actor_id).host
+    path = furl(actor_id).path
+    path_parts = path.split('/')
+    return f'{path_parts[1]}@{host}'
