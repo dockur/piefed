@@ -33,7 +33,7 @@ from app.utils import show_ban_message, piefed_markdown_to_lemmy_markdown, markd
     recently_downvoted_posts, joined_or_modding_communities, login_required_if_private_instance, \
     communities_banned_from, reported_posts, user_notes, login_required, moderating_communities_ids, approval_required, \
     blocked_or_banned_instances, blocked_communities, block_honey_pot, user_pronouns, mimetype_from_url, \
-    community_membership_private
+    community_membership_private, check_anoobis
 
 
 @bp.route('/feed/new', methods=['GET', 'POST'])
@@ -403,6 +403,7 @@ def feed_list():
 
 # @bp.route('/f/<actor>', methods=['GET']) - defined in activitypub/routes.py, which calls this function for user requests. A bit weird.
 @login_required_if_private_instance
+@check_anoobis
 def show_feed(feed):
     block_honey_pot()
     # if the feed is private abort, unless the logged in user is the owner of the feed
