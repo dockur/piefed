@@ -105,6 +105,13 @@
             }
         }
 
+        function isMobile() {
+            if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+                return navigator.userAgentData.mobile;
+            }
+            return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             var difficulty = isMobile() ? DIFFICULTY_MOBILE : DIFFICULTY_DESKTOP;
             setTimeout(function () {
