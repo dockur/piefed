@@ -195,3 +195,5 @@ class Config(object):
     VOTE_QUOTA = int(os.environ.get('VOTE_QUOTA') or 240)
 
     ANOOBIS = os.environ.get('ANOOBIS') or False
+    ANOOBIS_DIFFICULTY_DESKTOP = os.environ.get('') or 19
+    ANOOBIS_DIFFICULTY_MOBILE = os.environ.get('') or 12

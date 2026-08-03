@@ -2599,3 +2599,10 @@ function setupLoadingAnimation() {
         }
     });
 }
+
+function isMobile() {
+    if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+        return navigator.userAgentData.mobile;
+    }
+    return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+}
