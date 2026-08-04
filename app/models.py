@@ -2854,7 +2854,6 @@ class PostReply(db.Model):
             site = Site()
 
         if reply_is_just_link_to_gif_reaction(reply.body) and site.enable_gif_reply_rep_decrease:
-            user.reputation -= 1
             raise PostReplyValidationError(_('Gif comment ignored'))
 
         if reply_is_low_effort(reply.body) and site.enable_this_comment_filter:

@@ -331,11 +331,8 @@ class CreateImageForm(CreatePostForm):
                 except UnidentifiedImageError:
                     image_text = ''
 
-                if 'Anonymous' in image_text and (
-                        'No.' in image_text or ' N0' in image_text):  # chan posts usually contain the text 'Anonymous' and ' No.12345'
-                    self.image_file.errors.append(
-                        "This image is an invalid file type.")  # deliberately misleading error message
-                    current_user.reputation -= 1
+                if 'Anonymous' in image_text and ('No.' in image_text or ' N0' in image_text):  # chan posts usually contain the text 'Anonymous' and ' No.12345'
+                    self.image_file.errors.append("This image is from 4chan.")
                     db.session.commit()
                     return False
         if uploaded_file.filename.endswith('.gif'):
