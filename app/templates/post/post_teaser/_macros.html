@@ -28,7 +28,7 @@
         <a href="/" target="_blank" title="{{ g.site.name }}"><img src="{{ g.site.logo if g.site.logo else '/static/images/piefed_logo_full_t_300x300.svg' }}" alt="Logo" width="40" height="40"></a>
     </div>
     {% endif -%}
-    <h3 lang="{{ post.language_code() }}">{% if post.sticky -%}<span class="fe fe-sticky-left"></span>{% endif -%}<a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _external=embed) }}" {{ 'target="_blank"' if embed }} class="post_teaser_title_a" {% if not post.indexable %}rel="noindex"{% endif %} >{{ post.title }}</a>
+    <h3 lang="{{ post.language_code() }}">{% if post.sticky -%}<span class="fe fe-sticky-left"></span>{% endif -%}<a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _external=embed) }}" {{ 'target="_blank"' if embed }} class="post_teaser_title_a" {% if not post.indexable %}rel="noindex"{% endif %} >{{ post.title if post.title != '(content in post body)' else '' }}</a>
         {% if post.type == POST_TYPE_IMAGE -%}
             <span class="fe fe-image" aria-hidden="true"> </span>
         {% endif -%}
