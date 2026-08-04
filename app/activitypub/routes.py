@@ -414,6 +414,7 @@ def user_profile(actor):
                               "sharedInbox": f"{current_app.config['SERVER_URL']}/inbox"
                           },
                           "published": ap_datetime(user.created),
+                          "attributionDomains": [current_app.config['SERVER_NAME']]
                           }
 
             if user.avatar_id is not None:

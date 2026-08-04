@@ -17,6 +17,7 @@
 - [FEP-3b86: Activity Intents](https://codeberg.org/fediverse/fep/src/branch/main/fep/3b86/fep-3b86.md)
 - [FEP-7888: Context Property](https://codeberg.org/fediverse/fep/src/branch/main/fep/7888/fep-7888.md)
 - [FEP-c0e0: Emoji reactions](https://codeberg.org/fediverse/fep/src/branch/main/fep/c0e0/fep-c0e0.md)
+- [FEP-2345: fediverse:creator](https://codeberg.org/fediverse/fep/src/branch/main/fep/2345/fep-2345.md)
 
 ## Partially Supported FEPS
 

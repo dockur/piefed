@@ -241,6 +241,12 @@ def show_post(post_id: int, sort, low_bandwidth, autoplay):
             recently_downvoted_replies = []
             reply_collapse_threshold = -10
 
+        # fep-2345 - fediverse:creator tag
+        if post.type == POST_TYPE_ARTICLE or post.type == POST_TYPE_LINK or post.type == POST_TYPE_POLL or post.type == POST_TYPE_EVENT or post.is_microblog():
+            creator = '@' + post.author.lemmy_link()
+        else:
+            creator = None
+
         # Polls
         poll_results = False
         poll_choices = []
@@ -309,7 +315,7 @@ def show_post(post_id: int, sort, low_bandwidth, autoplay):
                                    breadcrumbs=breadcrumbs, related_communities=related_communities, mods=mod_list,
                                    has_voted=has_voted, poll_results=poll_results, poll_data=poll_data,
                                    poll_choices=poll_choices, poll_total_votes=poll_total_votes,
-                                   event=event,
+                                   event=event, creator=creator,
                                    canonical=post.ap_id, form=form, replies=replies, more_replies=more_replies,
                                    user_flair=user_flair, lazy_load_replies=lazy_load_replies,
                                    THREAD_CUTOFF_DEPTH=constants.THREAD_CUTOFF_DEPTH,

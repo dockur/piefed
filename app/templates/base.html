@@ -86,6 +86,9 @@
         {% else -%}
             <meta property="og:image" content="{{ g.site.logo if g.site.logo else '/static/images/piefed_logo_full_t_300x300.svg' }}" />
         {% endif -%}
+        {% if creator -%}
+            <meta name="fediverse:creator" content="{{ creator }}" />
+        {% endif -%}
         {% if rss_feed -%}
             {% if rss_feed is string -%}
                 <link rel="alternate" type="application/rss+xml" title="{{ rss_feed_name }}" href="{{ rss_feed }}" />
