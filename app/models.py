@@ -1412,7 +1412,13 @@ class User(UserMixin, db.Model):
         return self.created and self.created > utcnow() - timedelta(days=1)
 
     def has_blocked_instance(self, instance_id: int):
+        if instance_id is None:
+            return False
         instance_block = db.session.query(InstanceBlock).filter_by(user_id=self.id, instance_id=instance_id).first()
+        return instance_block is not None
+
+    def has_blocked_instances(self):
+        instance_block = db.session.query(InstanceBlock).filter_by(user_id=self.id).first()
         return instance_block is not None
 
     def has_blocked_user(self, user_id: int):

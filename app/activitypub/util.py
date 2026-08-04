@@ -1804,6 +1804,8 @@ def find_reported_object(ap_id) -> Union[User, Post, PostReply, None]:
 
 
 def find_instance_id(server):
+    if not server:
+        return None
     server = server.strip().lower()
     instance = db.session.query(Instance).filter_by(domain=server).first()
     if instance:
