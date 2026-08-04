@@ -4580,16 +4580,26 @@ def is_invalid_get_request_uri(uri):
 def sanitize_svg_bytes(svg_bytes: bytes) -> bytes:
     # Sanitize SVGs to remove potentially dangerous elements.
 
-    try:
-        # Allow common image MIME types in data URLs
-        keep_data_url_mime_types = {
-            "image": ["jpeg", "png", "gif", "webp", "avif"],
-        }
+    max_svg_size = 10 * 1024 * 1024  # 10 MB
+    if len(svg_bytes) > max_svg_size:
+        raise ValueError(f"SVG file too large: {len(svg_bytes)} bytes (max {max_svg_size})")
 
-        return filter_svg(svg_bytes, keep_data_url_mime_types)
-    except Exception as e:
-        current_app.logger.error(f"Error sanitizing SVG: {e}")
-        return svg_bytes
+    # Strip all XML declarations (<!...) to prevent XXE/billion laughs attacks
+    svg_bytes = re.sub(rb'<\!.*?>', rb'', svg_bytes, flags=re.DOTALL)
+
+    # Strip all XML processing instructions (<?...?>) as they can also be attack vectors
+    svg_bytes = re.sub(rb'<\?.*?\?>', rb'', svg_bytes, flags=re.DOTALL)
+
+    # Additional cleanup
+    svg_bytes = re.sub(rb'\[>', rb'', svg_bytes)
+    svg_bytes = re.sub(rb'\]>', rb'', svg_bytes)
+
+    # Allow common image MIME types in data URLs
+    keep_data_url_mime_types = {
+        "image": ["jpeg", "png", "gif", "webp", "avif"],
+    }
+
+    return filter_svg(svg_bytes, keep_data_url_mime_types)
 
 
 def sanitize_svg(filepath: str) -> bool:
@@ -4611,3 +4621,13 @@ def sanitize_svg(filepath: str) -> bool:
     except Exception as e:
         current_app.logger.error(f"Error sanitizing SVG: {e}")
         return False
+
+
+def requestor_domain():
+    requesting_domain = ''
+    if user_agent := str(request.user_agent):
+        if '+' in user_agent:
+            parts = user_agent.split('+')
+            requesting_domain = parts[-1].replace(')', '')
+            requesting_domain = furl(requesting_domain).host
+    return requesting_domain
