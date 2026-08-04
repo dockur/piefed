@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-07-02 19:09+1200\n"
-"PO-Revision-Date: 2026-07-21 08:02+0000\n"
+"PO-Revision-Date: 2026-07-29 10:49+0000\n"
 "Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
 "Language-Team: Cebuano <http://translate.piefed.social/projects/piefed/"
 "main-web-app/ceb/>\n"
@@ -1163,7 +1163,7 @@ msgstr ""
 
 #: app/admin/forms.py:323
 msgid "Ban posts"
-msgstr ""
+msgstr "I-ban ang mga post"
 
 #: app/admin/forms.py:324
 msgid "Ban comments"
@@ -1217,7 +1217,7 @@ msgstr ""
 #: app/templates/list_communities.html:83
 #: app/templates/post/_flair_choices.html:17 app/topic/forms.py:12
 msgid "Submit"
-msgstr ""
+msgstr "I-submit"
 
 #: app/admin/forms.py:361
 msgid "A local community at that url already exists"
@@ -1404,15 +1404,15 @@ msgstr ""
 #: app/templates/user/notifications.html:74
 #: app/templates/user/show_profile.html:421
 msgid "Communities"
-msgstr ""
+msgstr "Mga komunidad"
 
 #: app/admin/routes.py:1225
 msgid "Communities with no topic"
-msgstr ""
+msgstr "Mga komunidad nga walay paksa"
 
 #: app/admin/routes.py:1247
 msgid "Communities with low_quality == True"
-msgstr ""
+msgstr "Mga komunidad nga low_quality == True"
 
 #: app/admin/routes.py:1319 app/admin/routes.py:1427 app/admin/routes.py:1454
 #: app/admin/routes.py:1728 app/admin/routes.py:2011 app/admin/routes.py:2043
@@ -2699,7 +2699,7 @@ msgstr ""
 #: app/community/routes.py:171 app/templates/community/add_local.html:13
 #: app/templates/community/community_edit.html:26
 msgid "Create community"
-msgstr ""
+msgstr "Buhat og komunidad"
 
 #: app/community/routes.py:186
 msgid "Adding remote communities is restricted to admin and staff users only."
@@ -2744,7 +2744,7 @@ msgstr ""
 #: app/templates/communities_menu.html:14
 #: app/templates/list_communities.html:22 app/templates/search/start.html:42
 msgid "Add remote community"
-msgstr ""
+msgstr "Dugang ug layo nga komunidad"
 
 #: app/community/routes.py:272 app/community/routes.py:277
 msgid "This community is only visible to logged in users."
@@ -3315,7 +3315,7 @@ msgstr ""
 
 #: app/main/routes.py:185 app/main/routes.py:190
 msgid "Local posts"
-msgstr ""
+msgstr "Mga lokal nga post"
 
 #: app/main/routes.py:189 app/templates/_view_filter_nav.html:7
 #: app/templates/_view_filter_nav.html:20
@@ -3331,7 +3331,7 @@ msgstr ""
 
 #: app/main/routes.py:192
 msgid "All posts"
-msgstr ""
+msgstr "Tanan nga mga post"
 
 #: app/main/routes.py:234 app/templates/explore_menu.html:45
 #: app/templates/themes/dillo/base.html:73
@@ -3962,7 +3962,7 @@ msgstr ""
 #: app/templates/post/_post_replies.html:25 app/user/forms.py:82
 #: app/user/forms.py:91
 msgid "Old"
-msgstr ""
+msgstr "Daan"
 
 #: app/templates/_home_nav.html:12 app/templates/_home_nav.html:99
 #: app/templates/themes/dillo/_home_nav.html:12
@@ -3985,7 +3985,7 @@ msgstr ""
 #: app/templates/user/show_profile.html:158
 #: app/templates/user/user_preview.html:30 app/user/forms.py:83
 msgid "Active"
-msgstr ""
+msgstr "Aktibo"
 
 #: app/templates/_home_nav.html:15 app/templates/_home_nav.html:101
 #: app/templates/user/_user_nav.html:8 app/templates/user/_user_nav.html:9
@@ -4437,7 +4437,7 @@ msgstr ""
 #: app/templates/themes/dillo/index.html:34
 #: app/templates/topic/show_topic.html:131
 msgid "More communities"
-msgstr ""
+msgstr "Mas daghang mga komunidad"
 
 #: app/templates/_side_pane.html:212
 msgid "More feeds"
@@ -4457,7 +4457,7 @@ msgstr ""
 #: app/templates/list_communities.html:72
 #: app/templates/themes/dillo/_view_filter_nav.html:5 app/user/forms.py:95
 msgid "Subscribed"
-msgstr ""
+msgstr "Naka-subscribe na"
 
 #: app/templates/_view_filter_nav.html:9 app/templates/_view_filter_nav.html:22
 #: app/templates/themes/dillo/_view_filter_nav.html:8
@@ -4542,7 +4542,7 @@ msgstr ""
 
 #: app/templates/about.html:24
 msgid "About Us"
-msgstr ""
+msgstr "Mahitungod Kanamo"
 
 #: app/templates/about.html:32
 msgid "Legal Information"
@@ -4578,7 +4578,7 @@ msgstr "Mga Notification"
 #: app/templates/base.html:197 app/templates/base.html:209
 #: app/templates/base.html:329
 msgid "Explore"
-msgstr ""
+msgstr "Pagsuhid"
 
 #: app/templates/base.html:201 app/templates/base.html:271
 #: app/templates/base.html:314 app/templates/donate.html:15
@@ -4739,7 +4739,7 @@ msgstr ""
 
 #: app/templates/communities_menu.html:7
 msgid "Filter communities..."
-msgstr ""
+msgstr "I-filter ang mga komunidad..."
 
 #: app/templates/communities_menu.html:11
 #: app/templates/communities_menu.html:43
@@ -4830,6 +4830,8 @@ msgstr ""
 #: app/templates/index.html:40 app/templates/themes/dillo/index.html:33
 msgid "No posts yet. Join some communities to see more."
 msgstr ""
+"Wala pa’y mga post. Apil sa pipila ka mga komunidad aron makakita ug mas "
+"daghan."
 
 #: app/templates/admin/activities.html:61
 #: app/templates/admin/communities.html:116 app/templates/admin/content.html:53
@@ -4911,7 +4913,7 @@ msgstr ""
 #: app/templates/user/show_profile.html:264
 #: app/templates/user/show_profile.html:293
 msgid "Next page"
-msgstr ""
+msgstr "Sunod nga panid"
 
 #: app/templates/index.html:66 app/templates/themes/dillo/_side_pane.html:108
 msgid "New communities"
@@ -4924,7 +4926,7 @@ msgstr ""
 #: app/templates/index.html:83 app/templates/search/results.html:76
 #: app/templates/themes/dillo/_side_pane.html:116
 msgid "Active communities"
-msgstr ""
+msgstr "Mga aktibong komunidad"
 
 #: app/templates/index.html:95 app/templates/search/results.html:87
 #: app/templates/themes/dillo/_side_pane.html:121
@@ -4945,7 +4947,7 @@ msgstr "Bag-ong mga instance"
 
 #: app/templates/index.html:171
 msgid "More instances"
-msgstr ""
+msgstr "Mas daghang mga intstance"
 
 #: app/templates/keyboard_shortcuts.html:11
 msgid "Most shortcuts are the same as what reddit has."
@@ -5021,7 +5023,7 @@ msgstr ""
 #: app/templates/admin/communities.html:29
 #: app/templates/list_communities.html:16
 msgid "Create local community"
-msgstr ""
+msgstr "Buhat og lokal nga komunidad"
 
 #: app/templates/admin/communities.html:30
 #: app/templates/list_communities.html:21
@@ -5030,7 +5032,7 @@ msgstr ""
 
 #: app/templates/list_communities.html:44
 msgid "Community Location"
-msgstr ""
+msgstr "Lokasyon sa Komunidad"
 
 #: app/templates/list_communities.html:48
 msgid "Filter based on whether the community is local or remote"
@@ -5041,7 +5043,7 @@ msgstr ""
 #: app/templates/list_communities.html:50
 #: app/templates/list_communities.html:69
 msgid "Any"
-msgstr ""
+msgstr "Bisan unsa"
 
 #: app/templates/admin/reports.html:23 app/templates/admin/users.html:27
 #: app/templates/community/community_moderate.html:33
@@ -5052,7 +5054,7 @@ msgstr ""
 
 #: app/templates/list_communities.html:63
 msgid "Subscription Status"
-msgstr ""
+msgstr "Istatus sa Subskripsyon"
 
 #: app/templates/list_communities.html:67
 msgid "Filter based on community subscription status"
@@ -5060,7 +5062,7 @@ msgstr ""
 
 #: app/templates/list_communities.html:75
 msgid "Not Subscribed"
-msgstr ""
+msgstr "Wala naka-subscribe"
 
 #: app/templates/list_communities.html:88 app/templates/tag/tag.html:67
 msgid "Clear Filters"
@@ -5068,7 +5070,7 @@ msgstr ""
 
 #: app/templates/list_communities.html:98
 msgid "Advanced Search"
-msgstr ""
+msgstr "Advanced nga Search"
 
 #: app/templates/list_communities.html:111
 msgid "Choose a topic to filter communities by"
@@ -5109,7 +5111,7 @@ msgstr ""
 
 #: app/templates/list_communities.html:223
 msgid "Active People"
-msgstr ""
+msgstr "Mga Aktibong Tawo"
 
 #: app/templates/admin/communities.html:51
 #: app/templates/list_communities.html:233
@@ -5134,7 +5136,7 @@ msgstr ""
 #: app/templates/user/show_profile.html:187
 #: app/templates/user/user_preview.html:26
 msgid "Posts"
-msgstr ""
+msgstr "Mga post"
 
 #: app/templates/admin/content.html:30 app/templates/admin/content.html:67
 #: app/templates/community/_community_moderation_nav.html:17
@@ -5156,7 +5158,7 @@ msgstr ""
 #: app/templates/user/show_profile.html:190
 #: app/templates/user/user_preview.html:27
 msgid "Comments"
-msgstr ""
+msgstr "Mga Komento"
 
 #: app/templates/admin/communities.html:88
 #: app/templates/list_communities.html:257
@@ -5172,11 +5174,11 @@ msgstr ""
 #: app/templates/community/community_moderate.html:42
 #: app/templates/list_communities.html:271
 msgid "Created"
-msgstr ""
+msgstr "Gihimo"
 
 #: app/templates/list_communities.html:276
 msgid "Rank"
-msgstr ""
+msgstr "Ranggo"
 
 #: app/templates/list_communities.html:313
 #, python-format
@@ -5321,12 +5323,12 @@ msgstr ""
 #: app/templates/community/community_moderate_comments.html:18
 #: app/templates/community/community_moderate_subscribers.html:17
 msgid "Moderation"
-msgstr ""
+msgstr "Pagdumala"
 
 #: app/templates/admin/_nav.html:26 app/templates/admin/_tabbed_nav.html:28
 #: app/templates/admin/federation.html:15
 msgid "Federation"
-msgstr ""
+msgstr "Pederasyon"
 
 #: app/templates/admin/_nav.html:28 app/templates/admin/_tabbed_nav.html:30
 #: app/templates/admin/newsletter.html:15
@@ -5336,12 +5338,12 @@ msgstr ""
 #: app/templates/admin/_nav.html:29 app/templates/admin/_tabbed_nav.html:31
 #: app/templates/admin/activities.html:14
 msgid "Activities"
-msgstr ""
+msgstr "Mga kalihokan"
 
 #: app/templates/admin/_nav.html:32 app/templates/admin/_tabbed_nav.html:34
 #: app/templates/admin/permissions.html:15
 msgid "Permissions"
-msgstr ""
+msgstr "Pagtugot"
 
 #: app/templates/admin/_tabbed_nav.html:5
 msgid "Site"
@@ -5353,17 +5355,17 @@ msgstr ""
 
 #: app/templates/admin/_tabbed_nav.html:7
 msgid "Chooser"
-msgstr ""
+msgstr "Tagpili"
 
 #: app/templates/admin/_tabbed_nav.html:17 app/templates/admin/misc.html:48
 #: app/templates/auth/instance_chooser.html:116
 msgid "Registration"
-msgstr ""
+msgstr "Pagrehistro"
 
 #: app/templates/admin/_tabbed_nav.html:24
 #: app/templates/admin/cms_pages.html:15
 msgid "Pages"
-msgstr ""
+msgstr "Mga Pahina"
 
 #: app/templates/admin/activities.html:15
 #: app/templates/admin/communities.html:22
@@ -5458,7 +5460,7 @@ msgstr ""
 
 #: app/templates/admin/approve_registrations.html:15
 msgid "Registrations"
-msgstr ""
+msgstr "Mga Pagrehistro"
 
 #: app/templates/admin/approve_registrations.html:17
 #, python-format
@@ -5614,7 +5616,7 @@ msgstr ""
 
 #: app/templates/admin/cms_page_delete.html:33
 msgid "Created:"
-msgstr ""
+msgstr "Gihimo:"
 
 #: app/templates/admin/cms_page_delete.html:36
 msgid "Content preview:"
@@ -6184,7 +6186,7 @@ msgstr ""
 
 #: app/templates/admin/site.html:29
 msgid "About this instance"
-msgstr ""
+msgstr "Mahitungod niini nga instance"
 
 #: app/templates/admin/site.html:30
 msgid ""
@@ -8053,7 +8055,7 @@ msgstr ""
 
 #: app/templates/post/_post_full.html:225
 msgid "Location"
-msgstr ""
+msgstr "Lokasyon"
 
 #: app/templates/post/_post_full.html:233
 msgid "Max Attendees"
@@ -8288,7 +8290,7 @@ msgstr ""
 #: app/templates/post/_post_reply_teaser.html:117
 #: app/templates/post/add_reply_inline_result.html:87
 msgid "reply"
-msgstr ""
+msgstr "Tubagon"
 
 #: app/templates/post/_post_reply_teaser.html:120
 msgid "locked"
@@ -9643,7 +9645,7 @@ msgstr ""
 
 #: app/templates/user/notifications.html:25
 msgid "Unread"
-msgstr ""
+msgstr "Wala pa mabasa"
 
 #: app/templates/user/notifications.html:53
 msgid "No notifications to show."
@@ -10070,7 +10072,7 @@ msgstr ""
 
 #: app/templates/user/notifs/3.html:8
 msgid "replied to post"
-msgstr ""
+msgstr "mitubag sa post"
 
 #: app/templates/user/notifs/3.html:19 app/templates/user/notifs/4.html:19
 msgid "Reply Details"
@@ -10084,7 +10086,7 @@ msgstr ""
 
 #: app/templates/user/notifs/4.html:8
 msgid "replied to comment"
-msgstr ""
+msgstr "mitubag sa komento"
 
 #: app/templates/user/notifs/5.html:11
 msgid "New Post in followed feed "
@@ -10116,7 +10118,7 @@ msgstr ""
 
 #: app/templates/user/notifs/_time_and_buttons.html:18
 msgid "Mark as unread"
-msgstr ""
+msgstr "Markahi nga wala pa mabasa"
 
 #: app/topic/forms.py:8
 msgid "New topic name"
@@ -10361,7 +10363,7 @@ msgstr ""
 
 #: app/user/forms.py:132
 msgid "Anytime"
-msgstr ""
+msgstr "Bisan kanus-a"
 
 #: app/user/forms.py:133
 msgid "In 1 day"

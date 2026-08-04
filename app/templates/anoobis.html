@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script src="/static/js/scripts.js" nonce="{{ nonce }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/scripts.js', changed=getmtime('js/scripts.js')) }}" nonce="{{ nonce }}"></script>
     <script nonce="{{ nonce }}">
         // Proof-of-work challenge.
 
@@ -103,6 +103,13 @@
                 }
                 nonce++;
             }
+        }
+
+        function isMobile() {
+            if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+                return navigator.userAgentData.mobile;
+            }
+            return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
         }
 
         document.addEventListener("DOMContentLoaded", function () {

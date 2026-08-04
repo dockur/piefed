@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-07-02 19:10+1200\n"
-"PO-Revision-Date: 2026-07-20 10:54+0000\n"
+"PO-Revision-Date: 2026-07-29 10:49+0000\n"
 "Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
-"Language-Team: Tagalog <http://translate.piefed.social/projects/piefed/"
+"Language-Team: Filipino <http://translate.piefed.social/projects/piefed/"
 "main-web-app/fil/>\n"
 "Language: fil\n"
 "MIME-Version: 1.0\n"
@@ -4003,7 +4003,7 @@ msgstr ""
 #: app/templates/themes/dillo/_home_nav.html:10 app/user/forms.py:81
 #: app/user/forms.py:90
 msgid "New"
-msgstr ""
+msgstr "Bago"
 
 #: app/templates/_home_nav.html:9 app/templates/_home_nav.html:97
 #: app/templates/user/_read_posts_nav.html:5
@@ -4043,7 +4043,7 @@ msgstr ""
 #: app/templates/user/show_profile.html:158
 #: app/templates/user/user_preview.html:30 app/user/forms.py:83
 msgid "Active"
-msgstr ""
+msgstr "Aktibo"
 
 #: app/templates/_home_nav.html:15 app/templates/_home_nav.html:101
 #: app/templates/user/_user_nav.html:8 app/templates/user/_user_nav.html:9
@@ -4200,7 +4200,7 @@ msgstr ""
 #: app/templates/post/post_embed.html:13
 #: app/templates/themes/dillo/_macros.html:16
 msgid "New account"
-msgstr ""
+msgstr "Bagong account"
 
 #: app/templates/_macros.html:43
 #: app/templates/post/add_reply_inline_result.html:25
@@ -4652,12 +4652,12 @@ msgstr ""
 #: app/templates/base.html:219 app/templates/themes/dillo/base.html:130
 #: app/templates/user/user_preview.html:55
 msgid "View profile"
-msgstr ""
+msgstr "Tingnan ang profile"
 
 #: app/templates/base.html:222 app/templates/themes/dillo/base.html:131
 #: app/templates/user/edit_profile.html:20 app/user/routes.py:277
 msgid "Edit profile"
-msgstr ""
+msgstr "I-edit ang profile"
 
 #: app/templates/base.html:225 app/templates/themes/dillo/base.html:132
 msgid "Chats"
@@ -4671,17 +4671,17 @@ msgstr ""
 
 #: app/templates/base.html:231 app/templates/themes/dillo/base.html:134
 msgid "Activity Alerts"
-msgstr ""
+msgstr "Mga Abiso sa Aktibidad"
 
 #: app/templates/base.html:234 app/templates/user/scheduled_posts.html:15
 #: app/user/routes.py:1790
 msgid "Scheduled posts"
-msgstr ""
+msgstr "Naka-iskedyul na mga post"
 
 #: app/templates/base.html:237 app/templates/user/hidden_posts.html:15
 #: app/user/routes.py:1802
 msgid "Hidden posts"
-msgstr ""
+msgstr "Nakatagong mga post"
 
 #: app/templates/base.html:242
 msgid "Manage donations"
@@ -4809,7 +4809,7 @@ msgstr "Lokal na komunidad"
 #: app/templates/themes/dillo/base.html:75
 #: app/templates/themes/dillo/base.html:100 app/templates/topics_menu.html:11
 msgid "All communities"
-msgstr ""
+msgstr "Lahat ng mga komunidad"
 
 #: app/templates/communities_menu.html:17
 msgid "Favorites"
@@ -4822,7 +4822,7 @@ msgstr "Sinalihan na mga komunidad"
 #: app/templates/communities_menu.html:37
 #: app/templates/communities_menu.html:46
 msgid "Random community"
-msgstr ""
+msgstr "Random na komunidad"
 
 #: app/templates/donate.html:16 app/templates/user/choose_plan.html:63
 msgid ""
@@ -4973,7 +4973,7 @@ msgstr ""
 
 #: app/templates/index.html:66 app/templates/themes/dillo/_side_pane.html:108
 msgid "New communities"
-msgstr ""
+msgstr "Bagong mga komunidad"
 
 #: app/templates/index.html:76
 msgid "More new communities"
@@ -4999,7 +4999,7 @@ msgstr ""
 
 #: app/templates/index.html:161
 msgid "New instances"
-msgstr ""
+msgstr "Mga bagong instance"
 
 #: app/templates/index.html:171
 msgid "More instances"
@@ -5234,7 +5234,7 @@ msgstr "Nilikha"
 
 #: app/templates/list_communities.html:276
 msgid "Rank"
-msgstr "Iranggo"
+msgstr "Ranggo"
 
 #: app/templates/list_communities.html:313
 #, python-format
@@ -5488,7 +5488,7 @@ msgstr ""
 #: app/templates/community/community_moderate_subscribers.html:150
 #: app/templates/community/community_wiki_revisions.html:47
 msgid "View"
-msgstr ""
+msgstr "Tingnan"
 
 #: app/templates/admin/activity_json.html:20
 msgid "Re-submit this activity"
@@ -6459,7 +6459,7 @@ msgstr ""
 
 #: app/templates/auth/instance_chooser.html:38
 msgid "Newbies"
-msgstr ""
+msgstr "Mga baguhan"
 
 #: app/templates/auth/instance_chooser.html:40
 msgid "Newbie-friendly"
@@ -7243,7 +7243,7 @@ msgstr ""
 #: app/templates/user/edit_profile.html:85
 #: app/templates/user/edit_profile.html:96
 msgid "View image"
-msgstr ""
+msgstr "Tingnan ang larawan"
 
 #: app/templates/community/community_edit.html:46
 #: app/templates/community/community_edit.html:56
@@ -9701,7 +9701,7 @@ msgstr ""
 
 #: app/templates/user/notifications.html:25
 msgid "Unread"
-msgstr ""
+msgstr "Hindi nababasa"
 
 #: app/templates/user/notifications.html:53
 msgid "No notifications to show."
