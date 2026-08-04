@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: piefed\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-06-28 19:10+1200\n"
-"PO-Revision-Date: 2026-07-19 06:49+0000\n"
-"Last-Translator: Snoopy <snoopy@users.noreply.translate.piefed.social>\n"
+"PO-Revision-Date: 2026-08-02 12:03+0000\n"
+"Last-Translator: libb <libb@thefoolwithapen.com>\n"
 "Language-Team: French <http://translate.piefed.social/projects/piefed/"
 "main-web-app/fr/>\n"
 "Language: fr\n"
@@ -280,7 +280,6 @@ msgstr "Communauté non trouvée sur cette instance"
 
 #: app/activitypub/routes.py:1024 app/shared/user.py:261
 #: app/templates/user/notifs/13.html:5
-#, fuzzy
 msgid "You have a new follower"
 msgstr "Vous avez un nouvel abonné"
 
@@ -308,7 +307,7 @@ msgstr "Microblogues"
 
 #: app/activitypub/util.py:3975 app/activitypub/util.py:3977
 msgid "Microblog posts from around the fediverse."
-msgstr ""
+msgstr "Publications de microblog provenant de l'ensemble du fediverse."
 
 #: app/admin/constants.py:16
 msgid "Post"
@@ -512,8 +511,10 @@ msgid "Additional JS"
 msgstr "Ajout de JS"
 
 #: app/admin/forms.py:64
+#, fuzzy
 msgid "Trim read posts table after this many days"
 msgstr ""
+"Supprimer les messages de la table « posts » après un certain nombre de jours"
 
 #: app/admin/forms.py:65 app/templates/_view_filter_nav.html:9
 #: app/templates/_view_filter_nav.html:23 app/templates/admin/reports.html:20
@@ -619,24 +620,23 @@ msgid "Allow federation with these instances"
 msgstr "Autoriser la fédération avec ces instances"
 
 #: app/admin/forms.py:99
-#, fuzzy
 msgid "Allowlist mode"
-msgstr "Mode clair"
+msgstr "Mode liste blanche"
 
 #: app/admin/forms.py:100
 #, fuzzy
 msgid "Weak"
-msgstr "Semaine"
+msgstr "Faible"
 
 #: app/admin/forms.py:101
 #, fuzzy
 msgid "Strong"
-msgstr "JSON"
+msgstr "Fort"
 
 #: app/admin/forms.py:102
 #, fuzzy
 msgid "Intense"
-msgstr "Chinois"
+msgstr "Intense"
 
 #: app/admin/forms.py:104
 msgid "Deny federation with these instances"
@@ -972,13 +972,12 @@ msgid "Show posts from child topics"
 msgstr "Montrer les publications des sous-rubriques"
 
 #: app/admin/forms.py:208 app/templates/admin/topics.html:39
-#, fuzzy
 msgid "Countries"
-msgstr "Communautés"
+msgstr "Pays"
 
 #: app/admin/forms.py:208
 msgid "Use two-letter country codes, one per line."
-msgstr ""
+msgstr "Utilisez les codes de pays à deux lettres. Un code pays par ligne."
 
 #: app/admin/forms.py:213 app/templates/admin/instances.html:24
 #: app/templates/admin/instances.html:99
@@ -1004,9 +1003,8 @@ msgstr "Fiable"
 #: app/admin/forms.py:216 app/templates/admin/instances.html:27
 #: app/templates/instance/list_instances.html:88
 #: app/templates/instance/list_instances.html:128
-#, fuzzy
 msgid "Silenced"
-msgstr "Envoyer"
+msgstr "Mise sous silence"
 
 #: app/admin/forms.py:217
 msgid "Hide from instance chooser"
@@ -1194,7 +1192,7 @@ msgstr "Bannir les commentaires"
 
 #: app/admin/forms.py:325
 msgid "Can send PMs"
-msgstr ""
+msgstr "Peut envoyer des MP"
 
 #: app/admin/forms.py:339
 msgid "Remove avatar"
@@ -1365,7 +1363,7 @@ msgstr[1] ""
 #: app/admin/routes.py:559
 #, fuzzy
 msgid "Federation settings - preload"
-msgstr "Paramètres de Fédération"
+msgstr "Paramètres de Fédération - préchargement"
 
 #: app/admin/routes.py:878
 #, python-format
@@ -1389,9 +1387,8 @@ msgstr[1] ""
 "de détails"
 
 #: app/admin/routes.py:882
-#, fuzzy
 msgid "Federation settings - remote scan"
-msgstr "Paramètres de Fédération"
+msgstr "Paramètres de Fédération - Analyse distante"
 
 #: app/admin/routes.py:913
 msgid "Ban imports started in a background process."
@@ -1404,9 +1401,8 @@ msgstr ""
 "fichier JSON est manquant."
 
 #: app/admin/routes.py:980
-#, fuzzy
 msgid "Federation settings - ban lists"
-msgstr "Paramètres de Fédération"
+msgstr "Paramètres de Fédération - listes de ban"
 
 #: app/admin/routes.py:1116
 msgid ""
@@ -1927,9 +1923,8 @@ msgid "No user found with that email address."
 msgstr "Aucun profil trouvé avec cette adresse e-mail."
 
 #: app/auth/routes.py:120 app/auth/routes.py:147
-#, fuzzy
 msgid "If an account exists, a link has been sent"
-msgstr "Aucun compte avec ce pseudo n'existe."
+msgstr "Si le compte existe, un lien a été envoyé"
 
 #: app/auth/routes.py:123
 msgid "Problem sending email, please contact the administrator for support"
@@ -1942,9 +1937,8 @@ msgid "Sorry, you cannot use that email address."
 msgstr "Désolé, vous ne pouvez pas utiliser cette adresse de courriel."
 
 #: app/auth/routes.py:144
-#, fuzzy
 msgid "If an account exists, a link has been sent."
-msgstr "Aucun compte avec ce pseudo n'existe."
+msgstr "Si le compte existe, un lien a été envoyé."
 
 #: app/auth/routes.py:148
 msgid "Reset Password"
@@ -2981,14 +2975,12 @@ msgid "Banner removed!"
 msgstr "Image de bannière supprimée !"
 
 #: app/community/routes.py:1351 app/templates/_side_pane.html:150
-#, fuzzy
 msgid "Disable theme"
-msgstr "Désactivé"
+msgstr "Désactiver le thème"
 
 #: app/community/routes.py:1356 app/templates/_side_pane.html:150
-#, fuzzy
 msgid "Enable theme"
-msgstr "Thème par défaut"
+msgstr "Activer le thème"
 
 #: app/community/routes.py:1407
 #: app/templates/community/community_mod_list.html:43
@@ -3255,9 +3247,8 @@ msgid "Warning on posts"
 msgstr "Alerte sur les publications"
 
 #: app/domain/forms.py:8
-#, fuzzy
 msgid "Warning type"
-msgstr "Avertissement"
+msgstr "Type d'avertissement"
 
 #: app/domain/forms.py:9 app/templates/admin/communities.html:83
 msgid "Warning"
@@ -3266,12 +3257,11 @@ msgstr "Avertissement"
 #: app/domain/forms.py:10
 #, fuzzy
 msgid "Helpful context"
-msgstr "Supprimer le contenu"
+msgstr "Contexte utile"
 
 #: app/domain/forms.py:11
-#, fuzzy
 msgid "Recommendation"
-msgstr "Conservation"
+msgstr "Recommendation"
 
 #: app/domain/routes.py:220
 #, python-format
@@ -3443,9 +3433,8 @@ msgid "Next"
 msgstr "Page suivante"
 
 #: app/main/routes.py:185 app/main/routes.py:190
-#, fuzzy
 msgid "Local posts"
-msgstr "Publication vérrouillée"
+msgstr "Publications locales"
 
 #: app/main/routes.py:189 app/templates/_view_filter_nav.html:7
 #: app/templates/_view_filter_nav.html:20
@@ -3460,9 +3449,8 @@ msgid "Posts from popular communities"
 msgstr "Publications dans les communautés populaires"
 
 #: app/main/routes.py:192
-#, fuzzy
 msgid "All posts"
-msgstr "Bannir les publications"
+msgstr "Toutes les publications"
 
 #: app/main/routes.py:234 app/templates/explore_menu.html:45
 #: app/templates/themes/dillo/base.html:73
@@ -3508,14 +3496,17 @@ msgstr "Avertissement de contenu"
 #: app/main/routes.py:1374
 msgid "You took too long to respond so your account has been flagged as a bot."
 msgstr ""
+"Vous avez mis trop de temps pour répondre. Votre compte a été signalé comme "
+"bot."
 
 #: app/main/routes.py:1378
 msgid "Thanks!"
-msgstr ""
+msgstr "Merci !"
 
 #: app/main/routes.py:1379
+#, fuzzy
 msgid "You have confirmed that your account is operated by a human."
-msgstr ""
+msgstr "Vous avez confirmé que votre compte est géré par une personne."
 
 #: app/main/routes.py:1387
 msgid "This page is intentionally left blank."
@@ -3560,7 +3551,9 @@ msgstr "Choix de la communauté pour publier"
 #: app/templates/search/_search_form.html:34
 #, fuzzy
 msgid "Enter a community name in the format community@server.name"
-msgstr "Entrez un nom de communauté dans le format suivant : xyz@example.com"
+msgstr ""
+"Entrez un nom de communauté dans le format suivant : "
+"communauté@nomduserveur.tdl"
 
 #: app/post/forms.py:75 app/post/forms.py:81 app/post/forms.py:87
 #: app/templates/admin/instances.html:92 app/templates/admin/users.html:44
@@ -4056,8 +4049,9 @@ msgid "%(actor)s has been banned."
 msgstr "%(actor)s a été bannie."
 
 #: app/shared/user.py:252
+#, fuzzy
 msgid "Someone wants to follow you"
-msgstr ""
+msgstr "Une personne souhaite vous suivre"
 
 #: app/shared/tasks/follows.py:65
 msgid "Community is on banned or blocked instance"
@@ -4559,7 +4553,7 @@ msgstr "Utilisateurices actives au cours des 6 derniers mois"
 
 #: app/templates/_side_pane.html:166 app/templates/index.html:144
 #: app/templates/index.html:151
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s User / 6 Months"
 msgid_plural "%(count)s Users / 6 Months"
 msgstr[0] "%(count)s Utilisateurice / 6 mois"
@@ -4918,9 +4912,8 @@ msgid "All communities"
 msgstr "Toutes les communautés"
 
 #: app/templates/communities_menu.html:17
-#, fuzzy
 msgid "Favorites"
-msgstr "Voter pour"
+msgstr "Favoris"
 
 #: app/templates/communities_menu.html:31 app/templates/topics_menu.html:21
 msgid "Joined communities"
@@ -4995,6 +4988,7 @@ msgstr "Parcourir les rubriques"
 #: app/templates/index.html:13
 msgid "Create an account to tailor this feed to your interests."
 msgstr ""
+"Créez un compte pour personnaliser ce flux selon vos centres d'intérêts."
 
 #: app/templates/index.html:40 app/templates/themes/dillo/index.html:33
 msgid "No posts yet. Join some communities to see more."
@@ -5089,9 +5083,8 @@ msgid "New communities"
 msgstr "Nouvelles Communautés"
 
 #: app/templates/index.html:76
-#, fuzzy
 msgid "More new communities"
-msgstr "Explorer les communautés"
+msgstr "Explorer de nouvelles communautés"
 
 #: app/templates/index.html:83 app/templates/search/results.html:76
 #: app/templates/themes/dillo/_side_pane.html:116
@@ -5106,21 +5099,19 @@ msgstr "Parcourir les rubriques"
 #: app/templates/index.html:139
 #, fuzzy
 msgid "This server"
-msgstr "Rejoindre ce serveur"
+msgstr "Ce serveur"
 
 #: app/templates/index.html:146
 msgid "Whole network"
-msgstr ""
+msgstr "Ensemble du réseau"
 
 #: app/templates/index.html:161
-#, fuzzy
 msgid "New instances"
-msgstr "Instances en ligne"
+msgstr "Nouvelles instances"
 
 #: app/templates/index.html:171
-#, fuzzy
 msgid "More instances"
-msgstr "Instance source"
+msgstr "Plus d'instances"
 
 #: app/templates/keyboard_shortcuts.html:11
 msgid "Most shortcuts are the same as what reddit has."
@@ -6013,7 +6004,7 @@ msgstr "indexable"
 #: app/templates/user/show_profile.html:120
 #, fuzzy
 msgid "View on home server"
-msgstr "Rejoindre ce serveur"
+msgstr "Lire sur le serveur d'origine"
 
 #: app/templates/admin/emoji.html:16
 msgid "Add new emoji"
@@ -6053,9 +6044,8 @@ msgid "Load communities from Lemmyverse data"
 msgstr "Ajouter des communautés à partir des données du Lemmyverse"
 
 #: app/templates/admin/federation_ban_lists.html:15
-#, fuzzy
 msgid "Federation - ban lists"
-msgstr "Statut de la Fédération"
+msgstr "Fédération - listes de ban"
 
 #: app/templates/admin/federation_ban_lists.html:16
 msgid ""
@@ -6080,7 +6070,7 @@ msgstr ""
 #: app/templates/admin/federation_preload.html:15
 #, fuzzy
 msgid "Bulk community import - from lemmyverse"
-msgstr "Ajouter des communautés à partir des données du Lemmyverse"
+msgstr "Importation groupée des communautés à partir du Lemmyverse"
 
 #: app/templates/admin/federation_preload.html:16
 msgid ""
@@ -6111,7 +6101,7 @@ msgstr ""
 #: app/templates/admin/federation_remote_scan.html:15
 #, fuzzy
 msgid "Federation - Remote server scan"
-msgstr "Analyse du serveur distant"
+msgstr "Fédération - Analyse du serveur distant"
 
 #: app/templates/admin/federation_remote_scan.html:16
 msgid ""
@@ -6587,7 +6577,7 @@ msgstr "Corps original de la publication"
 
 #: app/templates/admin/reports/post_report.html:37
 msgid "Source Instance"
-msgstr "Instance source"
+msgstr "Instance d'origine"
 
 #: app/templates/admin/reports/user_report.html:5
 #: app/templates/user/notifs/20.html:32
@@ -6619,20 +6609,29 @@ msgid "Content filter setup"
 msgstr "Réglage du filtre de contenu"
 
 #: app/templates/auth/filter_selection.html:18
+#, fuzzy
 msgid ""
 "Bots automatically create posts from major news organisations, etc which "
 "can be annoying."
 msgstr ""
+"Les bots créent automatiquement des publications provenant des principaux "
+"médias, etc., ce qui peut être agaçant."
 
 #: app/templates/auth/filter_selection.html:21
+#, fuzzy
 msgid ""
 "NSFL posts may contain gore, intense war footage or other disturbing "
 "content."
 msgstr ""
+"Les publications NSFL peuvent contenir des scènes sanglantes, des images de "
+"guerre violentes ou d'autres contenus perturbants."
 
 #: app/templates/auth/filter_selection.html:23
+#, fuzzy
 msgid "These posts were written using AI or link to articles made using AI."
 msgstr ""
+"Ces publications ont été écrite via IA ou utilisent des liens vers des "
+"articles fabriqués via l'IA."
 
 #: app/templates/auth/filter_selection.html:26
 msgid "You will be able to change this later."
@@ -6797,9 +6796,9 @@ msgid ""
 "Age is how long the server has been online for. Generally older ones are "
 "more likely to be around for the long term."
 msgstr ""
-"L'âge correspond à la durée écoulée depuis que le serveur a été mis en "
-"ligne. Généralement, les serveurs les plus anciens ont plus de chances de"
-" perdurer longtemps."
+"L'âge, c'est le temps écoulé depuis que le serveur a été mis en ligne. "
+"Généralement, il est plus probables que les plus âgés restent actifs dans la "
+"durée."
 
 #: app/templates/auth/instance_chooser.html:154
 msgid ""
@@ -7282,8 +7281,11 @@ msgstr ""
 "communautés à forte fréquentation !"
 
 #: app/templates/community/_notification_toggle.html:12
+#, fuzzy
 msgid "Favorite this community to put it on the Explore menu"
 msgstr ""
+"Ajoutez cette communauté dans vos favoris pour qu'elle apparaisse dans le "
+"menu Explorer"
 
 #: app/templates/community/add_local.html:25
 #: app/templates/community/community_edit.html:35
@@ -7417,9 +7419,8 @@ msgid "This link has already been posted elsewhere:"
 msgstr "Ce lien a déjà été publié sur ces communautés :"
 
 #: app/templates/community/check_url_posted.html:8
-#, fuzzy
 msgid "Post Title"
-msgstr "Titre de la publication : "
+msgstr "Titre de la publication"
 
 #: app/templates/community/community.html:39
 #: app/templates/community/community.html:76
@@ -8231,9 +8232,8 @@ msgid "Federated"
 msgstr "Fédérée"
 
 #: app/templates/instance/list_instances.html:87
-#, fuzzy
 msgid "Silenced instances"
-msgstr "Instances bloquées"
+msgstr "Instances mise sous silence"
 
 #: app/templates/instance/list_instances.html:150
 msgid "Heard from"
@@ -8273,9 +8273,8 @@ msgstr "Bloquer tout le monde de l'instance %(instance_name)s"
 #: app/templates/user/show_profile.html:105
 #: app/templates/user/show_profile.html:321
 #: app/templates/user/user_preview.html:65
-#, fuzzy
 msgid "Unfollow"
-msgstr "S'abonner"
+msgstr "Se désabonner"
 
 #: app/templates/instance/people.html:42
 #: app/templates/user/show_profile.html:101
@@ -8429,7 +8428,7 @@ msgstr "Modalité d'organisation"
 #: app/templates/post/_post_full.html:259
 #, fuzzy
 msgid "No paywall link"
-msgstr "Suivre le lien"
+msgstr "Pas de lien Mur de paie"
 
 #: app/templates/post/_post_full.html:265
 msgid "Licence"
@@ -8851,14 +8850,12 @@ msgid "Poll choices"
 msgstr "Choix du sondage"
 
 #: app/templates/post/post_edit.html:184
-#, fuzzy
 msgid "First choice"
-msgstr "Ajouter un choix"
+msgstr "Premier choix"
 
 #: app/templates/post/post_edit.html:187
-#, fuzzy
 msgid "Second choice"
-msgstr "Ajouter un choix"
+msgstr "Deuxième choix"
 
 #: app/templates/post/post_edit.html:228
 msgid "Add choice"
@@ -9781,17 +9778,18 @@ msgid "Stop applying this filter after this date. Optional."
 msgstr "Arrêter d'appliquer ce filtre après cette date. Facultatif."
 
 #: app/templates/user/edit_note.html:13
-#, fuzzy, python-format
+#, python-format
 msgid "Edit private note for \"%(user_name)s\""
-msgstr "Modifier la note pour \"%(user_name)s\""
+msgstr "Modifier la note privée pour \"%(user_name)s\""
 
 #: app/templates/user/edit_note.html:15
+#, fuzzy
 msgid "Use an emoji for the note"
-msgstr ""
+msgstr "Utiliser un émoji pour la note"
 
 #: app/templates/user/edit_note.html:44
 msgid "or some text, below:"
-msgstr ""
+msgstr "ou du texte, ci-dessous :"
 
 #: app/templates/user/edit_note.html:50
 msgid ""
@@ -10254,7 +10252,7 @@ msgstr "Envoyer un message en utilisant Matrix"
 #: app/templates/user/show_profile.html:103
 #: app/templates/user/user_preview.html:63
 msgid "Cancel follow request"
-msgstr ""
+msgstr "Annuler la demande d'abonnement"
 
 #: app/templates/user/show_profile.html:116
 msgid "Edit user in admin panel"
@@ -10326,13 +10324,12 @@ msgstr "Aperçu"
 #: app/templates/user/show_profile.html:314
 #, fuzzy
 msgid "Following"
-msgstr "Suivre le lien"
+msgstr "Suivis"
 
 #: app/templates/user/show_profile.html:199
 #: app/templates/user/show_profile.html:333
-#, fuzzy
 msgid "Followers"
-msgstr "S'abonner"
+msgstr "Abonnées"
 
 #: app/templates/user/show_profile.html:211
 #, python-format
@@ -10362,9 +10359,8 @@ msgid "Comments by %(user_name)s"
 msgstr "Commentaires de %(user_name)s"
 
 #: app/templates/user/show_profile.html:305
-#, fuzzy
 msgid "Archived comments"
-msgstr "Commentaires bannis"
+msgstr "Commentaires archivés"
 
 #: app/templates/user/show_profile.html:370
 msgid "Same IP address"
@@ -10376,24 +10372,24 @@ msgstr "Modérer l'utilisateurice"
 
 #: app/templates/user/show_profile.html:402
 msgid "Ask if bot"
-msgstr ""
+msgstr "Demander si c'est un bot"
 
 #: app/templates/user/show_profile.html:407
 msgid "Bot challenge result pending"
-msgstr ""
+msgstr "Résultat du défis «Bot ?» en attente"
 
 #: app/templates/user/show_profile.html:409
 #, fuzzy
 msgid "Not a bot"
-msgstr "Publications des bots"
+msgstr "Pas un bot"
 
 #: app/templates/user/show_profile.html:453
 #: app/templates/user/show_upvoted.html:35
 #: app/templates/user/show_upvoted.html:63
 #: app/templates/user/show_upvoted.html:78 app/user/routes.py:156
-#, fuzzy, python-format
+#, python-format
 msgid "Posts upvoted by %(user_name)s"
-msgstr "Publications de %(user_name)s"
+msgstr "Publications hautvoté par %(user_name)s"
 
 #: app/templates/user/stripe_redirect.html:10 app/user/subscription.py:87
 msgid "Please wait..."
@@ -10777,9 +10773,8 @@ msgid "Reply hide threshold"
 msgstr "Seuil de masquage de la réponse"
 
 #: app/user/forms.py:68
-#, fuzzy
 msgid "Posts per page"
-msgstr "Publication purgée."
+msgstr "Publications par page"
 
 #: app/user/forms.py:69
 msgid "Use markdown editor GUI when writing"
@@ -11335,18 +11330,19 @@ msgstr "La lecture de l'historique a été supprimée"
 
 #: app/user/routes.py:1971
 msgid "Follow request sent."
-msgstr ""
+msgstr "Demande d'abonnement envoyé."
 
 #: app/user/routes.py:1994
-#, fuzzy
 msgid "Unfollowed."
-msgstr "S'abonner"
+msgstr "Désabonné."
 
 #: app/user/routes.py:2014
 msgid ""
 "Bot challenge was sent. If they do not respond within 48 hours their "
 "account will be flagged as a bot."
 msgstr ""
+"Le défi «Bot ?» a été envoyé. S'iels ne répondent pas en moins de 48h, leur "
+"compte sera signalé comme étant un bot."
 
 #: app/user/routes.py:2040
 #, python-format
