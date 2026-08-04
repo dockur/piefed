@@ -1543,7 +1543,10 @@ def login_required_if_private_instance(func):
 def check_anoobis(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        if current_user.is_anonymous and current_app.config['ANOOBIS'] and request.cookies.get('anoobis') is None:
+        whitelist = ['Mastodon', 'Friendica', 'Synapse', 'PieFed']
+        if current_user.is_anonymous and current_app.config['ANOOBIS'] and \
+                request.cookies.get('anoobis') is None and \
+                any(item in request.user_agent.string for item in whitelist):
             return redirect(url_for('main.anoobis', next=request.path))
         return func(*args, **kwargs)
 
