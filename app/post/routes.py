@@ -2393,6 +2393,13 @@ def post_set_ai(post_id):
     return 'Done'
 
 
+@bp.route('/post/<int:post_id>/set_read', methods=['POST'])
+@login_required
+def post_set_read(post_id):
+    mark_post_read([post_id], True, current_user.id)
+    return ''
+
+
 @bp.route('/post_reply/<int:post_reply_id>/check_ai', methods=['POST'])
 def post_reply_check_ai(post_reply_id):
     post_reply = PostReply.query.get(post_reply_id)
