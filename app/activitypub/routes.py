@@ -36,7 +36,8 @@ from app.utils import gibberish, get_setting, community_membership, ap_datetime,
     community_moderators, html_to_text, add_to_modlog, instance_banned, get_redis_connection, \
     feed_membership, get_task_session, patch_db_session, \
     blocked_phrases, orjson_response, moderating_communities, joined_communities, moderating_communities_ids, \
-    moderating_communities_ids_all_users, publish_sse_event, blocked_users, block_honey_pot, instance_allowed
+    moderating_communities_ids_all_users, publish_sse_event, blocked_users, block_honey_pot, instance_allowed, \
+    requestor_domain
 
 
 @bp.route('/testredis')
@@ -52,14 +53,7 @@ def testredis_get():
 
 @bp.route('/.well-known/webfinger')
 def webfinger():
-    requesting_domain = ''
-    if user_agent := str(request.user_agent):
-        if '+' in user_agent:
-            parts = user_agent.split('+')
-            requesting_domain = parts[-1].replace(')', '')
-            requesting_domain = furl(requesting_domain).host
-
-    if requesting_domain:
+    if requesting_domain := requestor_domain():
         if not hasattr(g, 'site'):
             g.site = db.session.query(Site).get(1)
         if get_setting('use_allowlist') and g.site.allowlist_mode == ALLOWLIST_INTENSE:
@@ -2075,10 +2069,15 @@ def comment_ap(comment_id):
     if is_activitypub_request():
         if reply.community.local_only or reply.community.private:
             abort(403)
+        if reply.author.has_blocked_instance(find_instance_id(requestor_domain())):
+            return make_response(f'Author has blocked {requestor_domain()}'), 401
         reply_data = comment_model_to_json(reply) if request.method == 'GET' else []
         resp = jsonify(reply_data)
         resp.content_type = 'application/activity+json'
-        resp.headers.set('Vary', 'Accept')
+        if reply.author.has_blocked_instances():
+            resp.headers.set('Vary', 'Accept, User-Agent')
+        else:
+            resp.headers.set('Vary', 'Accept')
         resp.headers.set('Cache-Control', 'public, max-age=120')
         resp.headers.set('Link',
                          f'<https://{current_app.config["SERVER_NAME"]}/comment/{reply.id}>; rel="alternate"; type="text/html"')
@@ -2099,6 +2098,8 @@ def post_ap(post_id):
         if post.is_local():
             if post.community.local_only or post.community.private or post.status < POST_STATUS_PUBLISHED:
                 abort(403)
+            if post.author.has_blocked_instance(find_instance_id(requestor_domain())):
+                return make_response(f'Author has blocked {requestor_domain()}'), 401
             if request.method == 'GET':
                 post_data = post_to_page(post)
                 post_data['@context'] = default_context()
@@ -2107,7 +2108,10 @@ def post_ap(post_id):
             resp = jsonify(post_data)
             resp.content_type = 'application/activity+json'
             resp.headers.set('Cache-Control', 'public, max-age=120')
-            resp.headers.set('Vary', 'Accept')
+            if post.author.has_blocked_instances():
+                resp.headers.set('Vary', 'Accept, User-Agent')
+            else:
+                resp.headers.set('Vary', 'Accept')
             if post.slug:
                 resp.headers.set('Link',
                                  f'<https://{current_app.config["SERVER_NAME"]}{post.slug}>; rel="alternate"; type="text/html"')

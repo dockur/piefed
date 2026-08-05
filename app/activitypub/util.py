@@ -1681,8 +1681,7 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory, to
                                                     Image.open(BytesIO(source_image)).convert('L'), timeout=30)
                                             except Exception:
                                                 image_text = ''
-                                            if 'Anonymous' in image_text and (
-                                                    'No.' in image_text or ' N0' in image_text):  # chan posts usually contain the text 'Anonymous' and ' No.12345'
+                                            if 'Anonymous' in image_text and ('No.' in image_text or ' N0' in image_text):  # chan posts usually contain the text 'Anonymous' and ' No.12345'
                                                 post = session.query(Post).filter_by(image_id=file.id).first()
                                                 targets_data = {'gen': '0',
                                                                 'post_id': post.id,
@@ -1804,6 +1803,8 @@ def find_reported_object(ap_id) -> Union[User, Post, PostReply, None]:
 
 
 def find_instance_id(server):
+    if not server:
+        return None
     server = server.strip().lower()
     instance = db.session.query(Instance).filter_by(domain=server).first()
     if instance:

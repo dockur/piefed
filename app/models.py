@@ -1412,7 +1412,13 @@ class User(UserMixin, db.Model):
         return self.created and self.created > utcnow() - timedelta(days=1)
 
     def has_blocked_instance(self, instance_id: int):
+        if instance_id is None:
+            return False
         instance_block = db.session.query(InstanceBlock).filter_by(user_id=self.id, instance_id=instance_id).first()
+        return instance_block is not None
+
+    def has_blocked_instances(self):
+        instance_block = db.session.query(InstanceBlock).filter_by(user_id=self.id).first()
         return instance_block is not None
 
     def has_blocked_user(self, user_id: int):
@@ -2848,7 +2854,6 @@ class PostReply(db.Model):
             site = Site()
 
         if reply_is_just_link_to_gif_reaction(reply.body) and site.enable_gif_reply_rep_decrease:
-            user.reputation -= 1
             raise PostReplyValidationError(_('Gif comment ignored'))
 
         if reply_is_low_effort(reply.body) and site.enable_this_comment_filter:
