@@ -1300,8 +1300,9 @@ def site_instance_chooser_view():
         'can_make_communities': not g.site.community_creation_admin_only,
         'defederation': list(set([instance.domain for instance in defed_list])),
         'trusts': list(set([instance.domain for instance in trusted_list])),
-        'tos_url': g.site.tos_url,
-        'registration_mode': g.site.registration_mode
+        'tos_url': g.site.tos_url or '',
+        'registration_mode': g.site.registration_mode,
+        'software': 'piefed'
     }
     return result
 
