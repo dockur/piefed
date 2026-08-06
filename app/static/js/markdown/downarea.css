@@ -299,6 +299,7 @@
     align-items: center;
     justify-content: center;
     font-family: "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", sans-serif;
+    max-width: 40px;
 }
 
 .emoji-item:hover {
