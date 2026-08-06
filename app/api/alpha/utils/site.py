@@ -1,3 +1,5 @@
+from sqlalchemy import or_, cast, String
+
 from app.api.alpha.views import site_view, federated_instances_view, site_instance_chooser_view
 from app.constants import SRC_API, VERSION
 from app.models import InstanceBlock, InstanceChooser, Language
@@ -29,7 +31,11 @@ def get_site_instance_chooser_search(query_params):
 
     instances = InstanceChooser.query
     if query_params.get('q', '') != '':
-        instances = instances.filter(InstanceChooser.domain.ilike(f"%{query_params['q']}%"))
+        instances = instances.filter(or_(InstanceChooser.domain.ilike(f"%{query_params['q']}%"),
+                                         cast(
+                                             InstanceChooser.data['elevator_pitch'],
+                                             String
+                                         ).ilike(f"%{query_params['q']}%")))
     if query_params.get('nsfw', '') != '':
         if query_params['nsfw'] == 'yes':
             instances = instances.filter(InstanceChooser.nsfw == True)

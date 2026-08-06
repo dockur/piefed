@@ -67,7 +67,8 @@ document.addEventListener("DOMContentLoaded", function () {
         setupReactionDialog,
         setupScrollChat,
         setupCodeBlockCopy,
-        setupLoadingAnimation
+        setupLoadingAnimation,
+        setupHidRead
     ];
     
     // Run critical setups immediately
@@ -2596,6 +2597,27 @@ function setupLoadingAnimation() {
                 document.getElementById('loading_animation').classList.remove('hidden');
             });
             form.dataset.loadingAnimationSetup = 'true';
+        }
+    });
+}
+
+function setupHidRead() {
+    document.querySelectorAll('a.hide_read_post').forEach(a => {
+        if (!a.dataset.hideReadSetup) {
+            a.addEventListener('click', function(event) {
+                event.preventDefault();
+                const postId = a.dataset.id;
+                const postTeaser = document.getElementById(`post_${postId}`);
+                const csrfToken = JSON.parse(document.body.getAttribute("hx-headers"))["x-csrftoken"];
+                postTeaser.classList.add('visually-hidden');
+                fetch(`/post/${postId}/set_read`, {
+                    method: 'POST',
+                    headers: {
+                        'x-csrftoken': csrfToken
+                    }
+                });
+            });
+            a.dataset.hideReadSetup = 'true';
         }
     });
 }

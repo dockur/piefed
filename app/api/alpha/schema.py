@@ -261,6 +261,7 @@ class GetSiteInstanceChooserResponse(DefaultSchema):
     defederation = fields.List(fields.String(), required=True)
     trusts = fields.List(fields.String(), required=True)
     registration_mode = fields.String(required=True)
+    software = fields.String(required=True)
 
 
 class GetSiteInstanceChooserSearchResponseItem(DefaultSchema):

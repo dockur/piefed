@@ -167,6 +167,11 @@
                     </a>
                 </div>
             {% endif -%}
+            {% if current_user.is_authenticated and current_user.hide_read_posts %}
+            <div>
+                <a href="#" data-id="{{ post.id }}" class="hide_read_post"><span class="fe fe-hide"></span></a>
+            </div>
+            {% endif -%}
             {% if (moderated_community_ids and post.community_id in moderated_community_ids) or current_user.get_id() in admin_ids -%}
               <div class="dropdown" id="flair_dropdown_{{ post.id }}">
                 <a href='{{ '/post/' + post.id|string + '/set_flair' if low_bandwidth else '#' }}'
