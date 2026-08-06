@@ -90,7 +90,7 @@
     {% for emoji in emojis %}
         <button type="button" class="emoji-item">
             {%- if emoji.url -%}
-                <img src="{{ emoji.url }}" alt="{{ emoji.token }}" title="{{ emoji.token }}" style="width: 20px; height: 20px;">
+                <img src="{{ emoji.url }}" alt="{{ emoji.token }}" title="{{ emoji.token }}" style="width: 25px; height: 25px; overflow: hidden;">
             {%- else -%}
                 {{ emoji.token }}
             {%- endif -%}
