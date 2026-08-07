@@ -571,6 +571,8 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
             usernotes = None
         
         user_votes = get_post_votes_for_posts(user_id, post_ids)
+        unread_counts = get_post_unread_counts(user_id, post_ids)
+        interacted_at = get_post_interacted_at(user_id, post_ids)
     else:
         bookmarked_posts = []
         banned_from = {}
@@ -580,6 +582,8 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
         communities_joined = []
         usernotes = {}
         user_votes = {}
+        unread_counts = {}
+        interacted_at = {}
 
     postlist = []
     for post in posts:
@@ -591,7 +595,8 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
                                   banned_from=banned_from, bookmarked_posts=bookmarked_posts,
                                   post_subscriptions=post_subscriptions, read_posts=read_post_set,
                                   communities_joined=communities_joined, content_filters=content_filters,
-                                  usernotes=usernotes, my_vote=my_vote))
+                                  usernotes=usernotes, my_vote=my_vote, unread_counts=unread_counts,
+                                  interacted_at=interacted_at))
     if use_faster_query:
         list_json = {
             "posts": postlist,
@@ -618,6 +623,50 @@ def get_post_votes_for_posts(user_id, post_ids):
     
     # Convert to a dictionary for O(1) lookup
     return {vote[0]: vote[1] for vote in votes}
+
+
+def get_post_unread_counts(user_id, post_ids):
+    """Pre-fetch user unread comment counts for a list of posts to avoid N+1 queries in post_view()"""
+    if not user_id or not post_ids:
+        return {}
+
+    counts = db.session.execute(
+        text("""SELECT
+                    p.id AS post_id,
+                    CASE
+                        WHEN rp.read_post_id IS NOT NULL
+                        THEN COUNT(CASE WHEN pr.posted_at >= rp.interacted_at THEN 1 END)
+                        ELSE p.reply_count
+                    END AS reply_count
+                FROM
+                    post p
+                LEFT JOIN
+                    read_posts rp ON rp.read_post_id = p.id AND rp.user_id = :user_id
+                LEFT JOIN
+                    post_reply pr ON pr.post_id = p.id
+                WHERE
+                    p.id IN :post_ids
+                GROUP BY
+                    p.id, p.reply_count, rp.read_post_id, rp.interacted_at;"""),
+        {'user_id': user_id, 'post_ids': tuple(post_ids)}
+    ).all()
+
+    # Convert to a dictionary for O(1) lookup
+    return {c[0]: c[1] for c in counts}
+
+
+def get_post_interacted_at(user_id, post_ids):
+    """Pre-fetch user interacted_at for a list of posts to avoid N+1 queries in post_view()"""
+    if not user_id or not post_ids:
+        return {}
+
+    interacted = db.session.execute(
+        text('SELECT read_post_id, interacted_at FROM "read_posts" WHERE read_post_id IN :post_ids and user_id = :user_id'),
+        {'user_id': user_id, 'post_ids': tuple(post_ids)}
+    ).all()
+
+    # Convert to a dictionary for O(1) lookup
+    return {i[0]: i[1] for i in interacted}
 
 
 def get_post_list2(auth, data, user_id=None, search_type='Posts') -> dict:
