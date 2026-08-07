@@ -168,12 +168,12 @@
                 {% if user.stripe_subscription_id %}<strong>{{ _('Donor') }}</strong><br />{% endif %}
             {% endif -%}
         </p>
-        {% if user.about_html -%}
+        {% if user.about_html and (user.trustworthy() or current_user.is_authenticated) -%}
             <div class="profile_bio">
                 {{ user.about_html|safe }}
             </div>
         {% endif -%}
-        {% if user.extra_fields -%}
+        {% if user.extra_fields and (user.trustworthy() or current_user.is_authenticated) -%}
             <ul class="list-group">
                 {% for field in user.extra_fields -%}
                     <li class="list-group-item">
