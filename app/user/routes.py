@@ -532,6 +532,7 @@ def user_settings():
     ]
     form.read_languages.choices = read_language_choices()
     if form.validate_on_submit():
+        old_read_languages = current_user.read_language_ids
         propagate_indexable = form.indexable.data != current_user.indexable
         current_user.newsletter = form.newsletter.data
         current_user.searchable = form.searchable.data
@@ -567,6 +568,10 @@ def user_settings():
         db.session.commit()
         from app.api.alpha.views import user_view
         cache.delete_memoized(user_view)
+
+        if old_read_languages != current_user.read_language_ids:
+            from app.utils import user_filters_languages
+            cache.delete_memoized(user_filters_languages, current_user.id)
 
         flash(_('Your changes have been saved.'), 'success')
 
