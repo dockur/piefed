@@ -20,7 +20,7 @@
         {% include "community/_community_moderation_nav.html" %}
         <div class="row">
             <div class="col-12 col-md-10">
-                <h1 class="mt-2">{{ _('Wiki pages for %(community)s', community=community.display_name()) }}</h1>
+                <h1 class="mt-2 ml-3">{{ _('Wiki pages for %(community)s', community=community.display_name()) }}</h1>
             </div>
             <div class="col-12 text-right">
                 <a class="btn btn-primary" href="{{ url_for('community.community_wiki_add', actor=community.link()) }}">{{ _('Add wiki page') }}</a>

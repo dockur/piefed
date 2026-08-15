@@ -1,0 +1,57 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_field %}
+
+{% block app_content %}
+<div class="row">
+    <main class="col-12 col-lg-8 position-relative main_pane">
+        <nav id="breadcrumb_nav" aria-label="{{ _('Breadcrumbs') }}">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+              <li class="breadcrumb-item"><a href="/communities">{{ _('Communities') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('activitypub.community_profile', actor=community.link()) }}">{{ (community.title + '@' + community.ap_domain)|shorten }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('RSS feeds') }}</li>
+          </ol>
+        </nav>
+        {% include "community/_community_moderation_nav.html" %}
+        <h1 class="mt-2">{{ _('RSS feeds') }}</h1>
+        {% if can_add_rss %}
+            <a class="btn btn-primary float-right" href="{{ url_for('community.community_rss_feed_edit', community_id=community.id) }}">{{ _('Add RSS feed') }}</a>
+        {% endif %}
+        <p>{{ _('RSS feeds can be used to automatically create posts in this community') }}.</p>
+        {% if rss_feeds %}
+        <table class="table table-striped">
+            <tr>
+               <th>{{ _('Title') }}</th>
+               <th>{{ _('Url') }}</th>
+               <th>{{ _('Error') }}</th>
+               <th>{{ _('Actions') }}</th>
+            </tr>
+            {% for rss_feed in rss_feeds %}
+                <tr>
+                    <td>{{ rss_feed.title }}</td>
+                    <td><span title="{{ rss_feed.url }}">{{ rss_feed.url | truncate(150) }}</span></td>
+                    <td>{{ rss_feed.last_error }}</td>
+                    <td>
+                        <div class="dropdown">
+                          <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('community.community_rss_feed_edit', community_id=community.id, feed_id=rss_feed.id) }}">{{ _('Edit') }}</a></li>
+                            <li><a class="confirm_first dropdown-item" href="{{ url_for('community.community_rss_feed_delete', community_id=community.id, feed_id=rss_feed.id) }}">{{ _('Delete') }}</a></li>
+                          </ul>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p>{{ _('No rss feeds yet') }}.</p>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

@@ -92,13 +92,13 @@ def search_for_user(address: str, allow_fetch: bool = True):
         server = ''
 
     if server:
-        banned = BannedInstances.query.filter_by(domain=server).first()
+        banned = db.session.query(BannedInstances).filter_by(domain=server).first()
         if banned:
             reason = f" Reason: {banned.reason}" if banned.reason is not None else ''
             raise Exception(f"{server} is blocked.{reason}")
-        already_exists = User.query.filter_by(ap_id=address).first()
+        already_exists = db.session.query(User).filter_by(ap_id=address).first()
     else:
-        already_exists = User.query.filter_by(user_name=name, ap_id=None).first()
+        already_exists = db.session.query(User).filter_by(user_name=name, ap_id=None).first()
     
     if already_exists:
         return already_exists
@@ -132,7 +132,7 @@ def search_for_user(address: str, allow_fetch: bool = True):
                         else:
                             return None
                 if object_request.status_code == 401:
-                    site = Site.query.get(1)
+                    site = db.session.query(Site).get(1)
                     for attempt in [1,2]:
                         try:
                             object_request = signed_get_request(links['href'], site.private_key, f"{current_app.config['SERVER_URL']}/actor#main-key")

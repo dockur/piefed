@@ -1371,6 +1371,8 @@ def content_warning():
 @bp.route('/anoobis')
 def anoobis():
     next = request.args.get('next')
+    if next is None:
+        return ''
     f = furl(next)
     if next and (f.host is None or f.host == current_app.config['SERVER_NAME']) and (f.scheme is None or f.scheme.startswith('http')):
         return render_template('anoobis.html', next=next, diff_desktop=current_app.config['ANOOBIS_DIFFICULTY_DESKTOP'],

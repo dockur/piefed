@@ -1,0 +1,35 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_field %}
+
+{% block app_content %}
+<div class="row">
+    <main class="col-12 col-lg-8 position-relative main_pane">
+        <nav id="breadcrumb_nav" aria-label="{{ _('Breadcrumbs') }}">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+            {% if instance -%}
+              <li class="breadcrumb-item"><a href="/instances">{{ _('Instances') }}</a></li>
+              <li class="breadcrumb-item"><a href="/instance/{{ instance.domain }}">{{ instance.domain }}</a></li>
+            {% endif -%}
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Add people') }}</li>
+          </ol>
+        </nav>
+        <h1 class="mt-2">{{ _('Add people') }}</h1>
+        <form method="post" enctype="multipart/form-data" id="add_people_form" role="form">
+            <p>{{ _('Provide either a list of fediverse handles or upload a CSV file exported from Mastodon.') }}</p>
+            {{ form.csrf_token() }}
+            {{ render_field(form.people) }}
+            {{ render_field(form.mastodon_csv) }}
+            {{ render_field(form.submit) }}
+        </form>
+    </main>
+
+    <aside id="side_pane" class="col-12 col-lg-4 side_pane" role="complementary">
+
+    </aside>
+</div>
+{% endblock %}

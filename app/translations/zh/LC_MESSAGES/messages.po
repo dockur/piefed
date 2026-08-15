@@ -4,15 +4,16 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-06-28 19:10+1200\n"
-"PO-Revision-Date: 2026-05-27 10:20+0000\n"
+"PO-Revision-Date: 2026-08-05 09:18+0000\n"
 "Last-Translator: Poesty Li <poesty7450@gmail.com>\n"
+"Language-Team: Chinese (Simplified Han script) <http://"
+"translate.piefed.social/projects/piefed/main-web-app/zh_Hans/>\n"
 "Language: zh\n"
-"Language-Team: Chinese (Simplified Han script) "
-"<http://translate.piefed.social/projects/piefed/main-web-app/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.10.4\n"
 "Generated-By: Babel 2.12.1\n"
 
 #: app/__init__.py:54
@@ -275,7 +276,7 @@ msgstr "在此实例上找不到社区"
 #: app/activitypub/routes.py:1024 app/shared/user.py:261
 #: app/templates/user/notifs/13.html:5
 msgid "You have a new follower"
-msgstr ""
+msgstr "你有一位新的关注者"
 
 #: app/activitypub/util.py:2648
 #, python-format
@@ -296,13 +297,12 @@ msgid "A comment has been reported"
 msgstr "评论已被举报"
 
 #: app/activitypub/util.py:3974
-#, fuzzy
 msgid "Microblogs"
-msgstr "管理日志"
+msgstr "微博客"
 
 #: app/activitypub/util.py:3975 app/activitypub/util.py:3977
 msgid "Microblog posts from around the fediverse."
-msgstr ""
+msgstr "来自联邦宇宙各处的微博客帖子。"
 
 #: app/admin/constants.py:16
 msgid "Post"
@@ -499,7 +499,7 @@ msgstr "附加 JS 代码"
 
 #: app/admin/forms.py:64
 msgid "Trim read posts table after this many days"
-msgstr ""
+msgstr "超过此天数后修剪已读帖子表"
 
 #: app/admin/forms.py:65 app/templates/_view_filter_nav.html:9
 #: app/templates/_view_filter_nav.html:23 app/templates/admin/reports.html:20
@@ -597,24 +597,20 @@ msgid "Allow federation with these instances"
 msgstr "允许与这些实例的联邦"
 
 #: app/admin/forms.py:99
-#, fuzzy
 msgid "Allowlist mode"
-msgstr "浅色模式"
+msgstr "白名单模式"
 
 #: app/admin/forms.py:100
-#, fuzzy
 msgid "Weak"
-msgstr "周"
+msgstr "弱"
 
 #: app/admin/forms.py:101
-#, fuzzy
 msgid "Strong"
-msgstr "JSON"
+msgstr "强"
 
 #: app/admin/forms.py:102
-#, fuzzy
 msgid "Intense"
-msgstr "中文"
+msgstr "强烈"
 
 #: app/admin/forms.py:104
 msgid "Deny federation with these instances"
@@ -942,13 +938,12 @@ msgid "Show posts from child topics"
 msgstr "显示子主题的帖子"
 
 #: app/admin/forms.py:208 app/templates/admin/topics.html:39
-#, fuzzy
 msgid "Countries"
-msgstr "社区"
+msgstr "国家"
 
 #: app/admin/forms.py:208
 msgid "Use two-letter country codes, one per line."
-msgstr ""
+msgstr "使用两位字母的国家代码，每行一个。"
 
 #: app/admin/forms.py:213 app/templates/admin/instances.html:24
 #: app/templates/admin/instances.html:99
@@ -974,9 +969,8 @@ msgstr "受信任"
 #: app/admin/forms.py:216 app/templates/admin/instances.html:27
 #: app/templates/instance/list_instances.html:88
 #: app/templates/instance/list_instances.html:128
-#, fuzzy
 msgid "Silenced"
-msgstr "发送"
+msgstr "已静音"
 
 #: app/admin/forms.py:217
 msgid "Hide from instance chooser"
@@ -1160,7 +1154,7 @@ msgstr "封禁评论"
 
 #: app/admin/forms.py:325
 msgid "Can send PMs"
-msgstr ""
+msgstr "可以发送私信"
 
 #: app/admin/forms.py:339
 msgid "Remove avatar"
@@ -1320,9 +1314,8 @@ msgstr[0] ""
 "个启动了后台订阅流程，详情请查看 admin/activities"
 
 #: app/admin/routes.py:559
-#, fuzzy
 msgid "Federation settings - preload"
-msgstr "联邦设置"
+msgstr "联邦设置 - 预加载"
 
 #: app/admin/routes.py:878
 #, python-format
@@ -1339,9 +1332,8 @@ msgstr[0] ""
 "个启动了后台订阅流程，详情请查看 admin/activities"
 
 #: app/admin/routes.py:882
-#, fuzzy
 msgid "Federation settings - remote scan"
-msgstr "联邦设置"
+msgstr "联邦设置 - 远程扫描"
 
 #: app/admin/routes.py:913
 msgid "Ban imports started in a background process."
@@ -1352,9 +1344,8 @@ msgid "Ban imports requested, but no json provided."
 msgstr "请求封禁导入，但未提供 JSON。"
 
 #: app/admin/routes.py:980
-#, fuzzy
 msgid "Federation settings - ban lists"
-msgstr "联邦设置"
+msgstr "联邦设置 - 封禁列表"
 
 #: app/admin/routes.py:1116
 msgid ""
@@ -1849,9 +1840,8 @@ msgid "No user found with that email address."
 msgstr "未找到使用该电子邮件地址的用户。"
 
 #: app/auth/routes.py:120 app/auth/routes.py:147
-#, fuzzy
 msgid "If an account exists, a link has been sent"
-msgstr "不存在该用户名的账号。"
+msgstr "如果账号存在，则已发送链接"
 
 #: app/auth/routes.py:123
 msgid "Problem sending email, please contact the administrator for support"
@@ -1862,9 +1852,8 @@ msgid "Sorry, you cannot use that email address."
 msgstr "抱歉，您无法使用该电子邮件地址。"
 
 #: app/auth/routes.py:144
-#, fuzzy
 msgid "If an account exists, a link has been sent."
-msgstr "不存在该用户名的账号。"
+msgstr "如果账号存在，则已发送链接。"
 
 #: app/auth/routes.py:148
 msgid "Reset Password"
@@ -2875,14 +2864,12 @@ msgid "Banner removed!"
 msgstr "横幅已移除！"
 
 #: app/community/routes.py:1351 app/templates/_side_pane.html:150
-#, fuzzy
 msgid "Disable theme"
-msgstr "已禁用"
+msgstr "禁用主题"
 
 #: app/community/routes.py:1356 app/templates/_side_pane.html:150
-#, fuzzy
 msgid "Enable theme"
-msgstr "默认主题"
+msgstr "启用主题"
 
 #: app/community/routes.py:1407
 #: app/templates/community/community_mod_list.html:43
@@ -3136,23 +3123,20 @@ msgid "Warning on posts"
 msgstr "帖子警告"
 
 #: app/domain/forms.py:8
-#, fuzzy
 msgid "Warning type"
-msgstr "警告"
+msgstr "警告类型"
 
 #: app/domain/forms.py:9 app/templates/admin/communities.html:83
 msgid "Warning"
 msgstr "警告"
 
 #: app/domain/forms.py:10
-#, fuzzy
 msgid "Helpful context"
-msgstr "已删除内容"
+msgstr "有用的上下文"
 
 #: app/domain/forms.py:11
-#, fuzzy
 msgid "Recommendation"
-msgstr "保留"
+msgstr "推荐"
 
 #: app/domain/routes.py:220
 #, python-format
@@ -3312,9 +3296,8 @@ msgid "Next"
 msgstr "下一步"
 
 #: app/main/routes.py:185 app/main/routes.py:190
-#, fuzzy
 msgid "Local posts"
-msgstr "锁定帖子"
+msgstr "本地帖子"
 
 #: app/main/routes.py:189 app/templates/_view_filter_nav.html:7
 #: app/templates/_view_filter_nav.html:20
@@ -3329,9 +3312,8 @@ msgid "Posts from popular communities"
 msgstr "来自热门社区的帖子"
 
 #: app/main/routes.py:192
-#, fuzzy
 msgid "All posts"
-msgstr "封禁帖子"
+msgstr "全部帖子"
 
 #: app/main/routes.py:234 app/templates/explore_menu.html:45
 #: app/templates/themes/dillo/base.html:73
@@ -3374,15 +3356,15 @@ msgstr "内容警告"
 
 #: app/main/routes.py:1374
 msgid "You took too long to respond so your account has been flagged as a bot."
-msgstr ""
+msgstr "你响应时间过长，因此你的账号已被标记为机器人。"
 
 #: app/main/routes.py:1378
 msgid "Thanks!"
-msgstr ""
+msgstr "谢谢！"
 
 #: app/main/routes.py:1379
 msgid "You have confirmed that your account is operated by a human."
-msgstr ""
+msgstr "你已确认你的账号由真人操作。"
 
 #: app/main/routes.py:1387
 msgid "This page is intentionally left blank."
@@ -3423,9 +3405,8 @@ msgstr "发布到的社区"
 
 #: app/post/forms.py:69 app/post/forms.py:137
 #: app/templates/search/_search_form.html:34
-#, fuzzy
 msgid "Enter a community name in the format community@server.name"
-msgstr "以 xyz@example.com 格式输入社区名称"
+msgstr "请输入格式为 community@server.name 的社区名称"
 
 #: app/post/forms.py:75 app/post/forms.py:81 app/post/forms.py:87
 #: app/templates/admin/instances.html:92 app/templates/admin/users.html:44
@@ -3902,7 +3883,7 @@ msgstr "%(actor)s 已被封禁。"
 
 #: app/shared/user.py:252
 msgid "Someone wants to follow you"
-msgstr ""
+msgstr "有人想要关注你"
 
 #: app/shared/tasks/follows.py:65
 msgid "Community is on banned or blocked instance"
@@ -4394,7 +4375,7 @@ msgstr "半年活跃用户"
 
 #: app/templates/_side_pane.html:166 app/templates/index.html:144
 #: app/templates/index.html:151
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s User / 6 Months"
 msgid_plural "%(count)s Users / 6 Months"
 msgstr[0] "%(count)s 位用户 / 6 个月"
@@ -4738,9 +4719,8 @@ msgid "All communities"
 msgstr "所有社区"
 
 #: app/templates/communities_menu.html:17
-#, fuzzy
 msgid "Favorites"
-msgstr "投票"
+msgstr "收藏"
 
 #: app/templates/communities_menu.html:31 app/templates/topics_menu.html:21
 msgid "Joined communities"
@@ -4812,7 +4792,7 @@ msgstr "更多主题"
 
 #: app/templates/index.html:13
 msgid "Create an account to tailor this feed to your interests."
-msgstr ""
+msgstr "创建账号，以根据你的兴趣定制此信息流。"
 
 #: app/templates/index.html:40 app/templates/themes/dillo/index.html:33
 msgid "No posts yet. Join some communities to see more."
@@ -4905,9 +4885,8 @@ msgid "New communities"
 msgstr "新社区"
 
 #: app/templates/index.html:76
-#, fuzzy
 msgid "More new communities"
-msgstr "更多社区"
+msgstr "更多新社区"
 
 #: app/templates/index.html:83 app/templates/search/results.html:76
 #: app/templates/themes/dillo/_side_pane.html:116
@@ -4920,23 +4899,20 @@ msgid "Browse topics"
 msgstr "浏览主题"
 
 #: app/templates/index.html:139
-#, fuzzy
 msgid "This server"
-msgstr "加入此服务器"
+msgstr "此服务器"
 
 #: app/templates/index.html:146
 msgid "Whole network"
-msgstr ""
+msgstr "全网"
 
 #: app/templates/index.html:161
-#, fuzzy
 msgid "New instances"
-msgstr "在线实例"
+msgstr "新实例"
 
 #: app/templates/index.html:171
-#, fuzzy
 msgid "More instances"
-msgstr "来源实例"
+msgstr "更多实例"
 
 #: app/templates/keyboard_shortcuts.html:11
 msgid "Most shortcuts are the same as what reddit has."
@@ -5818,9 +5794,8 @@ msgstr "可索引"
 
 #: app/templates/admin/edit_user.html:57
 #: app/templates/user/show_profile.html:120
-#, fuzzy
 msgid "View on home server"
-msgstr "加入此服务器"
+msgstr "在主服务器上查看"
 
 #: app/templates/admin/emoji.html:16
 msgid "Add new emoji"
@@ -5860,9 +5835,8 @@ msgid "Load communities from Lemmyverse data"
 msgstr "从 Lemmyverse 数据加载社区"
 
 #: app/templates/admin/federation_ban_lists.html:15
-#, fuzzy
 msgid "Federation - ban lists"
-msgstr "联合状态"
+msgstr "联邦 - 封禁列表"
 
 #: app/templates/admin/federation_ban_lists.html:16
 msgid ""
@@ -5881,9 +5855,8 @@ msgid ""
 msgstr "注意：\"banned_instances\"或\"allowed_instances\"中仅会填充其中一个。"
 
 #: app/templates/admin/federation_preload.html:15
-#, fuzzy
 msgid "Bulk community import - from lemmyverse"
-msgstr "从 Lemmyverse 数据加载社区"
+msgstr "批量社区导入 - 来自 lemmyverse"
 
 #: app/templates/admin/federation_preload.html:16
 msgid ""
@@ -5906,9 +5879,8 @@ msgid ""
 msgstr "此实例处于开发模式。此功能可能导致超时，具体取决于您的网络设置方式。"
 
 #: app/templates/admin/federation_remote_scan.html:15
-#, fuzzy
 msgid "Federation - Remote server scan"
-msgstr "远程服务器扫描"
+msgstr "联邦 - 远程服务器扫描"
 
 #: app/templates/admin/federation_remote_scan.html:16
 msgid ""
@@ -6366,17 +6338,17 @@ msgstr "内容过滤器设置"
 msgid ""
 "Bots automatically create posts from major news organisations, etc which "
 "can be annoying."
-msgstr ""
+msgstr "机器人会自动发布来自主要新闻机构等的内容，这可能很烦人。"
 
 #: app/templates/auth/filter_selection.html:21
 msgid ""
 "NSFL posts may contain gore, intense war footage or other disturbing "
 "content."
-msgstr ""
+msgstr "NSFL 帖子可能包含血腥、激烈的战争画面或其他令人不安的内容。"
 
 #: app/templates/auth/filter_selection.html:23
 msgid "These posts were written using AI or link to articles made using AI."
-msgstr ""
+msgstr "这些帖子是使用 AI 撰写的，或链接到使用 AI 制作的文章。"
 
 #: app/templates/auth/filter_selection.html:26
 msgid "You will be able to change this later."
@@ -6988,7 +6960,7 @@ msgstr "通知每个新帖。在高流量社区中不建议使用！"
 
 #: app/templates/community/_notification_toggle.html:12
 msgid "Favorite this community to put it on the Explore menu"
-msgstr ""
+msgstr "收藏此社区以将其放入“探索”菜单"
 
 #: app/templates/community/add_local.html:25
 #: app/templates/community/community_edit.html:35
@@ -7107,14 +7079,12 @@ msgid "Found a community:"
 msgstr "找到一个社区："
 
 #: app/templates/community/check_url_posted.html:3
-#, fuzzy
 msgid "This link has already been posted elsewhere:"
-msgstr "此链接已在这些社区中发布："
+msgstr "此链接已在其他地方发布过："
 
 #: app/templates/community/check_url_posted.html:8
-#, fuzzy
 msgid "Post Title"
-msgstr "帖子标题： "
+msgstr "帖子标题"
 
 #: app/templates/community/community.html:39
 #: app/templates/community/community.html:76
@@ -7876,9 +7846,8 @@ msgid "Federated"
 msgstr "已联合"
 
 #: app/templates/instance/list_instances.html:87
-#, fuzzy
 msgid "Silenced instances"
-msgstr "已屏蔽实例"
+msgstr "已静音的实例"
 
 #: app/templates/instance/list_instances.html:150
 msgid "Heard from"
@@ -7918,9 +7887,8 @@ msgstr "屏蔽来自 %(instance_name)s 的所有人"
 #: app/templates/user/show_profile.html:105
 #: app/templates/user/show_profile.html:321
 #: app/templates/user/user_preview.html:65
-#, fuzzy
 msgid "Unfollow"
-msgstr "关注"
+msgstr "取消关注"
 
 #: app/templates/instance/people.html:42
 #: app/templates/user/show_profile.html:101
@@ -8072,9 +8040,8 @@ msgid "Join Mode"
 msgstr "参与模式"
 
 #: app/templates/post/_post_full.html:259
-#, fuzzy
 msgid "No paywall link"
-msgstr "跟随链接"
+msgstr "无付费墙链接"
 
 #: app/templates/post/_post_full.html:265
 msgid "Licence"
@@ -8482,14 +8449,12 @@ msgid "Poll choices"
 msgstr "投票选项"
 
 #: app/templates/post/post_edit.html:184
-#, fuzzy
 msgid "First choice"
-msgstr "添加选项"
+msgstr "第一选择"
 
 #: app/templates/post/post_edit.html:187
-#, fuzzy
 msgid "Second choice"
-msgstr "添加选项"
+msgstr "第二选择"
 
 #: app/templates/post/post_edit.html:228
 msgid "Add choice"
@@ -9343,17 +9308,17 @@ msgid "Stop applying this filter after this date. Optional."
 msgstr "在此日期之后停止应用此过滤器。可选。"
 
 #: app/templates/user/edit_note.html:13
-#, fuzzy, python-format
+#, python-format
 msgid "Edit private note for \"%(user_name)s\""
-msgstr "编辑 \"%(user_name)s\" 的备注"
+msgstr "编辑“%(user_name)s”的私人备注"
 
 #: app/templates/user/edit_note.html:15
 msgid "Use an emoji for the note"
-msgstr ""
+msgstr "为备注使用表情符号"
 
 #: app/templates/user/edit_note.html:44
 msgid "or some text, below:"
-msgstr ""
+msgstr "或下方的一些文字："
 
 #: app/templates/user/edit_note.html:50
 msgid ""
@@ -9765,7 +9730,7 @@ msgstr "使用 Matrix 发送消息"
 #: app/templates/user/show_profile.html:103
 #: app/templates/user/user_preview.html:63
 msgid "Cancel follow request"
-msgstr ""
+msgstr "取消关注请求"
 
 #: app/templates/user/show_profile.html:116
 msgid "Edit user in admin panel"
@@ -9831,15 +9796,13 @@ msgstr "概览"
 
 #: app/templates/user/show_profile.html:194
 #: app/templates/user/show_profile.html:314
-#, fuzzy
 msgid "Following"
-msgstr "跟随链接"
+msgstr "正在关注"
 
 #: app/templates/user/show_profile.html:199
 #: app/templates/user/show_profile.html:333
-#, fuzzy
 msgid "Followers"
-msgstr "关注"
+msgstr "关注者"
 
 #: app/templates/user/show_profile.html:211
 #, python-format
@@ -9869,9 +9832,8 @@ msgid "Comments by %(user_name)s"
 msgstr "%(user_name)s 的评论"
 
 #: app/templates/user/show_profile.html:305
-#, fuzzy
 msgid "Archived comments"
-msgstr "被禁言的评论"
+msgstr "已归档的评论"
 
 #: app/templates/user/show_profile.html:370
 msgid "Same IP address"
@@ -9883,24 +9845,23 @@ msgstr "管理用户"
 
 #: app/templates/user/show_profile.html:402
 msgid "Ask if bot"
-msgstr ""
+msgstr "询问是否为机器人"
 
 #: app/templates/user/show_profile.html:407
 msgid "Bot challenge result pending"
-msgstr ""
+msgstr "机器人验证结果待定"
 
 #: app/templates/user/show_profile.html:409
-#, fuzzy
 msgid "Not a bot"
-msgstr "机器人发表的帖子"
+msgstr "不是机器人"
 
 #: app/templates/user/show_profile.html:453
 #: app/templates/user/show_upvoted.html:35
 #: app/templates/user/show_upvoted.html:63
 #: app/templates/user/show_upvoted.html:78 app/user/routes.py:156
-#, fuzzy, python-format
+#, python-format
 msgid "Posts upvoted by %(user_name)s"
-msgstr "由 %(user_name)s 发布的帖子"
+msgstr "%(user_name)s 点赞的帖子"
 
 #: app/templates/user/stripe_redirect.html:10 app/user/subscription.py:87
 msgid "Please wait..."
@@ -10260,9 +10221,8 @@ msgid "Reply hide threshold"
 msgstr "回复隐藏阈值"
 
 #: app/user/forms.py:68
-#, fuzzy
 msgid "Posts per page"
-msgstr "帖子已清除。"
+msgstr "每页帖子数"
 
 #: app/user/forms.py:69
 msgid "Use markdown editor GUI when writing"
@@ -10800,18 +10760,17 @@ msgstr "阅读历史已被删除"
 
 #: app/user/routes.py:1971
 msgid "Follow request sent."
-msgstr ""
+msgstr "关注请求已发送。"
 
 #: app/user/routes.py:1994
-#, fuzzy
 msgid "Unfollowed."
-msgstr "关注"
+msgstr "已取消关注。"
 
 #: app/user/routes.py:2014
 msgid ""
 "Bot challenge was sent. If they do not respond within 48 hours their "
 "account will be flagged as a bot."
-msgstr ""
+msgstr "机器人验证已发送。如果他们未在 48 小时内回复，其账号将被标记为机器人。"
 
 #: app/user/routes.py:2040
 #, python-format
@@ -11160,4 +11119,3 @@ msgstr "您的捐款已被取消。"
 
 #~ msgid "User note"
 #~ msgstr "用户备注"
-

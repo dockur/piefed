@@ -238,7 +238,7 @@ def follow_user(follow_id: int, src, auth=None):
     is_accepted = False
     if to_follow.is_local():
         if to_follow.ap_manually_approves_followers is True:
-            is_accepted = False
+            is_accepted = None
         else:
             is_accepted = True
             user.num_following += 1
@@ -248,7 +248,7 @@ def follow_user(follow_id: int, src, auth=None):
     db.session.commit()
 
     if to_follow.is_local():
-        if not is_accepted:
+        if is_accepted is None:
             targets_data = {'gen': '0',
                             'author_id': user.id,
                             'author_user_name': user.ap_id if user.ap_id else user.user_name}
@@ -286,7 +286,7 @@ def unfollow_user(follow_id: int, src, auth=None):
     to_unfollow.num_followers -= 1
 
     db.session.execute(text(
-        'DELETE FROM "user_follower" WHERE local_user_id = :local_user_id AND remote_user_id = :remote_user_id'),
+        'DELETE FROM "user_follower" WHERE local_user_id = :local_user_id AND remote_user_id = :remote_user_id AND is_inward is false'),
             {'local_user_id': user.id, 'remote_user_id': to_unfollow.id})
     db.session.commit()
 

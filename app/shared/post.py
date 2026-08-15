@@ -18,7 +18,7 @@ from app.activitypub.util import make_image_sizes, notify_about_post
 from app.community.util import tags_from_string_old, end_poll_date, flair_from_form, flairs_from_string
 from app.constants import *
 from app.models import File, Notification, NotificationSubscription, Poll, PollChoice, Post, PostBookmark, PostVote, \
-    Report, Site, User, utcnow, Instance, Event, Community, votes_cast_today
+    Report, Site, User, utcnow, Instance, Event, Community, CommunityFlair, votes_cast_today
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, gibberish, ensure_directory_exists, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, fixup_url, domain_from_url, \
@@ -268,6 +268,14 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
             tags = []
         if 'flair' in input:
             flair = flairs_from_string(input['flair'], post.community_id)
+        elif 'flair_id' in input:
+            # Handle single flair_id for RSS feeds and other API calls
+            flair_id = input['flair_id']
+            if isinstance(flair_id, int):
+                flair = [CommunityFlair.query.get(flair_id)]
+            else:
+                flair = CommunityFlair.query.filter(CommunityFlair.id.in_(flair_id)).all()
+            flair = [f for f in flair if f is not None]
         else:
             flair = []
         scheduled_for = None
@@ -378,7 +386,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
     post.indexable = user.indexable
     if post.community.is_moderator(user) or post.community.is_owner(user) or user.is_admin():
         post.sticky = False if src == SRC_API else input.sticky.data
-    post.nsfw = nsfw
+    post.nsfw = nsfw or post.community.nsfw
     post.nsfl = False if src == SRC_API else input.nsfl.data
     post.ai_generated = ai_generated
     post.notify_author = notify_author

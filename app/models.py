@@ -622,6 +622,7 @@ class Community(db.Model):
     languages = db.relationship('Language', lazy='dynamic', secondary=community_language,
                                 backref=db.backref('communities', lazy='dynamic'))
     flair = db.relationship('CommunityFlair', backref=db.backref('community'), cascade="all, delete-orphan")
+    rss_feeds = db.relationship('RssFeed', backref=db.backref('community'), cascade="all, delete-orphan")
     modlog = db.relationship('ModLog', lazy='dynamic', foreign_keys="ModLog.community_id", back_populates='community')
 
     __table_args__ = (
@@ -890,6 +891,10 @@ class Community(db.Model):
 
     def delete_dependencies(self):
         from app import redis_client
+        for rss_feed in self.rss_feeds:
+            rss_feed.delete_dependencies()
+            db.session.delete(rss_feed)
+            db.session.commit()
         for post in db.session.query(Post).filter_by(community_id=self.id):
             with redis_client.lock(f"lock:post:{post.id}", timeout=30, blocking_timeout=30):
                 post.delete_dependencies()
@@ -1602,7 +1607,7 @@ class User(UserMixin, db.Model):
         if user_follow:
             if user_follow.is_accepted is True:
                 return 'following'
-            elif user_follow.is_accepted is False:
+            elif user_follow.is_accepted is None or user_follow.is_accepted is False:
                 return 'pending'
             else:
                 return 'no'
@@ -2289,6 +2294,7 @@ class Post(db.Model):
 
         db.session.execute(text('DELETE FROM "hidden_posts" WHERE hidden_post_id = :post_id'), {'post_id': self.id})
         db.session.execute(text('DELETE FROM "read_posts" WHERE read_post_id = :post_id'), {'post_id': self.id})
+        db.session.execute(text('UPDATE "rss_feed_item" SET post_id = null WHERE post_id = :post_id'), {'post_id': self.id})
 
         # Handle file deletions from disk before cascade deletes the File records
         if self.image_id and self.image:
@@ -4253,6 +4259,49 @@ class PostBoost(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), index=True)
     created_at = db.Column(db.DateTime, default=utcnow, index=True)
+
+
+class RssFeed(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    community_id = db.Column(db.Integer, db.ForeignKey('community.id'), index=True)
+    title = db.Column(db.String(512))
+    url = db.Column(db.String(1024))
+    check_frequency = db.Column(db.Integer)   # How often to check, in minutes
+    flair_id = db.Column(db.Integer, db.ForeignKey('community_flair.id'), nullable=True)
+    next_check = db.Column(db.DateTime, nullable=False, default=utcnow, index=True)
+    etag = db.Column(db.String(512), nullable=True)
+    last_modified = db.Column(db.String(128), nullable=True)
+    last_error = db.Column(db.DateTime, nullable=True)
+    error_count = db.Column(db.Integer, nullable=False, default=0)
+
+    items = db.relationship('RssFeedItem', backref=db.backref('feed'), cascade='all,delete', lazy='dynamic')
+    flair = db.relationship('CommunityFlair')
+
+    def delete_dependencies(self):
+        # delete all feed items and their posts
+        for item in self.items:
+            item.delete_dependencies()
+
+
+class RssFeedItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    feed_id = db.Column(db.Integer, db.ForeignKey('rss_feed.id'), nullable=False, index=True)
+    guid = db.Column(db.String(2048), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=True, index=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=utcnow)
+
+    def delete_dependencies(self):
+        from app import redis_client
+        post = Post.query.get(self.post_id)
+        if post:
+            with redis_client.lock(f"lock:post:{post.id}", timeout=30, blocking_timeout=30):
+                post.delete_dependencies()
+                db.session.delete(post)
+                db.session.commit()
+
+    __table_args__ = (
+        db.UniqueConstraint('feed_id', 'guid'),
+    )
 
 
 def _large_community_subscribers() -> float:

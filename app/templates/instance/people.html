@@ -12,41 +12,78 @@
         <nav id="breadcrumb_nav" aria-label="{{ _('Breadcrumbs') }}">
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
-            <li class="breadcrumb-item"><a href="/instances">{{ _('Instances') }}</a></li>
-            <li class="breadcrumb-item"><a href="/instance/{{ instance.domain }}">{{ instance.domain }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ _('People') }}</li>
+            {% if instance -%}
+              <li class="breadcrumb-item"><a href="/instances">{{ _('Instances') }}</a></li>
+              <li class="breadcrumb-item"><a href="/instance/{{ instance.domain }}">{{ instance.domain }}</a></li>
+            {% endif -%}
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
           </ol>
         </nav>
-        <h1 class="mt-2">{{ _('People from %(instance)s', instance=instance.domain) }}</h1>
+        <div class="mt-3" style="float: right;"><a href="/instance/add_people" class="btn btn-primary">{{ _('Add remote people') }}</a></div>
+        {% if instance %}
+            <h1 class="mt-2">{{ _('People from %(instance)s', instance=instance.domain) }}</h1>
+        {% else -%}
+            <h1 class="mt-2">{{ title }}</h1>
+        {% endif -%}
+
         {% if people %}
-            <table class="table table-striped">
-                <tr>
-                    <th>{{ _('Name') }}</th>
-                    <th>{{ _('About') }}</th>
-                    <th>{{ _('Posts') }}</th>
-                    <th>{{ _('Comments') }}</th>
-                    <th> </th>
-                </tr>
+            <form><input type="search" placeholder="{{ _('Search') }}" name="q" class="form-control" autofocus value="{{ q if q else '' }}"></form>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 mt-2">
                 {% for person in people.items %}
-                    <tr>
-                        <td valign="top">{{ render_username(person, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}</td>
-                        <td class="profile_bio">{{ person.about_html | safe if person.about_html }}</td>
-                        <td valign="top">{{ person.post_count }}</td>
-                        <td valign="top">{{ person.post_reply_count }}</td>
-                        <td>
-                            {% if current_user.is_authenticated %}
-                                {% if current_user.get_id() != person.id -%}
-                                    {% if person.id in currently_following -%}
-                                        <a href="#" class="btn btn-primary btn-sm ms-auto" hx-post="{{ url_for('user.user_unfollow', actor=person.link()) }}" hx-trigger="click throttle:1s" hx-swap="outerHTML" rel="nofollow">{{ _('Unfollow') }}</a>
-                                    {%- else -%}
-                                        <a href="#" class="btn btn-primary btn-sm ms-auto" hx-post="{{ url_for('user.user_follow', actor=person.link()) }}" hx-trigger="click throttle:1s" hx-swap="outerHTML" rel="nofollow">{{ _('Follow') }}</a>
+                    <div class="col">
+                        <div class="card h-100 person-card">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex align-items-center justify-content-center mb-2">
+                                    <a href="/u/{{ person.link() }}" class="text-decoration-none">
+                                    {% if person.avatar_id and not low_bandwidth -%}
+                                        <img src="{{ person.avatar_thumbnail() }}" alt="" loading="lazy" class="rounded-circle {% if person.avatar_thumbnail().endswith('.gif') %}gif{% endif %}" decoding="async" referrerpolicy="no-referrer" width="48" height="48" />
+                                    {% else -%}
+                                        <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                            <span class="fe fe-user text-muted"></span>
+                                        </div>
+                                    {% endif -%}</a>
+                                </div>
+                                <div class="text-center mb-2">
+                                    <h5 class="card-title mb-0 text-break"><a href="/u/{{ person.link() }}" class="text-decoration-none">
+                                        {{ person.display_name() }}
+                                        {% if person.bot or person.bot_override -%}
+                                            <span class="fe fe-bot-account ms-1" title="{{ _('Bot account') }}"> </span>
+                                        {% endif -%}{% if person.ap_domain -%} <small class="text-muted me-2">{{ person.ap_domain }}</small>{% endif %}</a>
+                                    </h5>
+                                    <div class="d-flex align-items-center justify-content-center flex-wrap">
+                                        <small class="text-muted me-2">{{ _('Posts') }}: {{ person.post_count }}</small>
+                                        <small class="text-muted">{{ _('Comments') }}: {{ person.post_reply_count }}</small>
+                                    </div>
+                                </div>
+                                {% if person.about_html %}
+                                    <div class="small flex-grow-1 overflow-hidden" style="max-height: 60px;" title="{{ person.about if len(person.about.strip()) > 75 else '' }}">
+                                        {{ person.about.strip() | truncate(150, True) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent border-0 p-2">
+                                {% if current_user.is_authenticated %}
+                                    {% if current_user.get_id() != person.id -%}
+                                        <div class="d-flex gap-2">
+                                            {% if person.id in currently_following -%}
+                                                <a href="#" class="btn btn-primary btn-sm flex-fill" hx-post="{{ url_for('user.user_unfollow', actor=person.link()) }}" hx-trigger="click throttle:1s" hx-swap="outerHTML" rel="nofollow">{{ _('Unfollow') }}</a>
+                                            {%- else -%}
+                                                <a href="#" class="btn btn-primary btn-sm flex-fill" hx-post="{{ url_for('user.user_follow', actor=person.link()) }}" hx-trigger="click throttle:1s" hx-swap="outerHTML" rel="nofollow">{{ _('Follow') }}</a>
+                                            {% endif -%}
+                                            <a href="/u/{{ person.link() }}?show_posts_tab=1" class="btn btn-outline-primary btn-sm flex-fill show_post_preview" data-id="{{ person.id }}">{{ _('Posts') }}</a>
+                                        </div>
                                     {% endif -%}
-                                {% endif -%}
-                            {% endif -%}
-                        </td>
-                    </tr>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="w-100">
+                        <p>{{ _('No people found. Perhaps %(domain)s does not know about them yet? Try adding them.', domain=instance_domain) }}</p>
+                        <p><a href="/instance/add_people" class="btn btn-primary">{{ _('Add remote people') }}</a></p>
+                    </div>
                 {% endfor %}
-            </table>
+            </div>
             <nav aria-label="{{ _('Pagination') }}" class="mt-4" role="navigation">
                 {% if prev_url -%}
                     <a href="{{ prev_url }}" class="btn btn-primary" rel='nofollow'>
@@ -66,14 +103,6 @@
 
     <aside id="side_pane" class="col-12 col-lg-4 side_pane" role="complementary">
 
-        <div class="card">
-            <div class="card-header">
-                 <h2> </h2>
-            </div>
-            <div class="card-body">
-
-            </div>
-        </div>
     </aside>
 </div>
 {% endblock %}

@@ -237,7 +237,10 @@
                                         <a class="dropdown-item{% if active_child == 'bookmarks' %} active{% endif %}" href="/bookmarks">{{ _('Bookmarks') }}</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item{% if active_child == 'alerts' %} active{% endif %}" href="/alerts">{{ _('Activity Alerts') }}</a>
+                                        <a class="dropdown-item{% if active_child == 'follow_requests' %} active{% endif %}" href="/user/follow_requests">{{ _('Follow requests') }}</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item{% if active_child == 'alerts' %} active{% endif %}" href="/alerts">{{ _('Activity alerts') }}</a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item{% if active_child == 'scheduled_posts' %} active{% endif %}" href="/scheduled_posts">{{ _('Scheduled posts') }}</a>

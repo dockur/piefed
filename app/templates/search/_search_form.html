@@ -8,6 +8,9 @@
 
         <input type="radio" name="search_for" class="btn-check" id="btncheck3" autocomplete="off" value="communities" {{ 'checked' if search_for | default('') == 'communities' else '' }}>
         <label class="btn btn-outline-primary" for="btncheck3">{{ _('Communities') }}</label>
+
+        <input type="radio" name="search_for" class="btn-check" id="btncheck4" autocomplete="off" value="people" {{ 'checked' if search_for | default('') == 'people' else '' }}>
+        <label class="btn btn-outline-primary" for="btncheck4">{{ _('People') }}</label>
     </div>
     <div class="form-group"><label class="form-control-label" for="search_term" aria-label="{{ _('Search here') }}">{{ _('Keyword') }}</label>
         <input autofocus="" class="form-control" id="search_term" name="q" type="search" value="{{ q | default('') }}">

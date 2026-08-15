@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-07-02 19:09+1200\n"
-"PO-Revision-Date: 2026-07-29 10:49+0000\n"
+"PO-Revision-Date: 2026-08-15 03:21+0000\n"
 "Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
 "Language-Team: Cebuano <http://translate.piefed.social/projects/piefed/"
 "main-web-app/ceb/>\n"
@@ -655,7 +655,7 @@ msgstr ""
 
 #: app/admin/forms.py:109
 msgid "Automatically add new remote communities"
-msgstr ""
+msgstr "Awtomatikong idugang ang mga bag-ong remote nga komunidad"
 
 #: app/admin/forms.py:114
 msgid "Closing down announcement for home page"
@@ -700,19 +700,19 @@ msgstr ""
 #: app/admin/forms.py:134 app/templates/user/import_export.html:24
 #: app/user/forms.py:146
 msgid "Import"
-msgstr ""
+msgstr "Pag-import"
 
 #: app/admin/forms.py:135 app/templates/user/import_export.html:28
 #: app/user/forms.py:145
 msgid "Export"
-msgstr ""
+msgstr "I-export"
 
 #: app/admin/forms.py:139 app/community/forms.py:87 app/community/forms.py:142
 #: app/community/forms.py:218 app/templates/admin/cms_pages.html:24
 #: app/templates/post/post_block_image_purge_posts.html:19
 #: app/templates/user/scheduled_posts.html:25
 msgid "Title"
-msgstr ""
+msgstr "Pamagat"
 
 #: app/admin/forms.py:140 app/admin/forms.py:238 app/community/forms.py:26
 #: app/feed/forms.py:13 app/feed/forms.py:65
@@ -743,11 +743,11 @@ msgstr ""
 
 #: app/admin/forms.py:144
 msgid "Rules"
-msgstr ""
+msgstr "Mga lagda"
 
 #: app/admin/forms.py:145 app/community/forms.py:93
 msgid "NSFW community"
-msgstr ""
+msgstr "Komunidad nga NSFW"
 
 #: app/admin/forms.py:146 app/community/forms.py:33
 msgid "Only AI-generated content"
@@ -759,48 +759,48 @@ msgstr ""
 
 #: app/admin/forms.py:148 app/community/forms.py:95
 msgid "Only accept posts from current instance"
-msgstr ""
+msgstr "Tugoti ra ang mga post gikan sa kani nga instance"
 
 #: app/admin/forms.py:149 app/community/forms.py:106
 msgid "Only moderators can post"
-msgstr ""
+msgstr "Mga moderator ra ang maka-post"
 
 #: app/admin/forms.py:150 app/community/forms.py:107
 msgid "New moderators wanted"
-msgstr ""
+msgstr "Gikinahanglan ang mga bag-ong moderator"
 
 #: app/admin/forms.py:151 app/community/forms.py:108
 msgid "Everyone"
-msgstr ""
+msgstr "Ang tanan"
 
 #: app/admin/forms.py:152 app/community/forms.py:109
 msgid "Nobody"
-msgstr ""
+msgstr "Walay bisan kinsa"
 
 #: app/admin/forms.py:153 app/community/forms.py:110 app/community/forms.py:147
 msgid "Community members"
-msgstr ""
+msgstr "Mga miyembro sa komunidad"
 
 #: app/admin/forms.py:154 app/community/forms.py:111 app/user/forms.py:124
 msgid "This instance"
-msgstr ""
+msgstr "Kini nga instance"
 
 #: app/admin/forms.py:155 app/community/forms.py:112
 #: app/templates/instance/list_instances.html:80 app/user/forms.py:125
 msgid "Trusted instances"
-msgstr ""
+msgstr "Masaligan nga instance"
 
 #: app/admin/forms.py:158 app/community/forms.py:115
 msgid "Accept downvotes from"
-msgstr ""
+msgstr "dawat sa mga downvote gikan sa"
 
 #: app/admin/forms.py:160
 msgid "Posts can be popular"
-msgstr ""
+msgstr "Ang mga post mahimong popular"
 
 #: app/admin/forms.py:161
 msgid "Posts show in All list"
-msgstr ""
+msgstr "Ang mga post makita sa Tanan nga lista"
 
 #: app/admin/forms.py:162
 msgid "Low quality / toxic - upvotes in here don't add to reputation"
@@ -808,51 +808,51 @@ msgstr ""
 
 #: app/admin/forms.py:163
 msgid "Forever"
-msgstr ""
+msgstr "Hangtod sa kahangturan"
 
 #: app/admin/forms.py:164
 msgid "1 week"
-msgstr ""
+msgstr "1 ka semana"
 
 #: app/admin/forms.py:165
 msgid "2 weeks"
-msgstr ""
+msgstr "2 ka semana"
 
 #: app/admin/forms.py:166
 msgid "1 month"
-msgstr ""
+msgstr "1 bulan"
 
 #: app/admin/forms.py:167
 msgid "2 months"
-msgstr ""
+msgstr "2 ka bulan"
 
 #: app/admin/forms.py:168
 msgid "3 months"
-msgstr ""
+msgstr "3 ka bulan"
 
 #: app/admin/forms.py:169
 msgid "6 months"
-msgstr ""
+msgstr "6 ka bulan"
 
 #: app/admin/forms.py:170
 msgid "1 year"
-msgstr ""
+msgstr "1 ka tuig"
 
 #: app/admin/forms.py:171
 msgid "2 years"
-msgstr ""
+msgstr "2 ka tuig"
 
 #: app/admin/forms.py:172
 msgid "5 years"
-msgstr ""
+msgstr "5 ka tuig"
 
 #: app/admin/forms.py:173
 msgid "10 years"
-msgstr ""
+msgstr "10 ka tuig"
 
 #: app/admin/forms.py:175
 msgid "Retain content"
-msgstr ""
+msgstr "Pabilin ang content"
 
 #: app/admin/forms.py:176 app/community/forms.py:117
 #: app/templates/admin/communities.html:45
@@ -860,7 +860,7 @@ msgstr ""
 #: app/templates/admin/communities.html:99
 #: app/templates/list_communities.html:107
 msgid "Topic"
-msgstr ""
+msgstr "Paksa"
 
 #: app/admin/forms.py:177 app/community/forms.py:120
 #: app/templates/community/_community_nav.html:154
@@ -868,15 +868,15 @@ msgstr ""
 #: app/templates/community/_community_nav.html:493
 #: app/templates/feed/_feed_nav.html:125 app/templates/feed/_feed_nav.html:190
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 #: app/admin/forms.py:178 app/community/forms.py:121
 msgid "Masonry"
-msgstr ""
+msgstr "Pagmamasoneria"
 
 #: app/admin/forms.py:179 app/community/forms.py:122
 msgid "Wide masonry"
-msgstr ""
+msgstr "Lapad nga pagmamasona"
 
 #: app/admin/forms.py:180 app/community/forms.py:123
 #: app/templates/admin/communities.html:68
@@ -885,16 +885,16 @@ msgstr ""
 #: app/templates/community/_community_nav.html:359
 #: app/templates/feed/_feed_nav.html:121
 msgid "Layout"
-msgstr ""
+msgstr "Layout"
 
 #: app/admin/forms.py:181 app/admin/forms.py:219 app/community/forms.py:28
 #: app/community/forms.py:89
 msgid "Posting warning"
-msgstr ""
+msgstr "Pag-post og pasidaan"
 
 #: app/admin/forms.py:182 app/community/forms.py:46 app/community/forms.py:118
 msgid "Languages"
-msgstr ""
+msgstr "Mga pinulongan"
 
 #: app/admin/forms.py:183
 msgid "Override remote language setting"
@@ -914,7 +914,7 @@ msgstr ""
 
 #: app/admin/forms.py:193 app/community/forms.py:54 app/feed/forms.py:31
 msgid "Url is required."
-msgstr ""
+msgstr "Kinahanglan ang URL."
 
 #: app/admin/forms.py:204 app/community/forms.py:25 app/feed/forms.py:12
 #: app/feed/forms.py:64 app/templates/admin/approve_registrations.html:23
@@ -932,11 +932,11 @@ msgstr ""
 #: app/templates/user/people.html:21 app/templates/user/user_feeds.html:19
 #: app/templates/user/user_public_feeds.html:17 app/user/forms.py:220
 msgid "Name"
-msgstr ""
+msgstr "Ngalan"
 
 #: app/admin/forms.py:204
 msgid "Human readable name for the topic."
-msgstr ""
+msgstr "Nabasa ug masabtan nga ngalan alang sa paksa."
 
 #: app/admin/forms.py:205 app/community/forms.py:143
 msgid "Slug"
@@ -944,7 +944,7 @@ msgstr ""
 
 #: app/admin/forms.py:205
 msgid "A short and unique identifier that becomes part of the URL."
-msgstr ""
+msgstr "Mubo ug talagsaon nga identifier nga mahimong bahin sa URL."
 
 #: app/admin/forms.py:206
 msgid "Parent topic"
@@ -956,11 +956,11 @@ msgstr ""
 
 #: app/admin/forms.py:208 app/templates/admin/topics.html:43
 msgid "Countries"
-msgstr ""
+msgstr "Mga nasud"
 
 #: app/admin/forms.py:208
 msgid "Use two-letter country codes, one per line."
-msgstr ""
+msgstr "Gamit ug duha ka-letter nga country code, usa ka code matag linya."
 
 #: app/admin/forms.py:213 app/templates/admin/instances.html:24
 #: app/templates/admin/instances.html:99
@@ -973,7 +973,7 @@ msgstr ""
 #: app/admin/forms.py:214 app/templates/admin/instances.html:25
 #: app/templates/admin/instances.html:97
 msgid "Gone forever"
-msgstr ""
+msgstr "Nawala nagyud"
 
 #: app/admin/forms.py:215 app/templates/admin/instances.html:26
 #: app/templates/admin/instances.html:53 app/templates/admin/instances.html:54
@@ -981,21 +981,21 @@ msgstr ""
 #: app/templates/instance/list_instances.html:81
 #: app/templates/instance/list_instances.html:123
 msgid "Trusted"
-msgstr ""
+msgstr "Kasaligan"
 
 #: app/admin/forms.py:216 app/templates/admin/instances.html:27
 #: app/templates/instance/list_instances.html:88
 #: app/templates/instance/list_instances.html:128
 msgid "Silenced"
-msgstr ""
+msgstr "Gipahilom"
 
 #: app/admin/forms.py:217
 msgid "Hide from instance chooser"
-msgstr ""
+msgstr "Itago gikan sa tigpili sa instance"
 
 #: app/admin/forms.py:218
 msgid "Communities become popular when added"
-msgstr ""
+msgstr "Ang mga komunidad mahimong popular kung idugang"
 
 #: app/admin/forms.py:220
 msgid "Notes about this instance (only visible to other admins)"
@@ -1007,7 +1007,7 @@ msgstr ""
 
 #: app/admin/forms.py:226
 msgid "Domain (not including https://)"
-msgstr ""
+msgstr "Domain (dili apil ang https://)"
 
 #: app/admin/forms.py:231 app/admin/forms.py:239
 #: app/templates/admin/blocked_images.html:19
@@ -1016,7 +1016,7 @@ msgstr ""
 
 #: app/admin/forms.py:232 app/admin/forms.py:240
 msgid "Filename"
-msgstr ""
+msgstr "Ngalan sa file"
 
 #: app/admin/forms.py:233 app/admin/forms.py:241
 #: app/templates/admin/blocked_images.html:21
@@ -1024,12 +1024,12 @@ msgstr ""
 #: app/templates/user/show_profile.html:148
 #: app/templates/user/user_preview.html:22 app/user/forms.py:249
 msgid "Note"
-msgstr ""
+msgstr "Tala"
 
 #: app/admin/forms.py:246 app/auth/forms.py:15 app/auth/forms.py:26
 #: app/community/forms.py:156 app/community/forms.py:208
 msgid "User name"
-msgstr ""
+msgstr "Ngalan sa user"
 
 #: app/admin/forms.py:248 app/user/forms.py:13
 msgid "Email address"
@@ -1042,7 +1042,7 @@ msgstr ""
 
 #: app/admin/forms.py:251 app/auth/forms.py:32 app/auth/forms.py:115
 msgid "Repeat password"
-msgstr ""
+msgstr "Usba ang password"
 
 #: app/admin/forms.py:252 app/user/forms.py:16
 msgid "Bio"
@@ -1073,7 +1073,7 @@ msgstr ""
 #: app/templates/admin/users.html:60 app/templates/admin/users.html:99
 #: app/templates/admin/users.html:100
 msgid "Banned"
-msgstr ""
+msgstr "Gi-ban"
 
 #: app/admin/forms.py:259 app/user/forms.py:61
 msgid "Subscribe to email newsletter"
@@ -1082,43 +1082,43 @@ msgstr ""
 #: app/admin/forms.py:260 app/admin/forms.py:326 app/auth/forms.py:131
 #: app/auth/forms.py:135 app/user/forms.py:197 app/user/forms.py:201
 msgid "Show"
-msgstr ""
+msgstr "Ipakita"
 
 #: app/admin/forms.py:261 app/admin/forms.py:327 app/auth/forms.py:132
 #: app/auth/forms.py:136 app/user/forms.py:198 app/user/forms.py:202
 #: app/user/forms.py:224
 msgid "Hide completely"
-msgstr ""
+msgstr "Itago gyud"
 
 #: app/admin/forms.py:262 app/admin/forms.py:328
 msgid "Blur"
-msgstr ""
+msgstr "Hanap"
 
 #: app/admin/forms.py:263 app/admin/forms.py:329 app/user/forms.py:224
 msgid "Make semi-transparent"
-msgstr ""
+msgstr "Himoa nga semi-transparent"
 
 #: app/admin/forms.py:264 app/auth/forms.py:139 app/user/forms.py:63
 #: app/user/forms.py:205
 msgid "Posts by bots"
-msgstr ""
+msgstr "Mga post sa mga bot"
 
 #: app/admin/forms.py:266 app/admin/forms.py:330 app/auth/forms.py:141
 #: app/user/forms.py:64 app/user/forms.py:207
 msgid "NSFW posts"
-msgstr ""
+msgstr "Mga post nga NSFW"
 
 #: app/admin/forms.py:268 app/admin/forms.py:332 app/auth/forms.py:143
 #: app/user/forms.py:65 app/user/forms.py:209
 msgid "NSFL posts"
-msgstr ""
+msgstr "Mga post nga NSFL"
 
 #: app/admin/forms.py:272 app/admin/forms.py:335
 #: app/templates/admin/permissions.html:21
 #: app/templates/user/show_profile.html:146
 #: app/templates/user/user_preview.html:15
 msgid "Staff"
-msgstr ""
+msgstr "Kawani"
 
 #: app/admin/forms.py:275 app/admin/forms.py:338
 msgid "Role"
@@ -1126,7 +1126,7 @@ msgstr ""
 
 #: app/admin/forms.py:281 app/auth/forms.py:49
 msgid "An account with this email address already exists."
-msgstr ""
+msgstr "Adunay na’y account nga naglungtad na gamit kining email address."
 
 #: app/admin/forms.py:285 app/auth/forms.py:56
 msgid "User names cannot contain @."
@@ -1135,31 +1135,35 @@ msgstr ""
 #: app/admin/forms.py:289 app/auth/forms.py:65
 msgid "This username was used in the past and cannot be reused."
 msgstr ""
+"Kini nga username gigamit na sa miaging panahon ug dili na mahimong gamiton "
+"pag-usab."
 
 #: app/admin/forms.py:291 app/auth/forms.py:67
 msgid "An account with this user name already exists."
-msgstr ""
+msgstr "Adunay na’y usa ka account nga adunay maong username."
 
 #: app/admin/forms.py:294
 msgid "A community with this name exists so it cannot be used for a user."
 msgstr ""
+"Adunay na’y usa ka komunidad nga adunay niining ngalan, mao nga dili na kini "
+"magamit alang sa usa ka user."
 
 #: app/admin/forms.py:301 app/admin/forms.py:314 app/auth/forms.py:83
 #: app/auth/forms.py:99
 msgid "This password is too common."
-msgstr ""
+msgstr "Kini nga password kay kasagarang gamiton kaayo."
 
 #: app/admin/forms.py:311 app/auth/forms.py:96
 msgid "This password is not secure."
-msgstr ""
+msgstr "Dili luwas ang maong password."
 
 #: app/admin/forms.py:319
 msgid "Flag their posts as from a bot"
-msgstr ""
+msgstr "Markahi ang ilang mga post nga gikan sa usa ka bot"
 
 #: app/admin/forms.py:320
 msgid "Suppress cross-posts"
-msgstr ""
+msgstr "Pugngi ang cross-posting"
 
 #: app/admin/forms.py:323
 msgid "Ban posts"
@@ -1167,19 +1171,19 @@ msgstr "I-ban ang mga post"
 
 #: app/admin/forms.py:324
 msgid "Ban comments"
-msgstr ""
+msgstr "I-ban ang mga komento"
 
 #: app/admin/forms.py:325
 msgid "Can send PMs"
-msgstr ""
+msgstr "Mahimo ka magpadala og mga pribadong mensahe (PMs)."
 
 #: app/admin/forms.py:339
 msgid "Remove avatar"
-msgstr ""
+msgstr "Kuhaa ang avatar"
 
 #: app/admin/forms.py:340
 msgid "Remove banner"
-msgstr ""
+msgstr "Kuhaa ang banner"
 
 #: app/admin/forms.py:341
 msgid "Notes about this user (only visible to other admins)"
@@ -1187,31 +1191,31 @@ msgstr ""
 
 #: app/admin/forms.py:346
 msgid "Subject"
-msgstr ""
+msgstr "Paksa"
 
 #: app/admin/forms.py:347
 msgid "Body (text)"
-msgstr ""
+msgstr "Lawas (teksto)"
 
 #: app/admin/forms.py:348
 msgid "Body (html)"
-msgstr ""
+msgstr "Lawas (HTML)"
 
 #: app/admin/forms.py:349
 msgid "Test mode"
-msgstr ""
+msgstr "Mode sa pagsulay"
 
 #: app/admin/forms.py:350 app/admin/routes.py:1902
 msgid "Send newsletter"
-msgstr ""
+msgstr "Magpadala og newsletter"
 
 #: app/admin/forms.py:354
 msgid "New url"
-msgstr ""
+msgstr "Bag-ong URL"
 
 #: app/admin/forms.py:355
 msgid "Set new owner"
-msgstr ""
+msgstr "Ibutang ug bag-ong tag-iya"
 
 #: app/admin/forms.py:356 app/dev/forms.py:29
 #: app/templates/list_communities.html:83
@@ -1221,7 +1225,7 @@ msgstr "I-submit"
 
 #: app/admin/forms.py:361
 msgid "A local community at that url already exists"
-msgstr ""
+msgstr "Ang usa ka lokal nga komunidad sa maong URL naa na na"
 
 #: app/admin/forms.py:365
 msgid "URL path"
@@ -1233,7 +1237,7 @@ msgstr ""
 
 #: app/admin/forms.py:367
 msgid "Page title"
-msgstr ""
+msgstr "Pamagat sa Pahina"
 
 #: app/admin/forms.py:368
 msgid "Content (Markdown)"
@@ -1267,30 +1271,30 @@ msgstr ""
 #: app/admin/forms.py:391 app/templates/admin/emoji.html:27
 #: app/templates/user/filters.html:48
 msgid "Keywords"
-msgstr ""
+msgstr "Mga keyword"
 
 #: app/admin/forms.py:392 app/templates/admin/emoji.html:26
 msgid "Category"
-msgstr ""
+msgstr "Kategorya"
 
 #: app/admin/routes.py:66
 msgid "Storage used"
-msgstr ""
+msgstr "Gigamit nga storage"
 
 #: app/admin/routes.py:236 app/admin/routes.py:268 app/admin/routes.py:313
 #: app/feed/routes.py:158
 msgid "Settings saved."
-msgstr ""
+msgstr "Na-save na ang mga setting."
 
 #: app/admin/routes.py:246 app/templates/admin/_nav.html:5
 #: app/templates/admin/site.html:16
 msgid "Site profile"
-msgstr ""
+msgstr "Profile sa site"
 
 #: app/admin/routes.py:352 app/admin/routes.py:374
 #: app/templates/admin/_nav.html:6 app/templates/admin/misc.html:19
 msgid "Misc settings"
-msgstr ""
+msgstr "Mga dugang nga setting"
 
 #: app/admin/routes.py:366
 msgid ""
@@ -1300,11 +1304,11 @@ msgstr ""
 
 #: app/admin/routes.py:417
 msgid "Admin settings saved"
-msgstr ""
+msgstr "Na-save na ang mga setting sa admin"
 
 #: app/admin/routes.py:433
 msgid "Federation settings"
-msgstr ""
+msgstr "Mga setting sa pederasyon"
 
 #: app/admin/routes.py:498
 #, python-format
@@ -1314,7 +1318,7 @@ msgstr ""
 #: app/admin/routes.py:548 app/admin/routes.py:871
 #, python-format
 msgid "Results: %(results)s"
-msgstr ""
+msgstr "Mga resulta: %(results)s"
 
 #: app/admin/routes.py:552
 #, python-format
@@ -1421,7 +1425,7 @@ msgstr "Mga komunidad nga low_quality == True"
 #: app/community/routes.py:2128 app/community/routes.py:2356
 #: app/domain/routes.py:44
 msgid "Saved"
-msgstr ""
+msgstr "Na-save na"
 
 #: app/admin/routes.py:1323
 msgid ""
@@ -1452,19 +1456,21 @@ msgstr "Mga topic"
 
 #: app/admin/routes.py:1430 app/templates/admin/topics.html:38
 msgid "Add topic"
-msgstr ""
+msgstr "Idugang nga topic"
 
 #: app/admin/routes.py:1463
 msgid "Edit topic"
-msgstr ""
+msgstr "I-edit ang topic"
 
 #: app/admin/routes.py:1474
 msgid "Topic deleted"
-msgstr ""
+msgstr "Na-delete na ang topic"
 
 #: app/admin/routes.py:1476
 msgid "Cannot delete topic with communities assigned to it."
 msgstr ""
+"Dili mahimo nga tangtangon ang topic nga adunay mga komunidad nga gi-assign "
+"niini."
 
 #: app/admin/routes.py:1522 app/templates/admin/_nav.html:13
 #: app/templates/admin/_tabbed_nav.html:14
@@ -1479,15 +1485,15 @@ msgstr ""
 
 #: app/admin/routes.py:1551
 msgid "Likely spam"
-msgstr ""
+msgstr "Lagmit spam"
 
 #: app/admin/routes.py:1563
 msgid "Deleted content"
-msgstr ""
+msgstr "Na-delete nga content"
 
 #: app/admin/routes.py:1636
 msgid "Registration approved."
-msgstr ""
+msgstr "Naaprubahan na ang pagrehistro."
 
 #: app/admin/routes.py:1672
 msgid "Registration denied. User removed from the database."
@@ -1507,31 +1513,31 @@ msgstr ""
 
 #: app/admin/routes.py:1747
 msgid "Edit user"
-msgstr ""
+msgstr "I-edit ang user"
 
 #: app/admin/routes.py:1766
 msgid "Verification email sent!"
-msgstr ""
+msgstr "Nasend na ang email sa pag-verify!"
 
 #: app/admin/routes.py:1768
 msgid "Problem sending email: "
-msgstr ""
+msgstr "Problema sa pagpadala og email: "
 
 #: app/admin/routes.py:1825
 msgid "User added"
-msgstr ""
+msgstr "Gidugang nga user"
 
 #: app/admin/routes.py:1828
 msgid "Add user"
-msgstr ""
+msgstr "Pagdugang og user"
 
 #: app/admin/routes.py:1836
 msgid "This user cannot be deleted."
-msgstr ""
+msgstr "Dili mahimong tangtangon ang maong user."
 
 #: app/admin/routes.py:1859
 msgid "User deleted"
-msgstr ""
+msgstr "Na-delete nga user"
 
 #: app/admin/routes.py:1888 app/templates/admin/reports.html:15
 #: app/templates/admin/users.html:66 app/templates/admin/users.html:104
@@ -1539,15 +1545,15 @@ msgstr ""
 #: app/templates/community/community_moderate.html:22
 #: app/templates/community/community_moderate_subscribers.html:135
 msgid "Reports"
-msgstr ""
+msgstr "Mga report"
 
 #: app/admin/routes.py:1899
 msgid "Newsletter sent"
-msgstr ""
+msgstr "Napadala na ang newsletter"
 
 #: app/admin/routes.py:1923
 msgid "Settings saved"
-msgstr ""
+msgstr "Na-save na ang mga setting"
 
 #: app/admin/routes.py:1928 app/templates/user/show_profile.html:146
 msgid "Role permissions"
@@ -1555,16 +1561,16 @@ msgstr ""
 
 #: app/admin/routes.py:2027
 msgid "Edit instance"
-msgstr ""
+msgstr "I-edit ang instance"
 
 #: app/admin/routes.py:2045
 msgid "Problem adding instance to database"
-msgstr ""
+msgstr "Problema sa pagdugang og instance sa database"
 
 #: app/admin/routes.py:2060
 #, python-format
 msgid "Set community owner to %(user_name)s"
-msgstr ""
+msgstr "Ibutang ang tag-iya sa komunidad sa %(user_name)s"
 
 #: app/admin/routes.py:2099
 #, python-format
@@ -1575,19 +1581,19 @@ msgstr ""
 
 #: app/admin/routes.py:2102
 msgid "Ensure this community has the right moderators."
-msgstr ""
+msgstr "Siguraduhon nga ang maong komunidad adunay husto nga mga moderator."
 
 #: app/admin/routes.py:2107
 msgid "Move community"
-msgstr ""
+msgstr "Ibalhin ang komunidad"
 
 #: app/admin/routes.py:2117 app/templates/admin/_nav.html:35
 msgid "Blocked images"
-msgstr ""
+msgstr "Mga na-block nga mga hulagway"
 
 #: app/admin/routes.py:2140
 msgid "Edit blocked image"
-msgstr ""
+msgstr "I-edit ang giblock nga hulagway"
 
 #: app/admin/routes.py:2164
 msgid ""
@@ -1598,21 +1604,21 @@ msgstr ""
 #: app/admin/routes.py:2166 app/templates/admin/blocked_images.html:14
 #: app/templates/admin/edit_blocked_image.html:15
 msgid "Add blocked image"
-msgstr ""
+msgstr "Idugang ang giblock nga hulagway"
 
 #: app/admin/routes.py:2180 app/post/routes.py:2128
 #, python-format
 msgid "%(count)s posts deleted."
-msgstr ""
+msgstr "Ang mga post ni %(count)s gitangtang."
 
 #: app/admin/routes.py:2186 app/post/routes.py:2140
 #: app/templates/post/post_block_image_purge_posts.html:15
 msgid "Posts containing blocked images"
-msgstr ""
+msgstr "Mga post nga adunay mga na-block nga mga hulagway"
 
 #: app/admin/routes.py:2199
 msgid "Blocked image deleted"
-msgstr ""
+msgstr "Ang na-block nga hulagway nadelete na"
 
 #: app/admin/routes.py:2210
 msgid "CMS Pages"
@@ -1628,7 +1634,7 @@ msgstr ""
 
 #: app/admin/routes.py:2247
 msgid "Edit page"
-msgstr ""
+msgstr "I-edit ang pahina"
 
 #: app/admin/routes.py:2257
 msgid "Page deleted."
@@ -1649,7 +1655,7 @@ msgstr ""
 
 #: app/admin/routes.py:2304
 msgid "Edit Emoji"
-msgstr ""
+msgstr "I-edit ang Emoji"
 
 #: app/admin/routes.py:2315
 msgid "Emoji deleted."
@@ -1657,21 +1663,21 @@ msgstr ""
 
 #: app/admin/util.py:96
 msgid "No recipients"
-msgstr ""
+msgstr "Walay mga tigdawat"
 
 #: app/admin/util.py:120 app/community/forms.py:232 app/feed/util.py:18
 #: app/templates/admin/activities.html:52 app/user/forms.py:123
 msgid "None"
-msgstr ""
+msgstr "Wala"
 
 #: app/auth/forms.py:17
 msgid "or email"
-msgstr ""
+msgstr "o email"
 
 #: app/auth/forms.py:19 app/auth/forms.py:31 app/auth/forms.py:33
 #: app/user/forms.py:15
 msgid "Minimum length 8, maximum 128"
-msgstr ""
+msgstr "Minimum nga gitas-on 8, maximum nga gitas-on 128"
 
 #: app/auth/forms.py:20 app/user/forms.py:70
 msgid "Low bandwidth mode"
@@ -1691,7 +1697,7 @@ msgstr ""
 
 #: app/auth/forms.py:34
 msgid "Why would you like to join this site?"
-msgstr ""
+msgstr "Ngano nga gusto nimo moapil niini nga site?"
 
 #: app/auth/forms.py:35
 msgid "I agree to the terms of service & privacy policy (see links in footer)"
@@ -1699,16 +1705,16 @@ msgstr ""
 
 #: app/auth/forms.py:36
 msgid "Enter captcha code below"
-msgstr ""
+msgstr "I-enter ang captcha code dinhi"
 
 #: app/auth/forms.py:39 app/auth/util.py:361 app/templates/base.html:288
 #: app/templates/themes/dillo/base.html:88
 msgid "Register"
-msgstr ""
+msgstr "Magparehistro"
 
 #: app/auth/forms.py:54
 msgid "User names cannot contain spaces."
-msgstr ""
+msgstr "Ang mga username dili mahimong adunay mga espasyo."
 
 #: app/auth/forms.py:60
 msgid "User names can only contain letters, numbers, and underscores."
@@ -1717,33 +1723,33 @@ msgstr ""
 #: app/auth/forms.py:72 app/auth/forms.py:76 app/community/forms.py:77
 #: app/community/forms.py:81 app/feed/forms.py:47
 msgid "This name is in use already."
-msgstr ""
+msgstr "Ang ngalan na kini gigamit na."
 
 #: app/auth/forms.py:86
 msgid "Maximum password length is 128 characters."
-msgstr ""
+msgstr "Ang maximum nga gitas-on sa password kay 128 ka karakter."
 
 #: app/auth/forms.py:110
 msgid "Request password reset"
-msgstr ""
+msgstr "Hangyo sa pag-reset sa password"
 
 #: app/auth/forms.py:116
 msgid "Set password"
-msgstr ""
+msgstr "I-set ang password"
 
 #: app/auth/forms.py:121 app/auth/routes.py:126
 #: app/templates/admin/edit_user.html:36
 #: app/templates/auth/resend_email_request.html:13
 msgid "Resend verification email"
-msgstr ""
+msgstr "Ipadala pag-usab ang email sa pag-verify"
 
 #: app/auth/forms.py:125
 msgid "Please make it stop"
-msgstr ""
+msgstr "Palihug, hunong na kini"
 
 #: app/auth/forms.py:126
 msgid "A little is ok"
-msgstr ""
+msgstr "Ok ra bisan gamay ra"
 
 #: app/auth/forms.py:127
 msgid "Bring it on"
@@ -1755,16 +1761,16 @@ msgstr ""
 
 #: app/auth/forms.py:133 app/user/forms.py:199
 msgid "Blur thumbnail"
-msgstr ""
+msgstr "I-blur ang thumbnail"
 
 #: app/auth/forms.py:134 app/auth/forms.py:138 app/user/forms.py:200
 #: app/user/forms.py:204
 msgid "Make post semi-transparent"
-msgstr ""
+msgstr "Himoa nga semi-transparent ang post"
 
 #: app/auth/forms.py:137 app/user/forms.py:203
 msgid "Label as AI"
-msgstr ""
+msgstr "Markahi kini nga AI"
 
 #: app/auth/forms.py:145 app/user/forms.py:211
 msgid "AI-generated posts"
@@ -1776,11 +1782,11 @@ msgstr ""
 
 #: app/auth/forms.py:152 app/post/forms.py:125
 msgid "Choose"
-msgstr ""
+msgstr "Pili-a"
 
 #: app/auth/forms.py:157
 msgid "Set email"
-msgstr ""
+msgstr "I-set ang email"
 
 #: app/auth/oauth_util.py:38
 msgid ""
@@ -1794,23 +1800,24 @@ msgstr ""
 
 #: app/auth/oauth_util.py:134 app/auth/oauth_util.py:135 app/auth/util.py:169
 msgid "Application declined"
-msgstr ""
+msgstr "Gisalikway ang aplikasyon"
 
 #: app/auth/oauth_util.py:136 app/auth/util.py:170
 msgid "Sorry, we are not accepting registrations from your country."
 msgstr ""
+"Pasensya na, wala mi kami gadawat nga mga rehistrasyon gikan sa inyong nasud."
 
 #: app/auth/oauth_util.py:146
 msgid "Login failed due to a problem with the OAuth server."
-msgstr ""
+msgstr "Napakyas ang pag-login tungod sa usa ka problema sa OAuth server."
 
 #: app/auth/oauth_util.py:162 app/auth/routes.py:296 app/auth/util.py:440
 msgid "This account has been deleted."
-msgstr ""
+msgstr "Ang account na kini na-delete na."
 
 #: app/auth/onboarding.py:23
 msgid "Which server do you want to join?"
-msgstr ""
+msgstr "Unsa nga server ang gusto nimo apil-an?"
 
 #: app/auth/onboarding.py:68
 msgid ""
@@ -1832,14 +1839,14 @@ msgstr ""
 
 #: app/auth/routes.py:85
 msgid "Account under review"
-msgstr ""
+msgstr "Gi-review pa ang account"
 
 #: app/auth/routes.py:90 app/main/routes.py:1322 app/main/routes.py:1350
 #: app/main/routes.py:1373 app/templates/auth/permission_denied.html:12
 #: app/templates/chat/blocked.html:13 app/templates/chat/denied.html:14
 #: app/templates/topic/suggestion_denied.html:14
 msgid "Sorry"
-msgstr ""
+msgstr "Pasensya na"
 
 #: app/auth/routes.py:90
 msgid ""
@@ -1849,23 +1856,25 @@ msgstr ""
 
 #: app/auth/routes.py:95 app/templates/auth/check_email.html:12
 msgid "Check your email"
-msgstr ""
+msgstr "Susiha ang imong email"
 
 #: app/auth/routes.py:109
 msgid "No user found with that email address."
-msgstr ""
+msgstr "Wala’y nakit-an nga user gamit ang maong email address."
 
 #: app/auth/routes.py:120 app/auth/routes.py:147
 msgid "If an account exists, a link has been sent"
-msgstr ""
+msgstr "Kung adunay account, gipadala na ang link"
 
 #: app/auth/routes.py:123
 msgid "Problem sending email, please contact the administrator for support"
 msgstr ""
+"Problema sa pagpadala og email. Palihog kontaka ang administrator alang sa "
+"suporta"
 
 #: app/auth/routes.py:139
 msgid "Sorry, you cannot use that email address."
-msgstr ""
+msgstr "Pasensya na, dili nimo magamit ang maong email address."
 
 #: app/auth/routes.py:144
 msgid "If an account exists, a link has been sent."
@@ -1873,7 +1882,7 @@ msgstr ""
 
 #: app/auth/routes.py:148
 msgid "Reset Password"
-msgstr ""
+msgstr "I-reset ang Password"
 
 #: app/auth/routes.py:162
 #, python-format
@@ -1884,11 +1893,11 @@ msgstr ""
 
 #: app/auth/routes.py:176 app/auth/routes.py:192
 msgid "Thank you for verifying your email address."
-msgstr ""
+msgstr "Salamat sa pag-verify sa imong email address."
 
 #: app/auth/routes.py:194
 msgid "Email address validation failed."
-msgstr ""
+msgstr "Nakapakyas ang pag-validate sa email address."
 
 #: app/auth/routes.py:258
 msgid "This Google account is already connected to another user."
@@ -3278,7 +3287,7 @@ msgstr ""
 #: app/templates/base.html:314 app/templates/instance/overview.html:14
 #: app/templates/instance/people.html:15 app/templates/user/filters.html:83
 msgid "Instances"
-msgstr ""
+msgstr "Mga Instance"
 
 #: app/instance/routes.py:117 app/templates/instance/overview.html:18
 #, python-format
@@ -5066,7 +5075,7 @@ msgstr "Wala naka-subscribe"
 
 #: app/templates/list_communities.html:88 app/templates/tag/tag.html:67
 msgid "Clear Filters"
-msgstr ""
+msgstr "I-clear ang mga Filter"
 
 #: app/templates/list_communities.html:98
 msgid "Advanced Search"
@@ -7135,7 +7144,7 @@ msgstr ""
 
 #: app/templates/community/community.html:159
 msgid "No posts in this community yet."
-msgstr ""
+msgstr "Wala pa’y mga post sa niini nga komunidad."
 
 #: app/templates/community/community.html:171
 msgid "No comments in this community yet."
@@ -7572,7 +7581,7 @@ msgstr ""
 
 #: app/templates/domain/domain.html:33
 msgid "No posts in this domain yet."
-msgstr ""
+msgstr "Wala pa’y mga post sa maong domain."
 
 #: app/templates/domain/domain.html:55
 msgid "Domain management"
@@ -7804,7 +7813,7 @@ msgstr ""
 
 #: app/templates/feed/show_feed.html:117
 msgid "No posts in this feed yet."
-msgstr ""
+msgstr "Wala pa’y mga post sa niini nga feed."
 
 #: app/templates/feed/show_feed.html:187
 msgid "Feed communities"
@@ -7822,7 +7831,7 @@ msgstr ""
 #: app/templates/instance/list_instances.html:27
 #: app/templates/instance/list_instances.html:28
 msgid "Clear filters"
-msgstr ""
+msgstr "I-clear ang mga filter"
 
 #: app/templates/instance/list_instances.html:34
 msgid "Online Status"
@@ -7928,7 +7937,7 @@ msgstr ""
 
 #: app/templates/instance/posts.html:27
 msgid "No posts from this instance yet."
-msgstr ""
+msgstr "Wala pa’y mga post gikan sa maong instance."
 
 #: app/templates/post/_add_remove_bookmark.html:2
 #: app/templates/post/_add_remove_bookmark.html:3
@@ -8929,7 +8938,7 @@ msgstr ""
 
 #: app/templates/tag/tag.html:25
 msgid "No posts in this tag yet."
-msgstr ""
+msgstr "Wala pa’y mga post sa kini nga tag."
 
 #: app/templates/tag/tag.html:47
 msgid "Tag management"
@@ -9020,7 +9029,7 @@ msgstr ""
 
 #: app/templates/topic/show_topic.html:59
 msgid "No posts in this topic yet."
-msgstr ""
+msgstr "Wala pa’y mga post sa niini nga topic."
 
 #: app/templates/topic/show_topic.html:120
 msgid "Topic communities"
@@ -9715,7 +9724,7 @@ msgstr ""
 #: app/templates/user/read_posts.html:29
 #: app/templates/user/show_profile.html:271
 msgid "No posts yet."
-msgstr ""
+msgstr "Wala pa’y mga post."
 
 #: app/templates/user/read_posts.html:54
 msgid "Delete history"
@@ -9842,7 +9851,7 @@ msgstr ""
 
 #: app/templates/user/show_profile.html:240
 msgid "No posts or comments yet."
-msgstr ""
+msgstr "Wala pa’y mga post o komento."
 
 #: app/templates/user/show_profile.html:250 app/user/routes.py:123
 #, python-format

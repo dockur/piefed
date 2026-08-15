@@ -13,7 +13,7 @@
 
         <h1 class="mt-2">{{ title }}</h1>
 
-        <p class="mt-4 mb-4">{% if not closed %}<a href="/auth/register" class="btn btn-primary">{{ _('Join %(domain)s', domain=instance_domain) }}</a>{% endif %}
+        <p class="mt-4 mb-4">{% if not closed %}<a href="/auth/register" class="btn btn-primary" id="joinThisInstance">{{ _('Join %(domain)s', domain=instance_domain) }}</a>{% endif %}
         <a href="#" class="btn btn-outline-secondary" id="helpMe">{{ _("I don't know, help me") }}</a>
         </p>
         {% if not closed %}

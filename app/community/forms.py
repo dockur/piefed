@@ -12,7 +12,7 @@ from sqlalchemy import func
 from wtforms import StringField, SubmitField, TextAreaField, BooleanField, HiddenField, SelectField, FileField, \
     DateField, IntegerField, DateTimeLocalField, RadioField
 
-from wtforms.validators import ValidationError, DataRequired, Length, Regexp, Optional
+from wtforms.validators import ValidationError, DataRequired, Length, Regexp, Optional, URL
 
 from app import db
 from app.constants import DOWNVOTE_ACCEPT_ALL, DOWNVOTE_ACCEPT_MEMBERS, DOWNVOTE_ACCEPT_INSTANCE, \
@@ -586,3 +586,34 @@ class EditCommunityMembership(FlaskForm):
     block_flair = MultiCheckboxField(_l('Block posts with this flair'), coerce=int, validators=[Optional()],
                                         render_kw={'class': 'form-multicheck-columns'})
     submit = SubmitField(_l('Save'))
+
+
+class CommunityRssFeedEdit(FlaskForm):
+    name = StringField(_l('Name'))
+    url = StringField(_l('Url'), validators=[DataRequired(), URL(allow_ip=False)])
+    flair = SelectField(_l('Flair'), render_kw={'class': 'form-select'})
+    polling_choices = [
+        ('30', _l('30 minutes')),
+        ('60', _l('1 hour')),
+        ('360', _l('6 hours')),
+        ('720', _l('12 hours')),
+        ('1440', _l('1 day')),
+        ('4320', _l('3 days')),
+        ('10080', _l('7 days')),
+    ]
+    check_frequency = SelectField(_l('Polling frequency'), validators=[DataRequired()], choices=polling_choices,
+                                  render_kw={'class': 'form-select'})
+    submit = SubmitField(_l('Save'))
+
+
+class DeleteCommunityRssFeedForm(FlaskForm):
+    submit = SubmitField(_l('Delete RSS feed'))
+
+
+class InstanceAddPeopleForm(FlaskForm):
+    people = TextAreaField(_('Fediverse handles'), validators=[DataRequired()],
+                           render_kw={'placeholder': _l('Fediverse handles, such as @person@example.org, one per line'),
+                                      'autofocus': True})
+    mastodon_csv = FileField(_l('Mastodon CSV'), render_kw={'accept': 'text/csv'})
+    referrer = HiddenField()
+    submit = SubmitField(_l('Add people'))

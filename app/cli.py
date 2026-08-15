@@ -1,6 +1,6 @@
 # if commands in this file are not working (e.g. 'flask translate') make sure you set the FLASK_APP environment variable.
 # e.g. export FLASK_APP=pyfedi.py
-
+import hashlib
 # This file is part of PieFed, which is licensed under the GNU Affero General Public License (AGPL) version 3.0.
 # You should have received a copy of the GPL along with this program. If not, see <http://www.gnu.org/licenses/>.
 
@@ -14,11 +14,12 @@ from datetime import datetime, timedelta
 from random import randint, uniform
 from time import sleep
 from zoneinfo import ZoneInfo
+import fastfeedparser
 
 import click
 import flask
 import redis
-from flask import json, current_app
+from flask import json, current_app, g
 from flask_babel import _, force_locale
 from furl import furl
 from sqlalchemy import or_, desc, text, create_engine
@@ -29,21 +30,22 @@ from app.activitypub.util import extract_domain_and_actor, notify_about_post
 from app.auth.util import random_token
 from app.community.util import is_bad_name
 from app.constants import NOTIF_COMMUNITY, NOTIF_POST, NOTIF_REPLY, POST_STATUS_SCHEDULED, POST_STATUS_PUBLISHED, \
-    POST_TYPE_LINK, POST_TYPE_POLL, POST_TYPE_IMAGE, NOTIF_REMINDER, POST_TYPE_VIDEO, POST_TYPE_ARTICLE
+    POST_TYPE_LINK, POST_TYPE_POLL, POST_TYPE_IMAGE, NOTIF_REMINDER, POST_TYPE_VIDEO, POST_TYPE_ARTICLE, SRC_API
 from app.email import send_email
 from app.models import CronJobLog, Settings, BannedInstances, Role, User, RolePermission, Domain, ActivityPubLog, \
     utcnow, Site, Instance, File, Notification, Post, CommunityMember, NotificationSubscription, PostReply, Language, \
     Community, SendQueue, _store_files_in_s3, PostVote, Poll, \
-    ActivityBatch, Reminder
+    ActivityBatch, Reminder, RssFeed, RssFeedItem
 from app.shared.tasks import task_selector
 from app.shared.tasks.maintenance import add_remote_communities, remove_old_bot_content, pwn_bots
+from app.shared.post import make_post
 from app.utils import retrieve_block_list, blocked_domains, retrieve_peertube_block_list, \
     shorten_string, get_request, blocked_communities, gibberish, \
     recently_upvoted_post_replies, recently_upvoted_posts, jaccard_similarity, \
     get_redis_connection, instance_online, instance_gone_forever, find_next_occurrence, \
     guess_mime_type, ensure_directory_exists, \
     render_from_tpl, get_task_session, patch_db_session, get_setting, get_recipient_language, \
-    log_cron_task_to_db, allowlist_html, markdown_to_html
+    log_cron_task_to_db, allowlist_html, markdown_to_html, html_to_text, site_language_id
 
 logger = logging.getLogger(__name__)
 
@@ -996,6 +998,9 @@ def register(app):
 
                         reminders()
 
+                        if current_app.config['RSS_FEEDS']:
+                            rss_feeds()
+
                         plugins.fire_hook('cron_often')
 
                 except redis.exceptions.LockError:
@@ -1164,6 +1169,205 @@ def register(app):
             db.session.delete(pending_reminder)
             db.session.commit()
 
+    def rss_feeds():
+
+        # Find or create the feed_bot user
+        feed_bot = User.query.filter_by(user_name='feed_bot', ap_id=None).first()
+        if not feed_bot:
+            # Create the feed_bot user
+            from app.auth.util import random_token
+            private_key, public_key = RsaKeys.generate_keypair()
+            feed_bot = User(
+                user_name='feed_bot',
+                title='RSS',
+                email='feed_bot@' + current_app.config['SERVER_NAME'],
+                verification_token=random_token(16),
+                private_key=private_key,
+                public_key=public_key,
+                instance_id=1,
+                bot=True,
+                verified=True,
+                email_unread_sent=False,
+                alt_user_name=random_token(20),
+                ap_profile_id=f"{current_app.config['SERVER_URL']}/u/feed_bot",
+                ap_public_url=f"{current_app.config['SERVER_URL']}/u/feed_bot",
+                ap_inbox_url=f"{current_app.config['SERVER_URL']}/u/feed_bot/inbox",
+                suppress_crossposts=True,
+                accept_private_messages=0,
+                admin_note='Automatically created bot to author RSS feed posts',
+                searchable=False,
+                indexable=False,
+                newsletter=False,
+            )
+            feed_bot.set_password(random_token(32))
+            db.session.add(feed_bot)
+            db.session.commit()
+
+        # Generate JWT token for feed_bot
+        auth_token = f"Bearer {feed_bot.encode_jwt_token()}"
+
+        # Get all feeds that need checking
+        feeds = RssFeed.query.filter(RssFeed.next_check < utcnow(), RssFeed.error_count < 30).all()
+
+        g.site = Site.query.get(1)
+
+        for feed in feeds:
+            try:
+                # Fetch the RSS feed
+                response = get_request(feed.url)
+                
+                if response.status_code >= 400:
+                    feed.last_error = f'http response: {response.status_code}'
+                    feed.error_count += 1
+                    feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
+                    db.session.commit()
+                    continue
+                
+                # Check for 304 Not Modified
+                if response.status_code == 304:
+                    feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
+                    feed.error_count = 0
+                    db.session.commit()
+                    continue
+                
+                # Client-side etag check: if etag hasn't changed, skip processing
+                # This handles servers that don't return 304 properly
+                new_etag = response.headers.get('etag') or response.headers.get('ETag')
+                new_last_modified = response.headers.get('last-modified') or response.headers.get('Last-Modified')
+                
+                # Normalize etag by removing compression suffixes and weak etag prefix
+                normalized_new_etag = new_etag
+                if new_etag:
+                    # Remove W/ prefix for weak etags
+                    if new_etag.startswith('W/'):
+                        normalized_new_etag = new_etag[2:]
+                    # Remove compression suffixes
+                    for suffix in ['-gzip', '-br', '-compress', '-deflate']:
+                        if normalized_new_etag.endswith(suffix):
+                            normalized_new_etag = normalized_new_etag[:-len(suffix)]
+                            break
+                
+                # Compare with stored etag (also normalize it)
+                normalized_stored_etag = feed.etag
+                if feed.etag:
+                    if feed.etag.startswith('W/'):
+                        normalized_stored_etag = feed.etag[2:]
+                    for suffix in ['-gzip', '-br', '-compress', '-deflate']:
+                        if normalized_stored_etag.endswith(suffix):
+                            normalized_stored_etag = normalized_stored_etag[:-len(suffix)]
+                            break
+                
+                # Check if content is unchanged
+                if normalized_new_etag and normalized_stored_etag and normalized_new_etag == normalized_stored_etag:
+                    feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
+                    feed.error_count = 0
+                    db.session.commit()
+                    continue
+
+                # Parse the feed
+                parsed_feed = fastfeedparser.parse(response.content, include_media=False, include_enclosures=False)
+
+                # Update etag and last_modified from response headers
+                # Normalize and store the new etag
+                normalized_etag_for_storage = normalized_new_etag
+
+                # Update feed metadata
+                feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
+                if normalized_etag_for_storage:
+                    feed.etag = normalized_etag_for_storage
+                if new_last_modified:
+                    feed.last_modified = new_last_modified
+                db.session.commit()
+
+                # Check if feed has entries
+                if not hasattr(parsed_feed, 'entries') or not parsed_feed.entries:
+                    db.session.commit()
+                    continue
+
+                # Check if this is the first time we're retrieving this feed
+                # If there are no existing RssFeedItems (this is the first fetch), record all current guids without creating posts, to avoid an initial flood of posts
+                existing_items_count = RssFeedItem.query.filter_by(feed_id=feed.id).count()
+                is_first_fetch = existing_items_count == 0
+
+                items_processed = 0
+                items_recorded = 0
+                # Process each item in the feed
+                for item in parsed_feed.entries:
+                    # Generate a GUID for the item - use item.id if available, otherwise create one
+                    item_guid = item.get('id') or item.get('link')
+                    if not item_guid:
+                        item_guid = hashlib.sha256(
+                            f"{item.get('title', '')}|{item.get('published', '')}|{item.get('description', '')}".encode()
+                        ).hexdigest()
+
+                    # Check if this item has already been processed
+                    existing_item = RssFeedItem.query.filter_by(feed_id=feed.id, guid=item_guid).first()
+
+                    if existing_item:
+                        continue
+
+                    # If this is the first fetch, just record the guid without creating a post
+                    if is_first_fetch:
+                        rss_item = RssFeedItem(feed_id=feed.id, guid=item_guid, post_id=None)
+                        db.session.add(rss_item)
+                        items_recorded += 1
+                        continue
+
+                    # Prepare input for make_post
+                    item_title = item.get('title') or 'Untitled'
+                    item_url = item.get('link') or ''
+                    item_body = item.get('description') or item.get('summary') or ''
+
+                    input_data = {
+                        'title': item_title,
+                        'url': item_url,
+                        'body': shorten_string(html_to_text(item_body), 500),
+                        'language_id': site_language_id(g.site),  # Default language. Can this be found in the rss feed?
+                        'nsfw': False,
+                        'ai_generated': False,
+                        'notify_author': False,
+                        'image_alt_text': '',
+                        'flair_id': feed.flair_id
+                    }
+
+                    try:
+                        # Create the post!
+                        result = make_post(
+                            input=input_data,
+                            community=feed.community,
+                            type=POST_TYPE_LINK,
+                            src=SRC_API,
+                            auth=auth_token
+                        )
+
+                        # get post from result - for SRC_API, result is (user.id, post)
+                        if isinstance(result, tuple):
+                            post_obj = result[1]
+                        else:
+                            post_obj = result
+
+                        # Record that we've processed this item
+                        rss_item = RssFeedItem(feed_id=feed.id, guid=item_guid, post_id=post_obj.id)
+                        db.session.add(rss_item)
+                        items_processed += 1
+
+                    except Exception as e:
+                        current_app.logger.error(f"Error creating post from item {item_guid}: {e}")
+                        db.session.rollback()
+                        rss_item = RssFeedItem(feed_id=feed.id, guid=item_guid, post_id=None)
+                        db.session.add(rss_item)
+                        continue
+
+                # Commit all the new items and feed updates
+                feed.error_count = 0
+                db.session.commit()
+
+            except Exception as e:
+                current_app.logger.error(f"Error processing feed {feed.id}: {e}")
+                # Update error tracking
+                feed.error_count += 1
+                feed.last_error = utcnow()
+                db.session.commit()
 
     @app.cli.command('move-files-to-s3')
     def move_files_to_s3():
