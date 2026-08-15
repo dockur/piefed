@@ -605,7 +605,7 @@ class DeleteCommunityRssFeedForm(FlaskForm):
 
 
 class InstanceAddPeopleForm(FlaskForm):
-    people = TextAreaField(_('Fediverse handles'), validators=[DataRequired()],
+    people = TextAreaField(_('Fediverse handles'),
                            render_kw={'placeholder': _l('Fediverse handles, such as @person@example.org, one per line'),
                                       'autofocus': True})
     mastodon_csv = FileField(_l('Mastodon CSV'), render_kw={'accept': 'text/csv'})
