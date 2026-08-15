@@ -164,6 +164,7 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
                 unread_comments = unread_counts.get(post.id) or 0
         else:
             bookmarked = post_sub = followed = read_post = False
+            unread_comments = 0
         if not stub:
             if banned_from is None:
                 banned = post.community_id in communities_banned_from(post.user_id)
