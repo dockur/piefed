@@ -1971,8 +1971,6 @@ class Post(db.Model):
                             lines.append(line)
                     post.body = '\n'.join(lines)
                     post.body_html = markdown_to_html(post.body)
-            if 'blogspot.com' in post.url:
-                return None
             domain = domain_from_url(post.url)
             # notify about links to banned websites.
             already_notified = set()  # often admins and mods are the same people - avoid notifying them twice

@@ -280,9 +280,6 @@ class CreateLinkForm(CreatePostForm):
     image_alt_text = StringField(_l('Alt text (for links to images)'), validators=[Optional(), Length(min=3, max=1500)])
 
     def validate_link_url(self, field):
-        if 'blogspot.com' in field.data:
-            self.link_url.errors.append(_l("Links to %(domain)s are not allowed.", domain='blogspot.com'))
-            return False
         domain = domain_from_url(field.data, create=False)
         if domain and domain.banned:
             self.link_url.errors.append(_l("Links to %(domain)s are not allowed.", domain=domain.name))
@@ -390,9 +387,6 @@ class CreateEventForm(CreatePostForm):
         self.join_mode.choices = [('free', _('Free')), ('donation', _('Donation')), ('paid', _('Paid'))]
 
     def validate_link_url(self, field):
-        if 'blogspot.com' in field.data:
-            self.link_url.errors.append(_l("Links to %(domain)s are not allowed.", domain='blogspot.com'))
-            return False
         domain = domain_from_url(field.data, create=False)
         if domain and domain.banned:
             self.link_url.errors.append(_l("Links to %(domain)s are not allowed.", domain=domain.name))
