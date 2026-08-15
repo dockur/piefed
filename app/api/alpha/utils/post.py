@@ -21,7 +21,8 @@ from app.utils import authorise_api_user, blocked_users, blocked_communities, bl
     site_language_id, filtered_out_communities, joined_or_modding_communities, \
     user_filters_home, user_filters_posts, in_sorted_list, instance_sticky_posts, instance_sticky_post_ids, \
     communities_banned_from_all_users, moderating_communities_ids_all_users, blocked_domains, SqlKeysetPagination, \
-    community_membership_private, paginate_post_ids, post_ids_to_models, user_access, moderating_communities_ids
+    community_membership_private, paginate_post_ids, post_ids_to_models, user_access, moderating_communities_ids, \
+    user_filters_languages
 from app.shared.tasks import task_selector
 
 
@@ -93,6 +94,7 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
         blocked_instance_ids = blocked_or_banned_instances(user_id)
         blocked_domain_ids = blocked_domains(user_id)
         private_community_ids = community_membership_private(user_id)
+        read_language_ids = user_filters_languages(user_id)
     else:
         blocked_person_ids = []
         blocked_community_ids = []
@@ -135,6 +137,10 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
     if blocked_instance_ids:
         post_query_criteria.append('c.instance_id NOT IN :blocked_instance_ids AND p.instance_id NOT IN :blocked_instance_ids')
         post_query_parameters['blocked_instance_ids'] = tuple(blocked_instance_ids)
+
+    if read_language_ids:
+        post_query_criteria.append('(p.language_id IN :read_language_ids OR p.language_id is null)')
+        post_query_parameters['read_language_ids'] = tuple(read_language_ids)
 
     if type == "Local":
         posts = Post.query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING,

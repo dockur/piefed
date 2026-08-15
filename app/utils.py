@@ -131,7 +131,7 @@ def getmtime(filename):
 def get_request(uri, params=None, headers=None) -> httpx.Response:
     if is_invalid_get_request_uri(uri):
         current_app.logger.info(f"invalid get request {uri}")
-        raise httpx.HTTPError(f"HTTPError: invalid uri") from None
+        raise httpx.HTTPError("HTTPError: invalid uri") from None
     timeout = 15 if 'washingtonpost.com' in uri else 10  # Washington Post is really slow on og:image for some reason
     if headers is None:
         headers = {'User-Agent': f'PieFed/{current_app.config["VERSION"]}; +https://{current_app.config["SERVER_NAME"]}'}
@@ -2050,6 +2050,15 @@ def user_filters_replies(user_id):
         else:
             result['-1'].update(keywords)
     return result
+
+
+@cache.memoize(timeout=300)
+def user_filters_languages(user_id):
+    user = User.query.get(user_id)
+    if user.read_language_ids and len(user.read_language_ids) > 0:
+        return user.read_language_ids
+    else:
+        return None
 
 
 @cache.memoize(timeout=300)
@@ -4563,7 +4572,7 @@ def is_invalid_get_request_uri(uri):
             # rather than treating the URI as invalid.
             try:
                 infos = socket.getaddrinfo(f.host, None)
-            except (socket.gaierror, socket.timeout) as e:
+            except (socket.gaierror, socket.timeout):
                 return False
 
             ips = []
