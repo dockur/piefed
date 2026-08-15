@@ -176,7 +176,7 @@ def instance_people_top():
 
     people = User.query.filter_by(deleted=False, banned=False, searchable=True, bot=False, bot_override=False)
     people = people.filter(User.post_count > 1, User.post_reply_count > 1, User.reputation > 1,
-                           User.last_seen > utcnow() - timedelta(days=7), User.avatar_id != None)
+                           User.last_seen > utcnow() - timedelta(days=3), User.avatar_id != None)
     if search:
         people = people.search(search, sort=True)
     people = people.order_by(desc(User.reputation / (User.post_count + User.post_reply_count)))
@@ -184,8 +184,8 @@ def instance_people_top():
     # Pagination
     people = people.paginate(page=page, per_page=100 if current_user.is_authenticated and not low_bandwidth else 50,
                              error_out=False)
-    next_url = url_for('instance.instance_people', page=people.next_num, q=search) if people.has_next else None
-    prev_url = url_for('instance.instance_people', page=people.prev_num, q=search) if people.has_prev and page != 1 else None
+    next_url = url_for('instance.instance_people_top', page=people.next_num, q=search) if people.has_next else None
+    prev_url = url_for('instance.instance_people_top', page=people.prev_num, q=search) if people.has_prev and page != 1 else None
 
     return render_template('instance/people.html', people=people, instance=instance, next_url=next_url,
                            prev_url=prev_url, currently_following=following_user_ids(current_user.get_id()),
