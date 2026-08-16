@@ -19,8 +19,8 @@
     <a href="{{ url_for('community.community_wiki_list', actor=community.link()) }}" class="btn {{ 'btn-primary' if current == 'wiki' else 'btn-outline-secondary' }}" rel="nofollow noindex">
         {{ _('Wiki') }}
     </a>
-    <a href="/community/{{ community.link() }}/moderate/appeals" class="btn {{ 'btn-primary' if current == 'appeals' else 'btn-outline-secondary' }} disabled" rel="nofollow noindex" >
-        {{ _('Appeals') }}
+    <a href="/community/{{ community.link() }}/rss_feeds" class="btn {{ 'btn-primary' if current == 'rss_feeds' else 'btn-outline-secondary' }}" rel="nofollow noindex" >
+        {{ _('RSS feeds') }}
     </a>
     <a href="/community/{{ community.link() }}/moderate/flair" class="btn {{ 'btn-primary' if current == 'flair' else 'btn-outline-secondary' }}" rel="nofollow noindex" >
         {{ _('Flair') }}

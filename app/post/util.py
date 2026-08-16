@@ -286,7 +286,7 @@ def url_needs_archive(url) -> bool:
 
 
 def generate_archive_link(url) -> bool:
-    return 'https://removepaywalls.com/' + url
+    return 'https://www.removepaywall.com/search?url=' + url
 
 
 # Forms like the cross post form need the type for the url

@@ -181,6 +181,9 @@ def run_search():
         if search_for == 'communities':
             return redirect(f'/communities?search={q}&language_id={language_id}')
 
+        if search_for == 'people':
+            return redirect(f'/instance/all/people?q={q}')
+
         # Voting history
         if current_user.is_authenticated:
             recently_upvoted = recently_upvoted_posts(current_user.id)

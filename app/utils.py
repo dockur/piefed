@@ -1656,7 +1656,10 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 def ip_address() -> str:
-    ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For') or request.remote_addr
+    try:
+        ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For') or request.remote_addr
+    except:
+        ip = ''
     if ',' in ip:  # Remove all but first ip addresses
         ip = ip[:ip.index(',')].strip()
     return ip
@@ -4332,7 +4335,8 @@ def rewrite_href(url: str) -> str:
 @cache.memoize(timeout=600)
 def user_pronouns() -> defaultdict:
     result = defaultdict(str)
-    pronouns = db.session.query(UserExtraField).filter(func.lower(UserExtraField.label) == 'pronouns')
+    pronouns = db.session.query(UserExtraField).filter(or_(func.lower(UserExtraField.label) == 'pronouns',
+                                                           func.lower(UserExtraField.label) == 'species'))
     for pronoun in pronouns:
         if len(pronoun.text) <= 22:
             if '<' in pronoun.text and '>' in pronoun.text:
@@ -4640,3 +4644,13 @@ def requestor_domain():
             requesting_domain = parts[-1].replace(')', '')
             requesting_domain = furl(requesting_domain).host
     return requesting_domain
+
+
+EMAIL_RE = re.compile(
+    r'^[A-Za-z0-9.!#$%&\'*+/=?^_`{|}~-]+@'
+    r'[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$'
+)
+
+
+def validate_email(value):
+    return bool(EMAIL_RE.fullmatch(value.strip()))

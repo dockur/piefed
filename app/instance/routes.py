@@ -1,18 +1,24 @@
 from collections import namedtuple
+import csv
+import io
+from datetime import timedelta
 
-from flask import request, url_for, g, abort, flash, redirect, make_response
+from flask import request, url_for, g, abort, flash, redirect, make_response, current_app
 from flask_babel import _
 from flask_login import current_user
 from sqlalchemy import or_, desc, text
 
 from app import db
+from app.community.forms import InstanceAddPeopleForm
 from app.constants import *
 from app.instance import bp
-from app.models import Instance, User, Post, read_posts, AllowedInstances, BannedInstances
+from app.instance.util import is_fedi_handle, bulk_follow
+from app.models import Instance, User, Post, read_posts, AllowedInstances, BannedInstances, utcnow
 from app.shared.site import block_remote_instance, unblock_remote_instance
 from app.utils import render_template, blocked_domains, \
     blocked_or_banned_instances, blocked_communities, blocked_users, user_filters_home, recently_upvoted_posts, \
-    recently_downvoted_posts, reported_posts, login_required, moderating_communities_ids, following_user_ids
+    recently_downvoted_posts, reported_posts, login_required, moderating_communities_ids, following_user_ids, \
+    validation_required, approval_required, user_ip_banned, show_ban_message, referrer
 
 
 @bp.route('/instances', methods=['GET'])
@@ -122,30 +128,104 @@ def instance_overview(instance_domain):
 def instance_people(instance_domain):
     page = request.args.get('page', 1, type=int)
     low_bandwidth = request.cookies.get('low_bandwidth', '0') == '1'
+    search = request.args.get('q')
+    instance = None
 
-    instance = Instance.query.filter(Instance.domain == instance_domain).first()
-    if instance is None:
-        abort(404)
+    if instance_domain == 'all':
+        ...
+    elif instance_domain == 'local':
+        instance = Instance.query.get(1)
+    else:
+        instance = Instance.query.filter(Instance.domain == instance_domain).first()
+        if instance is None:
+            abort(404)
 
     if current_user.is_authenticated and current_user.is_admin():
-        people = User.query.filter_by(instance_id=instance.id, deleted=False, banned=False).\
-            order_by(desc(User.last_seen))
+        people = User.query.filter_by(deleted=False, banned=False, bot=False, bot_override=False)
+        if instance:
+            people = people.filter(User.instance_id == instance.id)
     else:
-        people = User.query.filter_by(instance_id=instance.id, deleted=False, banned=False, searchable=True).\
-            order_by(desc(User.last_seen))
+        people = User.query.filter_by(deleted=False, banned=False, searchable=True, bot=False, bot_override=False)
+        if instance:
+            people = people.filter(User.instance_id == instance.id)
+    if search:
+        people = people.search(search, sort=True)
+    people = people.order_by(desc(User.post_count + User.post_reply_count + User.reputation))
 
     # Pagination
     people = people.paginate(page=page, per_page=100 if current_user.is_authenticated and not low_bandwidth else 50,
                              error_out=False)
-    next_url = url_for('instance.instance_people', page=people.next_num,
+    next_url = url_for('instance.instance_people', page=people.next_num, q=search,
                        instance_domain=instance_domain) if people.has_next else None
-    prev_url = url_for('instance.instance_people', page=people.prev_num,
+    prev_url = url_for('instance.instance_people', page=people.prev_num, q=search,
                        instance_domain=instance_domain) if people.has_prev and page != 1 else None
 
     return render_template('instance/people.html', people=people, instance=instance, next_url=next_url,
                            prev_url=prev_url, currently_following=following_user_ids(current_user.get_id()),
-                           title=_('People from %(instance)s', instance=instance.domain),
+                           q=search,
+                           title=_('People from %(instance)s', instance=instance.domain) if instance else _('People'),
                            )
+
+
+@bp.route('/instance/people/interesting', methods=['GET'])
+def instance_people_top():
+    page = request.args.get('page', 1, type=int)
+    low_bandwidth = request.cookies.get('low_bandwidth', '0') == '1'
+    search = request.args.get('q')
+    instance = None
+
+    people = User.query.filter_by(deleted=False, banned=False, searchable=True, bot=False, bot_override=False)
+    people = people.filter(User.post_count > 1, User.post_reply_count > 1, User.reputation > 1,
+                           User.last_seen > utcnow() - timedelta(days=3), User.avatar_id != None)
+    if search:
+        people = people.search(search, sort=True)
+    people = people.order_by(desc(User.reputation / (User.post_count + User.post_reply_count)))
+
+    # Pagination
+    people = people.paginate(page=page, per_page=100 if current_user.is_authenticated and not low_bandwidth else 50,
+                             error_out=False)
+    next_url = url_for('instance.instance_people_top', page=people.next_num, q=search) if people.has_next else None
+    prev_url = url_for('instance.instance_people_top', page=people.prev_num, q=search) if people.has_prev and page != 1 else None
+
+    return render_template('instance/people.html', people=people, instance=instance, next_url=next_url,
+                           prev_url=prev_url, currently_following=following_user_ids(current_user.get_id()),
+                           q=search,
+                           title=_('Interesting people'),
+                           )
+
+
+@bp.route('/instance/add_people', methods=['GET', 'POST'])
+@login_required
+@validation_required
+@approval_required
+def instance_add_people():
+    if current_user.banned or user_ip_banned():
+        return show_ban_message()
+    form = InstanceAddPeopleForm()
+    if form.validate_on_submit():
+        to_follow = []
+        if form.people.data:
+            people = form.people.data.strip().split('\n')
+            for person in people:
+                if is_fedi_handle(person.strip()):
+                    to_follow.append(person.strip())
+
+        if form.mastodon_csv.data:
+            csv_text = form.mastodon_csv.data.read().decode('utf-8')
+            for csv_row in csv.reader(io.StringIO(csv_text)):
+                if csv_row and is_fedi_handle(csv_row[0]):
+                    to_follow.append(csv_row[0])
+
+        if current_app.debug:
+            bulk_follow(current_user.id, to_follow)
+        else:
+            bulk_follow.delay(current_user.id, to_follow)
+        flash(_('%(num)d people will be followed. Please wait a few minutes while this happens in the background.',
+                num=len(to_follow)))
+        return redirect(referrer(form.referrer.data))
+
+    form.referrer.data = request.referrer
+    return render_template('instance/add_people.html', title=_('Add people'), form=form)
 
 
 @bp.route('/instance/<instance_domain>/posts', methods=['GET'])

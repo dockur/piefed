@@ -1,0 +1,18 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block app_content %}
+<div class="row">
+    <main class="col-12 col-lg-8 position-relative main_pane">
+        {% block title %}<h1>{{ title }}</h1>{% endblock %}
+        {{ render_form(form) }}
+    </main>
+
+    {% include "_side_pane.html" %}
+
+</div>
+{% endblock %}

@@ -65,6 +65,7 @@ NOTIF_NEW_MOD = 10  # I have been made a moderator for a community
 NOTIF_REMINDER = 11  # A reminder that the user set before
 NOTIF_ANSWER = 12  # An answer was accepted as the preferred one
 NOTIF_FOLLOW = 13  # I have a new follower
+NOTIF_FOLLOW_REQUEST = 14  # I have a new followe request
 
 # --- mod/admin level ---
 NOTIF_REPORT = 20  # a user, post, comment, or community have been reported

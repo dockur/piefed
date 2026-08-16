@@ -197,3 +197,5 @@ class Config(object):
     ANOOBIS = os.environ.get('ANOOBIS') or False
     ANOOBIS_DIFFICULTY_DESKTOP = os.environ.get('') or 19
     ANOOBIS_DIFFICULTY_MOBILE = os.environ.get('') or 12
+
+    RSS_FEEDS = os.environ.get('RSS_FEEDS') or False

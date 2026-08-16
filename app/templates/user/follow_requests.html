@@ -1,0 +1,43 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from "_macros.html" import render_username %}
+{% set active_child = 'follow_requests' %}
+
+{% block app_content %}
+<div class="row">
+    <main class="col-12 col-lg-8 position-relative main_pane">
+        <nav class="mb-2"  id="breadcrumb_nav" title="{{ _('Navigation') }}">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+            <li class="breadcrumb-item"><a href="/u/{{ user.link() }}">{{ user.display_name() }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Follow requests') }}</li>
+          </ol>
+        </nav>
+        <h1>{{ title }}</h1>
+        {% if follow_requests %}
+            <table class="table table-striped" role="table">
+                <tr>
+                    <th>{{ _('Name') }}</th>
+                    <th>{{ _('Action') }}</th>
+                </tr>
+                {% for follow_request in follow_requests %}
+                    <tr>
+                        <td>{{ render_username(follow_request) }}</td>
+                        <td id="request_{{ follow_request.id }}">
+                            <a href='#' class="btn btn-primary btn-sm" hx-post="{{ url_for('user.user_follow_request_accept', user_id=follow_request.id) }}"
+                               hx-trigger="click throttle:1s" hx-swap="innerHTML" hx-target="#request_{{ follow_request.id }}" rel="nofollow">{{ _('Accept') }}</a>
+                            <a href='#' class="btn btn-outline-primary btn-sm" hx-target="#request_{{ follow_request.id }}" hx-post="{{ url_for('user.user_follow_request_accept', user_id=follow_request.id) }}"
+                               hx-trigger="click throttle:1s" hx-swap="innerHTML" rel="nofollow">{{ _('Reject') }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>{{ _('No follow requests yet.') }}</p>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

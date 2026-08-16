@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-07-02 19:10+1200\n"
-"PO-Revision-Date: 2026-07-29 10:49+0000\n"
+"PO-Revision-Date: 2026-08-05 09:18+0000\n"
 "Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
 "Language-Team: Filipino <http://translate.piefed.social/projects/piefed/"
 "main-web-app/fil/>\n"
@@ -3336,7 +3336,7 @@ msgstr ""
 #: app/templates/base.html:314 app/templates/instance/overview.html:14
 #: app/templates/instance/people.html:15 app/templates/user/filters.html:83
 msgid "Instances"
-msgstr ""
+msgstr "Mga Instance"
 
 #: app/instance/routes.py:117 app/templates/instance/overview.html:18
 #, python-format
@@ -4495,7 +4495,7 @@ msgstr ""
 #: app/templates/themes/dillo/index.html:34
 #: app/templates/topic/show_topic.html:131
 msgid "More communities"
-msgstr ""
+msgstr "Higit pang mga komunidad"
 
 #: app/templates/_side_pane.html:212
 msgid "More feeds"
@@ -4636,7 +4636,7 @@ msgstr ""
 #: app/templates/base.html:197 app/templates/base.html:209
 #: app/templates/base.html:329
 msgid "Explore"
-msgstr ""
+msgstr "Galugarin"
 
 #: app/templates/base.html:201 app/templates/base.html:271
 #: app/templates/base.html:314 app/templates/donate.html:15
@@ -4888,6 +4888,8 @@ msgstr ""
 #: app/templates/index.html:40 app/templates/themes/dillo/index.html:33
 msgid "No posts yet. Join some communities to see more."
 msgstr ""
+"Wala pa ring mga post. Sumali sa ilang mga komunidad para makita ang higit "
+"pa."
 
 #: app/templates/admin/activities.html:61
 #: app/templates/admin/communities.html:116 app/templates/admin/content.html:53
@@ -5384,7 +5386,7 @@ msgstr ""
 #: app/templates/admin/_nav.html:26 app/templates/admin/_tabbed_nav.html:28
 #: app/templates/admin/federation.html:15
 msgid "Federation"
-msgstr ""
+msgstr "Pederasyon"
 
 #: app/templates/admin/_nav.html:28 app/templates/admin/_tabbed_nav.html:30
 #: app/templates/admin/newsletter.html:15
@@ -5394,12 +5396,12 @@ msgstr ""
 #: app/templates/admin/_nav.html:29 app/templates/admin/_tabbed_nav.html:31
 #: app/templates/admin/activities.html:14
 msgid "Activities"
-msgstr ""
+msgstr "Mga Gawain"
 
 #: app/templates/admin/_nav.html:32 app/templates/admin/_tabbed_nav.html:34
 #: app/templates/admin/permissions.html:15
 msgid "Permissions"
-msgstr ""
+msgstr "Mga Pahintulot"
 
 #: app/templates/admin/_tabbed_nav.html:5
 msgid "Site"
@@ -5411,17 +5413,17 @@ msgstr ""
 
 #: app/templates/admin/_tabbed_nav.html:7
 msgid "Chooser"
-msgstr ""
+msgstr "Tagapili"
 
 #: app/templates/admin/_tabbed_nav.html:17 app/templates/admin/misc.html:48
 #: app/templates/auth/instance_chooser.html:116
 msgid "Registration"
-msgstr ""
+msgstr "Pagpaparehistro"
 
 #: app/templates/admin/_tabbed_nav.html:24
 #: app/templates/admin/cms_pages.html:15
 msgid "Pages"
-msgstr ""
+msgstr "Mga pahina"
 
 #: app/templates/admin/activities.html:15
 #: app/templates/admin/communities.html:22
@@ -5516,7 +5518,7 @@ msgstr ""
 
 #: app/templates/admin/approve_registrations.html:15
 msgid "Registrations"
-msgstr ""
+msgstr "Mga pagpaparehistro"
 
 #: app/templates/admin/approve_registrations.html:17
 #, python-format
@@ -5640,7 +5642,7 @@ msgstr ""
 
 #: app/templates/admin/cms_page_delete.html:16
 msgid "Back to Pages"
-msgstr ""
+msgstr "Bumalik sa Mga Pahina"
 
 #: app/templates/admin/cms_page_delete.html:20
 msgid "Are you sure you want to delete this page?"
@@ -5729,7 +5731,7 @@ msgstr ""
 
 #: app/templates/admin/cms_pages.html:48
 msgid "No pages have been created yet."
-msgstr ""
+msgstr "Wala pang mga pahinang nalilikha."
 
 #: app/templates/admin/communities.html:24
 msgid "No topic"
@@ -6035,7 +6037,7 @@ msgstr ""
 
 #: app/templates/admin/instance_chooser.html:14
 msgid "Instance chooser settings"
-msgstr ""
+msgstr "Mga setting ng tagapili ng instance"
 
 #: app/templates/admin/instance_chooser.html:15
 msgid ""
@@ -7191,7 +7193,7 @@ msgstr ""
 
 #: app/templates/community/community.html:159
 msgid "No posts in this community yet."
-msgstr ""
+msgstr "Wala pang mga post sa komunidad na ito."
 
 #: app/templates/community/community.html:171
 msgid "No comments in this community yet."
@@ -7628,7 +7630,7 @@ msgstr ""
 
 #: app/templates/domain/domain.html:33
 msgid "No posts in this domain yet."
-msgstr ""
+msgstr "Wala pang mga post sa domain na ito."
 
 #: app/templates/domain/domain.html:55
 msgid "Domain management"
@@ -7860,7 +7862,7 @@ msgstr ""
 
 #: app/templates/feed/show_feed.html:117
 msgid "No posts in this feed yet."
-msgstr ""
+msgstr "Wala pang mga post sa feed na ito."
 
 #: app/templates/feed/show_feed.html:187
 msgid "Feed communities"
@@ -7984,7 +7986,7 @@ msgstr ""
 
 #: app/templates/instance/posts.html:27
 msgid "No posts from this instance yet."
-msgstr ""
+msgstr "Wala pang mga post mula sa instance na ito."
 
 #: app/templates/post/_add_remove_bookmark.html:2
 #: app/templates/post/_add_remove_bookmark.html:3
@@ -8985,7 +8987,7 @@ msgstr ""
 
 #: app/templates/tag/tag.html:25
 msgid "No posts in this tag yet."
-msgstr ""
+msgstr "Wala pang mga post sa tag na ito."
 
 #: app/templates/tag/tag.html:47
 msgid "Tag management"
@@ -9076,7 +9078,7 @@ msgstr ""
 
 #: app/templates/topic/show_topic.html:59
 msgid "No posts in this topic yet."
-msgstr ""
+msgstr "Wala pang mga post sa paksang ito."
 
 #: app/templates/topic/show_topic.html:120
 msgid "Topic communities"
@@ -9771,7 +9773,7 @@ msgstr ""
 #: app/templates/user/read_posts.html:29
 #: app/templates/user/show_profile.html:271
 msgid "No posts yet."
-msgstr ""
+msgstr "Wala pang mga post."
 
 #: app/templates/user/read_posts.html:54
 msgid "Delete history"
@@ -9898,7 +9900,7 @@ msgstr ""
 
 #: app/templates/user/show_profile.html:240
 msgid "No posts or comments yet."
-msgstr ""
+msgstr "Wala pang mga post o komento."
 
 #: app/templates/user/show_profile.html:250 app/user/routes.py:123
 #, python-format

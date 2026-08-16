@@ -997,34 +997,48 @@ def process_inbox_request(request_json, store_ap_json):
                             log_incoming_ap(id, APLOG_FOLLOW, APLOG_FAILURE, saved_json,
                                             'Follow request for remote user received')
                             return
+                        if local_user.has_blocked_user(remote_user.id) or local_user.has_blocked_instance(remote_user.instance_id) or instance_banned(remote_user.instance.domain):
+                            log_incoming_ap(id, APLOG_FOLLOW, APLOG_FAILURE, saved_json, f'Attempt to follow denied due to block')
+                            return
                         existing_follower = session.query(UserFollower).filter_by(local_user_id=local_user.id,
                                                                          remote_user_id=remote_user.id, is_inward=True).first()
                         if not existing_follower:
-                            auto_accept = not local_user.ap_manually_approves_followers
+                            auto_accept = local_user.ap_manually_approves_followers is False
                             new_follower = UserFollower(local_user_id=local_user.id, remote_user_id=remote_user.id,
-                                                        is_accepted=auto_accept, is_inward=True)
+                                                        is_accepted=auto_accept if auto_accept else None, is_inward=True)
                             if not local_user.ap_followers_url:
                                 local_user.ap_followers_url = local_user.public_url() + '/followers'
                             session.add(new_follower)
                             session.commit()
-                            accept = {"@context": default_context(), "actor": local_user.public_url(),
-                                      "to": [remote_user.public_url()],
-                                      "object": {"actor": remote_user.public_url(), "to": None,
-                                                 "object": local_user.public_url(), "type": "Follow", "id": follow_id},
-                                      "type": "Accept",
-                                      "id": f"{current_app.config['SERVER_URL']}/activities/accept/" + gibberish(32)}
-                            send_post_request(remote_user.ap_inbox_url, accept, local_user.private_key,
-                                              f"{local_user.public_url()}#main-key")
+                            if auto_accept:
+                                accept = {"@context": default_context(), "actor": local_user.public_url(),
+                                          "to": [remote_user.public_url()],
+                                          "object": {"actor": remote_user.public_url(), "to": None,
+                                                     "object": local_user.public_url(), "type": "Follow", "id": follow_id},
+                                          "type": "Accept",
+                                          "id": f"{current_app.config['SERVER_URL']}/activities/accept/" + gibberish(32)}
+                                send_post_request(remote_user.ap_inbox_url, accept, local_user.private_key,
+                                                  f"{local_user.public_url()}#main-key")
 
-                            targets_data = {'gen': '0',
-                                            'author_id': remote_user.id,
-                                            'author_user_name': remote_user.ap_id if remote_user.ap_id else remote_user.user_name}
-                            new_notification = Notification(title=_('You have a new follower'),
-                                                            url=f"/user/{remote_user.id}",
-                                                            user_id=local_user.id, author_id=remote_user.id,
-                                                            notif_type=NOTIF_FOLLOW,
-                                                            subtype='new_follower',
-                                                            targets=targets_data)
+                                targets_data = {'gen': '0',
+                                                'author_id': remote_user.id,
+                                                'author_user_name': remote_user.ap_id if remote_user.ap_id else remote_user.user_name}
+                                new_notification = Notification(title=_('You have a new follower'),
+                                                                url=f"/user/{remote_user.id}",
+                                                                user_id=local_user.id, author_id=remote_user.id,
+                                                                notif_type=NOTIF_FOLLOW,
+                                                                subtype='new_follower',
+                                                                targets=targets_data)
+                            else:
+                                targets_data = {'gen': '0',
+                                                'author_id': remote_user.id,
+                                                'author_user_name': remote_user.ap_id if remote_user.ap_id else remote_user.user_name}
+                                new_notification = Notification(title=_('Someone is requesting to follow you'),
+                                                                url=f"/user/follow_requests",
+                                                                user_id=local_user.id, author_id=remote_user.id,
+                                                                notif_type=NOTIF_FOLLOW_REQUEST,
+                                                                subtype='new_follower',
+                                                                targets=targets_data)
                             db.session.add(new_notification)
                             local_user.unread_notifications += 1
                             db.session.commit()
@@ -1093,10 +1107,12 @@ def process_inbox_request(request_json, store_ap_json):
                                                                                   follow_id=user.id).first()
                         if join_request:
                             existing_follow = session.query(UserFollower).filter_by(local_user_id=join_request.user_id,
-                                                                                    remote_user_id=join_request.follow_id).first()
+                                                                                    remote_user_id=join_request.follow_id,
+                                                                                    is_inward=False).first()
                             if not existing_follow:
                                 member = UserFollower(local_user_id=join_request.user_id,
-                                                      remote_user_id=join_request.follow_id)
+                                                      remote_user_id=join_request.follow_id,
+                                                      is_inward=False, is_accepted=True)
                                 session.add(member)
                             else:
                                 existing_follow.is_accepted = True
@@ -2042,6 +2058,7 @@ def user_followers(actor):
             .outerjoin(UserBlock,
                        (User.id == UserBlock.blocker_id) & (UserFollower.local_user_id == UserBlock.blocked_id)) \
             .filter((UserFollower.local_user_id == user.id) & (UserBlock.id == None)) \
+            .filter(UserFollower.is_accepted == True) \
             .all()
 
         items = []

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import time
+from datetime import datetime, timedelta
 
 from flask import current_app, g
 from sqlalchemy import text, func, or_
@@ -27,7 +28,7 @@ from app.shared.post import get_post_flair_list
 
 def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, communities_moderating=None, banned_from=None,
               bookmarked_posts=None, post_subscriptions=None, communities_joined=None, read_posts=None, content_filters=None,
-              usernotes=None) -> dict:
+              usernotes=None, unread_counts=None, interacted_at=None) -> dict:
     if isinstance(post, int):
         post = Post.query.get(post)
         if post is None:
@@ -138,8 +139,32 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
                     {'post_id': post.id, 'user_id': user_id}).scalar()
             else:
                 read_post = post.id in read_posts
+
+            # unread comments on post
+            if unread_counts is None:
+                if interacted_at is None:
+                    since = db.session.execute(
+                        text('SELECT interacted_at FROM "read_posts" WHERE read_post_id = :post_id and user_id = :user_id'),
+                        {'post_id': post.id, 'user_id': user_id}).scalar()
+                else:
+                    since = interacted_at.get(post.id) or datetime.utcnow() - timedelta(days=1)
+                unread_comments = db.session.execute(text("""SELECT
+                                    p.id AS post_id,
+                                    COUNT(pr.id) AS reply_count
+                                FROM
+                                    post p
+                                LEFT JOIN
+                                    post_reply pr ON pr.post_id = p.id
+                                    AND pr.posted_at >= :since
+                                WHERE
+                                    p.id = :post_id
+                                GROUP BY
+                                    p.id;"""), {'since': since, 'post_id': post.id}).scalar()
+            else:
+                unread_comments = unread_counts.get(post.id) or 0
         else:
             bookmarked = post_sub = followed = read_post = False
+            unread_comments = 0
         if not stub:
             if banned_from is None:
                 banned = post.community_id in communities_banned_from(post.user_id)
@@ -174,7 +199,7 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
                                          post.community_id in communities_moderating[user_id] else False
         v2 = {'post': post_view(post=post, variant=1, stub=stub), 'counts': counts, 'banned_from_community': False,
               'subscribed': subscribe_type,
-              'saved': saved, 'read': read, 'hidden': False, 'unread_comments': post.reply_count, 'my_vote': my_vote,
+              'saved': saved, 'read': read, 'hidden': False, 'unread_comments': unread_comments, 'my_vote': my_vote,
               'filtered': post.blocked_by_content_filter(content_filters, user_id) == '-1',
               'blurred': post.blurred(g.user if hasattr(g, 'user') else None),
               'activity_alert': activity_alert,

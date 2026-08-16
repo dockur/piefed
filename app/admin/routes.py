@@ -1249,6 +1249,30 @@ def admin_communities_low_quality():
                            communities=communities)
 
 
+@bp.route('/communities/un-moderated', methods=['GET'])
+@permission_required('administer all communities')
+@login_required
+def admin_communities_unmoderated():
+    page = request.args.get('page', 1, type=int)
+    search = request.args.get('search', '')
+
+    communities = Community.query.filter(Community.un_moderated == True)
+    if search:
+        communities = communities.filter(Community.title.ilike(f"%{search}%"))
+    communities = communities.order_by(-Community.post_count).paginate(page=page, per_page=1000, error_out=False)
+
+    next_url = url_for('admin.admin_communities_unmoderated',
+                       page=communities.next_num) if communities.has_next else None
+    prev_url = url_for('admin.admin_communities_unmoderated',
+                       page=communities.prev_num) if communities.has_prev and page != 1 else None
+
+    flash(_('A community is considered unmoderated when mods have been inactive for 3 months or are bots.'))
+
+    return render_template('admin/communities.html', title=_('Unmoderated communities'), next_url=next_url,
+                           prev_url=prev_url,
+                           communities=communities)
+
+
 @bp.route('/community/<int:community_id>/edit', methods=['GET', 'POST'])
 @permission_required('administer all communities')
 @login_required

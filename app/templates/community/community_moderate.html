@@ -17,14 +17,7 @@
           </ol>
         </nav>
         {% include "community/_community_moderation_nav.html" %}
-        <div class="row">
-            <div class="col-12 col-md-10">
-                <h1 class="mt-2">{{ _('Reports') }}</h1>
-            </div>
-            <div class="col-12 col-md-2 text-right">
-                <!-- <a class="btn btn-primary" href="{{ url_for('community.community_find_moderator', community_id=community.id) }}">{{ _('Add moderator') }}</a> -->
-            </div>
-        </div>
+        <h1 class="mt-2">{{ _('Reports') }}</h1>
         <p>{{ _('See and handle all reports made about %(community)s', community=community.display_name()) }}.</p>
         {% if reports.items %}
         <form method="get">
