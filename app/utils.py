@@ -1427,6 +1427,12 @@ def banned_instances(user_id) -> List[int]:
 
 
 @cache.memoize(timeout=86400)
+def silenced_instances() -> List[int]:
+    instances = db.session.query(Instance).filter(Instance.silenced == True)
+    return [block.id for block in instances]
+
+
+@cache.memoize(timeout=86400)
 def allowed_instance_domains() -> List[str]:
     allowed = db.session.query(AllowedInstances).all()
     return [instance.domain for instance in allowed]
