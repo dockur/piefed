@@ -101,6 +101,7 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
         blocked_instance_ids = []
         blocked_domain_ids = []
         private_community_ids = []
+        read_language_ids = []
 
     content_filters = {}
     u_rp_ids = []
