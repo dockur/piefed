@@ -149,7 +149,6 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
                 else:
                     since = interacted_at.get(post.id) or datetime.utcnow() - timedelta(days=1)
                 unread_comments = db.session.execute(text("""SELECT
-                                    p.id AS post_id,
                                     COUNT(pr.id) AS reply_count
                                 FROM
                                     post p
@@ -157,9 +156,7 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
                                     post_reply pr ON pr.post_id = p.id
                                     AND pr.posted_at >= :since
                                 WHERE
-                                    p.id = :post_id
-                                GROUP BY
-                                    p.id;"""), {'since': since, 'post_id': post.id}).scalar()
+                                    p.id = :post_id"""), {'since': since, 'post_id': post.id}).scalar()
             else:
                 unread_comments = unread_counts.get(post.id) or 0
         else:
