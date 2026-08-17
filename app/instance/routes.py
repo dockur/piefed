@@ -18,7 +18,7 @@ from app.shared.site import block_remote_instance, unblock_remote_instance
 from app.utils import render_template, blocked_domains, \
     blocked_or_banned_instances, blocked_communities, blocked_users, user_filters_home, recently_upvoted_posts, \
     recently_downvoted_posts, reported_posts, login_required, moderating_communities_ids, following_user_ids, \
-    validation_required, approval_required, user_ip_banned, show_ban_message, referrer
+    validation_required, approval_required, user_ip_banned, show_ban_message, referrer, silenced_instances
 
 
 @bp.route('/instances', methods=['GET'])
@@ -142,10 +142,14 @@ def instance_people(instance_domain):
 
     if current_user.is_authenticated and current_user.is_admin():
         people = User.query.filter_by(deleted=False, banned=False, bot=False, bot_override=False)
+        if instance_ids := silenced_instances():
+            people = people.filter(or_(User.instance_id.not_in(instance_ids), User.instance_id == None))
         if instance:
             people = people.filter(User.instance_id == instance.id)
     else:
         people = User.query.filter_by(deleted=False, banned=False, searchable=True, bot=False, bot_override=False)
+        if instance_ids := silenced_instances():
+            people = people.filter(or_(User.instance_id.not_in(instance_ids), User.instance_id == None))
         if instance:
             people = people.filter(User.instance_id == instance.id)
     if search:
@@ -177,6 +181,8 @@ def instance_people_top():
     people = User.query.filter_by(deleted=False, banned=False, searchable=True, bot=False, bot_override=False)
     people = people.filter(User.post_count > 1, User.post_reply_count > 1, User.reputation > 1,
                            User.last_seen > utcnow() - timedelta(days=3), User.avatar_id != None)
+    if instance_ids := silenced_instances():
+        people = people.filter(or_(User.instance_id.not_in(instance_ids), User.instance_id == None))
     if search:
         people = people.search(search, sort=True)
     people = people.order_by(desc(User.reputation / (User.post_count + User.post_reply_count)))
