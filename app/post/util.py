@@ -11,7 +11,7 @@ from sqlalchemy import desc, asc, text, or_
 from app import db, cache
 from app.constants import POST_TYPE_LINK, POST_TYPE_IMAGE, POST_TYPE_VIDEO, POST_TYPE_POLL
 from app.models import PostReply, Post, Community, User, Language, utcnow
-from app.utils import blocked_or_banned_instances, blocked_users, is_video_hosting_site, get_request
+from app.utils import blocked_or_banned_instances, blocked_users, is_video_hosting_site, get_request, silenced_instances
 
 
 @cache.memoize(timeout=600)
@@ -163,6 +163,8 @@ def post_replies(post: Post, sort_by: str, viewer: User, db_only=False) -> List[
             comments = comments.filter(
                 or_(PostReply.language_id.in_(tuple(viewer.read_language_ids)), PostReply.language_id == None))
     else:
+        if instance_ids := silenced_instances():
+            comments = comments.filter(or_(PostReply.instance_id.not_in(instance_ids), PostReply.instance_id == None))
         comments.filter(PostReply.score > -20)
 
     if sort_by == 'hot':
