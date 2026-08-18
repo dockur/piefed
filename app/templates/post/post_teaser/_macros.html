@@ -75,7 +75,7 @@
 {% endif -%}
 {%- endmacro %}
 
-{% macro render_emoji_reactions(post) %}
+{% macro render_emoji_reactions(post, current_user) %}
     <div id="post_reactions_{{ post.id }}" class="outermost_reaction_container">
         {%- if post.emoji_reactions -%}
         <div class="message_reactions" id="p_reactions_{{ post.id }}">
@@ -249,7 +249,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
-    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif %}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post, current_user=current_user) }}{% endif %}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -274,7 +274,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
-    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post, current_user=current_user) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -301,7 +301,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
-    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post, current_user=current_user) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -328,7 +328,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
-    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post, current_user=current_user) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -353,7 +353,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
-    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post, current_user=current_user) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -406,7 +406,7 @@
                 {% endif -%}
             </div>
         </div>
-        {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
+        {% if not low_bandwidth %}{{ render_emoji_reactions(post, current_user=current_user) }}{% endif -%}
     {% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
