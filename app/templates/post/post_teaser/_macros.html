@@ -75,6 +75,31 @@
 {% endif -%}
 {%- endmacro %}
 
+{% macro render_emoji_reactions(post) %}
+    <div id="post_reactions_{{ post.id }}" class="outermost_reaction_container">
+        {%- if post.emoji_reactions -%}
+        <div class="message_reactions" id="p_reactions_{{ post.id }}">
+            {% for reaction in post.emoji_reactions -%}
+                <div class="message_reaction_container me-1">
+                    <div class="message_reaction{{ ' reacted' if current_user.is_authenticated and current_user.lemmy_link() in reaction['authors'] }}"
+                         hx-post="/post/{{ post.id }}/emoji_set"
+                         hx-vals='{"emoji": "{{ reaction['token'] }}"}'
+                         hx-target="#p_reactions_{{ post.id }}" hx-swap="outerHTML"
+                         title='{{ ", ".join(reaction["authors"]) }}'>
+                        <div class="emoji">{% if reaction['url'] and reaction['url'].startswith('https://') -%}
+                                                <img src="{{ reaction['url'] }}" width="20" alt="{{ reaction['token'] }}" decoding="async" referrerpolicy="no-referrer">
+                                            {% else -%}
+                                                {{ reaction['token'] }}
+                                            {%- endif %}</div>
+                        <div class="message_reaction_count">{{ reaction['count'] }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {%- endif -%}
+    </div>
+{%- endmacro %}
+
 {% macro render_utilities_bar(post, sort=None, embed=False, low_bandwidth=False, current_user=None, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, moderated_community_ids=None) -%}
 {% set POST_TYPE_LINK = 1 -%}
 {% set POST_TYPE_ARTICLE = 2 -%}
@@ -148,7 +173,7 @@
             <a rel="nofollow" aria-label="{{ _('Cross-post') }}" href="{{ '/post/' + post.id|string + '/cross-post' }}"><span class="fe fe-cross-post"></span></a>
         </div>
     {% endif -%}
-    {% if current_user.is_authenticated and (post.type == POST_TYPE_IMAGE or post.type == POST_TYPE_VIDEO) -%}
+    {% if current_user.is_authenticated -%}
     <div class="emoji_button">
         {{ render_post_emoji_button(post, post.community, current_user=current_user, can_upvote_here=can_upvote_here, communities_banned_from_list=communities_banned_from_list, disable_voting=disable_voting, recently_upvoted_replies=recently_upvoted_replies) }}
     </div>
@@ -224,6 +249,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif %}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -248,6 +274,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -274,6 +301,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -300,6 +328,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -324,28 +353,7 @@
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
-    <div id="post_reactions_{{ post.id }}" class="outermost_reaction_container">
-        {%- if post.emoji_reactions -%}
-        <div class="message_reactions" id="p_reactions_{{ post.id }}">
-            {% for reaction in post.emoji_reactions -%}
-                <div class="message_reaction_container me-1">
-                    <div class="message_reaction{{ ' reacted' if current_user.is_authenticated and current_user.lemmy_link() in reaction['authors'] }}"
-                         hx-post="/post/{{ post.id }}/emoji_set"
-                         hx-vals='{"emoji": "{{ reaction['token'] }}"}'
-                         hx-target="#p_reactions_{{ post.id }}" hx-swap="outerHTML"
-                         title='{{ ", ".join(reaction["authors"]) }}'>
-                        <div class="emoji">{% if reaction['url'] and reaction['url'].startswith('https://') -%}
-                                                <img src="{{ reaction['url'] }}" width="20" alt="{{ reaction['token'] }}" decoding="async" referrerpolicy="no-referrer">
-                                            {% else -%}
-                                                {{ reaction['token'] }}
-                                            {%- endif %}</div>
-                        <div class="message_reaction_count">{{ reaction['count'] }}</div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        {%- endif -%}
-    </div>
+    {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
 {%- endmacro %}
@@ -398,28 +406,7 @@
                 {% endif -%}
             </div>
         </div>
-        <div id="post_reactions_{{ post.id }}" class="outermost_reaction_container">
-            {%- if post.emoji_reactions -%}
-            <div class="message_reactions" id="p_reactions_{{ post.id }}">
-                {% for reaction in post.emoji_reactions -%}
-                    <div class="message_reaction_container me-1">
-                        <div class="message_reaction{{ ' reacted' if current_user.is_authenticated and current_user.lemmy_link() in reaction['authors'] }}"
-                             hx-post="/post/{{ post.id }}/emoji_set"
-                             hx-vals='{"emoji": "{{ reaction['token'] }}"}'
-                             hx-target="#p_reactions_{{ post.id }}" hx-swap="outerHTML"
-                             title='{{ ", ".join(reaction["authors"]) }}'>
-                            <div class="emoji">{% if reaction['url'] and reaction['url'].startswith('https://') -%}
-                                                    <img src="{{ reaction['url'] }}" width="20" alt="{{ reaction['token'] }}" decoding="async" referrerpolicy="no-referrer">
-                                                {% else -%}
-                                                    {{ reaction['token'] }}
-                                                {%- endif %}</div>
-                            <div class="message_reaction_count">{{ reaction['count'] }}</div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            {%- endif -%}
-        </div>
+        {% if not low_bandwidth %}{{ render_emoji_reactions(post) }}{% endif -%}
     {% endif -%}
     {{ render_utilities_bar(post, sort=sort, current_user=current_user, joined_communities=joined_communities, can_upvote_here=can_upvote_here, can_downvote_here=can_downvote_here, disable_voting=disable_voting, recently_upvoted=recently_upvoted, recently_downvoted=recently_downvoted, communities_banned_from_list=communities_banned_from_list, upvoted_class=upvoted_class, downvoted_class=downvoted_class, reported_posts=reported_posts, moderated_community_ids=moderated_community_ids) }}
 </div>
