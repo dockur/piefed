@@ -77,6 +77,12 @@ body.compact-min {
     padding: 0;
   }
 
+  .post_teaser_body {
+    .outermost_reaction_container {
+      display: none;
+    }
+  }
+
 }
 
 body.compact-max {

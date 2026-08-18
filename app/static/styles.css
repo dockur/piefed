@@ -4173,6 +4173,9 @@ body.compact-min .form-select {
 body.compact-min .ts-wrapper {
   padding: 0;
 }
+body.compact-min .post_teaser_body .outermost_reaction_container {
+  display: none;
+}
 
 body.compact-max .post_teaser {
   border-bottom-width: var(--border-1);
