@@ -1169,6 +1169,10 @@ def register(app):
             db.session.delete(pending_reminder)
             db.session.commit()
 
+    @app.cli.command('rss-feeds')
+    def rss_feeds_command():
+        rss_feeds()
+
     def rss_feeds():
 
         # Find or create the feed_bot user
@@ -1215,26 +1219,42 @@ def register(app):
             try:
                 # Fetch the RSS feed
                 response = get_request(feed.url)
-                
+
                 if response.status_code >= 400:
                     feed.last_error = f'http response: {response.status_code}'
                     feed.error_count += 1
                     feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
                     db.session.commit()
                     continue
-                
+
                 # Check for 304 Not Modified
                 if response.status_code == 304:
                     feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
                     feed.error_count = 0
                     db.session.commit()
                     continue
-                
+
+                if response.status_code == 302:  # Follow redirections once only
+                    response = get_request(response.headers['Location'])
+                    if response.status_code >= 400:
+                        feed.last_error = f'http response: {response.status_code}'
+                        feed.error_count += 1
+                        feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
+                        db.session.commit()
+                        continue
+
+                    # Check for 304 Not Modified
+                    if response.status_code == 304:
+                        feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
+                        feed.error_count = 0
+                        db.session.commit()
+                        continue
+
                 # Client-side etag check: if etag hasn't changed, skip processing
                 # This handles servers that don't return 304 properly
                 new_etag = response.headers.get('etag') or response.headers.get('ETag')
                 new_last_modified = response.headers.get('last-modified') or response.headers.get('Last-Modified')
-                
+
                 # Normalize etag by removing compression suffixes and weak etag prefix
                 normalized_new_etag = new_etag
                 if new_etag:
@@ -1246,7 +1266,7 @@ def register(app):
                         if normalized_new_etag.endswith(suffix):
                             normalized_new_etag = normalized_new_etag[:-len(suffix)]
                             break
-                
+
                 # Compare with stored etag (also normalize it)
                 normalized_stored_etag = feed.etag
                 if feed.etag:
@@ -1256,16 +1276,13 @@ def register(app):
                         if normalized_stored_etag.endswith(suffix):
                             normalized_stored_etag = normalized_stored_etag[:-len(suffix)]
                             break
-                
+
                 # Check if content is unchanged
                 if normalized_new_etag and normalized_stored_etag and normalized_new_etag == normalized_stored_etag:
                     feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
                     feed.error_count = 0
                     db.session.commit()
                     continue
-
-                # Parse the feed
-                parsed_feed = fastfeedparser.parse(response.content, include_media=False, include_enclosures=False)
 
                 # Update etag and last_modified from response headers
                 # Normalize and store the new etag
@@ -1278,6 +1295,12 @@ def register(app):
                 if new_last_modified:
                     feed.last_modified = new_last_modified
                 db.session.commit()
+
+                if not response.content:
+                    continue
+
+                # Parse the feed
+                parsed_feed = fastfeedparser.parse(response.content, include_media=False, include_enclosures=False)
 
                 # Check if feed has entries
                 if not hasattr(parsed_feed, 'entries') or not parsed_feed.entries:

@@ -268,7 +268,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
             tags = []
         if 'flair' in input:
             flair = flairs_from_string(input['flair'], post.community_id)
-        elif 'flair_id' in input:
+        elif 'flair_id' in input and input['flair_id']:
             # Handle single flair_id for RSS feeds and other API calls
             flair_id = input['flair_id']
             if isinstance(flair_id, int):
