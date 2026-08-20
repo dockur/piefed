@@ -16,7 +16,7 @@
         <h1>{{ _('Site profile') }}</h1>
         <form method="post" enctype="multipart/form-data">
             {{ form.csrf_token() }}
-            <p>{{ _('Configure the flair the instance, by giving it a name, a short slogan, basic info for the sidebar and a logo. This information appears in link previews in social media.') }}</p>
+            <p>{{ _('Configure the appearance of the instance, by giving it a name, a short slogan, basic info for the sidebar and a logo. This information appears in link previews in social media.') }}</p>
             {{ render_field(form.name) }}
             {{ render_field(form.description) }}
             {{ render_field(form.sidebar) }}
