@@ -1343,7 +1343,7 @@ def register(app):
 
                     input_data = {
                         'title': item_title,
-                        'url': item_url,
+                        'url': strip_tracking(item_url),
                         'body': shorten_string(html_to_text(item_body), 500),
                         'language_id': site_language_id(g.site),  # Default language. Can this be found in the rss feed?
                         'nsfw': False,
@@ -2255,3 +2255,21 @@ def actor_id_to_ap_id(actor_id) -> str:
     path = furl(actor_id).path
     path_parts = path.split('/')
     return f'{path_parts[1]}@{host}'
+
+
+def strip_tracking(url):
+    if url is None or url == '':
+        return ''
+
+    f = furl(url)
+
+    tracking_prefixes = (
+        "utm_",
+        "at_",
+    )
+
+    for key in list(f.args):
+        if key.startswith(tracking_prefixes):
+            del f.args[key]
+
+    return f.url
