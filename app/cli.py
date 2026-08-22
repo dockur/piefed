@@ -2266,6 +2266,7 @@ def strip_tracking(url):
     tracking_prefixes = (
         "utm_",
         "at_",
+        "traffic_source"
     )
 
     for key in list(f.args):
