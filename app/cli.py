@@ -1221,7 +1221,7 @@ def register(app):
                 response = get_request(feed.url)
 
                 if response.status_code >= 400:
-                    feed.last_error = f'http response: {response.status_code}'
+                    feed.last_error = utcnow()
                     feed.error_count += 1
                     feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
                     db.session.commit()
@@ -1237,7 +1237,7 @@ def register(app):
                 if response.status_code == 302:  # Follow redirections once only
                     response = get_request(response.headers['Location'])
                     if response.status_code >= 400:
-                        feed.last_error = f'http response: {response.status_code}'
+                        feed.last_error = utcnow()
                         feed.error_count += 1
                         feed.next_check = utcnow() + timedelta(minutes=feed.check_frequency)
                         db.session.commit()
