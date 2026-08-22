@@ -1857,7 +1857,7 @@ def community_rss_feed_edit(community_id, feed_id=None):
             if rss_feed:
                 form.name.data = rss_feed.title
                 form.url.data = rss_feed.url
-                form.check_frequency.data = rss_feed.check_frequency
+                form.check_frequency.data = str(rss_feed.check_frequency)
                 if rss_feed.flair_id:
                     form.flair.data = str(rss_feed.flair_id)
 
