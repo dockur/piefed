@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python -m venv /venv
 ENV PATH="/venv/bin:$PATH"
 
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip-py313-slim \
     --mount=source=requirements.txt,target=/tmp/requirements.txt \
     pip install -r /tmp/requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,target=/root/.cache/pip,id=pip-py313-slim \
     pip install gunicorn
 
 FROM python:3.13-slim AS runtime
