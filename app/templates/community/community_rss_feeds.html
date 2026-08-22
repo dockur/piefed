@@ -20,8 +20,10 @@
         <h1 class="mt-2">{{ _('RSS feeds') }}</h1>
         {% if can_add_rss %}
             <a class="btn btn-primary float-right" href="{{ url_for('community.community_rss_feed_edit', community_id=community.id) }}">{{ _('Add RSS feed') }}</a>
+            <p>{{ _('RSS feeds can be used to automatically create posts in this community') }}.</p>
+        {% else -%}
+            <p>{{ _('RSS feeds are not enabled on this instance.') }}.</p>
         {% endif %}
-        <p>{{ _('RSS feeds can be used to automatically create posts in this community') }}.</p>
         {% if rss_feeds %}
         <table class="table table-striped">
             <tr>

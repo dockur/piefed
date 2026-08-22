@@ -35,7 +35,7 @@ from app.utils import get_request, allowlist_html, get_setting, ap_datetime, mar
     moderating_communities, get_task_session, is_video_hosting_site, opengraph_parse, mastodon_extra_field_link, \
     blocked_users, piefed_markdown_to_lemmy_markdown, store_files_in_s3, guess_mime_type, get_recipient_language, \
     patch_db_session, to_srgb, communities_banned_from_all_users, blocked_communities, blocked_or_banned_instances, \
-    instance_community_ids, banned_instances, communities_run_by_inactive_mods
+    instance_community_ids, banned_instances, communities_run_by_inactive_mods, inspect_image_c2pa
 
 
 def public_key():
@@ -1490,6 +1490,14 @@ def make_image_sizes_async(file_id, thumbnail_width, medium_width, directory, to
                                 if content_type.startswith('image') or (content_type == 'application/octet-stream' and file.source_url.endswith('.avif')):
                                     source_image = source_image_response.content
                                     source_image_response.close()
+
+                                    # detect AI image posts
+                                    if directory == 'posts':
+                                        if ai_image := inspect_image_c2pa(source_image, content_type):
+                                            if ai_image['c2pa']['ai_generated']:
+                                                session.execute(text('UPDATE "post" SET ai_generated = true WHERE image_id = :file_id AND ai_generated is false'), {
+                                                    'file_id': file.id
+                                                })
 
                                     content_type_parts = content_type.split('/')
                                     if content_type_parts:

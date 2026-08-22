@@ -3548,8 +3548,6 @@ form h5 {
 .message_reactions .message_reaction .emoji {
   margin: var(--spacing-2) var(--spacing-4);
   padding: var(--spacing-2) 0px;
-  height: var(--spacing-20);
-  width: var(--spacing-20);
   flex-shrink: 0;
   overflow: hidden;
   font-size: 18px;

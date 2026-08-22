@@ -57,3 +57,4 @@ rich
 pendulum~=3.2.0
 py-svg-hush~=0.3.0
 fastfeedparser~=0.6.0
+c2pa-python~=0.37.0
