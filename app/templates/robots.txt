@@ -54,6 +54,9 @@ Disallow: /
 User-agent: LinkupBot
 Disallow: /
 
+User-agent: Lightpanda
+Disallow: /
+
 User-agent: SleepBot
 Disallow: /
 
