@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM python:3.13-slim AS builder
+FROM python:3.14-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.cache/pip,id=pip-py313-slim \
 RUN --mount=type=cache,target=/root/.cache/pip,id=pip-py313-slim \
     pip install gunicorn
 
-FROM python:3.13-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 ARG TARGETARCH
 ARG SUPERCRONIC_VERSION=v0.2.49
