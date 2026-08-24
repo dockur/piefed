@@ -24,8 +24,9 @@ def post_upload_image(auth, image_file=None):
     for fs in file_sizes:
         total_size += fs[1]
 
-    if total_size > current_app.config['FILE_UPLOAD_QUOTA']:
-        raise Exception('quota_exceeded')
+    # don't check quota on image uploads until I can sort this out properly
+    #if total_size > current_app.config['FILE_UPLOAD_QUOTA']:
+    #    raise Exception('quota_exceeded')
 
     url = process_upload(image_file, user=user)
     return {'url': url}

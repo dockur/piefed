@@ -1234,7 +1234,7 @@ def index_rss(feed_type=None):
     if feed_type == 'subscribed' and current_user_is_authenticated:
         community_ids = db.session.execute(text(
             'SELECT id FROM community as c INNER JOIN community_member as cm ON cm.community_id = c.id WHERE cm.is_banned is false AND cm.user_id = :user_id'),
-                                           {'user_id': current_user.id}).scalars()
+                                           {'user_id': user.id}).scalars()
     elif feed_type == 'local' or not current_user_is_authenticated:
         if not current_user_is_authenticated:
             community_ids = db.session.execute(
