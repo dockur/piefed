@@ -6,7 +6,13 @@ const getPreferredTheme = () => {
   if (storedTheme) {
     return storedTheme
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  const isLinux = navigator.platform.toLowerCase().includes('linux');
+  if(isLinux) {
+      return 'dark';
+  }
+  else {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
 }
 
 const setTheme = theme => {

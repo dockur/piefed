@@ -483,7 +483,13 @@ function setupLightDark() {
 
     var preferredTheme = getStoredTheme();
     if (!preferredTheme || (preferredTheme !== 'light' && preferredTheme !== 'dark')) {
-        preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const isLinux = navigator.platform.toLowerCase().includes('linux');
+        if(isLinux) {
+            preferredTheme = 'dark';
+        }
+        else {
+            preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
     }
     //setTheme(preferredTheme);
     icon.classList.remove('fe-eye');
