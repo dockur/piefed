@@ -19,3 +19,5 @@ errorlog = '-'
 
 max_requests = 2000
 max_requests_jitter = 50
+
+keepalive = 20
