@@ -17,7 +17,7 @@ worker_class = 'gthread'
 accesslog = '-'
 errorlog = '-'
 
-max_requests = 2000
+max_requests = 20000
 max_requests_jitter = 50
 
 keepalive = 20
