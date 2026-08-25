@@ -2940,7 +2940,7 @@ def update_post_from_activity(post: Post, request_json: dict):
                                     db.session.add(notification)
             # remove when lemmy supports flairs
             # for now only clear tags if there's new ones or if maybe another PieFed instance is trying to remove them
-            if len(flair_tags) > 0 or post.instance.software == 'piefed':
+            if len(flair_tags) > 0 or (post.instance.software == 'piefed' or post.instance.software == 'pylova'):
                 post.flair.clear()
                 for ft in flair_tags:
                     flair = find_flair_or_create(ft, post.community_id)

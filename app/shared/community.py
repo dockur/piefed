@@ -148,7 +148,7 @@ def invite_with_chat(community_id: int, handle: str, src, auth=None):
                 community_invite = create_invite_token(community, recipient, user)
                 message += f"If you'd like to join it use this link: {current_app.config['SERVER_URL']}/community/{community.link()}/accept_invite/{community_invite}."
         else:
-            if recipient.instance.software.lower() == 'piefed':
+            if recipient.instance.software.lower() == 'piefed' or recipient.instance.software.lower() == 'pylova':
                 if community.invitations <= INVITE_APPLY:
                     message += f"Join the community by going to https://{recipient.instance.domain}/c/{community.link()}@{community.ap_domain}/subscribe or if that doesn't work try pasting {community.lemmy_link()} into this form: https://{recipient.instance.domain}/community/add_remote."
                 else:
