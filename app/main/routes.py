@@ -1126,6 +1126,7 @@ def service_worker():
 @bp.route('/manifest.json', methods=['GET'])
 @bp.route('/static/manifest.json', methods=['GET'])
 def static_manifest():
+    g.site = Site.query.get(1)
     def get_manifest_for_os(os_family):
         base_dir = 'app/static/pwa_manifests'
         if os_family == 'mac os x':
