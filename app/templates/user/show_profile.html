@@ -389,6 +389,14 @@
                 </div>
             {% endif %}
         {% endif -%}
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="get" action="/search" class="show_loading">
+                    <input type="search" name="q" class="form-control" placeholder="{{ _('Search posts by %(name)s', name=user.display_name()) }}" />
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                </form>
+            </div>
+        </div>
         {% if current_user.is_authenticated and (user_access('ban users', current_user.id) or user_access('manage users', current_user.id)) and user.id != current_user.id %}
             <div class="card mb-3">
                 <div class="card-header">
