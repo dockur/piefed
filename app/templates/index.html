@@ -26,23 +26,8 @@
                 {% include "_view_filter_nav.html" %}
             </div>
         </div>
-        <div class="post_list h-feed hide_flair">
-            {% for post in instance_stickies -%}
-                <div class="bg-success bg-opacity-10 instance_sticky">
-                    {% include 'post/_post_teaser.html' %}
-                </div>
-            {% endfor -%}
-            {% set regular_posts_start = time.time() %}
-            {% for post in posts -%}
-                {% include 'post/_post_teaser.html' %}
-            {% else -%}
-                {% if not instance_stickies -%}
-                    <p>{{ _('No posts yet. Join some communities to see more.') }}</p>
-                    <p><a class="btn btn-primary" href="/communities">{{ _('More communities') }}</a></p>
-                {% endif -%}
-            {% endfor -%}
-            {% set regular_posts_end = time.time() %}
-            <!-- Regular posts render time: {{ regular_posts_end - regular_posts_start }} -->
+        <div class="post_list h-feed hide_flair" {% if reload_url %}id="auto-reload" hx-get="{{ reload_url }}" hx-trigger="refreshFragment" hx-swap="innerHTML" {% endif %}>
+            {% include "index_fragment.html" %}
         </div>
 
         <nav aria-label="{{ _('Pagination') }}" class="mt-4" role="navigation">
@@ -181,4 +166,11 @@
     </aside>
     <a href="/honey" class="visually-hidden" tabindex="-1" aria-hidden="true">Do not click this</a>
 </div>
+{% endblock %}
+
+{% block end_scripts %}
+<script nonce="{{ nonce }}">
+    var reloadUrl = '{{ reload_url }}'; // used by setupAutoReload() in scripts.js
+    var reloadsDone = 0;
+</script>
 {% endblock %}

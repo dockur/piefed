@@ -1,0 +1,13 @@
+{% for post in instance_stickies -%}
+    <div class="bg-success bg-opacity-10 instance_sticky">
+        {% include 'post/_post_teaser.html' %}
+    </div>
+{% endfor -%}
+{% for post in posts -%}
+    {% include 'post/_post_teaser.html' %}
+{% else -%}
+    {% if not instance_stickies -%}
+        <p>{{ _('No posts yet. Join some communities to see more.') }}</p>
+        <p><a class="btn btn-primary" href="/communities">{{ _('More communities') }}</a></p>
+    {% endif -%}
+{% endfor -%}
