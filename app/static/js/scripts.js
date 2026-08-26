@@ -1060,6 +1060,10 @@ function setupKeyboardShortcuts() {
         }
     });
 
+    setupVotableElements();
+}
+
+function setupVotableElements() {
     const votableElements = document.querySelectorAll('.post_teaser, .post_full');
     votableElements.forEach(votable => {
         votable.addEventListener('mouseover', event => {
@@ -2642,6 +2646,7 @@ function setupAutoReload() {
                     minute: "2-digit",
                     hour12: true
                 })})`;
+                setTimeout(setupVotableElements, 2000); // so people can vote with A and Z keys
             }
         }, 60000);  // once per minute
     }
