@@ -484,7 +484,7 @@ function setupLightDark() {
 
     var preferredTheme = getStoredTheme();
     if (!preferredTheme || (preferredTheme !== 'light' && preferredTheme !== 'dark')) {
-        const isLinux = navigator.platform.toLowerCase().includes('linux');
+        const isLinux = navigator.platform.toLowerCase().includes('linux') && !navigator.platform.toLowerCase().includes('android');
         if(isLinux) {
             preferredTheme = 'dark';
         }
