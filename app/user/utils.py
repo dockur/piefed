@@ -164,20 +164,16 @@ def _get_user_posts(user, post_page):
 
     if current_user.is_authenticated and (current_user.is_admin() or current_user.is_staff()):
         # Admins see everything
-        query = base_query.order_by(desc(Post.posted_at))
+        return base_query.order_by(desc(Post.posted_at)).paginate(page=post_page, per_page=20, error_out=False)
     elif current_user.is_authenticated and current_user.id == user.id:
         # Users see their own posts including soft-deleted ones they deleted
-        query = base_query.filter(
+        return base_query.filter(
             or_(Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Post.deleted_by == user.id)
-        ).order_by(desc(Post.posted_at))
+        ).order_by(desc(Post.posted_at)).paginate(page=post_page, per_page=20, error_out=False)
     else:
         # Everyone else sees only public, non-deleted posts
-        query = base_query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Post.private == False).order_by(
-            desc(Post.posted_at))
-    
-    # Apply limit via subquery to cap results before pagination
-    subq = query.limit(500).subquery()
-    return db.session.query(Post).select_from(subq).paginate(page=post_page, per_page=20, error_out=False)
+        return base_query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Post.private == False).order_by(
+            desc(Post.posted_at)).paginate(page=post_page, per_page=20, error_out=False)
 
 
 def _get_user_post_replies(user, replies_page):
@@ -186,19 +182,15 @@ def _get_user_post_replies(user, replies_page):
 
     if current_user.is_authenticated and (current_user.is_admin() or current_user.is_staff()):
         # Admins see everything
-        query = base_query.order_by(desc(PostReply.posted_at))
+        return base_query.order_by(desc(PostReply.posted_at)).paginate(page=replies_page, per_page=20, error_out=False)
     elif current_user.is_authenticated and current_user.id == user.id:
         # Users see their own replies including soft-deleted ones they deleted
-        query = base_query.filter(or_(PostReply.deleted == False, PostReply.deleted_by == user.id)).order_by(
-            desc(PostReply.posted_at))
+        return base_query.filter(or_(PostReply.deleted == False, PostReply.deleted_by == user.id)).order_by(
+            desc(PostReply.posted_at)).paginate(page=replies_page, per_page=20, error_out=False)
     else:
         # Everyone else sees only non-deleted replies
-        query = base_query.filter(PostReply.deleted == False, PostReply.private == False).order_by(
-            desc(PostReply.posted_at))
-    
-    # Apply limit via subquery to cap results before pagination
-    subq = query.limit(500).subquery()
-    return db.session.query(PostReply).select_from(subq).paginate(page=replies_page, per_page=20, error_out=False)
+        return base_query.filter(PostReply.deleted == False, PostReply.private == False).order_by(
+            desc(PostReply.posted_at)).paginate(page=replies_page, per_page=20, error_out=False)
 
 
 def _get_user_posts_and_replies(user, page):
