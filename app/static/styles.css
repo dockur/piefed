@@ -74,6 +74,8 @@
   --opacity-00: 0;
   --opacity-01: 0.1;
   --opacity-02: 0.2;
+  --opacity-03: 0.3;
+  --opacity-04: 0.4;
   --opacity-05: 0.5;
   --opacity-08: 0.8;
   --opacity-09: 0.9;
@@ -1689,7 +1691,7 @@ ul.form-multicheck-columns li {
   opacity: var(--opacity-08);
 }
 .post_list .post_teaser.blocked {
-  opacity: var(--opacity-02);
+  opacity: var(--opacity-04);
   font-size: 12px;
   font-size: var(--font-size-12);
 }
@@ -3859,6 +3861,8 @@ div:has(> input.hide_field) {
   --opacity-00: 0;
   --opacity-01: 0.1;
   --opacity-02: 0.2;
+  --opacity-03: 0.3;
+  --opacity-04: 0.4;
   --opacity-05: 0.5;
   --opacity-08: 0.8;
   --opacity-09: 0.9;
