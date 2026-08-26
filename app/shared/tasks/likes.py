@@ -138,7 +138,7 @@ def send_vote(user_id, object, vote_to_undo, vote_direction, emoji):
                        not instance_banned(instance.domain)):
                     continue
 
-                if instance.software == 'piefed':  # Send in a batch later
+                if instance.software == 'piefed' or instance.software == 'pylova':  # Send in a batch later
                     session.add(ActivityBatch(instance_id=instance.id, community_id=community.id, payload=payload_copy))
                     session.commit()
                 else:

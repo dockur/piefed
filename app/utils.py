@@ -3017,7 +3017,7 @@ def download_defeds_worker(defederation_subscription_id: int, domain: str):
 def retrieve_defederation_list(domain: str) -> List[str]:
     result = []
     software = instance_software(domain)
-    if software == 'lemmy' or software == 'piefed':
+    if software == 'lemmy' or software == 'piefed' or software == 'pylova':
         try:
             response = get_request(f'https://{domain}/api/v3/federated_instances')
         except:

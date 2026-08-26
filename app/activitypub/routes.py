@@ -1925,7 +1925,7 @@ def announce_activity_to_followers(community: Community, creator: User, activity
         # All good? Send!
         if instance and instance.online() and instance.inbox and not instance_banned(instance.inbox):
             if creator.instance_id != instance.id:  # don't send it to the instance that hosts the creator as presumably they already have the content
-                if can_batch and instance.software == 'piefed':
+                if can_batch and (instance.software == 'piefed' or instance.software == 'pylova'):
                     db.session.add(ActivityBatch(instance_id=instance.id, community_id=community.id,
                                                  payload=activity))
                     db.session.commit()
