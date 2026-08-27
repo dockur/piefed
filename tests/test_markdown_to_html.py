@@ -42,6 +42,13 @@ class TestMarkdownToHtml(unittest.TestCase):
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
         correct_html = '<p>This link has a tilde: <a href="https://site.tld/~user" rel="nofollow ugc" target="_blank">https://site.tld/~user</a></p>\n'
         self.assertEqual(result, correct_html)
+
+    def test_links_no_http(self):
+        """Test links that have no https:// on the front"""
+        markdown = "My website www.nihilore.com"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        correct_html = '<p>My website <a href="https://www.nihilore.com" rel="nofollow ugc" target="_blank">www.nihilore.com</a></p>\n'
+        self.assertEqual(result, correct_html)
     
     def test_links_w_parens(self):
         """Test links with parentheses."""
@@ -440,27 +447,27 @@ And if you want to add your score to the database to help your fellow Bookworms 
         """Tests embedded video markdown."""
 
         # mp4 video
-        markdown = "![alt text here](https://site.tld/video.mp4)"
+        markdown = "test ![alt text here](https://site.tld/video.mp4)"
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
-        target_html = '<p><video class="responsive-video" controls="" loop="" muted="" playsinline="" preload="metadata"><source src="https://site.tld/video.mp4" type="video/mp4"/> Your browser does not support playing HTML5 video. <a href="https://site.tld/video.mp4" rel="nofollow ugc" target="_blank">You can download a copy of the file instead.</a> Here is a description of the content: alt text here</video></p>\n'
+        target_html = '<p>test <video class="responsive-video" controls="" loop="" muted="" playsinline="" preload="metadata"><source src="https://site.tld/video.mp4" type="video/mp4"/> Your browser does not support playing HTML5 video. <a href="https://site.tld/video.mp4" rel="nofollow ugc" target="_blank">You can download a copy of the file instead.</a> Here is a description of the content: alt text here</video></p>\n'
         self.assertEqual(target_html, result)
 
         # webm video
-        markdown = "![alt text here](https://site.tld/video.webm)"
+        markdown = "test ![alt text here](https://site.tld/video.webm)"
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
-        target_html = '<p><video class="responsive-video" controls="" loop="" muted="" playsinline="" preload="metadata"><source src="https://site.tld/video.webm" type="video/webm"/> Your browser does not support playing HTML5 video. <a href="https://site.tld/video.webm" rel="nofollow ugc" target="_blank">You can download a copy of the file instead.</a> Here is a description of the content: alt text here</video></p>\n'
+        target_html = '<p>test <video class="responsive-video" controls="" loop="" muted="" playsinline="" preload="metadata"><source src="https://site.tld/video.webm" type="video/webm"/> Your browser does not support playing HTML5 video. <a href="https://site.tld/video.webm" rel="nofollow ugc" target="_blank">You can download a copy of the file instead.</a> Here is a description of the content: alt text here</video></p>\n'
         self.assertEqual(target_html, result)
 
         # other, unsupported video, just treat it like any other image markdown
-        markdown = "![alt text here](https://site.tld/video.mov)"
+        markdown = "test ![alt text here](https://site.tld/video.mov)"
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
-        target_html = '<p><img alt="alt text here" loading="lazy" src="https://site.tld/video.mov"/></p>\n'
+        target_html = '<p>test <img alt="alt text here" loading="lazy" src="https://site.tld/video.mov"/></p>\n'
         self.assertEqual(target_html, result)
 
         # make sure images still work right
-        markdown = "![alt text here](https://site.tld/image.png)"
+        markdown = "test ![alt text here](https://site.tld/image.png)"
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
-        target_html = '<p><img alt="alt text here" loading="lazy" src="https://site.tld/image.png"/></p>\n'
+        target_html = '<p>test <img alt="alt text here" loading="lazy" src="https://site.tld/image.png"/></p>\n'
         self.assertEqual(target_html, result)
     
     def test_inline_spoilers(self):

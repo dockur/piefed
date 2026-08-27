@@ -840,6 +840,20 @@ def links_with_parens(text: str) -> str:
     return better_html
 
 
+def fix_www_links(text: str) -> str:
+    """Add https:// to links that start with www."""
+
+    soup = BeautifulSoup(text, 'html.parser')
+
+    for link in soup.find_all("a"):
+        target_url = link.get("href")
+        if target_url and target_url.startswith("www."):
+            # Add https:// to links that start with www. but don't have a protocol
+            link['href'] = "https://" + target_url
+
+    return str(soup)
+
+
 def handle_better_lists(text: str) -> str:
     """Handles lists that don't have a blank line preceding them."""
 
@@ -949,6 +963,7 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
         raw_html = handle_lemmy_spoilers(raw_html)
         raw_html = make_quotes_straight(raw_html)
         raw_html = links_with_parens(raw_html)
+        raw_html = fix_www_links(raw_html)
 
         return allowlist_html(raw_html, a_target=a_target if anchors_new_tab else '', test_env=test_env)
     else:
