@@ -194,6 +194,7 @@
   <li><a href="{{ post_reply.ap_id }}" rel="nofollow" class="dropdown-item no-underline"><img src="/static/images/fediverse_logo.svg" class="options_fediverse_logo">
     {{ _('View original on %(domain)s', domain=post_reply.instance.domain) }}</a></li>
 {% endif -%}
+{% if current_user.is_authenticated -%}
 <li id="comment_source_swap_{{ post_reply.id }}">
     <a href="#" class="dropdown-item no-underline"
             hx-get="{{ url_for('post.post_reply_source', post_id=post.id, comment_id=post_reply.id, state="show") }}" 
@@ -204,6 +205,7 @@
         {{ _('View markdown source') }}
     </a>
 </li>
+{% endif -%}
 <li>
     <a href="{{ url_for('post.post_reply_report', post_id=post.id, comment_id=post_reply.id) }}" rel="nofollow" class="dropdown-item no-underline">
         <span class="fe fe-report"></span>

@@ -980,6 +980,7 @@ def post_reply_options(post_id: int, comment_id: int):
 
 
 @bp.route('/post/<int:post_id>/source/<state>', methods=['GET'])
+@login_required
 def post_source(post_id: int, state: str):
     # This should just be accessed by htmx
     if not request.headers.get('HX-Request'):
@@ -994,7 +995,7 @@ def post_source(post_id: int, state: str):
     
     if state == "show":
         if '````' in post.body:
-            post_body = '<pre><code>' + post.body + '</code></pre>'
+            post_body = '<pre><code>' + str(escape(post.body)) + '</code></pre>'
         elif '```' in post.body:
             post_body = markdown_to_html("````md\n" + post.body + "\n````")
         else:
@@ -1843,6 +1844,7 @@ def post_reply_distinguish(post_id: int, comment_id: int):
 
 
 @bp.route('/post/<int:post_id>/comment/<int:comment_id>/source/<state>', methods=['GET'])
+@login_required
 def post_reply_source(post_id: int, comment_id: int, state: str):
     # This should just be accessed by htmx
     if not request.headers.get('HX-Request'):
@@ -1858,7 +1860,7 @@ def post_reply_source(post_id: int, comment_id: int, state: str):
     
     if state == "show":
         if '````' in post_reply.body:
-            reply_body = '<pre><code>' + post_reply.body + '</code></pre>'
+            reply_body = '<pre><code>' + str(escape(post_reply.body)) + '</code></pre>'
         elif '```' in post_reply.body:
             reply_body = markdown_to_html("````md\n" + post_reply.body + "\n````")
         else:
