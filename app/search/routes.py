@@ -30,6 +30,7 @@ def run_search():
     page = request.args.get('page', 1, type=int)
     community = request.args.get('community', '').strip()
     language_id = request.args.get('language', 0, type=int)
+    user_id = request.args.get('user_id', 0, type=int)
     type = request.args.get('type', 0, type=int)
     software = request.args.get('software', '')
     low_bandwidth = request.cookies.get('low_bandwidth', '0') == '1'
@@ -101,6 +102,8 @@ def run_search():
             if minimum_upvote:
                 posts = posts.filter(Post.up_votes - Post.down_votes >= int(minimum_upvote))
             posts = posts.filter(Post.indexable == True)
+            if user_id != 0:
+                posts = posts.filter(Post.user_id == user_id)
             if q is not None:
                 posts = posts.search(q, sort=True if sort_by == '' else False)
             if type != 0:
@@ -152,6 +155,8 @@ def run_search():
                                                                               Post.deleted == False,
                                                                               Post.status > POST_STATUS_REVIEWING)
             replies = replies.filter(PostReply.indexable == True)
+            if user_id != 0:
+                replies = replies.filter(PostReply.user_id == user_id)
             if q is not None:
                 replies = replies.search(q, sort=True if sort_by == '' else False)
             if type != 0:

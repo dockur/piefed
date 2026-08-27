@@ -30,7 +30,7 @@ from sqlalchemy import desc, text
 
 from app.main.forms import ShareLinkForm
 from app.main.util import sidebar_active_communities, sidebar_new_instances, sidebar_upcoming_events, \
-    sidebar_new_communities, _base_list_communities_context
+    sidebar_new_communities, _base_list_communities_context, reload_url
 from app.translation import LibreTranslateAPI
 from app.utils import render_template, get_setting, request_etag_matches, return_304, blocked_domains, \
     ap_datetime, shorten_string, user_filters_home, \
@@ -194,28 +194,48 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
             (_('All posts'), f'index/feed/all{rss_token}'),
         ]
 
-    resp = make_response(render_template('index.html', posts=posts, active_communities=active_communities,
-                           new_communities=new_communities, upcoming_events=upcoming_events,
-                           show_post_community=True, low_bandwidth=low_bandwidth, recently_upvoted=recently_upvoted,
-                           recently_downvoted=recently_downvoted, new_instances=instances,
-                           communities_banned_from_list=communities_banned_from_list,
-                           SUBSCRIPTION_PENDING=SUBSCRIPTION_PENDING, SUBSCRIPTION_MEMBER=SUBSCRIPTION_MEMBER,
-                           etag=f"{sort}_{view_filter}_{hash(str(g.site.last_active))}", next_url=next_url,
-                           prev_url=prev_url, instance_stickies=instance_stickies,
-                           title=f"{g.site.name} - {g.site.description}",
-                           description=shorten_string(html_to_text(g.site.sidebar), 150),
-                           content_filters=content_filters, sort=sort, view_filter=view_filter,
-                           announcement=get_setting('announcement_html', get_setting('announcement')),
-                           reported_posts=reported_posts(user_id, user_id in g.admin_ids),
-                           user_notes=user_notes(user_id),
-                           joined_communities=joined_or_modding_communities(user_id),
-                           moderated_community_ids=moderating_communities_ids(user_id),
-                           inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
-                           enable_mod_filter=enable_mod_filter,
-                           has_topics=num_topics() > 0, time=time,
-                           user_pronouns=user_pronouns(),
-                           rss_feed=rss_feed
-                           ))
+    if request.args.get('fragment'):
+        resp = make_response(render_template('index_fragment.html', posts=posts,
+                                             show_post_community=True, low_bandwidth=low_bandwidth,
+                                             recently_upvoted=recently_upvoted,
+                                             recently_downvoted=recently_downvoted,
+                                             communities_banned_from_list=communities_banned_from_list,
+                                             SUBSCRIPTION_PENDING=SUBSCRIPTION_PENDING,
+                                             SUBSCRIPTION_MEMBER=SUBSCRIPTION_MEMBER,
+                                             etag=f"{sort}_{view_filter}_{hash(str(g.site.last_active))}",
+                                             instance_stickies=instance_stickies,
+                                             content_filters=content_filters, sort=sort, view_filter=view_filter,
+                                             reported_posts=reported_posts(user_id, user_id in g.admin_ids),
+                                             user_notes=user_notes(user_id),
+                                             joined_communities=joined_or_modding_communities(user_id),
+                                             moderated_community_ids=moderating_communities_ids(user_id),
+                                             enable_mod_filter=enable_mod_filter,
+                                             has_topics=num_topics() > 0, time=time,
+                                             user_pronouns=user_pronouns(),
+                                             ))
+    else:
+        resp = make_response(render_template('index.html', posts=posts, active_communities=active_communities,
+                               new_communities=new_communities, upcoming_events=upcoming_events,
+                               show_post_community=True, low_bandwidth=low_bandwidth, recently_upvoted=recently_upvoted,
+                               recently_downvoted=recently_downvoted, new_instances=instances,
+                               communities_banned_from_list=communities_banned_from_list,
+                               SUBSCRIPTION_PENDING=SUBSCRIPTION_PENDING, SUBSCRIPTION_MEMBER=SUBSCRIPTION_MEMBER,
+                               etag=f"{sort}_{view_filter}_{hash(str(g.site.last_active))}", next_url=next_url,
+                               prev_url=prev_url, instance_stickies=instance_stickies,
+                               title=f"{g.site.name} - {g.site.description}",
+                               description=shorten_string(html_to_text(g.site.sidebar), 150),
+                               content_filters=content_filters, sort=sort, view_filter=view_filter,
+                               announcement=get_setting('announcement_html', get_setting('announcement')),
+                               reported_posts=reported_posts(user_id, user_id in g.admin_ids),
+                               user_notes=user_notes(user_id),
+                               joined_communities=joined_or_modding_communities(user_id),
+                               moderated_community_ids=moderating_communities_ids(user_id),
+                               inoculation=inoculation[randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
+                               enable_mod_filter=enable_mod_filter,
+                               has_topics=num_topics() > 0, time=time,
+                               user_pronouns=user_pronouns(),
+                               rss_feed=rss_feed, reload_url=reload_url(sort, view_filter)
+                               ))
     if current_user.is_anonymous:
         resp.headers.set('ETag', f"{sort}_{view_filter}_{hash(str(g.site.last_active))}")
         resp.headers.set('Vary', 'Accept, Accept-Language')
@@ -1106,6 +1126,7 @@ def service_worker():
 @bp.route('/manifest.json', methods=['GET'])
 @bp.route('/static/manifest.json', methods=['GET'])
 def static_manifest():
+    g.site = Site.query.get(1)
     def get_manifest_for_os(os_family):
         base_dir = 'app/static/pwa_manifests'
         if os_family == 'mac os x':

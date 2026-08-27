@@ -3,9 +3,7 @@
   "@context": "https://schema.org",
   "@type": "SocialMediaPosting",
   "headline": {{ post.title|tojson }},
-  {% if post.body -%}
-  "text": {{ post.body|tojson }},
-  {% endif -%}
+  "text": {{ post.body|tojson if post.body else '""' }},
   {% if post.url -%}
   "url": {{ post.ap_id|tojson }},
   {% endif -%}

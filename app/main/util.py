@@ -86,3 +86,10 @@ def _base_list_communities_context():
         "joined_communities": joined_or_modding_communities(current_user.get_id()),
         "pending_communities": pending_communities(current_user.get_id())
     }
+
+
+def reload_url(sort, view_filter):
+    if current_user.is_authenticated:
+        if sort == 'new' or sort.startswith('top'):
+            return f'/home/{sort}/{view_filter}?fragment=1'
+    return ''
