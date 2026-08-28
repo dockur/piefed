@@ -2387,9 +2387,9 @@ def admin_media():
     if user_id:
         files = files.filter(user_file.c.user_id == user_id)
 
-    files = files.paginate(page=page, per_page=100, error_out=False)
-    next_url = url_for('admin.admin_media', page=files.next_num) if files.has_next else None
-    prev_url = url_for('admin.admin_media', page=files.prev_num) if files.has_prev and page != 1 else None
+    files = files.order_by(desc(File.id)).paginate(page=page, per_page=100, error_out=False)
+    next_url = url_for('admin.admin_media', page=files.next_num, user_id=user_id) if files.has_next else None
+    prev_url = url_for('admin.admin_media', page=files.prev_num, user_id=user_id) if files.has_prev and page != 1 else None
 
     return render_template('admin/media.html', files=files,
                            next_url=next_url, prev_url=prev_url, user_id=user_id)

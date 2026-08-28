@@ -112,8 +112,9 @@
                         {% if user.banned %}
                             <a href="#" data-url="{{ url_for('user.unban_profile', actor=user.link(), redirect="/admin/users") }}" class="confirm_first send_post">{{ _('Unban') }}</a>
                         {% else %}
-                            <a href="{{ url_for('user.ban_profile', actor=user.link()) }}" class="">{{ _('Ban') }}</a>
+                            <a href="{{ url_for('user.ban_profile', actor=user.link()) }}" class="">{{ _('Ban') }}</a>,
                         {% endif %}
+                        <a href="{{ url_for('admin.admin_media', user_id=user.id) }}">{{ _('Media') }}</a>
                     </td>
                 </tr>
             {% endfor %}
