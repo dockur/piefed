@@ -33,10 +33,12 @@ from app.community.util import save_icon_file, save_banner_file, search_for_comm
 from app.community.routes import do_subscribe
 from app.constants import REPORT_STATE_NEW, REPORT_STATE_ESCALATED, POST_STATUS_REVIEWING, ROLE_ADMIN
 from app.email import send_registration_approved_email
-from app.models import AllowedInstances, BannedInstances, ActivityPubLog, CronJobLog, utcnow, Site, Community, CommunityMember, \
+from app.models import AllowedInstances, BannedInstances, ActivityPubLog, CronJobLog, utcnow, Site, Community, \
+    CommunityMember, \
     User, Instance, File, Report, Topic, UserRegistration, Role, Post, PostReply, Language, RolePermission, Domain, \
-    Tag, DefederationSubscription, BlockedImage, CmsPage, Notification, Emoji
+    Tag, DefederationSubscription, BlockedImage, CmsPage, Notification, Emoji, user_file
 from app.shared.tasks import task_selector
+from app.shared.upload import process_file_delete
 from app.translation import LibreTranslateAPI
 from app.utils import render_template, permission_required, set_setting, get_setting, gibberish, markdown_to_html, \
     moderating_communities, joined_communities, finalize_user_setup, theme_list, blocked_phrases, blocked_referrers, \
@@ -2373,3 +2375,38 @@ def perf_test():
     result.append(f"Time: {elapsed:.3f} seconds")
     result.append(f"Iterations per second: {N / elapsed:,.0f}")
     return "<br>".join(result)
+
+
+@bp.route('/media', methods=['GET', 'POST'])
+@permission_required('administer all communities')
+@login_required
+def admin_media():
+    page = request.args.get('page', 1, int)
+    user_id = request.args.get('user_id', 0, int)
+    files = File.query.join(user_file).filter(user_file.c.file_id == File.id)
+    if user_id:
+        files = files.filter(user_file.c.user_id == user_id)
+
+    files = files.paginate(page=page, per_page=100, error_out=False)
+    next_url = url_for('admin.admin_media', page=files.next_num) if files.has_next else None
+    prev_url = url_for('admin.admin_media', page=files.prev_num) if files.has_prev and page != 1 else None
+
+    return render_template('admin/media.html', files=files,
+                           next_url=next_url, prev_url=prev_url)
+
+
+@bp.route('/media/<int:file_id>', methods=['GET', 'POST'])
+@permission_required('administer all users')
+@login_required
+def admin_media_details(file_id):
+    ...
+
+
+@bp.route('/media/<int:file_id>/delete', methods=['POST'])
+@permission_required('administer all users')
+@login_required
+def admin_media_delete(file_id):
+    file = File.query.get_or_404(file_id)
+    process_file_delete(file.source_url, file.user.first().id)
+    flash(_('File deleted.'))
+    return redirect(referrer(url_for('admin.admin_media')))

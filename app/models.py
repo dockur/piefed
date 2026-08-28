@@ -355,6 +355,14 @@ post_file = db.Table('post_file', db.Column('post_id', db.Integer, db.ForeignKey
                       )
 
 
+user_file = db.Table('user_file',
+                     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('file_id', db.Integer, db.ForeignKey('file.id')),
+                     db.Column('size', db.Integer),
+                     db.PrimaryKeyConstraint('user_id', 'file_id')
+                     )
+
+
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     file_path = db.Column(db.String(255))
@@ -367,6 +375,8 @@ class File(db.Model):
     thumbnail_width = db.Column(db.Integer)
     thumbnail_height = db.Column(db.Integer)
     hash = db.Column(BIT(256), index=True)
+
+    user = db.relationship('User', lazy='dynamic', secondary=user_file)
 
     def view_url(self, resize=False):
         if self.source_url:
@@ -400,6 +410,13 @@ class File(db.Model):
             return self.thumbnail_path
         thumbnail_path = self.thumbnail_path[4:] if self.thumbnail_path.startswith('app/') else self.thumbnail_path
         return f"{current_app.config['SERVER_URL']}/{thumbnail_path}"   # image paths must include fqdn (not just starting with /) because apps need to make a request from outside
+
+    def is_image(self):
+        common_image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.avif', '.svg+xml',
+                                   '.svg+xml; charset=utf-8']
+        parsed_url = urlparse(self.thumbnail_url())
+        path = parsed_url.path.lower()
+        return any(path.endswith(extension) for extension in common_image_extensions)
 
     def delete_from_disk(self, purge_cdn=True):
         purge_from_cache = []
@@ -919,14 +936,6 @@ user_role = db.Table('user_role',
                      db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
                      db.Column('role_id', db.Integer, db.ForeignKey('role.id')),
                      db.PrimaryKeyConstraint('user_id', 'role_id')
-                     )
-
-
-user_file = db.Table('user_file',
-                     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-                     db.Column('file_id', db.Integer, db.ForeignKey('file.id')),
-                     db.Column('size', db.Integer),
-                     db.PrimaryKeyConstraint('user_id', 'file_id')
                      )
 
 # table to hold users' read post ids
