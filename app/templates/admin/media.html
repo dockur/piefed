@@ -1,0 +1,62 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% set active_child = 'admin_media' %}
+
+{% block app_content %}
+{% include 'admin/_tabbed_nav.html' %}
+<br>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>{{ _('Media') }}</h2>
+        </div>
+        {% if user_id %}
+            <a href="#" data-url="{{ url_for('admin.admin_media_delete_all', user_id=user_id) }}" class="btn-primary btn btn-warning confirm_first send_post float-right">{{ _('Delete everything by this user') }}</a>
+        {% endif %}
+        <p>{{ _('Here are all the media files that people have uploaded into their personal library for use in the body of posts and comments.') }}</p>
+        {% if files and files.items %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>{{ _('Thumbnail') }}</th>
+                            <th>{{ _('Owner') }}</th>
+                            <th>{{ _('Delete') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                        <tr>
+                            <td>{% if file.is_image() %}<a href="{{ file.view_url() }}"><img src="{{ file.thumbnail_url() }}" width="100"></a>{% endif %}</td>
+                            <td>{% for u in file.user %}<a href="?user_id={{ u.id }}">{{ u.display_name() }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
+                            <td>
+                                <a href='#' data-url="{{ url_for('admin.admin_media_delete', file_id=file.id) }}" class="confirm_first send_post">{{ _('Delete') }}</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <nav aria-label="{{ _('Pagination') }}" class="mt-4" role="navigation">
+            {% if prev_url %}
+                <a href="{{ prev_url }}" class="btn btn-primary">
+                    <span aria-hidden="true">&larr;</span> {{ _('Previous page') }}
+                </a>
+            {% endif %}
+            {% if next_url %}
+                <a href="{{ next_url }}" class="btn btn-primary">
+                    {{ _('Next page') }} <span aria-hidden="true">&rarr;</span>
+                </a>
+            {% endif %}
+        </nav>
+        {% else %}
+            <p>{{ _('No media have been uploaded yet.') }}</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

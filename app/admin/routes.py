@@ -33,10 +33,12 @@ from app.community.util import save_icon_file, save_banner_file, search_for_comm
 from app.community.routes import do_subscribe
 from app.constants import REPORT_STATE_NEW, REPORT_STATE_ESCALATED, POST_STATUS_REVIEWING, ROLE_ADMIN
 from app.email import send_registration_approved_email
-from app.models import AllowedInstances, BannedInstances, ActivityPubLog, CronJobLog, utcnow, Site, Community, CommunityMember, \
+from app.models import AllowedInstances, BannedInstances, ActivityPubLog, CronJobLog, utcnow, Site, Community, \
+    CommunityMember, \
     User, Instance, File, Report, Topic, UserRegistration, Role, Post, PostReply, Language, RolePermission, Domain, \
-    Tag, DefederationSubscription, BlockedImage, CmsPage, Notification, Emoji
+    Tag, DefederationSubscription, BlockedImage, CmsPage, Notification, Emoji, user_file
 from app.shared.tasks import task_selector
+from app.shared.upload import process_file_delete
 from app.translation import LibreTranslateAPI
 from app.utils import render_template, permission_required, set_setting, get_setting, gibberish, markdown_to_html, \
     moderating_communities, joined_communities, finalize_user_setup, theme_list, blocked_phrases, blocked_referrers, \
@@ -1867,22 +1869,46 @@ def admin_user_delete(user_id):
     user.deleted_by = current_user.id
     db.session.commit()
 
-    if user.is_local():
-        if user.private_key is not None:  # They have a private key once the registration is fully completed
-            unsubscribe_from_everything_then_delete(user.id)
-        else:  # Non-finalized users can just be deleted as they will not have been federated anywhere.
-            user.deleted = True
-            user.delete_dependencies()
-            db.session.commit()
+    if current_app.debug:
+        admin_user_delete_task(user_id, current_user.id)
     else:
-        user.deleted = True
-        user.delete_dependencies()
-        db.session.commit()
-
-        add_to_modlog('delete_user', actor=current_user, target_user=user, link_text=user.display_name(), link=user.link())
+        admin_user_delete_task.delay(user_id, current_user.id)
 
     flash(_('User deleted'))
     return redirect(referrer())
+
+
+@celery.task
+def admin_user_delete_task(user_id, current_user_id):
+    with current_app.app_context():
+        session = get_task_session()
+        try:
+            with patch_db_session(session):
+                user: User = session.query(User).get(user_id)
+                current_usr = session.query(User).get(current_user_id)
+                if user:
+                    if user.is_local():
+                        if user.private_key is not None:  # They have a private key once the registration is fully completed
+                            unsubscribe_from_everything_then_delete(user.id)
+                        else:  # Non-finalized users can just be deleted as they will not have been federated anywhere.
+                            user.delete_dependencies()
+                            db.session.execute(text('UPDATE "user" SET deleted = true, banned = true WHERE id = :user_id'),
+                                               {'user_id': user.id})
+                            db.session.commit()
+                    else:
+                        user.delete_dependencies()
+                        db.session.execute(text('UPDATE "user" SET deleted = true, banned = true WHERE id = :user_id'), {'user_id': user.id})
+                        db.session.commit()
+
+                        add_to_modlog('delete_user', actor=current_usr, target_user=user, link_text=user.display_name(),
+                                      link=user.link())
+
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
 
 
 
@@ -2373,3 +2399,62 @@ def perf_test():
     result.append(f"Time: {elapsed:.3f} seconds")
     result.append(f"Iterations per second: {N / elapsed:,.0f}")
     return "<br>".join(result)
+
+
+@bp.route('/media', methods=['GET', 'POST'])
+@permission_required('administer all communities')
+@login_required
+def admin_media():
+    page = request.args.get('page', 1, int)
+    user_id = request.args.get('user_id', 0, int)
+    files = File.query.join(user_file).filter(user_file.c.file_id == File.id)
+    if user_id:
+        files = files.filter(user_file.c.user_id == user_id)
+
+    files = files.order_by(desc(File.id)).paginate(page=page, per_page=100, error_out=False)
+    next_url = url_for('admin.admin_media', page=files.next_num, user_id=user_id) if files.has_next else None
+    prev_url = url_for('admin.admin_media', page=files.prev_num, user_id=user_id) if files.has_prev and page != 1 else None
+
+    return render_template('admin/media.html', files=files,
+                           next_url=next_url, prev_url=prev_url, user_id=user_id)
+
+
+@bp.route('/media/<int:file_id>/delete', methods=['POST'])
+@permission_required('administer all users')
+@login_required
+def admin_media_delete(file_id):
+    file = File.query.get_or_404(file_id)
+    process_file_delete(file.source_url, file.user.first().id)
+    flash(_('File deleted.'))
+    return redirect(referrer(url_for('admin.admin_media')))
+
+
+@bp.route('/media/<int:user_id>/delete_all', methods=['POST'])
+@permission_required('administer all users')
+@login_required
+def admin_media_delete_all(user_id):
+    if current_app.debug:
+        delete_user_files_in_background(user_id)
+    else:
+        delete_user_files_in_background.delay(user_id)
+    flash(_('Files deleted in the background - this might take a while.'))
+    return redirect(url_for('admin.admin_media'))
+
+
+@celery.task
+def delete_user_files_in_background(user_id):
+    with current_app.app_context():
+        session = get_task_session()
+        try:
+            with patch_db_session(session):
+
+                files = session.query(File).join(user_file).filter(user_file.c.file_id == File.id)
+                files = files.filter(user_file.c.user_id == user_id)
+                for file in files:
+                    process_file_delete(file.source_url, file.user.first().id)
+
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()

@@ -65,32 +65,25 @@ class MediaLibrary {
      * @param {number} delay - Delay in ms to wait for DownArea initialization (default: 100)
      */
     overrideDownAreaImageButton(textareaSelector, delay = 100) {
-        setTimeout(() => {
-            let imageButton;
+        let attempts = 0;
+        const maxAttempts = 3;
 
-            console.log('overrideDownAreaImageButton called with selector:', textareaSelector, 'delay:', delay);
+        const tryOverride = () => {
+            let imageButton;
+            attempts++;
 
             if (textareaSelector) {
                 // Find image button within specific textarea's DownArea toolbar
                 const textarea = document.querySelector(textareaSelector);
-                console.log('Found textarea:', textarea);
-
                 if (textarea && textarea.parentNode && textarea.parentNode.parentNode) {
-                    console.log('parentNode:', textarea.parentNode);
-                    console.log('parentNode.parentNode:', textarea.parentNode.parentNode);
                     imageButton = textarea.parentNode.parentNode.querySelector('.downarea-toolbar-tool[data-action="image"]');
-                    console.log('Found image button:', imageButton);
-                } else {
-                    console.log('Could not navigate parent nodes');
                 }
             } else {
                 // Find first image button on page
                 imageButton = document.querySelector('.downarea-toolbar-tool[data-action="image"]');
-                console.log('Found first image button on page:', imageButton);
             }
 
             if (imageButton) {
-                console.log('Overriding image button click handler');
                 // Remove the default click handler by cloning the element
                 const newImageButton = imageButton.cloneNode(true);
                 imageButton.parentNode.replaceChild(newImageButton, imageButton);
@@ -99,15 +92,20 @@ class MediaLibrary {
                 newImageButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Media library image button clicked, triggerLink:', this.triggerLink);
                     if (this.triggerLink) {
                         this.triggerLink.click();
                     }
                 });
+            } else if (attempts < maxAttempts) {
+                // Retry again
+                setTimeout(tryOverride, delay);
             } else {
                 console.log('Image button NOT found!');
             }
-        }, delay);
+        };
+
+        // Initial delay before first attempt
+        setTimeout(tryOverride, delay);
     }
 
     setupDialogHandlers() {

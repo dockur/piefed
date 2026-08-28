@@ -12,6 +12,7 @@
             {% endif -%}
             {% if user_access('administer all users', current_user.id) %}
                 <a class="nav-link{% if active_child == 'admin_users' %} active{% endif %}" id="users-tab" type="button" role="tab" href="/admin/users" style="view-transition-name: users">{{ _('Users') }}</a>
+                <a class="nav-link{% if active_child == 'admin_media' %} active{% endif %}" id="media-tab" type="button" role="tab" href="/admin/media" style="view-transition-name: users">{{ _('Media') }}</a>
             {% endif -%}
             {% if g.site.registration_mode == 'RequireApplication' and user_access('approve registrations', current_user.id) %}
                 <a class="nav-link{% if active_child == 'admin_approve_registrations' %} active{% endif %}" id="users-tab" type="button" role="tab" href="/admin/approve_registrations" style="view-transition-name: approve">{{ _('Registration') }}</a>

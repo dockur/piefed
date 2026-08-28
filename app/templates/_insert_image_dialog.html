@@ -1,5 +1,5 @@
 <dialog id="insertImageDialog">
-    <div class="p-3">
+    <div class="p-3 pb-0">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">{{ _('Insert image') }}</h5>
             <button type="button" class="btn-close" aria-label="{{ _('Close') }}" id="insert_image_dialog_close"></button>
@@ -13,5 +13,6 @@
         </div>
         <hr>
         <div id="loadImagesHere"></div>
+        <p class="small mt-3">{{ _('These files are not very private - %(domain)s admins may review them occasionally.', domain=instance_domain) }}</p>
     </div>
 </dialog>
