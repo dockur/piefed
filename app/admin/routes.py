@@ -2392,14 +2392,7 @@ def admin_media():
     prev_url = url_for('admin.admin_media', page=files.prev_num) if files.has_prev and page != 1 else None
 
     return render_template('admin/media.html', files=files,
-                           next_url=next_url, prev_url=prev_url)
-
-
-@bp.route('/media/<int:file_id>', methods=['GET', 'POST'])
-@permission_required('administer all users')
-@login_required
-def admin_media_details(file_id):
-    ...
+                           next_url=next_url, prev_url=prev_url, user_id=user_id)
 
 
 @bp.route('/media/<int:file_id>/delete', methods=['POST'])
@@ -2410,3 +2403,34 @@ def admin_media_delete(file_id):
     process_file_delete(file.source_url, file.user.first().id)
     flash(_('File deleted.'))
     return redirect(referrer(url_for('admin.admin_media')))
+
+
+@bp.route('/media/<int:user_id>/delete_all', methods=['POST'])
+@permission_required('administer all users')
+@login_required
+def admin_media_delete_all(user_id):
+    if current_app.debug:
+        delete_user_files_in_background(user_id)
+    else:
+        delete_user_files_in_background.delay(user_id)
+    flash(_('Files deleted in the background - this might take a while.'))
+    return redirect(url_for('admin.admin_media'))
+
+
+@celery.task
+def delete_user_files_in_background(user_id):
+    with current_app.app_context():
+        session = get_task_session()
+        try:
+            with patch_db_session(session):
+
+                files = session.query(File).join(user_file).filter(user_file.c.file_id == File.id)
+                files = files.filter(user_file.c.user_id == user_id)
+                for file in files:
+                    process_file_delete(file.source_url, file.user.first().id)
+
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()

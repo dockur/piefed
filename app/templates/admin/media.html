@@ -14,9 +14,11 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>{{ _('Media') }}</h2>
         </div>
-
+        {% if user_id %}
+            <a href="#" data-url="{{ url_for('admin.admin_media_delete_all', user_id=user_id) }}" class="btn-primary btn btn-warning confirm_first send_post float-right">{{ _('Delete everything by this user') }}</a>
+        {% endif %}
         <p>{{ _('Here are all the media files that people have uploaded into their personal library for use in the body of posts and comments.') }}</p>
-        {% if files %}
+        {% if files and files.items %}
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
