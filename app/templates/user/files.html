@@ -23,6 +23,7 @@
         {% if total_size %}
             <p>{{ _('You are using %(size)s out of a quota of %(max_size)s', size=total_size | human_filesize, max_size=max_size | human_filesize) }}</p>
         {% endif %}
+        <p>{{ _('These files are not very private - %(domain)s admins may review them occasionally.', domain=instance_domain) }}</p>
         <div class="media_list">
             <table class="table table-responsive">
             {% for file in files.items -%}
