@@ -53,9 +53,8 @@ def unsubscribe_from_everything_then_delete_task(user_id):
                             if instance.inbox and instance.online() and instance.id != 1:  # instance id 1 is always the current instance
                                 send_post_request(instance.inbox, payload, user.private_key, f"{user.public_url()}#main-key")
 
-                user.banned = True
-                user.deleted = True
                 user.delete_dependencies()
+                db.session.execute(text('UPDATE "user" SET deleted = true, banned = true WHERE id = :user_id'), {'user_id': user.id})
                 session.commit()
         except Exception:
             session.rollback()

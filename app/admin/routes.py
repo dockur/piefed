@@ -1869,22 +1869,46 @@ def admin_user_delete(user_id):
     user.deleted_by = current_user.id
     db.session.commit()
 
-    if user.is_local():
-        if user.private_key is not None:  # They have a private key once the registration is fully completed
-            unsubscribe_from_everything_then_delete(user.id)
-        else:  # Non-finalized users can just be deleted as they will not have been federated anywhere.
-            user.deleted = True
-            user.delete_dependencies()
-            db.session.commit()
+    if current_app.debug:
+        admin_user_delete_task(user_id, current_user.id)
     else:
-        user.deleted = True
-        user.delete_dependencies()
-        db.session.commit()
-
-        add_to_modlog('delete_user', actor=current_user, target_user=user, link_text=user.display_name(), link=user.link())
+        admin_user_delete_task.delay(user_id, current_user.id)
 
     flash(_('User deleted'))
     return redirect(referrer())
+
+
+@celery.task
+def admin_user_delete_task(user_id, current_user_id):
+    with current_app.app_context():
+        session = get_task_session()
+        try:
+            with patch_db_session(session):
+                user: User = session.query(User).get(user_id)
+                current_usr = session.query(User).get(current_user_id)
+                if user:
+                    if user.is_local():
+                        if user.private_key is not None:  # They have a private key once the registration is fully completed
+                            unsubscribe_from_everything_then_delete(user.id)
+                        else:  # Non-finalized users can just be deleted as they will not have been federated anywhere.
+                            user.delete_dependencies()
+                            db.session.execute(text('UPDATE "user" SET deleted = true, banned = true WHERE id = :user_id'),
+                                               {'user_id': user.id})
+                            db.session.commit()
+                    else:
+                        user.delete_dependencies()
+                        db.session.execute(text('UPDATE "user" SET deleted = true, banned = true WHERE id = :user_id'), {'user_id': user.id})
+                        db.session.commit()
+
+                        add_to_modlog('delete_user', actor=current_usr, target_user=user, link_text=user.display_name(),
+                                      link=user.link())
+
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
 
 
 

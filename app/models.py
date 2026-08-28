@@ -1449,18 +1449,45 @@ class User(UserMixin, db.Model):
         return User.query.get(id)
 
     def delete_dependencies(self):
-        if self.cover_id:
-            file = db.session.query(File).get(self.cover_id)
-            file.delete_from_disk()
-            self.cover_id = None
-            db.session.delete(file)
-        if self.avatar_id:
-            file = db.session.query(File).get(self.avatar_id)
-            file.delete_from_disk()
-            self.avatar_id = None
-            db.session.delete(file)
+        # Get cover and avatar file IDs before clearing references
+        cover_file_id = self.cover_id
+        avatar_file_id = self.avatar_id
+        
+        # Clear references first
+        self.cover_id = None
+        self.avatar_id = None
+        db.session.flush()
+        
         if self.waiting_for_approval():
             db.session.query(UserRegistration).filter(UserRegistration.user_id == self.id).delete()
+        
+        # Handle user_file associations
+        user_files = db.session.query(File).join(user_file).filter(user_file.c.user_id == self.id).all()
+        for file in user_files:
+            file.delete_from_disk(purge_cdn=False)
+            db.session.execute(text('DELETE FROM "user_file" WHERE file_id = :file_id'), {'file_id': file.id})
+        
+        # Now handle cover and avatar files - delete them one at a time
+        # after checking they're no longer referenced
+        for file_id in [cover_file_id, avatar_file_id]:
+            if file_id is None:
+                continue
+            file = db.session.query(File).get(file_id)
+            if file is None:
+                continue
+            
+            # Check if any user still references this file
+            if db.session.query(User).filter(
+                or_(User.cover_id == file_id, User.avatar_id == file_id)
+            ).count() > 0:
+                continue
+            # Check user_file table
+            if db.session.query(user_file).filter(user_file.c.file_id == file_id).count() > 0:
+                continue
+            
+            # Safe to delete
+            file.delete_from_disk()
+            db.session.delete(file)
         db.session.execute(text('DELETE FROM "post_vote" WHERE user_id = :user_id'), {'user_id': self.id})
         db.session.execute(text('DELETE FROM "post_reply_vote" WHERE user_id = :user_id'), {'user_id': self.id})
         db.session.execute(text('DELETE FROM "user_role" WHERE user_id = :user_id'), {'user_id': self.id})
