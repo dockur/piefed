@@ -2206,6 +2206,7 @@ def show_profile_rss(actor):
         description = shorten_string(user.about, 150) if user.about else None
         og_image = user.avatar_image() if user.avatar_id else None
         fg = FeedGenerator()
+        fg.load_extension('dc', rss=True)
         fg.id(f"{current_app.config['SERVER_URL']}/u/{actor}")
         fg.title(f'{user.display_name()} on {g.site.name}')
         fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}", rel='alternate')
@@ -2246,7 +2247,7 @@ def show_profile_rss(actor):
             if post.body_html.strip():
                 fe.description(post.body_html.strip())
             fe.guid(post.profile_id(), permalink=True)
-            fe.author(name=post.author.user_name)
+            fe.dc.dc_creator(post.author.user_name)
             fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
 
         response = make_response(fg.rss_str())

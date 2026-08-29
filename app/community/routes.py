@@ -723,6 +723,7 @@ def show_community_rss(actor):
         description = shorten_string(community.description, 150) if community.description else None
         og_image = community.image.source_url if community.image_id else None
         fg = FeedGenerator()
+        fg.load_extension('dc', rss=True)
         fg.id(f"{current_app.config['SERVER_URL']}/c/{actor}")
         fg.title(f'{community.title} on {g.site.name}')
         fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}", rel='alternate')
@@ -750,7 +751,7 @@ def show_community_rss(actor):
                     fe.enclosure(post.url, type=type)
             fe.description(post.body_html)
             fe.guid(post.profile_id(), permalink=True)
-            fe.author(name=post.author.user_name)
+            fe.dc.dc_creator(post.author.user_name)
             fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
 
         response = make_response(fg.rss_str())
