@@ -2643,11 +2643,11 @@ function setupAutoReload() {
         if (window.scrollY === 0 && reloadsDone <= 120) {
             htmx.trigger("#auto-reload", "refreshFragment");    // in index.html there is hx-trigger="refreshFragment"
             reloadsDone += 1;
-            document.title = oldTitle + ` (refreshed ${new Date().toLocaleTimeString([], {
+            /*document.title = oldTitle + ` (refreshed ${new Date().toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true
-            })})`;
+            })})`; */
             setTimeout(setupVotableElements, 2000); // so people can vote with A and Z keys
         }
     }, 60000);  // once per minute
