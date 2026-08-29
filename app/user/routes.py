@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from io import BytesIO
 
 from feedgen.feed import FeedGenerator
+from slash import SlashExtension, SlashEntryExtension
 from flask import redirect, url_for, flash, request, make_response, session, current_app, abort, json, g, send_file
 from flask_babel import _, lazy_gettext as _l
 from flask_login import logout_user, current_user
@@ -2207,6 +2208,7 @@ def show_profile_rss(actor):
         og_image = user.avatar_image() if user.avatar_id else None
         fg = FeedGenerator()
         fg.load_extension('dc', rss=True)
+        fg.register_extension('slash', SlashExtension, SlashEntryExtension)
         fg.id(f"{current_app.config['SERVER_URL']}/u/{actor}")
         fg.title(f'{user.display_name()} on {g.site.name}')
         fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}", rel='alternate')
@@ -2249,6 +2251,7 @@ def show_profile_rss(actor):
             fe.guid(post.profile_id(), permalink=True)
             fe.dc.dc_creator(post.author.user_name)
             fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
+            fe.slash.comments(post.reply_count_cross_posted)  # TODO or just post.reply_count ?
 
             if post.community:
                 fe.category(term=post.community.name)

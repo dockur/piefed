@@ -66,6 +66,7 @@ from app.shared.community import leave_community
 from app.shared.feed import leave_feed
 from app.utils import get_recipient_language, subscribed_feeds, feed_membership
 from feedgen.feed import FeedGenerator
+from slash import SlashExtension, SlashEntryExtension
 from datetime import timezone, timedelta
 
 
@@ -724,6 +725,7 @@ def show_community_rss(actor):
         og_image = community.image.source_url if community.image_id else None
         fg = FeedGenerator()
         fg.load_extension('dc', rss=True)
+        fg.register_extension('slash', SlashExtension, SlashEntryExtension)
         fg.id(f"{current_app.config['SERVER_URL']}/c/{actor}")
         fg.title(f'{community.title} on {g.site.name}')
         fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}", rel='alternate')
@@ -753,6 +755,7 @@ def show_community_rss(actor):
             fe.guid(post.profile_id(), permalink=True)
             fe.dc.dc_creator(post.author.user_name)
             fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
+            fe.slash.comments(post.reply_count_cross_posted)  # TODO or just post.reply_count ?
 
             if post.community:
                 fe.category(term=post.community.name)
