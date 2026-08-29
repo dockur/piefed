@@ -2199,8 +2199,10 @@ def show_profile_rss(actor):
         if request_etag_matches(current_etag):
             return return_304(current_etag, 'application/rss+xml')
 
+        limit = request.args.get('limit', 20, int)
+        limit = max(min(limit, 100), 0)
         posts = user.posts.filter(Post.from_bot == False, Post.deleted == False,
-                                  Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(20).all()
+                                  Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(limit).all()
         description = shorten_string(user.about, 150) if user.about else None
         og_image = user.avatar_image() if user.avatar_id else None
         fg = FeedGenerator()

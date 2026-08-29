@@ -716,7 +716,9 @@ def show_community_rss(actor):
         if score:
             posts = posts.filter(Post.score >= score)
 
-        posts = posts.order_by(desc(Post.created_at)).limit(20).all()
+        limit = request.args.get('limit', 20, int)
+        limit = max(min(limit, 100), 0)
+        posts = posts.order_by(desc(Post.created_at)).limit(limit).all()
 
         description = shorten_string(community.description, 150) if community.description else None
         og_image = community.image.source_url if community.image_id else None
