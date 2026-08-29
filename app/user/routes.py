@@ -2228,11 +2228,9 @@ def show_profile_rss(actor):
             # Validate title and body - skip this post if invalid
             if not is_valid_xml_utf8(post.title.strip()):
                 continue
-            if post.body_html is None:
-                continue
             if post.body_html.strip() and not is_valid_xml_utf8(post.body_html.strip()):
                 continue
-            
+
             fe = fg.add_entry()
             fe.title(post.title.strip())
             if post.slug:
@@ -2243,7 +2241,7 @@ def show_profile_rss(actor):
                 if post.url in already_added:
                     continue
                 type = mimetype_from_url(post.url)
-                if type and not type.startswith('text/'):
+                if type:
                     fe.enclosure(post.url, type=type)
                 already_added.add(post.url)
             if post.body_html.strip():

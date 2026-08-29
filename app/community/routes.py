@@ -749,8 +749,9 @@ def show_community_rss(actor):
                 fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
             if post.url:
                 type = mimetype_from_url(post.url)
-                if type and not type.startswith('text/'):
+                if type:
                     fe.enclosure(post.url, type=type)
+
             fe.description(post.body_html)
             fe.guid(post.profile_id(), permalink=True)
             fe.dc.dc_creator(post.author.user_name)
