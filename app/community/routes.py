@@ -754,6 +754,12 @@ def show_community_rss(actor):
             fe.dc.dc_creator(post.author.user_name)
             fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
 
+            if post.community:
+                fe.category(term=post.community.name)
+            for cat in set([flair.flair for flair in post.flair] + [tag.name for tag in post.tags]):
+                if cat:
+                    fe.category(term=cat, scheme='flair/tag')
+
         response = make_response(fg.rss_str())
         response.headers.set('Content-Type', 'application/rss+xml')
         response.headers.add_header('ETag', f"{community.id}_{hash(community.last_active)}")
