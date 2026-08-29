@@ -2204,9 +2204,9 @@ def show_profile_rss(actor):
         description = shorten_string(user.about, 150) if user.about else None
         og_image = user.avatar_image() if user.avatar_id else None
         fg = FeedGenerator()
-        fg.id(f"{current_app.config['SERVER_URL']}/c/{actor}")
+        fg.id(f"{current_app.config['SERVER_URL']}/u/{actor}")
         fg.title(f'{user.display_name()} on {g.site.name}')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}", rel='alternate')
+        fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}", rel='alternate')
         if og_image:
             fg.logo(og_image)
         else:
@@ -2215,7 +2215,7 @@ def show_profile_rss(actor):
             fg.subtitle(description)
         else:
             fg.subtitle(' ')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}/feed", rel='self')
+        fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}/feed", rel='self')
         fg.language('en')
 
         already_added = set()
