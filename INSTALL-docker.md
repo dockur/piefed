@@ -2,7 +2,7 @@
 
 #### PRE-INSTALL REQUIREMENTS
 - Registered domain name for external access
-- Require SSL connection (Nginx/Caddy reverse proxy, Cloudflare Zero Trust Tunnel, Tailscale, Ngrok, etc.)
+- SSL connection required (Nginx/Caddy reverse proxy, Cloudflare Zero Trust Tunnel, Tailscale, Ngrok, etc.)
 
 Note: This guide uses `docker compose`. Depending on your docker setup, you may need to use the command `docker-compose` instead.
 
