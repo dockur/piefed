@@ -740,7 +740,7 @@ def show_community_rss(actor):
         fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}/feed", rel='self')
         fg.language('en')
 
-        for post in posts:
+        for post in reversed(posts):
             fe = fg.add_entry()
             fe.title(post.title)
             if post.slug:

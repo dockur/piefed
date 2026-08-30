@@ -2224,7 +2224,7 @@ def show_profile_rss(actor):
         fg.language('en')
 
         already_added = set()
-        for post in posts:
+        for post in reversed(posts):
             # Validate title and body - skip this post if invalid
             if not is_valid_xml_utf8(post.title.strip()):
                 continue
