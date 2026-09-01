@@ -2204,7 +2204,7 @@ def show_profile_rss(actor):
         limit = max(min(limit, 100), 0)
         posts = user.posts.filter(Post.from_bot == False, Post.deleted == False,
                                   Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(limit).all()
-        description = shorten_string(user.about, 150) if user.about else None
+        description = shorten_string(user.about, 150) if user.about else ' '
         og_image = user.avatar_image() if user.avatar_id else None
         fg = FeedGenerator()
         fg.load_extension('dc', rss=True)
@@ -2216,10 +2216,7 @@ def show_profile_rss(actor):
             fg.logo(og_image)
         else:
             fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-        if description:
-            fg.subtitle(description)
-        else:
-            fg.subtitle(' ')
+        fg.subtitle(description)
         fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}/feed", rel='self')
         fg.language('en')
 

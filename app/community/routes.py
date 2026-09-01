@@ -721,7 +721,7 @@ def show_community_rss(actor):
         limit = max(min(limit, 100), 0)
         posts = posts.order_by(desc(Post.created_at)).limit(limit).all()
 
-        description = shorten_string(community.description, 150) if community.description else None
+        description = shorten_string(community.description, 150) if community.description else ' '
         og_image = community.image.source_url if community.image_id else None
         fg = FeedGenerator()
         fg.load_extension('dc', rss=True)
@@ -733,10 +733,7 @@ def show_community_rss(actor):
             fg.logo(og_image)
         else:
             fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-        if description:
-            fg.subtitle(description)
-        else:
-            fg.subtitle(' ')
+        fg.subtitle(description)
         fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}/feed", rel='self')
         fg.language('en')
 
