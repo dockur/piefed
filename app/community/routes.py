@@ -726,7 +726,6 @@ def show_community_rss(actor):
         fg = FeedGenerator()
         fg.load_extension('dc', rss=True)
         fg.register_extension('slash', SlashExtension, SlashEntryExtension)
-        fg.id(f"{current_app.config['SERVER_URL']}/c/{actor}")
         fg.title(f'{community.title} on {g.site.name}')
         fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}", rel='alternate')
         if og_image:

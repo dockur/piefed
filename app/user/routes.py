@@ -2209,7 +2209,6 @@ def show_profile_rss(actor):
         fg = FeedGenerator()
         fg.load_extension('dc', rss=True)
         fg.register_extension('slash', SlashExtension, SlashEntryExtension)
-        fg.id(f"{current_app.config['SERVER_URL']}/u/{actor}")
         fg.title(f'{user.display_name()} on {g.site.name}')
         fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}", rel='alternate')
         if og_image:
