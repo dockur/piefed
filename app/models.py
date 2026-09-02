@@ -2470,13 +2470,6 @@ class Post(db.Model):
     def is_event(self):
         return self.type == constants.POST_TYPE_EVENT
 
-    def event_start(self):
-        if self.is_event():
-            if self.event.start:
-                return self.event.start
-        else:
-            return False
-
     def profile_id(self):
         if self.ap_id:
             return self.ap_id
