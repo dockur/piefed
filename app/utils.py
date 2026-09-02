@@ -4720,3 +4720,12 @@ def inspect_image_c2pa(data: bytes, mimetype: str) -> dict:
         # No C2PA manifest, unsupported format, etc.
         pass
     return result
+
+def get_event_start(post_id: int):
+    post = Post.query.get(post_id)
+
+    if post and post.is_event():
+        if getattr(post.event, "start", False):
+            return post.event.start
+
+    return None
