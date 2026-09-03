@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tini \
     curl \
     ca-certificates \
+    procps \
     postgresql-client \
     tesseract-ocr \
     tesseract-ocr-eng && \
