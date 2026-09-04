@@ -270,7 +270,7 @@
     {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
     {% if post.body_html -%}
         <div class="post_teaser_article_preview small post_teaser_clickable {{ 'blur' if blur_content }}" lang="{{ post.language_code() }}">
-            {% if post.event and post.event.start %}<time class="convert_to_local">{{ post.event.start.strftime('%Y-%m-%dT%H:%M:%SZ') }}</time>{% endif %}
+            {% if post.is_event() and get_event_start(post.id) %}<time class="convert_to_local">{{ get_event_start(post.id).strftime('%Y-%m-%dT%H:%M:%SZ') }}</time>{% endif %}
             {{ first_paragraph(post.body_html) | safe }}
         </div>
     {% endif -%}
