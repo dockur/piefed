@@ -4,10 +4,10 @@ import re
 from datetime import timedelta
 from time import sleep
 from io import BytesIO
-import json as python_json
+import orjson
 import shutil
 
-from flask import request, flash, json, url_for, current_app, redirect, g, abort, send_file
+from flask import request, flash, json, url_for, current_app, redirect, g, abort, send_file, make_response
 from flask_login import current_user, login_user
 from flask_babel import _, ngettext
 from slugify import slugify
@@ -24,10 +24,11 @@ from app.admin.constants import ReportTypes
 from app.admin.forms import FederationForm, SiteMiscForm, SiteProfileForm, EditCommunityForm, EditUserForm, \
     EditTopicForm, SendNewsletterForm, AddUserForm, PreLoadCommunitiesForm, ImportExportBannedListsForm, \
     EditInstanceForm, RemoteInstanceScanForm, MoveCommunityForm, EditBlockedImageForm, AddBlockedImageForm, \
-    CmsPageForm, CreateOfflineInstanceForm, InstanceChooserForm, CloseInstanceForm, EmojiForm
+    CmsPageForm, CreateOfflineInstanceForm, InstanceChooserForm, CloseInstanceForm, EmojiForm, TopicImportForm
 from flask_wtf import FlaskForm
 from app.admin.util import unsubscribe_from_everything_then_delete, unsubscribe_from_community, send_newsletter, \
-    topics_for_form, move_community_images_to_here, switch_to_unsilenced, switch_to_silenced
+    topics_for_form, move_community_images_to_here, switch_to_unsilenced, switch_to_silenced, serialize_topic_tree, \
+    create_topic_and_children
 from app.auth.util import send_email_verification, random_token
 from app.community.util import save_icon_file, save_banner_file, search_for_community, is_bad_name
 from app.community.routes import do_subscribe
@@ -967,15 +968,11 @@ def admin_federation_ban_lists():
                 banned_users.append(user_ban.ap_id)
         ban_lists_dict['banned_users'] = banned_users
 
-        # setup the BytesIO buffer
         buffer = BytesIO()
-        buffer.write(str(python_json.dumps(ban_lists_dict)).encode('utf-8'))
+        buffer.write(orjson.dumps(ban_lists_dict))
         buffer.seek(0)
 
         # send the file to the user as a download
-        # the as_attachment=True results in flask
-        # redirecting to the current page, so no
-        # url_for needed here
         return send_file(buffer, download_name=f'{current_app.config["SERVER_NAME"]}_bans.json', as_attachment=True,
                          mimetype='application/json')
 
@@ -1429,6 +1426,62 @@ def unsubscribe_everyone_then_delete_task(community_id):
 def admin_topics():
     topics = topic_tree()
     return render_template('admin/topics.html', title=_('Topics'), topics=topics)
+
+
+@bp.route('/topics/export', methods=['GET'])
+@permission_required('administer all communities')
+@login_required
+def admin_topics_export():
+    topics = topic_tree()
+
+    # Convert topic tree to JSON-serializable format
+    topics_data = serialize_topic_tree(topics)
+    
+    # Create JSON buffer for send_file to use
+    buffer = BytesIO()
+    buffer.write(orjson.dumps(topics_data, option=orjson.OPT_INDENT_2))
+    buffer.seek(0)
+    
+    return send_file(
+        buffer, 
+        download_name=f'{current_app.config["SERVER_NAME"]}_topics.json', 
+        as_attachment=True,
+        mimetype='application/json'
+    )
+
+
+@bp.route('/topics/import', methods=['GET', 'POST'])
+@permission_required('administer all communities')
+@login_required
+def admin_topics_import():
+    form = TopicImportForm()
+    if form.validate_on_submit():
+        import_file = form.import_file.data
+        
+        if import_file:
+            file_content = import_file.read()
+            
+            try:
+                topics_data = orjson.loads(file_content)
+
+                for topic_data in topics_data:
+                    create_topic_and_children(topic_data, None)
+                
+                db.session.commit()
+                
+                cache.delete_memoized(menu_topics)
+                cache.delete_memoized(topic_tree)
+                
+                flash(_('Topics imported successfully!'))
+                return redirect(url_for('admin.admin_topics'))
+                
+            except Exception as e:
+                current_app.logger.error(f"Error importing topics: {e}")
+                flash(_('Error importing topics: %(error)s', error=str(e)), 'error')
+        else:
+            flash(_('No file uploaded'), 'error')
+    
+    return render_template('admin/topic_import.html', title=_('Topic import'), form=form)
 
 
 @bp.route('/topic/add', methods=['GET', 'POST'])
