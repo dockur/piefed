@@ -1478,6 +1478,8 @@ def admin_topics_import():
             except Exception as e:
                 current_app.logger.error(f"Error importing topics: {e}")
                 flash(_('Error importing topics: %(error)s', error=str(e)), 'error')
+                if current_app.debug:
+                    raise e
         else:
             flash(_('No file uploaded'), 'error')
     

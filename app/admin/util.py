@@ -171,7 +171,7 @@ def move_community_images_to_here(community_id):
                                                    {'post_type': POST_TYPE_IMAGE, 'community_id': community_id}).scalars())
 
                 if store_files_in_s3():
-                    extra_args = {'ContentType': content_type}
+                    extra_args = {}
                     if current_app.config.get('S3_STORAGE_CLASS'):
                         extra_args['StorageClass'] = current_app.config['S3_STORAGE_CLASS']
                     if current_app.config.get('S3_PUBLIC_ACL'):
@@ -191,6 +191,7 @@ def move_community_images_to_here(community_id):
                             if post.image.source_url.startswith('app/static/media'):
                                 if os.path.isfile(post.image.source_url):
                                     content_type = guess_mime_type(post.image.source_url)
+                                    extra_args['ContentType'] = content_type
                                     new_path = post.image.source_url.replace('app/static/media/', "")
                                     s3.upload_file(post.image.source_url, current_app.config['S3_BUCKET'], new_path,
                                                    ExtraArgs=extra_args)
@@ -365,7 +366,10 @@ def create_topic_and_children(topic_data, parent_new_topic):
 
     new_topic.parent_id = parent_new_topic.id if parent_new_topic else None
 
-    process_topic_communities(topic_data, new_topic)
+    if current_app.debug:
+        process_topic_communities(topic_data, new_topic.id)
+    else:
+        process_topic_communities.delay(topic_data, new_topic.id)
 
     new_topic.num_communities = len(list(new_topic.communities))
 
@@ -373,28 +377,43 @@ def create_topic_and_children(topic_data, parent_new_topic):
     for child_data in topic_data.get('children', []):
         create_topic_and_children(child_data, new_topic)
 
+    db.session.commit()
 
-def process_topic_communities(topic_data, new_topic):
+
+@celery.task
+def process_topic_communities(topic_data, topic_id):
     """Process communities for a topic, subscribing to unknown ones."""
 
-    communities_links = topic_data.get('communities', [])
-    if not communities_links:
-        return
+    with current_app.app_context():
+        session = get_task_session()
+        try:
+            with patch_db_session(session):
+                communities_links = topic_data.get('communities', [])
+                if not communities_links:
+                    return
 
-    for community_link in communities_links:
-        community = search_for_community(community_link)
+                for community_link in communities_links:
+                    try:
+                        community = search_for_community(community_link)
+                    except Exception:
+                        community = None
 
-        if community is not None:
-            existing_membership = CommunityMember.query.filter_by(community_id=community.id, user_id=1).first()
+                    if community is not None:
+                        existing_membership = session.query(CommunityMember).filter_by(community_id=community.id, user_id=1).first()
 
-            if existing_membership is None:
-                if current_app.debug:
-                    do_subscribe(community.ap_id, 1, admin_preload=True)
-                else:
-                    do_subscribe.delay(community.ap_id, 1, admin_preload=True)
+                        if existing_membership is None:
+                            if current_app.debug:
+                                do_subscribe(community.ap_id, 1, admin_preload=True)
+                            else:
+                                do_subscribe.delay(community.ap_id, 1, admin_preload=True)
 
-            # Assign community to topic
-            community.topic_id = new_topic.id
-            db.session.commit()
-        else:
-            current_app.logger.warning(f"Community {community_link} not found, skipping")
+                        # Assign community to topic
+                        community.topic_id = topic_id
+                        session.commit()
+                    else:
+                        current_app.logger.warning(f"Community {community_link} not found, skipping")
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
