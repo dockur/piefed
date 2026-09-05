@@ -355,8 +355,8 @@ def create_topic_and_children(topic_data, parent_new_topic):
     new_topic = Topic(
         machine_name=topic_data['machine_name'],
         name=topic_data['name'],
-        num_communities=0,  # Will be updated after communities are processed
-        parent_id=None,     # Will be set after all topics are created
+        num_communities=0,  # Will be updated later
+        parent_id=None,     # Will be updated later
         show_posts_in_children=topic_data.get('show_posts_in_children', False),
         countries=topic_data.get('countries', []) or []
     )
@@ -370,8 +370,6 @@ def create_topic_and_children(topic_data, parent_new_topic):
         process_topic_communities(topic_data, new_topic.id)
     else:
         process_topic_communities.delay(topic_data, new_topic.id)
-
-    new_topic.num_communities = len(list(new_topic.communities))
 
     # Recursively create child topics and communities
     for child_data in topic_data.get('children', []):
@@ -409,6 +407,9 @@ def process_topic_communities(topic_data, topic_id):
 
                         # Assign community to topic
                         community.topic_id = topic_id
+                        session.execute(text('UPDATE "topic" SET num_communities = num_communities + 1 WHERE id = :topic_id'), {
+                            'topic_id': topic_id
+                        })
                         session.commit()
                     else:
                         current_app.logger.warning(f"Community {community_link} not found, skipping")
