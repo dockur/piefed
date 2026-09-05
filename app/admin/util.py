@@ -344,7 +344,7 @@ def serialize_topic_node(node):
         'parent_id': topic.parent_id,
         'show_posts_in_children': topic.show_posts_in_children,
         'countries': list(topic.countries) if topic.countries else [],
-        'communities': [community.lemmy_link() for community in topic.communities.all()],
+        'communities': [community.lemmy_link() for community in topic.communities.all() if not (community.local_only or community.private)],
         'children': serialize_topic_tree(node['children'])
     }
 
