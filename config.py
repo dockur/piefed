@@ -115,6 +115,7 @@ class Config(object):
     ENABLE_ALPHA_API = os.environ.get('ENABLE_ALPHA_API') or False
     SKIP_RATE_LIMIT_IPS = os.environ.get('SKIP_RATE_LIMIT_IPS') or ['127.0.0.1']
     SERVE_API_DOCS = os.environ.get('SERVE_API_DOCS') or False
+    RATELIMIT_ENABLED = os.environ.get('RATELIMIT_ENABLED', 'True') in ('True', 'true', '1')
 
     IMAGE_HASHING_ENDPOINT = os.environ.get('IMAGE_HASHING_ENDPOINT') or ''
 
