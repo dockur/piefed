@@ -2595,18 +2595,50 @@ a.unread:before, div.unread:before {
   line-height: var(--spacing-32);
 }
 
-.post_body, .comment_body, #preview, .reply_preview, .accordion-body, .post_col {
+.post_body, .comment_body, #preview, .reply_preview, .accordion-body, .post_col, #about_community .card-body {
   word-wrap: break-word;
   line-height: 1.6;
 }
-.post_body img, .comment_body img, #preview img, .reply_preview img, .accordion-body img, .post_col img {
+.post_body h1, .post_body h2, .post_body h3, .post_body h4, .post_body h5, .post_body h6, .comment_body h1, .comment_body h2, .comment_body h3, .comment_body h4, .comment_body h5, .comment_body h6, #preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6, .reply_preview h1, .reply_preview h2, .reply_preview h3, .reply_preview h4, .reply_preview h5, .reply_preview h6, .accordion-body h1, .accordion-body h2, .accordion-body h3, .accordion-body h4, .accordion-body h5, .accordion-body h6, .post_col h1, .post_col h2, .post_col h3, .post_col h4, .post_col h5, .post_col h6, #about_community .card-body h1, #about_community .card-body h2, #about_community .card-body h3, #about_community .card-body h4, #about_community .card-body h5, #about_community .card-body h6 {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+.post_body h1.post_title, .comment_body h1.post_title, #preview h1.post_title, .reply_preview h1.post_title, .accordion-body h1.post_title, .post_col h1.post_title, #about_community .card-body h1.post_title {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+.post_body h1, .comment_body h1, #preview h1, .reply_preview h1, .accordion-body h1, .post_col h1, #about_community .card-body h1 {
+  font-size: var(--font-size-31);
+}
+.post_body h2, .comment_body h2, #preview h2, .reply_preview h2, .accordion-body h2, .post_col h2, #about_community .card-body h2 {
+  font-size: var(--font-size-24);
+}
+.post_body h3, .comment_body h3, #preview h3, .reply_preview h3, .accordion-body h3, .post_col h3, #about_community .card-body h3 {
+  font-size: var(--font-size-18);
+}
+.post_body h4, .comment_body h4, #preview h4, .reply_preview h4, .accordion-body h4, .post_col h4, #about_community .card-body h4 {
+  font-size: var(--font-size-16);
+  font-weight: normal;
+}
+.post_body h5, .comment_body h5, #preview h5, .reply_preview h5, .accordion-body h5, .post_col h5, #about_community .card-body h5 {
+  font-size: var(--font-size-16);
+  font-weight: normal;
+  font-style: italic;
+}
+.post_body h6, .comment_body h6, #preview h6, .reply_preview h6, .accordion-body h6, .post_col h6, #about_community .card-body h6 {
+  font-size: var(--font-size-16);
+  font-weight: normal;
+  font-style: italic;
+  color: var(--bs-code-color);
+}
+.post_body img, .comment_body img, #preview img, .reply_preview img, .accordion-body img, .post_col img, #about_community .card-body img {
   max-width: 100%;
   height: auto;
 }
-.post_body .post_image img, .comment_body .post_image img, #preview .post_image img, .reply_preview .post_image img, .accordion-body .post_image img, .post_col .post_image img {
+.post_body .post_image img, .comment_body .post_image img, #preview .post_image img, .reply_preview .post_image img, .accordion-body .post_image img, .post_col .post_image img, #about_community .card-body .post_image img {
   margin-bottom: var(--spacing-16);
 }
-.post_body blockquote, .comment_body blockquote, #preview blockquote, .reply_preview blockquote, .accordion-body blockquote, .post_col blockquote {
+.post_body blockquote, .comment_body blockquote, #preview blockquote, .reply_preview blockquote, .accordion-body blockquote, .post_col blockquote, #about_community .card-body blockquote {
   padding: var(--spacing-4) var(--spacing-8);
   font-family: "Open Sans", "Segoe UI", Tahoma, Arial, sans-serif;
   margin: 0 var(--spacing-20) var(--spacing-12) var(--spacing-20);
@@ -2617,10 +2649,10 @@ a.unread:before, div.unread:before {
   background-color: var(--bs-secondary-bg-subtle);
   border-left-color: var(--bs-secondary-border-subtle);
 }
-.post_body blockquote p:last-child, .comment_body blockquote p:last-child, #preview blockquote p:last-child, .reply_preview blockquote p:last-child, .accordion-body blockquote p:last-child, .post_col blockquote p:last-child {
+.post_body blockquote p:last-child, .comment_body blockquote p:last-child, #preview blockquote p:last-child, .reply_preview blockquote p:last-child, .accordion-body blockquote p:last-child, .post_col blockquote p:last-child, #about_community .card-body blockquote p:last-child {
   margin-bottom: 0px;
 }
-.post_body pre, .comment_body pre, #preview pre, .reply_preview pre, .accordion-body pre, .post_col pre {
+.post_body pre, .comment_body pre, #preview pre, .reply_preview pre, .accordion-body pre, .post_col pre, #about_community .card-body pre {
   background: var(--bs-secondary-bg);
   font-family: monospace;
   padding: var(--spacing-4) var(--spacing-8);
@@ -2630,49 +2662,49 @@ a.unread:before, div.unread:before {
   border-width: var(--border-2);
   border-radius: var(--spacing-4);
 }
-.post_body .post_source pre, .comment_body .post_source pre, #preview .post_source pre, .reply_preview .post_source pre, .accordion-body .post_source pre, .post_col .post_source pre {
+.post_body .post_source pre, .comment_body .post_source pre, #preview .post_source pre, .reply_preview .post_source pre, .accordion-body .post_source pre, .post_col .post_source pre, #about_community .card-body .post_source pre {
   padding-top: var(--spacing-16);
   padding-bottom: var(--spacing-16);
 }
-.post_body p > code, .comment_body p > code, #preview p > code, .reply_preview p > code, .accordion-body p > code, .post_col p > code {
+.post_body p > code, .comment_body p > code, #preview p > code, .reply_preview p > code, .accordion-body p > code, .post_col p > code, #about_community .card-body p > code {
   background: var(--bs-secondary-bg);
   padding: var(--spacing-4) var(--spacing-8);
   border-radius: var(--spacing-4);
   position: relative;
 }
-.post_body p > code .btn, .comment_body p > code .btn, #preview p > code .btn, .reply_preview p > code .btn, .accordion-body p > code .btn, .post_col p > code .btn {
+.post_body p > code .btn, .comment_body p > code .btn, #preview p > code .btn, .reply_preview p > code .btn, .accordion-body p > code .btn, .post_col p > code .btn, #about_community .card-body p > code .btn {
   --bs-btn-padding-x: var(--spacing-4) ! important;
   --bs-btn-padding-y: 0 ! important;
 }
-.post_body code .before, .comment_body code .before, #preview code .before, .reply_preview code .before, .accordion-body code .before, .post_col code .before {
+.post_body code .before, .comment_body code .before, #preview code .before, .reply_preview code .before, .accordion-body code .before, .post_col code .before, #about_community .card-body code .before {
   float: right;
 }
-.post_body code .btn:hover, .comment_body code .btn:hover, #preview code .btn:hover, .reply_preview code .btn:hover, .accordion-body code .btn:hover, .post_col code .btn:hover {
+.post_body code .btn:hover, .comment_body code .btn:hover, #preview code .btn:hover, .reply_preview code .btn:hover, .accordion-body code .btn:hover, .post_col code .btn:hover, #about_community .card-body code .btn:hover {
   background-color: var(--black-tint-02);
   color: var(--white);
 }
-.post_body table.table, .comment_body table.table, #preview table.table, .reply_preview table.table, .accordion-body table.table, .post_col table.table {
+.post_body table.table, .comment_body table.table, #preview table.table, .reply_preview table.table, .accordion-body table.table, .post_col table.table, #about_community .card-body table.table {
   display: block;
   width: 100%;
   overflow-x: auto;
 }
-.post_body ol li, .post_body ul li, .comment_body ol li, .comment_body ul li, #preview ol li, #preview ul li, .reply_preview ol li, .reply_preview ul li, .accordion-body ol li, .accordion-body ul li, .post_col ol li, .post_col ul li {
+.post_body ol li, .post_body ul li, .comment_body ol li, .comment_body ul li, #preview ol li, #preview ul li, .reply_preview ol li, .reply_preview ul li, .accordion-body ol li, .accordion-body ul li, .post_col ol li, .post_col ul li, #about_community .card-body ol li, #about_community .card-body ul li {
   margin-bottom: var(--spacing-8);
 }
-.post_body ol li > p, .post_body ul li > p, .comment_body ol li > p, .comment_body ul li > p, #preview ol li > p, #preview ul li > p, .reply_preview ol li > p, .reply_preview ul li > p, .accordion-body ol li > p, .accordion-body ul li > p, .post_col ol li > p, .post_col ul li > p {
+.post_body ol li > p, .post_body ul li > p, .comment_body ol li > p, .comment_body ul li > p, #preview ol li > p, #preview ul li > p, .reply_preview ol li > p, .reply_preview ul li > p, .accordion-body ol li > p, .accordion-body ul li > p, .post_col ol li > p, .post_col ul li > p, #about_community .card-body ol li > p, #about_community .card-body ul li > p {
   margin-bottom: 0;
 }
-.post_body img[align=left], .comment_body img[align=left], #preview img[align=left], .reply_preview img[align=left], .accordion-body img[align=left], .post_col img[align=left] {
+.post_body img[align=left], .comment_body img[align=left], #preview img[align=left], .reply_preview img[align=left], .accordion-body img[align=left], .post_col img[align=left], #about_community .card-body img[align=left] {
   margin-right: var(--spacing-12);
   margin-bottom: var(--spacing-12);
   float: left;
 }
-.post_body img[align=right], .comment_body img[align=right], #preview img[align=right], .reply_preview img[align=right], .accordion-body img[align=right], .post_col img[align=right] {
+.post_body img[align=right], .comment_body img[align=right], #preview img[align=right], .reply_preview img[align=right], .accordion-body img[align=right], .post_col img[align=right], #about_community .card-body img[align=right] {
   margin-left: var(--spacing-12);
   margin-bottom: var(--spacing-12);
   float: right;
 }
-.post_body img[align=middle], .comment_body img[align=middle], #preview img[align=middle], .reply_preview img[align=middle], .accordion-body img[align=middle], .post_col img[align=middle] {
+.post_body img[align=middle], .comment_body img[align=middle], #preview img[align=middle], .reply_preview img[align=middle], .accordion-body img[align=middle], .post_col img[align=middle], #about_community .card-body img[align=middle] {
   display: block;
   margin: 0 auto var(--spacing-12) auto;
   float: none;

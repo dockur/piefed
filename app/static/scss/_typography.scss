@@ -32,6 +32,14 @@ $h5: var(--font-size-18); // most h5 is 1.25rem from reboot bootstrap class (equ
 $h6: var(--font-size-16);
 
 
+$h1_body: var(--font-size-31);
+$h2_body: var(--font-size-24);
+$h3_body: var(--font-size-18);
+$h4_body: var(--font-size-16);
+$h5_body: var(--font-size-16);
+$h6_body: var(--font-size-16);
+
+
 /* for more info about the feather font used for icons see https://at-ui.github.io/feather-font/ */
 /* use https://fontdrop.info/ to get the unicode values of the feather.ttf file */
 @font-face {
