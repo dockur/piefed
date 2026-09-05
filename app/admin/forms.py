@@ -391,3 +391,8 @@ class EmojiForm(FlaskForm):
     aliases = StringField(_l('Keywords'), validators=[Optional(), Length(max=100)])
     category = StringField(_l('Category'), validators=[DataRequired(), Length(max=20)])
     submit = SubmitField(_l('Save'))
+
+
+class TopicImportForm(FlaskForm):
+    import_file = FileField(_l('Json file that was exported from another instance'), validators=[DataRequired()])
+    import_submit = SubmitField(_l('Import'))

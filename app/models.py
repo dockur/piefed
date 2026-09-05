@@ -2214,7 +2214,7 @@ class Post(db.Model):
                 from app.utils import get_request, notify_admin
                 try:
                     is_ai = get_request(f"{current_app.config['DETECT_AI_ENDPOINT']}?url={post.ap_id}")
-                except Exception as e:
+                except Exception:
                     is_ai = None
                 if is_ai and is_ai.status_code == 200:
                     is_ai_result = is_ai.json()
@@ -2466,6 +2466,9 @@ class Post(db.Model):
 
     def is_microblog(self):
         return self.microblog and self.community.name == 'microblogs'
+
+    def is_event(self):
+        return self.type == constants.POST_TYPE_EVENT
 
     def profile_id(self):
         if self.ap_id:
@@ -2992,7 +2995,7 @@ class PostReply(db.Model):
             from app.utils import get_request, notify_admin
             try:
                 is_ai = get_request(f"{current_app.config['DETECT_AI_ENDPOINT']}?url={reply.ap_id}")
-            except Exception as e:
+            except Exception:
                 is_ai = None
             if is_ai and is_ai.status_code == 200:
                 is_ai_result = is_ai.json()

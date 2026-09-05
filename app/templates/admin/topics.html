@@ -47,6 +47,8 @@
                 {{ render_topic(topic, 0)|safe }}
             {% endfor %}
         </table>
+        <p><a href="{{ url_for('admin.admin_topics_import') }}" class="btn btn-primary">{{ _('Import topics') }}</a></p>
+        <p><a href="{{ url_for('admin.admin_topics_export') }}" class="btn btn-primary">{{ _('Export topics') }}</a></p>
     </div>
 </div>
 <hr />

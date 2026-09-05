@@ -10,8 +10,10 @@ from sqlalchemy import text, desc
 
 from app import db, celery
 from app.activitypub.signature import default_context, send_post_request
+from app.community.routes import do_subscribe
+from app.community.util import search_for_community
 from app.constants import POST_TYPE_IMAGE
-from app.models import User, Community, Instance, CommunityMember, Post
+from app.models import User, Community, Instance, CommunityMember, Post, Topic
 from app.utils import gibberish, topic_tree, get_request, store_files_in_s3, ensure_directory_exists, guess_mime_type, get_task_session, patch_db_session
 
 
@@ -320,3 +322,79 @@ def switch_to_unsilenced(instance_id, trusted: bool):
     db.session.execute(
         text('UPDATE "community" SET show_all = true, show_popular = :show_popular WHERE instance_id = :instance_id'),
         {'show_popular': trusted, 'instance_id': instance_id})
+
+
+def serialize_topic_tree(topic_tree_data):
+    """Convert topic tree data to JSON-serializable format."""
+    result = []
+    for item in topic_tree_data:
+        result.append(serialize_topic_node(item))
+    return result
+
+
+def serialize_topic_node(node):
+    """Convert a topic node to JSON-serializable format."""
+    topic = node['topic']
+    return {
+        'id': topic.id,
+        'machine_name': topic.machine_name,
+        'name': topic.name,
+        'num_communities': topic.num_communities,
+        'parent_id': topic.parent_id,
+        'show_posts_in_children': topic.show_posts_in_children,
+        'countries': list(topic.countries) if topic.countries else [],
+        'communities': [community.lemmy_link() for community in topic.communities.all()],
+        'children': serialize_topic_tree(node['children'])
+    }
+
+
+def create_topic_and_children(topic_data, parent_new_topic):
+    """Recursively create a topic and its children, including adding communities."""
+
+    new_topic = Topic(
+        machine_name=topic_data['machine_name'],
+        name=topic_data['name'],
+        num_communities=0,  # Will be updated after communities are processed
+        parent_id=None,     # Will be set after all topics are created
+        show_posts_in_children=topic_data.get('show_posts_in_children', False),
+        countries=topic_data.get('countries', []) or []
+    )
+
+    db.session.add(new_topic)
+    db.session.flush()  # Get the topic ID assigned
+
+    new_topic.parent_id = parent_new_topic.id if parent_new_topic else None
+
+    process_topic_communities(topic_data, new_topic)
+
+    new_topic.num_communities = len(list(new_topic.communities))
+
+    # Recursively create child topics and communities
+    for child_data in topic_data.get('children', []):
+        create_topic_and_children(child_data, new_topic)
+
+
+def process_topic_communities(topic_data, new_topic):
+    """Process communities for a topic, subscribing to unknown ones."""
+
+    communities_links = topic_data.get('communities', [])
+    if not communities_links:
+        return
+
+    for community_link in communities_links:
+        community = search_for_community(community_link)
+
+        if community is not None:
+            existing_membership = CommunityMember.query.filter_by(community_id=community.id, user_id=1).first()
+
+            if existing_membership is None:
+                if current_app.debug:
+                    do_subscribe(community.ap_id, 1, admin_preload=True)
+                else:
+                    do_subscribe.delay(community.ap_id, 1, admin_preload=True)
+
+            # Assign community to topic
+            community.topic_id = new_topic.id
+            db.session.commit()
+        else:
+            current_app.logger.warning(f"Community {community_link} not found, skipping")
