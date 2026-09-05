@@ -1103,6 +1103,8 @@ def add_post(actor, type=None):
         if post.sticky:
             sticky_post(post.id, True, SRC_WEB)  # federating post's stickiness is separate from creating it
 
+        flash(Markup(_('Your post has been created. <a href="/post/%(post_id)d/edit">Edit it</a> if you notice any typos!', post_id=post.id)))
+
         resp = make_response(redirect(post.slug))
         # remove cookies used to maintain state when switching post type
         resp.delete_cookie('post_title')

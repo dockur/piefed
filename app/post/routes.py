@@ -13,7 +13,7 @@ from sqlalchemy import text, desc, Integer, case
 from sqlalchemy.orm.exc import NoResultFound
 from ics import Calendar, DisplayAlarm
 import ics
-from markupsafe import escape
+from markupsafe import escape, Markup
 from slugify import slugify
 from wtforms.fields import Label
 
@@ -1073,7 +1073,7 @@ def post_edit(post_id: int):
             try:
                 uploaded_file = request.files['image_file'] if post_type == POST_TYPE_IMAGE or post_type == POST_TYPE_EVENT or post_type == POST_TYPE_VIDEO else None
                 edit_post(form, post, post_type, SRC_WEB, uploaded_file=uploaded_file)
-                flash(_('Your changes have been saved.'), 'success')
+                flash(Markup(_('Your changes have been saved. <a href="/post/%(post_id)d/edit">Edit it</a> if you notice any typos!')))
             except Exception as ex:
                 flash(_('Your edit was not accepted because %(reason)s', reason=str(ex)), 'error')
                 if current_app.debug:
