@@ -203,7 +203,7 @@ def register(app):
             staff_role.permissions.append(RolePermission(permission='approve registrations'))
             staff_role.permissions.append(RolePermission(permission='ban users'))
             staff_role.permissions.append(RolePermission(permission='administer all communities'))
-            staff_role.permissions.append(RolePermission(permission='administer all users'))
+            staff_role.permissions.append(RolePermission(permission='manage users'))
             db.session.add(staff_role)
 
             admin_role = Role(name='Admin', weight=3)
