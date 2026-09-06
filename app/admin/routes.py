@@ -47,13 +47,15 @@ from app.utils import render_template, permission_required, set_setting, get_set
     download_defeds, instance_banned, login_required, referrer, \
     community_membership, retrieve_image_hash, posts_with_blocked_images, user_access, reported_posts, user_notes, \
     safe_order_by, get_task_session, patch_db_session, low_value_reposters, moderating_communities_ids, \
-    instance_allowed, trusted_instance_ids, get_emoji_replacements, get_site_as_dict
+    instance_allowed, trusted_instance_ids, get_emoji_replacements, get_site_as_dict, roles_with
 from app.admin import bp
 
 
 @bp.route('/', methods=['GET', 'POST'])
 @login_required
 def admin_home():
+    if not current_user.is_admin_or_staff():
+        abort(403)
     load1, load5, load15 = os.getloadavg()
     if current_app.config["NUM_CPU"] and current_app.config["NUM_CPU"] != 0:
         num_cores = current_app.config["NUM_CPU"]
@@ -246,7 +248,8 @@ def admin_site():
         form.tos_url.data = site.tos_url
         form.contact_email.data = site.contact_email
         form.announcement.data = get_setting('announcement', '')
-    return render_template('admin/site.html', title=_('Site profile'), form=form)
+    return render_template('admin/site.html', title=_('Site profile'), form=form,
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/misc', methods=['GET', 'POST'])
@@ -352,7 +355,8 @@ def admin_misc():
         form.enable_report_em_dash_replies.data = get_setting('enable_report_em_dash_replies', True)
         form.limit_one_em_report_per_user.data = get_setting('limit_one_em_report_per_user', False)
         form.read_posts_cutoff.data = get_setting('read_posts_cutoff', 180)
-    return render_template('admin/misc.html', title=_('Misc settings'), form=form, close_form=close_form)
+    return render_template('admin/misc.html', title=_('Misc settings'), form=form, close_form=close_form,
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/instance_chooser', methods=['GET', 'POST'])
@@ -374,7 +378,8 @@ def admin_instance_chooser():
         form.financial_stability.data = get_setting('financial_stability', False)
         form.daily_backups.data = get_setting('daily_backups', False)
 
-    return render_template('admin/instance_chooser.html', title=_('Misc settings'), form=form)
+    return render_template('admin/instance_chooser.html', title=_('Misc settings'), form=form,
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/federation', methods=['GET', 'POST'])
@@ -434,7 +439,7 @@ def admin_federation():
         form.auto_add_remote_communities.data = get_setting('auto_add_remote_communities', False)
 
     return render_template('admin/federation.html', title=_('Federation settings'),
-                           form=form, current_app_debug=current_app.debug)
+                           form=form, current_app_debug=current_app.debug, roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/federation/preload', methods=['GET', 'POST'])
@@ -560,7 +565,8 @@ def admin_federation_preload():
         return redirect(url_for('admin.admin_federation_preload'))
 
     return render_template('admin/federation_preload.html', title=_('Federation settings - preload'),
-                           preload_form=preload_form, current_app_debug=current_app.debug)
+                           preload_form=preload_form, current_app_debug=current_app.debug,
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/federation/remote_scan', methods=['GET', 'POST'])
@@ -883,7 +889,8 @@ def admin_federation_remote_scan():
         return redirect(url_for('admin.admin_federation_remote_scan'))
 
     return render_template('admin/federation_remote_scan.html', title=_('Federation settings - remote scan'),
-                           remote_scan_form=remote_scan_form, current_app_debug=current_app.debug)
+                           remote_scan_form=remote_scan_form, current_app_debug=current_app.debug,
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/federation/ban_lists', methods=['GET', 'POST'])
@@ -977,7 +984,7 @@ def admin_federation_ban_lists():
                          mimetype='application/json')
 
     return render_template('admin/federation_ban_lists.html', title=_('Federation settings - ban lists'),
-                           ban_lists_form=ban_lists_form, current_app_debug=current_app.debug)
+                           ban_lists_form=ban_lists_form, current_app_debug=current_app.debug, roles_with=roles_with('change instance settings'))
 
 
 @celery.task
@@ -1136,7 +1143,7 @@ def admin_activities():
                        direction=direction_filter) if activities.has_prev and page != 1 else None
 
     return render_template('admin/activities.html', title=_('ActivityPub Log'), next_url=next_url, prev_url=prev_url,
-                           activities=activities)
+                           activities=activities, roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/activity_json/<int:activity_id>')
@@ -1165,7 +1172,7 @@ def activity_json(activity_id):
         json_html = markdown_to_html(json_md)
 
     return render_template('admin/activity_json.html', title=_('Activity JSON'), json_html=json_html,
-        activity=activity, current_app=current_app, skip_protocol_replacement=True)
+        activity=activity, current_app=current_app, skip_protocol_replacement=True, roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/activity_json/<int:activity_id>/replay')
@@ -1202,7 +1209,7 @@ def admin_communities():
 
     return render_template('admin/communities.html', title=_('Communities'), next_url=next_url, prev_url=prev_url,
                            communities=communities,
-                           search=search, sort_by=sort_by,
+                           search=search, sort_by=sort_by, roles_with=roles_with('administer all communities')
                            )
 
 
@@ -1223,7 +1230,7 @@ def admin_communities_no_topic():
 
     return render_template('admin/communities.html', title=_('Communities with no topic'), next_url=next_url,
                            prev_url=prev_url,
-                           communities=communities)
+                           communities=communities, roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/communities/low-quality', methods=['GET'])
@@ -1245,7 +1252,7 @@ def admin_communities_low_quality():
 
     return render_template('admin/communities.html', title=_('Communities with low_quality == True'), next_url=next_url,
                            prev_url=prev_url,
-                           communities=communities)
+                           communities=communities, roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/communities/un-moderated', methods=['GET'])
@@ -1269,7 +1276,7 @@ def admin_communities_unmoderated():
 
     return render_template('admin/communities.html', title=_('Unmoderated communities'), next_url=next_url,
                            prev_url=prev_url,
-                           communities=communities)
+                           communities=communities, roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/community/<int:community_id>/edit', methods=['GET', 'POST'])
@@ -1367,7 +1374,8 @@ def admin_community_edit(community_id):
         form.always_translate.data = community.always_translate
         form.can_be_archived.data = community.can_be_archived
         form.downvote_accept_mode.data = community.downvote_accept_mode
-    return render_template('admin/edit_community.html', title=_('Edit community'), form=form, community=community)
+    return render_template('admin/edit_community.html', title=_('Edit community'), form=form, community=community,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/community/<int:community_id>/delete', methods=['POST'])
@@ -1425,7 +1433,8 @@ def unsubscribe_everyone_then_delete_task(community_id):
 @login_required
 def admin_topics():
     topics = topic_tree()
-    return render_template('admin/topics.html', title=_('Topics'), topics=topics)
+    return render_template('admin/topics.html', title=_('Topics'), topics=topics,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/topics/export', methods=['GET'])
@@ -1483,7 +1492,8 @@ def admin_topics_import():
         else:
             flash(_('No file uploaded'), 'error')
     
-    return render_template('admin/topic_import.html', title=_('Topic import'), form=form)
+    return render_template('admin/topic_import.html', title=_('Topic import'), form=form,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/topic/add', methods=['GET', 'POST'])
@@ -1508,7 +1518,8 @@ def admin_topic_add():
         flash(_('Saved'))
         return redirect(url_for('admin.admin_topics'))
 
-    return render_template('admin/edit_topic.html', title=_('Add topic'), form=form)
+    return render_template('admin/edit_topic.html', title=_('Add topic'), form=form,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/topic/<int:topic_id>/edit', methods=['GET', 'POST'])
@@ -1541,7 +1552,8 @@ def admin_topic_edit(topic_id):
         form.show_posts_in_children.data = topic.show_posts_in_children
         if topic.countries and len(topic.countries):
             form.countries.data = "\n".join(topic.countries)
-    return render_template('admin/edit_topic.html', title=_('Edit topic'), form=form, topic=topic)
+    return render_template('admin/edit_topic.html', title=_('Edit topic'), form=form, topic=topic,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/topic/<int:topic_id>/delete', methods=['POST'])
@@ -1602,7 +1614,8 @@ def admin_users():
 
     return render_template('admin/users.html', title=_('Users'), next_url=next_url, prev_url=prev_url, users=users,
                            local_remote=local_remote, search=search, sort_by=sort_by, last_seen=last_seen,
-                           user_notes=user_notes(current_user.get_id()), verified=verified)
+                           user_notes=user_notes(current_user.get_id()), verified=verified,
+                           roles_with=roles_with('administer all users'))
 
 
 @bp.route('/content', methods=['GET'])
@@ -1677,6 +1690,7 @@ def admin_content():
                            posts_replies=posts_replies, show=show, days=days,
                            reported_posts=reported_posts(current_user.get_id(), current_user.get_id() in g.admin_ids),
                            moderated_community_ids=moderating_communities_ids(current_user.get_id()),
+                           roles_with=roles_with('administer all communities')
                            )
 
 
@@ -1696,6 +1710,7 @@ def admin_approve_registrations():
     return render_template('admin/approve_registrations.html',
                            registrations=registrations, disposable_domains=disposable_domains,
                            recently_approved=recently_approved,
+                           roles_with=roles_with('approve registrations')
                            )
 
 
@@ -1825,7 +1840,9 @@ def admin_user_edit(user_id):
         if user.roles and user.roles.count() > 0:
             form.role.data = user.roles[0].id
 
-    return render_template('admin/edit_user.html', title=_('Edit user'), form=form, user=user)
+    return render_template('admin/edit_user.html', title=_('Edit user'), form=form, user=user,
+                           roles_with=roles_with('administer all users'))
+
 
 @bp.route('/user/<int:user_id>/resend_email', methods=['POST'])
 @permission_required('administer all users')
@@ -1907,7 +1924,8 @@ def admin_users_add():
         flash(_('User added'))
         return redirect(url_for('admin.admin_users', local_remote='local'))
 
-    return render_template('admin/add_user.html', title=_('Add user'), form=form, user=user)
+    return render_template('admin/add_user.html', title=_('Add user'), form=form, user=user,
+                           roles_with=roles_with('administer all users'))
 
 
 @bp.route('/user/<int:user_id>/delete', methods=['POST'])
@@ -1965,8 +1983,6 @@ def admin_user_delete_task(user_id, current_user_id):
             session.close()
 
 
-
-
 @bp.route('/reports', methods=['GET'])
 @permission_required('administer all users')
 @login_required
@@ -1992,7 +2008,9 @@ def admin_reports():
     prev_url = url_for('admin.admin_reports', page=reports.prev_num) if reports.has_prev and page != 1 else None
 
     return render_template('admin/reports.html', title=_('Reports'), next_url=next_url, prev_url=prev_url,
-                           reports=reports, local_remote=local_remote, search=search, report_types=report_types, report_types_list=ReportTypes.get_choices())
+                           reports=reports, local_remote=local_remote, search=search, report_types=report_types,
+                           report_types_list=ReportTypes.get_choices(),
+                           roles_with=roles_with('administer all users'))
 
 
 @bp.route('/newsletter', methods=['GET', 'POST'])
@@ -2005,7 +2023,8 @@ def newsletter():
         flash(_('Newsletter sent'))
         return redirect(url_for('admin.newsletter'))
 
-    return render_template("admin/newsletter.html", form=form, title=_('Send newsletter'))
+    return render_template("admin/newsletter.html", form=form, title=_('Send newsletter'),
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/permissions', methods=['GET', 'POST'])
@@ -2032,7 +2051,8 @@ def admin_permissions():
     permissions = db.session.execute(text('SELECT DISTINCT permission FROM "role_permission"')).fetchall()
 
     return render_template('admin/permissions.html', title=_('Role permissions'), roles=roles,
-                           form=form, permissions=permissions)
+                           form=form, permissions=permissions,
+                           roles_with=roles_with('change user roles'))
 
 
 @bp.route('/instances', methods=['GET', 'POST'])
@@ -2081,7 +2101,8 @@ def admin_instances():
     return render_template('admin/instances.html', instances=instances,
                            title=_(title), search=search, filter=filter, sort_by=sort_by,
                            next_url=next_url, prev_url=prev_url,
-                           low_bandwidth=low_bandwidth)
+                           low_bandwidth=low_bandwidth,
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/instance/<int:instance_id>/edit', methods=['GET', 'POST'])
@@ -2130,7 +2151,8 @@ def admin_instance_edit(instance_id):
                                       {'domain': instance.domain}).scalar_one_or_none()
             form.hide.data = hide
 
-    return render_template('admin/edit_instance.html', title=_('Edit instance'), form=form, instance=instance)
+    return render_template('admin/edit_instance.html', title=_('Edit instance'), form=form, instance=instance,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/instance/create_offline', methods=['GET', 'POST'])
@@ -2152,7 +2174,8 @@ def admin_instance_create_offline():
             
         return redirect(url_for("admin.admin_instances"))
     
-    return render_template("admin/create_offline_instance.html", form=form)
+    return render_template("admin/create_offline_instance.html", form=form,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/community/<int:community_id>/move/<int:new_owner>', methods=['GET', 'POST'])
@@ -2210,7 +2233,8 @@ def admin_community_move(community_id, new_owner):
 
     form.new_url.data = community.name
 
-    return render_template('admin/community_move.html', title=_('Move community'), form=form, community=community)
+    return render_template('admin/community_move.html', title=_('Move community'), form=form, community=community,
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/blocked_images', methods=['GET'])
@@ -2221,7 +2245,8 @@ def admin_blocked_images():
     blocked_images = BlockedImage.query.order_by(desc(BlockedImage.id)).all()
     return render_template('admin/blocked_images.html', blocked_images=blocked_images,
                            title=_('Blocked images'),
-                           low_bandwidth=low_bandwidth)
+                           low_bandwidth=low_bandwidth,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/blocked_image/<int:image_id>/edit', methods=['GET', 'POST'])
@@ -2244,7 +2269,7 @@ def admin_blocked_image_edit(image_id):
         form.note.data = image.note
 
     return render_template('admin/edit_blocked_image.html', title=_('Edit blocked image'), form=form,
-                           blocked_image=image)
+                           blocked_image=image, roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/blocked_image/add', methods=['GET', 'POST'])
@@ -2269,7 +2294,8 @@ def admin_blocked_image_add():
 
     flash(_('Provide the url of an image or the hash (and file name) of it, but not both.'))
 
-    return render_template('admin/edit_blocked_image.html', title=_('Add blocked image'), form=form)
+    return render_template('admin/edit_blocked_image.html', title=_('Add blocked image'), form=form,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/block_image_purge_posts', methods=['GET', 'POST'])
@@ -2290,7 +2316,8 @@ def admin_blocked_image_purge_posts():
     posts = Post.query.filter(Post.id.in_(posts_with_blocked_images()), Post.deleted == False).order_by(desc(Post.posted_at)).all()
     return render_template('post/post_block_image_purge_posts.html', posts=posts,
                            title=_('Posts containing blocked images'),
-                           form=form, referrer=request.args.get('referrer'))
+                           form=form, referrer=request.args.get('referrer'),
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/blocked_image/<int:image_id>/delete', methods=['POST'])
@@ -2313,7 +2340,8 @@ def admin_blocked_image_delete(image_id):
 @login_required
 def admin_cms_pages():
     pages = CmsPage.query.order_by(CmsPage.created_at.desc()).all()
-    return render_template('admin/cms_pages.html', pages=pages, title=_('CMS Pages'))
+    return render_template('admin/cms_pages.html', pages=pages, title=_('CMS Pages'),
+                           roles_with=roles_with('edit cms pages'))
 
 
 @bp.route('/pages/add', methods=['GET', 'POST'])
@@ -2329,7 +2357,8 @@ def admin_cms_page_add():
         flash(_('Page saved.'))
         return redirect(url_for('admin.admin_cms_pages'))
 
-    return render_template('admin/cms_page_edit.html', form=form, title=_('Add CMS Page'))
+    return render_template('admin/cms_page_edit.html', form=form, title=_('Add CMS Page'),
+                           roles_with=roles_with('edit cms pages'))
 
 
 @bp.route('/pages/<int:page_id>/edit', methods=['GET', 'POST'])
@@ -2350,7 +2379,8 @@ def admin_cms_page_edit(page_id):
         flash(_('Page saved.'))
         return redirect(url_for('admin.admin_cms_pages'))
 
-    return render_template('admin/cms_page_edit.html', form=form, page=page, title=_('Edit page'))
+    return render_template('admin/cms_page_edit.html', form=form, page=page, title=_('Edit page'),
+                           roles_with=roles_with('edit cms pages'))
 
 
 @bp.route('/pages/<int:page_id>/delete', methods=['POST'])
@@ -2370,7 +2400,8 @@ def admin_cms_page_delete(page_id):
 @login_required
 def admin_emoji():
     emojis = Emoji.query.order_by(Emoji.token).all()
-    return render_template('admin/emoji.html', emojis=emojis, title=_('Emoji'))
+    return render_template('admin/emoji.html', emojis=emojis, title=_('Emoji'),
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/emoji/add', methods=['GET', 'POST'])
@@ -2387,7 +2418,8 @@ def admin_emoji_add():
         flash(_('Emoji saved.'))
         return redirect(url_for('admin.admin_emoji'))
 
-    return render_template('admin/emoji_edit.html', form=form, title=_('Add Emoji'))
+    return render_template('admin/emoji_edit.html', form=form, title=_('Add Emoji'),
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/emoji/<int:emoji_id>/edit', methods=['GET', 'POST'])
@@ -2407,7 +2439,8 @@ def admin_emoji_edit(emoji_id):
         flash(_('Emoji saved.'))
         return redirect(url_for('admin.admin_emoji'))
 
-    return render_template('admin/emoji_edit.html', form=form, page=emoji, title=_('Edit Emoji'))
+    return render_template('admin/emoji_edit.html', form=form, page=emoji, title=_('Edit Emoji'),
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/emoji/<int:emoji_id>/delete', methods=['POST'])
@@ -2471,7 +2504,8 @@ def admin_media():
     prev_url = url_for('admin.admin_media', page=files.prev_num, user_id=user_id) if files.has_prev and page != 1 else None
 
     return render_template('admin/media.html', files=files,
-                           next_url=next_url, prev_url=prev_url, user_id=user_id)
+                           next_url=next_url, prev_url=prev_url, user_id=user_id,
+                           roles_with=roles_with('administer all communities'))
 
 
 @bp.route('/media/<int:file_id>/delete', methods=['POST'])

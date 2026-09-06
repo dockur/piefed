@@ -66,7 +66,7 @@ from app.models import CronJobLog, Settings, Domain, Instance, BannedInstances, 
     Site, Post, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic, UserBlock, Language, \
     File, ModLog, CommunityBlock, Feed, FeedMember, CommunityFlair, CommunityJoinRequest, Notification, UserNote, \
     PostReply, PostReplyBookmark, AllowedInstances, InstanceBan, Tag, Emoji, UserExtraField, ArchivedPostReply, \
-    RevokedToken, CommunityFavorite, UserFollower, CommunityFlairBlock
+    RevokedToken, CommunityFavorite, UserFollower, CommunityFlairBlock, Role, RolePermission
 
 logger = logging.getLogger(__name__)
 
@@ -4729,3 +4729,10 @@ def get_event_start(post_id: int):
             return post.event.start
 
     return None
+
+
+def roles_with(permission):
+    roles = Role.query.join(RolePermission, Role.id == RolePermission.role_id).\
+        filter(RolePermission.permission == permission).\
+        order_by(Role.weight)
+    return ', '.join([role.name for role in roles.all()])

@@ -64,7 +64,7 @@ from app.utils import render_template, markdown_to_html, validation_required, \
     total_comments_on_post_and_cross_posts, approval_required, libretranslate_string, user_in_restricted_country, \
     site_language_code, block_honey_pot, joined_communities, moderating_communities, user_pronouns, \
     instance_sticky_posts, instance_sticky_post_ids, user_access, show_reason_why_no_federation, \
-    community_membership_private, user_ip_banned, check_anoobis
+    community_membership_private, user_ip_banned, check_anoobis, roles_with
 
 
 @login_required_if_private_instance
@@ -2131,7 +2131,8 @@ def post_block_image(post_id: int):
             return render_template('generic_form.html',
                                    title=_('Are you sure you want to block this image?'),
                                    message=_('All posts that use this image will be deleted and future posts of the image will be rejected.'),
-                                   form=form)
+                                   form=form,
+                                   roles_with=roles_with('change instance settings'))
 
     return redirect(referrer())
 
@@ -2160,7 +2161,8 @@ def post_block_image_purge_posts(post_id: int):
         order_by(desc(Post.posted_at)).all()
     return render_template('post/post_block_image_purge_posts.html', post=post, posts=posts,
                            title=_('Posts containing blocked images'),
-                           referrer=request.args.get('referrer'))
+                           referrer=request.args.get('referrer'),
+                           roles_with=roles_with('change instance settings'))
 
 
 @bp.route('/post/<int:post_id>/voting_activity', methods=['GET'])
