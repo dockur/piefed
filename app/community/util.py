@@ -41,10 +41,10 @@ def search_for_community(address: str, allow_fetch: bool = True) -> Community | 
 
         if current_app.config['SERVER_NAME'] == server:
             profile_id = f"https://{server}/c/{name.lower()}"
-            already_exists = Community.query.filter_by(ap_profile_id=profile_id, ap_id=None).first()
+            already_exists = db.session.query(Community).filter_by(ap_profile_id=profile_id, ap_id=None).first()
             return already_exists
 
-        already_exists = Community.query.filter_by(ap_id=address[1:]).first()
+        already_exists = db.session.query(Community).filter_by(ap_id=address[1:]).first()
         if already_exists:
             return already_exists
         elif not allow_fetch:

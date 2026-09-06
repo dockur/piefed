@@ -318,6 +318,7 @@
 
             {# application content needs to be provided in the app_content block #}
             {% block app_content %}{% endblock %}
+            {%- if roles_with %}<p><a href="/admin/permissions">Roles</a> that can access this page: {{ roles_with }}</p>{% endif %}
         </div>
         <footer class="footer mt-auto" role="contentinfo">
             <p class="text-center mt-4"><button class="btn btn-primary" style="display: none;" id="btn_add_home_screen">{{ _('Install PieFed app') }}</button></p>

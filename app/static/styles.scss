@@ -1913,9 +1913,49 @@ a.unread, div.unread {
   }
 }
 
-.post_body, .comment_body, #preview, .reply_preview, .accordion-body, .post_col {
+.post_body, .comment_body, #preview, .reply_preview, .accordion-body, .post_col, #about_community .card-body {
   word-wrap: break-word;
   line-height: 1.6;
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  h1.post_title {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-size: $h1_body;
+  }
+
+  h2 {
+    font-size: $h2_body;
+  }
+
+  h3 {
+    font-size: $h3_body;
+  }
+
+  h4 {
+    font-size: $h4_body;
+    font-weight: normal;
+  }
+
+  h5 {
+    font-size: $h5_body;
+    font-weight: normal;
+    font-style: italic;
+  }
+
+  h6 {
+    font-size: $h6_body;
+    font-weight: normal;
+    font-style: italic;
+    color: var(--bs-code-color);
+  }
 
   img {
     max-width: 100%;

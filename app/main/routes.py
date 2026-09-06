@@ -314,7 +314,7 @@ def list_communities():
         member_check = db.session.query(CommunityMember.community_id).filter(
             CommunityMember.user_id == current_user.id,
             CommunityMember.is_banned == False
-        ).subquery()
+        ).scalar_subquery()
         communities = communities.filter(
             or_(
                 Community.private == False,

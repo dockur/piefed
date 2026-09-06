@@ -14,7 +14,7 @@ from app.dev.forms import AddTestCommunities, AddTestTopics, DeleteTestCommuniti
 from app.inoculation import inoculation
 from app.models import Site, User, Community, CommunityMember, Language, Topic, utcnow
 from app.utils import render_template, community_membership, moderating_communities, joined_communities, menu_topics, \
-    markdown_to_html, permission_required, login_required
+    markdown_to_html, permission_required, login_required, roles_with
 
 
 # a page for handy dev tools
@@ -188,6 +188,7 @@ def tools():
                                topics_form=topics_form,
                                delete_communities_form=delete_communities_form,
                                delete_topics_form=delete_topics_form,
+                               roles_with=roles_with('change instance settings'),
                                inoculation=inoculation[random.randint(0, len(inoculation) - 1)] if g.site.show_inoculation_block else None,
                                )
 
@@ -208,4 +209,5 @@ def tools_activitypub():
         except JSONDecodeError as e:
             flash(_('Invalid json ' + str(e)), 'error')
 
-    return render_template('admin/dev_activitypub.html', title=_('Send ActivityPub to local inbox'), form=form)
+    return render_template('admin/dev_activitypub.html', title=_('Send ActivityPub to local inbox'), form=form,
+                           roles_with=roles_with('change instance settings'),)

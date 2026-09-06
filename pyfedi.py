@@ -142,8 +142,20 @@ def after_request(response):
             from flask import session
             session.modified = False
         # Cache headers for static resources
-        if request.path.startswith('/static/') or request.path.startswith('/bootstrap/static/'):
-            response.headers['Cache-Control'] = 'public, max-age=31536000'  # 1 year
+        # Skip manifest.json as it varies by User-Agent and has its own cache headers
+        if (request.path.startswith('/static/') or request.path.startswith('/bootstrap/static/')) and '/manifest.json' not in request.path:
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'  # 1 year
+            # Set Vary to only Accept-Encoding for static files to allow upstream proxy caching
+            # Static files don't vary by cookie or language, only by Accept-Encoding for compression
+            if 'Vary' in response.headers:
+                vary = response.headers['Vary']
+                vary_parts = [v.strip() for v in vary.split(',')]
+                # Only keep Accept-Encoding, remove everything else (Cookie, Accept-Language, etc.)
+                vary_parts = [v for v in vary_parts if v.lower() == 'accept-encoding']
+                if vary_parts:
+                    response.headers['Vary'] = ', '.join(vary_parts)
+                else:
+                    del response.headers['Vary']
     else:
         if not current_app.config['ALLOW_AI_CRAWLERS']:
             response.headers.add('Link', f'<https://{current_app.config["SERVER_NAME"]}/rsl.xml>; rel="license"; type="application/rsl+xml"')
