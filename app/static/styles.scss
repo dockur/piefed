@@ -2361,10 +2361,8 @@ h1 .warning_badge {
   object-fit: cover;
 }
 
-@include breakpoint(phablet) {
-	table td .community_icon {
-		display: block;
-	}
+table td .community_icon {
+    display: block;
 }
 
 .list-group-item .community_icon {

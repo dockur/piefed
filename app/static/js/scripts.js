@@ -8,33 +8,44 @@ if(!setTheme) {
     }
 }
 
+// Call a list of setup functions in order. One setup throwing an exception shouldn't take the rest of
+// the page down with it.
+function runSetups(setups) {
+    for (const setup of setups) {
+        try {
+            setup();
+        } catch (e) {
+            console.error(setup.name + '() failed:', e);
+        }
+    }
+}
+
 // fires after DOM is ready for manipulation
 document.addEventListener("DOMContentLoaded", function () {
     let low_bandwidth = document.body.classList.contains('low_bandwidth');
-    
-    // Critical setup functions that must run immediately
-    const criticalSetups = [
+
+    // Every setup function, run in order. Order matters in two places: the lightbox needs
+    // the teasers to exist, and setupDynamicContentObserver goes last so the observer isn't
+    // watching while the setups above it are still writing to the DOM - otherwise their
+    // writes trigger it and the whole lot runs a second time.
+    const setups = [
         setupMobileNav,
         setupLightDark,
         setupConfirmFirst,
         setupSendPost,
-        setupDynamicContentObserver
-    ];
-    
-    // High priority setup functions
-    const highPrioritySetups = [
         setupVotingLongPress,
         setupVotingDialogHandlers,
         setupKeyboardShortcuts,
+        setupDynamicKeyboardShortcuts,
         setupCommunityNameInput,
         setupCommunityConditionalFields,
         setupShowMoreLinks,
         setupSubmitOnInputChange,
-        setupTeaserClick
-    ];
-    
-    // Lower priority setup functions that can be deferred
-    const deferredSetups = [
+        setupTeaserClick,
+
+        // lightboxes are too heavy for low bandwidth mode
+        ...(low_bandwidth ? [] : [setupLightboxTeaser, setupLightboxPostBody]),
+
         setupTopicChooser,
         setupTimeTracking,
         setupConversationChooser,
@@ -56,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
         setupPopupCommunitySidebar,
         setupVideoSpoilers,
         setupCommunityFilter,
-        setupPopupTooltips,
         setupPasswordEye,
         setupBasicAutoResize,
         setupEventTimes,
@@ -69,47 +79,20 @@ document.addEventListener("DOMContentLoaded", function () {
         setupCodeBlockCopy,
         setupLoadingAnimation,
         setupHidRead,
-        setupAutoReload
+        setupShareIcons,
+        setupAutoReload,
+
+        // must be last - see comment above
+        setupDynamicContentObserver
     ];
-    
-    // Run critical setups immediately
-    criticalSetups.forEach(setup => setup());
-    
-    // Run high priority setups in next frame
-    requestAnimationFrame(() => {
-        highPrioritySetups.forEach(setup => setup());
-        
-        // Setup lightbox if not low bandwidth
-        if (!low_bandwidth) {
-            requestAnimationFrame(() => {
-                setupLightboxTeaser();
-                setupLightboxPostBody();
-            });
-        }
-    });
-    
-    // Defer remaining setups to avoid blocking
-    let setupIndex = 0;
-    function runDeferredSetups() {
-        const batchSize = 3; // Process 3 setups per frame
-        const endIndex = Math.min(setupIndex + batchSize, deferredSetups.length);
-        
-        for (let i = setupIndex; i < endIndex; i++) {
-            deferredSetups[i]();
-        }
-        
-        setupIndex = endIndex;
-        if (setupIndex < deferredSetups.length) {
-            requestAnimationFrame(runDeferredSetups);
-        }
-    }
-    requestAnimationFrame(runDeferredSetups);
+
+    runSetups(setups);
 
     if(navigator.getBattery) {
         navigator.getBattery().then(function(battery) {
             // Only load youtube videos in teasers if there is plenty of power available
             if (battery.charging) {
-                requestAnimationFrame(setupYouTubeLazyLoad);
+                setupYouTubeLazyLoad();
             }
         });
     }
@@ -364,7 +347,7 @@ function setupLightboxTeaser() {
     if(typeof baguetteBox !== 'undefined') {
         function popStateListener(event) {
             baguetteBox.hide();
-        };
+        }
         function baguetteBoxClickImg(event) {
           if (this.style.width != "100vw" && this.offsetWidth < window.innerWidth) {
             this.style.width = "100vw";
@@ -372,8 +355,9 @@ function setupLightboxTeaser() {
           } else {
             baguetteBox.hide();
           }
-        };
-        baguetteBox.run('.post_teaser', {
+        }
+
+        baguetteBox.run('.post_teaser a.post_link', {
             fullScreen: false,
             noScrollbars: true,
             async: true,
@@ -438,7 +422,7 @@ function setupMobileNav() {
         navbarToggler.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
         navbarSupportedContent.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
     });
-    if(window.innerWidth < 992) {
+    if(window.matchMedia('(max-width: 991.98px)').matches) {
         navbarToggler.setAttribute('aria-expanded', 'false');
     }
 
@@ -1726,22 +1710,24 @@ function handleCtrlEnterForBodyTextarea(textarea) {
 // Re-run specific setup functions for dynamically loaded content
 function setupDynamicContent() {
     // These are the key functions needed for post options and other dynamic content
-    setupConfirmFirst();
-    setupSendPost();
-    setupShowElementLinks();
-    setupShowMoreLinks();
-    setupUserPopup();
-    setupVotingLongPress();
-    setupDynamicKeyboardShortcuts();
-    setupHideButtons();
-    setupPopupTooltips();
-    setupBasicAutoResize();
-    setupUserMentionSuggestions();
-    setupTranslateAll();
-    setupReactionDialog();
-    setupCodeBlockCopy();
-    setupShareIcons();
-    
+    runSetups([
+        setupConfirmFirst,
+        setupSendPost,
+        setupShowElementLinks,
+        setupShowMoreLinks,
+        setupUserPopup,
+        setupVotingLongPress,
+        setupDynamicKeyboardShortcuts,
+        setupHideButtons,
+        setupBasicAutoResize,
+        setupUserMentionSuggestions,
+        setupTranslateAll,
+        setupReactionDialog,
+        setupCodeBlockCopy,
+        setupShareIcons
+    ]);
+
+
     // Process toBeHidden array after a short delay to allow inline scripts to run
     setTimeout(() => {
         processToBeHiddenArray();
@@ -2144,26 +2130,6 @@ function setupVotingDialogHandlers() {
         if (event.target === dialog) {
             dialog.close();
         }
-    });
-}
-
-function setupPopupTooltips() {
-    // Find all elements with a title, add the necessary bootstrap attributes
-    document.querySelectorAll('[title]').forEach(el => {
-      if (!el.hasAttribute('data-bs-toggle') && !el.dataset.tooltipSetup) {     // don't mess with dropdowns that use data-bs-toggle
-        el.setAttribute('data-bs-toggle', 'tooltip');
-        el.setAttribute('data-bs-placement', 'top');
-        el.dataset.tooltipSetup = 'true';
-      }
-    });
-
-    // Initialize tooltips only for elements that haven't been initialized yet
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]:not([data-tooltip-initialized])');
-    [...tooltipTriggerList].map(el => {
-      new bootstrap.Tooltip(el, {
-          delay: { show: 750, hide: 200 }
-      });
-      el.dataset.tooltipInitialized = 'true';
     });
 }
 
@@ -2591,8 +2557,8 @@ function setupShareIcons() {
                   navigator.clipboard.writeText(location.href);
                   alert("Link copied to clipboard");
                 }
-                shareAnchor.dataset.shareIconSetup = 'true';
             });
+            shareAnchor.dataset.shareIconSetup = 'true';
         }
     });
 }
