@@ -1193,6 +1193,9 @@ def admin_communities():
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search', '')
     sort_by = request.args.get('sort_by', 'title ASC')
+    page_length = 500
+    if current_user.page_length and current_user.page_length < page_length:
+        page_length = current_user.page_length
 
     communities = Community.query
     if search:
@@ -1200,7 +1203,7 @@ def admin_communities():
     communities = communities.order_by(safe_order_by(sort_by, Community, {'title', 'topic_id', 'subscriptions_count',
                                                                           'show_popular', 'show_all', 'post_count',
                                                                           'content_retention', 'nsfw', 'post_reply_count', 'last_active'}))
-    communities = communities.paginate(page=page, per_page=1000, error_out=False)
+    communities = communities.paginate(page=page, per_page=page_length, error_out=False)
 
     next_url = url_for('admin.admin_communities', page=communities.next_num, search=search,
                        sort_by=sort_by) if communities.has_next else None
@@ -1584,6 +1587,9 @@ def admin_users():
     sort_by = request.args.get('sort_by', 'last_seen DESC')
     last_seen = request.args.get('last_seen', 0, type=int)
     verified = request.args.get('verified', '')
+    page_length = 500
+    if current_user.page_length and current_user.page_length < page_length:
+        page_length = current_user.page_length
 
     sort_by_btn = request.args.get('sort_by_btn', '')
     if sort_by_btn:
@@ -1605,7 +1611,7 @@ def admin_users():
     elif verified == 'unverified':
         users = users.filter(User.verified == False)
     users = users.order_by(safe_order_by(sort_by, User, {'user_name', 'banned', 'reports', 'attitude', 'reputation', 'created', 'last_seen'}))
-    users = users.paginate(page=page, per_page=500, error_out=False)
+    users = users.paginate(page=page, per_page=page_length, error_out=False)
 
     next_url = url_for('admin.admin_users', page=users.next_num, search=search, local_remote=local_remote,
                        sort_by=sort_by, last_seen=last_seen) if users.has_next else None
