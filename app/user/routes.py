@@ -4,8 +4,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 
-from feedgen.feed import FeedGenerator
-from slash import SlashExtension, SlashEntryExtension
 from flask import redirect, url_for, flash, request, make_response, session, current_app, abort, json, g, send_file
 from flask_babel import _, lazy_gettext as _l
 from flask_login import logout_user, current_user
@@ -40,13 +38,13 @@ from app.utils import render_template, markdown_to_html, user_access, markdown_t
     user_filters_posts, user_filters_replies, theme_list, \
     blocked_users, add_to_modlog, \
     blocked_communities, piefed_markdown_to_lemmy_markdown, \
-    read_language_choices, request_etag_matches, return_304, mimetype_from_url, notif_id_to_string, \
+    read_language_choices, request_etag_matches, return_304, notif_id_to_string, \
     login_required_if_private_instance, recently_upvoted_posts, recently_downvoted_posts, recently_upvoted_post_replies, \
     recently_downvoted_post_replies, reported_posts, user_notes, login_required, get_setting, filtered_out_communities, \
-    moderating_communities_ids, is_valid_xml_utf8, blocked_or_banned_instances, blocked_domains, get_task_session, \
+    moderating_communities_ids, blocked_or_banned_instances, blocked_domains, get_task_session, \
     patch_db_session, user_in_restricted_country, referrer, user_pronouns, \
     permission_required, check_anoobis
-
+from app.rss_extras import RSSFeed
 
 @bp.route('/people', methods=['GET', 'POST'])
 @login_required
@@ -2204,56 +2202,20 @@ def show_profile_rss(actor):
         limit = max(min(limit, 100), 0)
         posts = user.posts.filter(Post.from_bot == False, Post.deleted == False,
                                   Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(limit).all()
+
+        server_url = current_app.config['SERVER_URL']
         description = shorten_string(user.about, 150) if user.about else ' '
-        og_image = user.avatar_image() if user.avatar_id else None
-        fg = FeedGenerator()
-        fg.load_extension('dc', rss=True)
-        fg.register_extension('slash', SlashExtension, SlashEntryExtension)
-        fg.title(f'{user.display_name()} on {g.site.name}')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}", rel='alternate')
-        if og_image:
-            fg.logo(og_image)
-        else:
-            fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-        fg.subtitle(description)
-        fg.link(href=f"{current_app.config['SERVER_URL']}/u/{actor}/feed", rel='self')
-        fg.language('en')
+        image = user.avatar_image() if user.avatar_id \
+                                        else f"{server_url}/static/images/apple-touch-icon.png"
+        feed = RSSFeed(title = f'{user.display_name()} on {g.site.name}',
+                       link = f"{server_url}/u/{actor}",
+                       description = description,
+                       logo = image,
+                       self_link = f"{server_url}/u/{actor}/feed",
+                       language = 'en'
+                     )
 
-        already_added = set()
-        for post in reversed(posts):
-            # Validate title and body - skip this post if invalid
-            if not is_valid_xml_utf8(post.title.strip()):
-                continue
-            if post.body_html.strip() and not is_valid_xml_utf8(post.body_html.strip()):
-                continue
-
-            fe = fg.add_entry()
-            fe.title(post.title.strip())
-            if post.slug:
-                fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-            else:
-                fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-            if post.url:
-                if post.url in already_added:
-                    continue
-                type = mimetype_from_url(post.url)
-                if type:
-                    fe.enclosure(post.url, type=type)
-                already_added.add(post.url)
-            if post.body_html.strip():
-                fe.description(post.body_html.strip())
-            fe.guid(post.profile_id(), permalink=True)
-            fe.dc.dc_creator(post.author.user_name)
-            fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-            fe.slash.comments(post.reply_count_cross_posted)  # TODO or just post.reply_count ?
-
-            if post.community:
-                fe.category(term=post.community.name)
-            for cat in set([flair.flair for flair in post.flair] + [tag.name for tag in post.tags]):
-                if cat:
-                    fe.category(term=cat, scheme='flair/tag')
-
-        response = make_response(fg.rss_str())
+        response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
         response.headers.add_header('ETag', f"{user.id}_{hash(user.last_seen)}")
         response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')

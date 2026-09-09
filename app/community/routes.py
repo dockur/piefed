@@ -49,7 +49,7 @@ from app.shared.community import invite_with_chat, invite_with_email, subscribe_
 from app.utils import get_setting, render_template, markdown_to_html, validation_required, \
     shorten_string, gibberish, community_membership, \
     request_etag_matches, return_304, can_upvote, can_downvote, user_filters_posts, \
-    joined_communities, moderating_communities, moderating_communities_ids, blocked_domains, mimetype_from_url, \
+    joined_communities, moderating_communities, moderating_communities_ids, blocked_domains, \
     blocked_or_banned_instances, \
     community_moderators, communities_banned_from, show_ban_message, recently_upvoted_posts, recently_downvoted_posts, \
     blocked_users, languages_for_form, add_to_modlog, \
@@ -65,8 +65,7 @@ from app.shared.tasks import task_selector
 from app.shared.community import leave_community
 from app.shared.feed import leave_feed
 from app.utils import get_recipient_language, subscribed_feeds, feed_membership
-from feedgen.feed import FeedGenerator
-from slash import SlashExtension, SlashEntryExtension
+from app.rss_extras import RSSFeed
 from datetime import timezone, timedelta
 
 
@@ -721,46 +720,19 @@ def show_community_rss(actor):
         limit = max(min(limit, 100), 0)
         posts = posts.order_by(desc(Post.created_at)).limit(limit).all()
 
+        server_url = current_app.config['SERVER_URL']
         description = shorten_string(community.description, 150) if community.description else ' '
-        og_image = community.image.source_url if community.image_id else None
-        fg = FeedGenerator()
-        fg.load_extension('dc', rss=True)
-        fg.register_extension('slash', SlashExtension, SlashEntryExtension)
-        fg.title(f'{community.title} on {g.site.name}')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}", rel='alternate')
-        if og_image:
-            fg.logo(og_image)
-        else:
-            fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-        fg.subtitle(description)
-        fg.link(href=f"{current_app.config['SERVER_URL']}/c/{actor}/feed", rel='self')
-        fg.language('en')
+        image = community.image.source_url if community.image_id \
+                          else f"{server_url}/static/images/apple-touch-icon.png"
+        feed = RSSFeed(title = f'{community.title} on {g.site.name}',
+                       link = f"{server_url}/c/{actor}",
+                       description = description,
+                       logo = image,
+                       self_link = f"{server_url}/c/{actor}/feed",
+                       language = 'en'
+                     )
 
-        for post in reversed(posts):
-            fe = fg.add_entry()
-            fe.title(post.title)
-            if post.slug:
-                fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-            else:
-                fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-            if post.url:
-                type = mimetype_from_url(post.url)
-                if type:
-                    fe.enclosure(post.url, type=type)
-
-            fe.description(post.body_html)
-            fe.guid(post.profile_id(), permalink=True)
-            fe.dc.dc_creator(post.author.user_name)
-            fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-            fe.slash.comments(post.reply_count_cross_posted)  # TODO or just post.reply_count ?
-
-            if post.community:
-                fe.category(term=post.community.name)
-            for cat in set([flair.flair for flair in post.flair] + [tag.name for tag in post.tags]):
-                if cat:
-                    fe.category(term=cat, scheme='flair/tag')
-
-        response = make_response(fg.rss_str())
+        response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
         response.headers.add_header('ETag', f"{community.id}_{hash(community.last_active)}")
         response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
