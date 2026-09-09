@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import timezone
+from urllib.parse import urlsplit
 
 from feedgen.feed import FeedGenerator
 from app.utils import mimetype_from_url, is_video_hosting_site
@@ -87,7 +88,6 @@ class RSSFeed:
 
     def create_feed(self, posts, server_url):
         fg = FeedGenerator()
-        fg.load_extension('dc', rss=True)
         fg.load_extension('media', rss=True)
         fg.register_extension('slash', SlashExtension, SlashEntryExtension)
 
@@ -133,7 +133,9 @@ class RSSFeed:
             fe.media.content(medium)
 
         if post.author:
-            fe.dc.dc_creator(post.author.user_name)
+            # @see post.author.email
+            fe.author(email=cls._email_from_public_url(post.author.ap_public_url))
+
         fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
         fe.slash.comments(post.reply_count_cross_posted)  # TODO or just post.reply_count ?
 
@@ -142,6 +144,12 @@ class RSSFeed:
         for cat in set([flair.flair for flair in post.flair] + [tag.display_as for tag in post.tags]):
             if cat:
                 fe.category(term=cat, scheme='flair/tag')
+
+    @staticmethod
+    def _email_from_public_url(url):
+        comps = urlsplit(url)
+        user = comps.path.replace('/u/', '', 1)
+        return f"{user}@{comps.netloc}"
 
     @staticmethod
     def _media_content(url, image):
