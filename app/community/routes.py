@@ -710,11 +710,20 @@ def show_community_rss(actor):
             abort(403)
 
         score = request.args.get('score', 0, int)
+        tag = request.args.get('tag', '')
+        flair = request.args.get('flair', '')
+
+        tag = Tag.query.filter(Tag.display_as == tag.strip()).first() if tag else None
+        flair_id = find_flair_id(flair.strip(), community.id)
 
         posts = Post.query.filter(Post.community_id == community.id).filter(Post.from_bot == False, Post.deleted == False,
                                   Post.status > POST_STATUS_REVIEWING, Post.private == False)
         if score:
             posts = posts.filter(Post.score >= score)
+        if tag:
+            posts = posts.join(post_tag).filter(post_tag.c.tag_id == tag.id)
+        if flair_id:
+            posts = posts.join(post_flair).filter(post_flair.c.flair_id == flair_id)
 
         limit = request.args.get('limit', 20, int)
         limit = max(min(limit, 100), 0)
