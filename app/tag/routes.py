@@ -120,32 +120,32 @@ def show_tag(tag):
 @bp.route('/tag/<tag>/feed', methods=['GET'])
 def show_tag_rss(tag):
     tag = Tag.query.filter(Tag.name == tag.lower()).first()
-    if not tag:
+    if tag:
+        posts = Post.query.join(Community, Community.id == Post.community_id). \
+            join(post_tag, post_tag.c.post_id == Post.id).filter(post_tag.c.tag_id == tag.id). \
+            filter(Community.banned == False, Post.deleted == False, Post.status > POST_STATUS_REVIEWING)
+
+        if current_user.is_anonymous or current_user.ignore_bots == 1:
+            posts = posts.filter(Post.from_bot == False)
+        posts = posts.filter(Community.private == False)
+        posts = posts.order_by(desc(Post.posted_at)).limit(20).all()
+
+        server_url = current_app.config['SERVER_URL']
+        image =  f"{server_url}{g.site.logo_152}" if g.site.logo_152 \
+                          else f"{server_url}/static/images/apple-touch-icon.png"
+        feed = RSSFeed(title = f'#{tag.display_as} on {g.site.name}',
+                       link = f"{server_url}/tag/{tag.name}",
+                       description = ' ',
+                       logo = image,
+                       self_link = f"{server_url}/tag/{tag.name}/feed",
+                       language = 'en'
+                     )
+
+        response = make_response(feed.create_feed(posts, server_url))
+        response.headers.set('Content-Type', 'application/rss+xml')
+        return response
+    else:
         abort(404)
-
-    posts = Post.query.join(Community, Community.id == Post.community_id). \
-        join(post_tag, post_tag.c.post_id == Post.id).filter(post_tag.c.tag_id == tag.id). \
-        filter(Community.banned == False, Post.deleted == False, Post.status > POST_STATUS_REVIEWING)
-
-    if current_user.is_anonymous or current_user.ignore_bots == 1:
-        posts = posts.filter(Post.from_bot == False)
-    posts = posts.filter(Community.private == False)
-    posts = posts.order_by(desc(Post.posted_at)).limit(20).all()
-
-    server_url = current_app.config['SERVER_URL']
-    image =  f"{server_url}{g.site.logo_152}" if g.site.logo_152 \
-                      else f"{server_url}/static/images/apple-touch-icon.png"
-    feed = RSSFeed(title = f'#{tag.display_as} on {g.site.name}',
-                   link = f"{server_url}/tag/{tag.name}",
-                   description = ' ',
-                   logo = image,
-                   self_link = f"{server_url}/tag/{tag.name}/feed",
-                   language = 'en'
-                 )
-
-    response = make_response(feed.create_feed(posts, server_url))
-    response.headers.set('Content-Type', 'application/rss+xml')
-    return response
 
 
 @bp.route('/tags', methods=['GET'])
@@ -265,17 +265,17 @@ def tag_cloud(type, category_id: int):
         join(Post, Post.id == post_tag.c.post_id). \
         filter(Post.community_id.in_(community_ids), Post.deleted == False). \
         group_by(Tag.id)
-
+    
     tag_list_results = tags_query.paginate(page=page, per_page=50, error_out=False)
     next_url = url_for('tag.tag_cloud', type=type, category_id=category_id, view='list',
                         page=tag_list_results.next_num) if tag_list_results.has_next else None
     prev_url = url_for('tag.tag_cloud', type=type, category_id=category_id, view='list',
                         page=tag_list_results.prev_num) if tag_list_results.has_prev and page != 1 else None
 
-
+    
     # Limit to top 50 tags by usage for performance
     tag_results = tags_query.order_by(db.desc('num_posts')).limit(50).all()
-
+    
     # Prepare tag data for JavaScript
     tags_data = []
     tag_ids = []
@@ -286,7 +286,7 @@ def tag_cloud(type, category_id: int):
             'numPosts': num_posts
         })
         tag_ids.append(tag.id)
-
+    
     # Calculate tag relationships (co-occurrence in posts)
     relationships = {}
     if tag_ids:
@@ -299,7 +299,7 @@ def tag_cloud(type, category_id: int):
                 Post.community_id.in_(community_ids),
                 Post.deleted == False
             ).subquery()
-
+            
             # Find other tags that appear in the same posts
             cooccurrence_counts = db.session.query(
                 post_tag.c.tag_id.label('tag2_id'),
@@ -309,7 +309,7 @@ def tag_cloud(type, category_id: int):
                 post_tag.c.tag_id.in_(tag_ids),
                 post_tag.c.tag_id != tag1_id
             ).group_by(post_tag.c.tag_id).all()
-
+            
             if cooccurrence_counts:
                 relationships[tag1_id] = {
                     tag2_id: count for tag2_id, count in cooccurrence_counts

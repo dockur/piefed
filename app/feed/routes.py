@@ -729,37 +729,37 @@ def show_feed_rss(feed_path):
     last_feed_machine_name = feed_url_parts[-1]
     feed = Feed.query.filter(Feed.machine_name == last_feed_machine_name.strip().lower()).first()
 
-    if not feed:
-        abort(404)
+    if feed:
+        # Get the feed_ids
+        if feed.show_posts_in_children:  # include posts from child feeds
+            feed_ids = get_all_child_feed_ids(feed)
+        else:
+            feed_ids = [feed.id]
 
-    # Get the feed_ids
-    if feed.show_posts_in_children:  # include posts from child feeds
-        feed_ids = get_all_child_feed_ids(feed)
+        # For each feed get the community ids (FeedItem) in the feed
+        feed_community_ids = []
+        for fid in feed_ids:
+            feed_items = FeedItem.query.join(Feed, FeedItem.feed_id == fid).all()
+            for item in feed_items:
+                feed_community_ids.append(item.community_id)
+
+        post_ids = get_deduped_post_ids('', feed_community_ids, 'new')
+        post_ids = paginate_post_ids(post_ids, 0, page_length=100)
+        posts = post_ids_to_models(post_ids, 'new')
+
+        server_url = current_app.config['SERVER_URL']
+        feed = RSSFeed(title = f'{feed.title} on {g.site.name}',
+                       link = f"{server_url}/f/{last_feed_machine_name}",
+                       description = ' ',
+                       logo = f"{server_url}/static/images/apple-touch-icon.png",
+                       self_link = f"{server_url}/f/{last_feed_machine_name}.rss",
+                       language = 'en'
+                     )
+
+        response = make_response(feed.create_feed(posts, server_url))
+        response.headers.set('Content-Type', 'application/rss+xml')
+        response.headers.add_header('ETag', f"{feed.id}_{hash(g.site.last_active)}")
+        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+        return response
     else:
-        feed_ids = [feed.id]
-
-    # For each feed get the community ids (FeedItem) in the feed
-    feed_community_ids = []
-    for fid in feed_ids:
-        feed_items = FeedItem.query.join(Feed, FeedItem.feed_id == fid).all()
-        for item in feed_items:
-            feed_community_ids.append(item.community_id)
-
-    post_ids = get_deduped_post_ids('', feed_community_ids, 'new')
-    post_ids = paginate_post_ids(post_ids, 0, page_length=100)
-    posts = post_ids_to_models(post_ids, 'new')
-
-    server_url = current_app.config['SERVER_URL']
-    feed = RSSFeed(title = f'{feed.title} on {g.site.name}',
-                   link = f"{server_url}/f/{last_feed_machine_name}",
-                   description = ' ',
-                   logo = f"{server_url}/static/images/apple-touch-icon.png",
-                   self_link = f"{server_url}/f/{last_feed_machine_name}.rss",
-                   language = 'en'
-                 )
-
-    response = make_response(feed.create_feed(posts, server_url))
-    response.headers.set('Content-Type', 'application/rss+xml')
-    response.headers.add_header('ETag', f"{feed.id}_{hash(g.site.last_active)}")
-    response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
-    return response
+        abort(404)
