@@ -177,7 +177,7 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
         recently_upvoted = []
         recently_downvoted = []
         communities_banned_from_list = []
-    
+
     user_id = current_user.get_id()
 
     rss_token = f'?token={current_user.rss_token}' if current_user.is_authenticated else ''
@@ -337,12 +337,12 @@ def list_communities():
 
     if language_id != 0:
         communities = communities.join(community_language).filter(community_language.c.language_id == language_id)
-    
+
     if home_select == "local":
         communities = communities.filter(Community.ap_id == None)
     elif home_select == "remote":
         communities = communities.filter(Community.ap_id != None)
-    
+
     if subscribe_select != "any":
         # get the user's joined communities
         user_joined_communities = joined_communities(current_user.get_id())
@@ -353,7 +353,7 @@ def list_communities():
             joined_ids.append(jc.id)
         for mc in user_moderating_communities:
             joined_ids.append(mc.id)
-        
+
         if subscribe_select == "subscribed":
             # filter down to just the joined communities
             communities = communities.filter(Community.id.in_(joined_ids))
@@ -372,7 +372,7 @@ def list_communities():
 
     is_admin = current_user.is_authenticated and current_user.is_admin()
 
-    # if filtering by public feed 
+    # if filtering by public feed
     # get all the ids of the communities
     # then filter the communites to ones whose ids match the feed
     if feed_id != 0:
@@ -381,11 +381,11 @@ def list_communities():
         for item in feed_items:
             feed_community_ids.append(item.community_id)
         communities = communities.filter(Community.id.in_(feed_community_ids))
-    
+
     # if filtering by home instance
     if instance:
         communities = communities.filter(Community.ap_domain == instance)
-    
+
     hide_nsfw = False
 
     if current_user.is_authenticated:
@@ -443,13 +443,13 @@ def list_communities():
     context = _base_list_communities_context()
     context["next_url"] = url_for('main.list_communities', page=communities.next_num, sort_by=sort_by,
                        **args_dict) if communities.has_next else None
-    context["prev_url"] = url_for('main.list_communities', page=communities.prev_num, sort_by=sort_by, 
+    context["prev_url"] = url_for('main.list_communities', page=communities.prev_num, sort_by=sort_by,
                        **args_dict) if communities.has_prev and page != 1 else None
 
     context.update({
         "communities": communities,
         "search": search_param,
-        "title": _('Communities'), 
+        "title": _('Communities'),
         "intance": instance,
         "home_select": home_select,
         "topics": topics,
@@ -738,7 +738,7 @@ def test():
     user = User.query.get(1)
     send_registration_approved_email(user)
 
-    markdown = """What light novels have you read in the past week? Something good? Bad? Let us know about it. 
+    markdown = """What light novels have you read in the past week? Something good? Bad? Let us know about it.
 
 And if you want to add your score to the database to help your fellow Bookworms find new reading materials you can use the following template:
 
@@ -1148,11 +1148,11 @@ def static_manifest():
     manifest['id'] = f'{current_app.config["SERVER_URL"]}'
     manifest['name'] = g.site.name if g.site.name else 'PieFed'
     manifest['description'] = g.site.description if g.site.description else ''
-    
+
     # Update icons to use custom logos with fallbacks
     logo_512 = get_setting('logo_512', '')
     logo_192 = get_setting('logo_192', '')
-    
+
     # Update the icons array
     for icon in manifest.get('icons', []):
         if icon.get('sizes') == '192x192':
@@ -1178,7 +1178,7 @@ def list_feeds():
     if search_param == '':
         # find all the feeds marked as public
         public_feeds = feed_tree_public()
-        
+
     else:
         # find all the feeds marked as public that match the search param
         public_feeds = feed_tree_public(search_param)
@@ -1307,7 +1307,7 @@ def random():
         sql = """select c.id from "community" c
                 inner join instance i on c.instance_id = i.id
                 where c.banned is false and i.gone_forever is false and c.post_count > 0 and c.private is false
-                and i.id not in :blocked_instances and c.nsfw is false 
+                and i.id not in :blocked_instances and c.nsfw is false
                 order by random()
                 limit 1"""
         community_id = db.session.execute(text(sql), {'blocked_instances': tuple(blocked)}).scalar_one_or_none()
@@ -1412,7 +1412,7 @@ def receive_webhook():
 
     if not payload:
         return jsonify({"error": "no payload received"}), 400
-    
+
     plugins.fire_hook("webhook", payload)
 
     return '', 202

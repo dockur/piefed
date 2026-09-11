@@ -268,7 +268,7 @@ def feed_copy(feed_id: int):
         db.session.add(feed)
         db.session.commit()
 
-        # get the FeedItems from the feed being copied and 
+        # get the FeedItems from the feed being copied and
         # make sure they all come over to the new Feed
         old_feed_items = FeedItem.query.join(Feed, FeedItem.feed_id == feed_to_copy.id).all()
         for item in old_feed_items:
@@ -344,7 +344,7 @@ def feed_notification(feed_id: int):
 def feed_add_community():
     # this expects a user_id, a new_feed_id, a current_feed_id,
     # and a community_id
-    # it will get those and then add a community to 
+    # it will get those and then add a community to
     # a feed using the FeedItem model
     user_id = int(request.args.get('user_id'))
     feed_id = int(request.args.get('new_feed_id'))
@@ -372,8 +372,8 @@ def feed_add_community():
 @bp.route('/feed/list', methods=['GET'])
 @login_required
 def feed_list():
-    # this takes a user id, community id, and current_feed id, 
-    # and returns a set of html entries of the users feeds 
+    # this takes a user id, community id, and current_feed id,
+    # and returns a set of html entries of the users feeds
 
     # get the user id
     user_id = int(request.args.get('user_id'))
@@ -415,7 +415,7 @@ def show_feed(feed):
         else:
             flash(_('Could not find that feed or it is not public. Try one of these instead...'))
             return redirect(url_for('main.list_feeds'))
-    
+
     if current_user.is_anonymous:
         if current_app.config['CONTENT_WARNING']:
             if feed.nsfl:
