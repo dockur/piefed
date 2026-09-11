@@ -124,7 +124,7 @@ def show_domain_rss(domain_id):
             posts = Post.query.join(Community, Community.id == Post.community_id). \
                 filter(Post.from_bot == False, Post.domain_id == domain.id, Community.banned == False,
                        Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Community.private == False,
-                       Post.private == False).order_by(desc(Post.posted_at)).limit(20)
+                       Post.private == False).order_by(desc(Post.posted_at)).limit(20).all()
 
             server_url = current_app.config['SERVER_URL']
             feed = RSSFeed(title = f'{domain.name} on {g.site.name}',
