@@ -5,7 +5,6 @@ from datetime import timedelta, timezone
 from random import randint
 
 import flask
-from feedgen.feed import FeedGenerator
 from furl import furl
 from markupsafe import Markup
 from pyld import jsonld
@@ -43,10 +42,11 @@ from app.utils import render_template, get_setting, request_etag_matches, return
     retrieve_image_hash, possible_communities, remove_tracking_from_link, reported_posts, \
     moderating_communities_ids, user_notes, login_required, safe_order_by, filtered_out_communities, \
     num_topics, referrer, block_honey_pot, user_pronouns, get_instance_stickies, \
-    community_membership_private, favorite_communities, mimetype_from_url, check_anoobis
+    community_membership_private, favorite_communities, check_anoobis
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
     Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage, BannedInstances, BotChallenge
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap, login_with_ldap
+from app.rss_extras import RSSFeed
 
 
 @bp.route('/', methods=['HEAD', 'GET'])
@@ -1280,40 +1280,19 @@ def index_rss(feed_type=None):
     post_ids = paginate_post_ids(post_ids, 0, page_length=50)
     posts = post_ids_to_models(post_ids, 'new')
 
-    description = shorten_string(g.site.description, 150) if g.site.description else None
-    og_image = g.site.logo if g.site.logo else None
-    fg = FeedGenerator()
-    fg.id(f"{current_app.config['SERVER_URL']}/{feed_type}{rss_token}")
-    fg.title(f'{g.site.name} - {feed_type.capitalize()}')
-    fg.link(href=f"{current_app.config['SERVER_URL']}", rel='alternate')
-    if og_image:
-        fg.logo(og_image)
-    else:
-        fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-    if description:
-        fg.subtitle(description)
-    else:
-        fg.subtitle(' ')
-    fg.link(href=f"{current_app.config['SERVER_URL']}/feed", rel='self')
-    fg.language('en')
+    server_url = current_app.config['SERVER_URL']
+    description = shorten_string(g.site.description, 150) if g.site.description else ' '
+    image = g.site.logo if g.site.logo\
+                      else f"{server_url}/static/images/apple-touch-icon.png"
+    feed = RSSFeed(title = f'{g.site.name} - {feed_type.capitalize()}',
+                   link = server_url,
+                   description = description,
+                   logo = image,
+                   self_link = f"{server_url}/feed",
+                   language = 'en'
+                 )
 
-    for post in posts:
-        fe = fg.add_entry()
-        fe.title(post.title)
-        if post.slug:
-            fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-        else:
-            fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-        if post.url:
-            type = mimetype_from_url(post.url)
-            if type and not type.startswith('text/'):
-                fe.enclosure(post.url, type=type)
-        fe.description(post.body_html)
-        fe.guid(post.profile_id(), permalink=True)
-        fe.author(name=post.author.user_name)
-        fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-
-    response = make_response(fg.rss_str())
+    response = make_response(feed.create_feed(posts, server_url))
     response.headers.set('Content-Type', 'application/rss+xml')
     response.headers.add_header('ETag', f"home_{hash(g.site.last_active)}")
     response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
