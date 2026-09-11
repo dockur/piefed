@@ -265,17 +265,17 @@ def tag_cloud(type, category_id: int):
         join(Post, Post.id == post_tag.c.post_id). \
         filter(Post.community_id.in_(community_ids), Post.deleted == False). \
         group_by(Tag.id)
-    
+
     tag_list_results = tags_query.paginate(page=page, per_page=50, error_out=False)
     next_url = url_for('tag.tag_cloud', type=type, category_id=category_id, view='list',
                         page=tag_list_results.next_num) if tag_list_results.has_next else None
     prev_url = url_for('tag.tag_cloud', type=type, category_id=category_id, view='list',
                         page=tag_list_results.prev_num) if tag_list_results.has_prev and page != 1 else None
 
-    
+
     # Limit to top 50 tags by usage for performance
     tag_results = tags_query.order_by(db.desc('num_posts')).limit(50).all()
-    
+
     # Prepare tag data for JavaScript
     tags_data = []
     tag_ids = []
@@ -286,7 +286,7 @@ def tag_cloud(type, category_id: int):
             'numPosts': num_posts
         })
         tag_ids.append(tag.id)
-    
+
     # Calculate tag relationships (co-occurrence in posts)
     relationships = {}
     if tag_ids:
@@ -299,7 +299,7 @@ def tag_cloud(type, category_id: int):
                 Post.community_id.in_(community_ids),
                 Post.deleted == False
             ).subquery()
-            
+
             # Find other tags that appear in the same posts
             cooccurrence_counts = db.session.query(
                 post_tag.c.tag_id.label('tag2_id'),
@@ -309,7 +309,7 @@ def tag_cloud(type, category_id: int):
                 post_tag.c.tag_id.in_(tag_ids),
                 post_tag.c.tag_id != tag1_id
             ).group_by(post_tag.c.tag_id).all()
-            
+
             if cooccurrence_counts:
                 relationships[tag1_id] = {
                     tag2_id: count for tag2_id, count in cooccurrence_counts
