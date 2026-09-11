@@ -85,6 +85,7 @@ class RSSFeed:
         fg.register_extension('slash', SlashExtension, SlashEntryExtension)
 
         fg.title(title)
+        fg.link(href=link, rel='alternate')
         fg.subtitle(description)
         if logo:
             fg.logo(logo)
@@ -92,9 +93,6 @@ class RSSFeed:
             fg.link(href=self_link, rel='self')
         if language:
             fg.language(language)
-        # feedgen takes the value of the last call of link as channel link for RSS,
-        # regardless of value of rel, so this must be the very last call of *link*
-        fg.link(href=link, rel='alternate')
 
         self._fg = fg
 
