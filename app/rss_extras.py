@@ -101,7 +101,8 @@ class RSSFeed:
         # which depending on the RSS client can be quite useful.
         # However, this also depends on ordering done by the caller,
         # and ultimately on FeedGenerator itself, so it's a heuristic only.
-        for post in reversed(posts):
+        # list() because callers may pass a Query or other iterable which reversed() can't handle
+        for post in reversed(list(posts)):
            self._add_post(post, self._fg, server_url)
 
         return self._fg.rss_str()
