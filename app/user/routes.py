@@ -2192,36 +2192,36 @@ def show_profile_rss(actor):
     else:
         user = find_actor_or_create(f'{current_app.config["SERVER_URL"]}/u/{actor}', create_if_not_found=False)
 
-    if user is not None:
-        # If nothing has changed since their last visit, return HTTP 304
-        current_etag = f"{user.id}_{hash(user.last_seen)}"
-        if request_etag_matches(current_etag):
-            return return_304(current_etag, 'application/rss+xml')
-
-        limit = request.args.get('limit', 20, int)
-        limit = max(min(limit, 100), 0)
-        posts = user.posts.filter(Post.from_bot == False, Post.deleted == False,
-                                  Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(limit).all()
-
-        server_url = current_app.config['SERVER_URL']
-        description = shorten_string(user.about, 150) if user.about else ' '
-        image = user.avatar_image() if user.avatar_id \
-                                        else f"{server_url}/static/images/apple-touch-icon.png"
-        feed = RSSFeed(title = f'{user.display_name()} on {g.site.name}',
-                       link = f"{server_url}/u/{actor}",
-                       description = description,
-                       logo = image,
-                       self_link = f"{server_url}/u/{actor}/feed",
-                       language = 'en'
-                     )
-
-        response = make_response(feed.create_feed(posts, server_url))
-        response.headers.set('Content-Type', 'application/rss+xml')
-        response.headers.add_header('ETag', f"{user.id}_{hash(user.last_seen)}")
-        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
-        return response
-    else:
+    if user is None:
         abort(404)
+
+    # If nothing has changed since their last visit, return HTTP 304
+    current_etag = f"{user.id}_{hash(user.last_seen)}"
+    if request_etag_matches(current_etag):
+        return return_304(current_etag, 'application/rss+xml')
+
+    limit = request.args.get('limit', 20, int)
+    limit = max(min(limit, 100), 0)
+    posts = user.posts.filter(Post.from_bot == False, Post.deleted == False,
+                              Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(limit).all()
+
+    server_url = current_app.config['SERVER_URL']
+    description = shorten_string(user.about, 150) if user.about else ' '
+    image = user.avatar_image() if user.avatar_id \
+                                    else f"{server_url}/static/images/apple-touch-icon.png"
+    feed = RSSFeed(title = f'{user.display_name()} on {g.site.name}',
+                   link = f"{server_url}/u/{actor}",
+                   description = description,
+                   logo = image,
+                   self_link = f"{server_url}/u/{actor}/feed",
+                   language = 'en'
+                 )
+
+    response = make_response(feed.create_feed(posts, server_url))
+    response.headers.set('Content-Type', 'application/rss+xml')
+    response.headers.add_header('ETag', f"{user.id}_{hash(user.last_seen)}")
+    response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+    return response
 
 
 @bp.route('/user/files', methods=['GET', 'POST'])

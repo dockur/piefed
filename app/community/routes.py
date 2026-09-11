@@ -700,54 +700,54 @@ def show_community_rss(actor):
         community: Community = Community.query.filter_by(ap_id=actor, banned=False).first()
     else:
         community: Community = Community.query.filter_by(name=actor, banned=False, ap_id=None).first()
-    if community is not None:
-        # If nothing has changed since their last visit, return HTTP 304
-        current_etag = f"{community.id}_{hash(community.last_active)}"
-        if request_etag_matches(current_etag):
-            return return_304(current_etag, 'application/rss+xml')
-
-        if community.private:
-            abort(403)
-
-        score = request.args.get('score', 0, int)
-        tag = request.args.get('tag', '')
-        flair = request.args.get('flair', '')
-
-        tag = Tag.query.filter(Tag.name == tag.strip()).first() if tag else None
-        flair_id = find_flair_id(flair.strip(), community.id)
-
-        posts = Post.query.filter(Post.community_id == community.id).filter(Post.from_bot == False, Post.deleted == False,
-                                  Post.status > POST_STATUS_REVIEWING, Post.private == False)
-        if score:
-            posts = posts.filter(Post.score >= score)
-        if tag:
-            posts = posts.join(post_tag).filter(post_tag.c.tag_id == tag.id)
-        if flair_id:
-            posts = posts.join(post_flair).filter(post_flair.c.flair_id == flair_id)
-
-        limit = request.args.get('limit', 20, int)
-        limit = max(min(limit, 100), 0)
-        posts = posts.order_by(desc(Post.created_at)).limit(limit).all()
-
-        server_url = current_app.config['SERVER_URL']
-        description = shorten_string(community.description, 150) if community.description else ' '
-        image = community.image.source_url if community.image_id \
-                          else f"{server_url}/static/images/apple-touch-icon.png"
-        feed = RSSFeed(title = f'{community.title} on {g.site.name}',
-                       link = f"{server_url}/c/{actor}",
-                       description = description,
-                       logo = image,
-                       self_link = f"{server_url}/c/{actor}/feed",
-                       language = 'en'
-                     )
-
-        response = make_response(feed.create_feed(posts, server_url))
-        response.headers.set('Content-Type', 'application/rss+xml')
-        response.headers.add_header('ETag', f"{community.id}_{hash(community.last_active)}")
-        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
-        return response
-    else:
+    if community is None:
         abort(404)
+
+    # If nothing has changed since their last visit, return HTTP 304
+    current_etag = f"{community.id}_{hash(community.last_active)}"
+    if request_etag_matches(current_etag):
+        return return_304(current_etag, 'application/rss+xml')
+
+    if community.private:
+        abort(403)
+
+    score = request.args.get('score', 0, int)
+    tag = request.args.get('tag', '')
+    flair = request.args.get('flair', '')
+
+    tag = Tag.query.filter(Tag.name == tag.strip()).first() if tag else None
+    flair_id = find_flair_id(flair.strip(), community.id)
+
+    posts = Post.query.filter(Post.community_id == community.id).filter(Post.from_bot == False, Post.deleted == False,
+                              Post.status > POST_STATUS_REVIEWING, Post.private == False)
+    if score:
+        posts = posts.filter(Post.score >= score)
+    if tag:
+        posts = posts.join(post_tag).filter(post_tag.c.tag_id == tag.id)
+    if flair_id:
+        posts = posts.join(post_flair).filter(post_flair.c.flair_id == flair_id)
+
+    limit = request.args.get('limit', 20, int)
+    limit = max(min(limit, 100), 0)
+    posts = posts.order_by(desc(Post.created_at)).limit(limit).all()
+
+    server_url = current_app.config['SERVER_URL']
+    description = shorten_string(community.description, 150) if community.description else ' '
+    image = community.image.source_url if community.image_id \
+                      else f"{server_url}/static/images/apple-touch-icon.png"
+    feed = RSSFeed(title = f'{community.title} on {g.site.name}',
+                   link = f"{server_url}/c/{actor}",
+                   description = description,
+                   logo = image,
+                   self_link = f"{server_url}/c/{actor}/feed",
+                   language = 'en'
+                 )
+
+    response = make_response(feed.create_feed(posts, server_url))
+    response.headers.set('Content-Type', 'application/rss+xml')
+    response.headers.add_header('ETag', f"{community.id}_{hash(community.last_active)}")
+    response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+    return response
 
 
 # iCal feed of the community

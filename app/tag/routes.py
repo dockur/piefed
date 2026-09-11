@@ -120,32 +120,32 @@ def show_tag(tag):
 @bp.route('/tag/<tag>/feed', methods=['GET'])
 def show_tag_rss(tag):
     tag = Tag.query.filter(Tag.name == tag.lower()).first()
-    if tag:
-        posts = Post.query.join(Community, Community.id == Post.community_id). \
-            join(post_tag, post_tag.c.post_id == Post.id).filter(post_tag.c.tag_id == tag.id). \
-            filter(Community.banned == False, Post.deleted == False, Post.status > POST_STATUS_REVIEWING)
-
-        if current_user.is_anonymous or current_user.ignore_bots == 1:
-            posts = posts.filter(Post.from_bot == False)
-        posts = posts.filter(Community.private == False)
-        posts = posts.order_by(desc(Post.posted_at)).limit(20).all()
-
-        server_url = current_app.config['SERVER_URL']
-        image =  f"{server_url}{g.site.logo_152}" if g.site.logo_152 \
-                          else f"{server_url}/static/images/apple-touch-icon.png"
-        feed = RSSFeed(title = f'#{tag.display_as} on {g.site.name}',
-                       link = f"{server_url}/tag/{tag.name}",
-                       description = ' ',
-                       logo = image,
-                       self_link = f"{server_url}/tag/{tag.name}/feed",
-                       language = 'en'
-                     )
-
-        response = make_response(feed.create_feed(posts, server_url))
-        response.headers.set('Content-Type', 'application/rss+xml')
-        return response
-    else:
+    if not tag:
         abort(404)
+
+    posts = Post.query.join(Community, Community.id == Post.community_id). \
+        join(post_tag, post_tag.c.post_id == Post.id).filter(post_tag.c.tag_id == tag.id). \
+        filter(Community.banned == False, Post.deleted == False, Post.status > POST_STATUS_REVIEWING)
+
+    if current_user.is_anonymous or current_user.ignore_bots == 1:
+        posts = posts.filter(Post.from_bot == False)
+    posts = posts.filter(Community.private == False)
+    posts = posts.order_by(desc(Post.posted_at)).limit(20).all()
+
+    server_url = current_app.config['SERVER_URL']
+    image =  f"{server_url}{g.site.logo_152}" if g.site.logo_152 \
+                      else f"{server_url}/static/images/apple-touch-icon.png"
+    feed = RSSFeed(title = f'#{tag.display_as} on {g.site.name}',
+                   link = f"{server_url}/tag/{tag.name}",
+                   description = ' ',
+                   logo = image,
+                   self_link = f"{server_url}/tag/{tag.name}/feed",
+                   language = 'en'
+                 )
+
+    response = make_response(feed.create_feed(posts, server_url))
+    response.headers.set('Content-Type', 'application/rss+xml')
+    return response
 
 
 @bp.route('/tags', methods=['GET'])
