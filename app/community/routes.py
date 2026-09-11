@@ -713,7 +713,7 @@ def show_community_rss(actor):
         tag = request.args.get('tag', '')
         flair = request.args.get('flair', '')
 
-        tag = Tag.query.filter(Tag.display_as == tag.strip()).first() if tag else None
+        tag = Tag.query.filter(Tag.name == tag.strip()).first() if tag else None
         flair_id = find_flair_id(flair.strip(), community.id)
 
         posts = Post.query.filter(Post.community_id == community.id).filter(Post.from_bot == False, Post.deleted == False,
