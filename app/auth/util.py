@@ -500,17 +500,10 @@ def sync_user_with_ldap(user, password):
 def determine_next_page():
     next_page = request.args.get("next")
     if not next_page or urlsplit(next_page).netloc != "":
-        check_user_finished_onboarding()
         next_page = url_for(
             "auth.filter_selection" if not current_user.finished_onboarding else "main.index"
         )
     return next_page
-
-
-def check_user_finished_onboarding():
-    if not current_user.finished_onboarding and current_user.communities():
-        current_user.finished_onboarding = True
-        db.session.commit()
 
 
 def configure_bandwidth_cookies(response, low_bandwidth_mode):

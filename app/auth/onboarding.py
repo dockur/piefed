@@ -79,9 +79,11 @@ def choose_topics():
         flash(_('Please join some communities you\'re interested in and then go to the home page by clicking on the logo above.'))
         return redirect(url_for('main.list_communities'))
 
+
 def mark_onboarding_as_finished():
     current_user.finished_onboarding = True
     db.session.commit()
+
 
 def join_topic(topic_id):
     communities = Community.query.filter_by(topic_id=topic_id, banned=False).all()
