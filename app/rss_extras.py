@@ -137,7 +137,11 @@ class RSSFeed:
             fe.author(email=cls._email_from_public_url(post.author.ap_public_url))
 
         fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-        fe.slash.comments(post.reply_count_cross_posted)  # TODO or just post.reply_count ?
+        # reply_count_cross_posted is nullable and can drift negative, so fall back and clamp
+        comment_count = post.reply_count_cross_posted
+        if comment_count is None:
+            comment_count = post.reply_count
+        fe.slash.comments(max(0, comment_count or 0))
 
         if post.community:
             fe.category(term=post.community.name)
