@@ -1,7 +1,6 @@
 from datetime import timezone
 from random import randint
 
-from feedgen.feed import FeedGenerator
 from flask import redirect, url_for, flash, request, make_response, current_app, abort, g
 from flask_babel import _
 from flask_login import current_user, login_required
@@ -16,9 +15,10 @@ from app.models import Post, Domain, Community, DomainBlock, read_posts
 from app.shared.domain import block_domain, unblock_domain
 from app.utils import render_template, permission_required, user_filters_posts, blocked_domains, \
     blocked_or_banned_instances, \
-    recently_upvoted_posts, recently_downvoted_posts, mimetype_from_url, request_etag_matches, \
+    recently_upvoted_posts, recently_downvoted_posts, request_etag_matches, \
     return_304, joined_or_modding_communities, login_required_if_private_instance, reported_posts, \
     moderating_communities_ids, block_honey_pot, user_pronouns, community_membership_private, check_anoobis
+from app.rss_extras import RSSFeed
 
 
 @bp.route('/d/<domain_id>', methods=['GET', 'POST'])
@@ -115,54 +115,33 @@ def show_domain_rss(domain_id):
             domain = Domain.query.get_or_404(domain_id)
             if domain.banned:
                 domain = None
-        if domain:
-            # If nothing has changed since their last visit, return HTTP 304
-            current_etag = f"{domain.id}_{hash(domain.post_count)}"
-            if request_etag_matches(current_etag):
-                return return_304(current_etag, 'application/rss+xml')
-
-            posts = Post.query.join(Community, Community.id == Post.community_id). \
-                filter(Post.from_bot == False, Post.domain_id == domain.id, Community.banned == False,
-                       Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Community.private == False,
-                       Post.private == False).order_by(desc(Post.posted_at)).limit(20)
-
-            fg = FeedGenerator()
-            fg.id(f"{current_app.config['SERVER_URL']}/d/{domain_id}")
-            fg.title(f'{domain.name} on {g.site.name}')
-            fg.link(href=f"{current_app.config['SERVER_URL']}/d/{domain_id}", rel='alternate')
-            fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-            fg.subtitle(' ')
-            fg.link(href=f"{current_app.config['SERVER_URL']}/c/{domain_id}/feed", rel='self')
-            fg.language('en')
-
-            already_added = set()
-
-            for post in posts:
-                fe = fg.add_entry()
-                fe.title(post.title)
-                if post.slug:
-                    fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-                else:
-                    fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-                if post.url:
-                    if post.url in already_added:
-                        continue
-                    type = mimetype_from_url(post.url)
-                    if type and not type.startswith('text/'):
-                        fe.enclosure(post.url, type=type)
-                    already_added.add(post.url)
-                fe.description(post.body_html)
-                fe.guid(post.profile_id(), permalink=True)
-                fe.author(name=post.author.user_name)
-                fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-
-            response = make_response(fg.rss_str())
-            response.headers.set('Content-Type', 'application/rss+xml')
-            response.headers.add_header('ETag', f"{domain.id}_{hash(domain.post_count)}")
-            response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
-            return response
-        else:
+        if not domain:
             abort(404)
+
+        # If nothing has changed since their last visit, return HTTP 304
+        current_etag = f"{domain.id}_{hash(domain.post_count)}"
+        if request_etag_matches(current_etag):
+            return return_304(current_etag, 'application/rss+xml')
+
+        posts = Post.query.join(Community, Community.id == Post.community_id). \
+            filter(Post.from_bot == False, Post.domain_id == domain.id, Community.banned == False,
+                   Post.deleted == False, Post.status > POST_STATUS_REVIEWING, Community.private == False,
+                   Post.private == False).order_by(desc(Post.posted_at)).limit(20).all()
+
+        server_url = current_app.config['SERVER_URL']
+        feed = RSSFeed(title = f'{domain.name} on {g.site.name}',
+                       link = f"{server_url}/d/{domain_id}",
+                       description = ' ',
+                       logo = f"{server_url}/static/images/apple-touch-icon.png",
+                       self_link = f"{server_url}/d/{domain_id}/feed",
+                       language = 'en'
+                     )
+
+        response = make_response(feed.create_feed(posts, server_url))
+        response.headers.set('Content-Type', 'application/rss+xml')
+        response.headers.add_header('ETag', f"{domain.id}_{hash(domain.post_count)}")
+        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+        return response
 
 
 @bp.route('/domains', methods=['GET'])

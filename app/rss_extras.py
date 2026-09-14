@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import timezone
 from urllib.parse import urlsplit
 
@@ -73,42 +72,41 @@ def _is_valid_xml_utf8(pystring):
     return True
 
 
-@dataclass
 class RSSFeed:
-    """ A strange mixin of a collection of RSS channel fields, dealing with the Post class/data model,
-    and of course proxying FeedGenerator – but it seems to be manageable.
+    """ A mixin of proxying FeedGenerator and dealing with the Post class/data model.
+    Feed channel data goes into __init__, DB model and related stuff into method arguments.
     Can be easily adapted to handle comments (PostReply class) should those be syndicated some day.
     """
-    title: str
-    link: str
-    description: str
-    logo: str|None = None
-    self_link: str|None = None
-    language: str|None = None
 
-    def create_feed(self, posts, server_url):
+    def __init__(self, *,  title: str, link: str, description: str, logo: str|None = None, \
+                   self_link: str|None = None, language: str|None = None):
         fg = FeedGenerator()
         fg.load_extension('media', rss=True)
         fg.register_extension('slash', SlashExtension, SlashEntryExtension)
 
-        fg.title(self.title)
-        fg.link(href=self.link, rel='alternate')
-        fg.subtitle(self.description)
-        if self.logo:
-            fg.logo(self.logo)
-        if self.self_link:
-            fg.link(href=self.self_link, rel='self')
-        if self.language:
-            fg.language(self.language)
+        fg.title(title)
+        fg.subtitle(description)
+        if logo:
+            fg.logo(logo)
+        if self_link:
+            fg.link(href=self_link, rel='self')
+        if language:
+            fg.language(language)
+        # feedgen takes the value of the last call of link as channel link for RSS,
+        # regardless of value of rel, so this must be the very last call of *link*
+        fg.link(href=link, rel='alternate')
 
+        self._fg = fg
+
+    def create_feed(self, posts, server_url):
         # the reversed below is so that newer entries will be first in the feed wrt document order,
         # which depending on the RSS client can be quite useful.
         # However, this also depends on ordering done by the caller,
         # and ultimately on FeedGenerator itself, so it's a heuristic only.
         for post in reversed(posts):
-           self._add_post(post, fg, server_url)
+           self._add_post(post, self._fg, server_url)
 
-        return fg.rss_str()
+        return self._fg.rss_str()
 
     @classmethod
     def _add_post(cls, post, feed, server_url):

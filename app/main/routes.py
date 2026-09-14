@@ -5,7 +5,6 @@ from datetime import timedelta, timezone
 from random import randint
 
 import flask
-from feedgen.feed import FeedGenerator
 from furl import furl
 from markupsafe import Markup
 from pyld import jsonld
@@ -43,10 +42,11 @@ from app.utils import render_template, get_setting, request_etag_matches, return
     retrieve_image_hash, possible_communities, remove_tracking_from_link, reported_posts, \
     moderating_communities_ids, user_notes, login_required, safe_order_by, filtered_out_communities, \
     num_topics, referrer, block_honey_pot, user_pronouns, get_instance_stickies, \
-    community_membership_private, favorite_communities, mimetype_from_url, check_anoobis
+    community_membership_private, favorite_communities, check_anoobis
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
     Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage, BannedInstances, BotChallenge
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap, login_with_ldap
+from app.rss_extras import RSSFeed
 
 
 @bp.route('/', methods=['HEAD', 'GET'])
@@ -177,7 +177,7 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
         recently_upvoted = []
         recently_downvoted = []
         communities_banned_from_list = []
-    
+
     user_id = current_user.get_id()
 
     rss_token = f'?token={current_user.rss_token}' if current_user.is_authenticated else ''
@@ -337,12 +337,12 @@ def list_communities():
 
     if language_id != 0:
         communities = communities.join(community_language).filter(community_language.c.language_id == language_id)
-    
+
     if home_select == "local":
         communities = communities.filter(Community.ap_id == None)
     elif home_select == "remote":
         communities = communities.filter(Community.ap_id != None)
-    
+
     if subscribe_select != "any":
         # get the user's joined communities
         user_joined_communities = joined_communities(current_user.get_id())
@@ -353,7 +353,7 @@ def list_communities():
             joined_ids.append(jc.id)
         for mc in user_moderating_communities:
             joined_ids.append(mc.id)
-        
+
         if subscribe_select == "subscribed":
             # filter down to just the joined communities
             communities = communities.filter(Community.id.in_(joined_ids))
@@ -372,7 +372,7 @@ def list_communities():
 
     is_admin = current_user.is_authenticated and current_user.is_admin()
 
-    # if filtering by public feed 
+    # if filtering by public feed
     # get all the ids of the communities
     # then filter the communites to ones whose ids match the feed
     if feed_id != 0:
@@ -381,11 +381,11 @@ def list_communities():
         for item in feed_items:
             feed_community_ids.append(item.community_id)
         communities = communities.filter(Community.id.in_(feed_community_ids))
-    
+
     # if filtering by home instance
     if instance:
         communities = communities.filter(Community.ap_domain == instance)
-    
+
     hide_nsfw = False
 
     if current_user.is_authenticated:
@@ -443,13 +443,13 @@ def list_communities():
     context = _base_list_communities_context()
     context["next_url"] = url_for('main.list_communities', page=communities.next_num, sort_by=sort_by,
                        **args_dict) if communities.has_next else None
-    context["prev_url"] = url_for('main.list_communities', page=communities.prev_num, sort_by=sort_by, 
+    context["prev_url"] = url_for('main.list_communities', page=communities.prev_num, sort_by=sort_by,
                        **args_dict) if communities.has_prev and page != 1 else None
 
     context.update({
         "communities": communities,
         "search": search_param,
-        "title": _('Communities'), 
+        "title": _('Communities'),
         "intance": instance,
         "home_select": home_select,
         "topics": topics,
@@ -738,7 +738,7 @@ def test():
     user = User.query.get(1)
     send_registration_approved_email(user)
 
-    markdown = """What light novels have you read in the past week? Something good? Bad? Let us know about it. 
+    markdown = """What light novels have you read in the past week? Something good? Bad? Let us know about it.
 
 And if you want to add your score to the database to help your fellow Bookworms find new reading materials you can use the following template:
 
@@ -1148,11 +1148,11 @@ def static_manifest():
     manifest['id'] = f'{current_app.config["SERVER_URL"]}'
     manifest['name'] = g.site.name if g.site.name else 'PieFed'
     manifest['description'] = g.site.description if g.site.description else ''
-    
+
     # Update icons to use custom logos with fallbacks
     logo_512 = get_setting('logo_512', '')
     logo_192 = get_setting('logo_192', '')
-    
+
     # Update the icons array
     for icon in manifest.get('icons', []):
         if icon.get('sizes') == '192x192':
@@ -1178,7 +1178,7 @@ def list_feeds():
     if search_param == '':
         # find all the feeds marked as public
         public_feeds = feed_tree_public()
-        
+
     else:
         # find all the feeds marked as public that match the search param
         public_feeds = feed_tree_public(search_param)
@@ -1280,40 +1280,19 @@ def index_rss(feed_type=None):
     post_ids = paginate_post_ids(post_ids, 0, page_length=50)
     posts = post_ids_to_models(post_ids, 'new')
 
-    description = shorten_string(g.site.description, 150) if g.site.description else None
-    og_image = g.site.logo if g.site.logo else None
-    fg = FeedGenerator()
-    fg.id(f"{current_app.config['SERVER_URL']}/{feed_type}{rss_token}")
-    fg.title(f'{g.site.name} - {feed_type.capitalize()}')
-    fg.link(href=f"{current_app.config['SERVER_URL']}", rel='alternate')
-    if og_image:
-        fg.logo(og_image)
-    else:
-        fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-    if description:
-        fg.subtitle(description)
-    else:
-        fg.subtitle(' ')
-    fg.link(href=f"{current_app.config['SERVER_URL']}/feed", rel='self')
-    fg.language('en')
+    server_url = current_app.config['SERVER_URL']
+    description = shorten_string(g.site.description, 150) if g.site.description else ' '
+    image = g.site.logo if g.site.logo\
+                      else f"{server_url}/static/images/apple-touch-icon.png"
+    feed = RSSFeed(title = f'{g.site.name} - {feed_type.capitalize()}',
+                   link = server_url,
+                   description = description,
+                   logo = image,
+                   self_link = f"{server_url}/feed",
+                   language = 'en'
+                 )
 
-    for post in posts:
-        fe = fg.add_entry()
-        fe.title(post.title)
-        if post.slug:
-            fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-        else:
-            fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-        if post.url:
-            type = mimetype_from_url(post.url)
-            if type and not type.startswith('text/'):
-                fe.enclosure(post.url, type=type)
-        fe.description(post.body_html)
-        fe.guid(post.profile_id(), permalink=True)
-        fe.author(name=post.author.user_name)
-        fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-
-    response = make_response(fg.rss_str())
+    response = make_response(feed.create_feed(posts, server_url))
     response.headers.set('Content-Type', 'application/rss+xml')
     response.headers.add_header('ETag', f"home_{hash(g.site.last_active)}")
     response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
@@ -1328,7 +1307,7 @@ def random():
         sql = """select c.id from "community" c
                 inner join instance i on c.instance_id = i.id
                 where c.banned is false and i.gone_forever is false and c.post_count > 0 and c.private is false
-                and i.id not in :blocked_instances and c.nsfw is false 
+                and i.id not in :blocked_instances and c.nsfw is false
                 order by random()
                 limit 1"""
         community_id = db.session.execute(text(sql), {'blocked_instances': tuple(blocked)}).scalar_one_or_none()
@@ -1433,7 +1412,7 @@ def receive_webhook():
 
     if not payload:
         return jsonify({"error": "no payload received"}), 400
-    
+
     plugins.fire_hook("webhook", payload)
 
     return '', 202

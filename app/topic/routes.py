@@ -3,7 +3,6 @@ from datetime import timedelta, timezone
 from random import randint
 from typing import List
 
-from feedgen.feed import FeedGenerator
 from flask import request, flash, url_for, current_app, redirect, abort, make_response, g
 from flask_babel import _
 from flask_login import current_user
@@ -18,12 +17,13 @@ from app.inoculation import inoculation
 from app.models import Topic, Community, NotificationSubscription, PostReply, utcnow
 from app.topic import bp
 from app.topic.forms import SuggestTopicsForm
-from app.utils import render_template, user_filters_posts, validation_required, mimetype_from_url, login_required, \
+from app.utils import render_template, user_filters_posts, validation_required, login_required, \
     gibberish, get_deduped_post_ids, paginate_post_ids, post_ids_to_models, blocked_communities, \
     recently_upvoted_posts, recently_downvoted_posts, blocked_or_banned_instances, blocked_users, \
     joined_or_modding_communities, \
     login_required_if_private_instance, communities_banned_from, reported_posts, user_notes, moderating_communities_ids, \
     approval_required, block_honey_pot, user_pronouns, community_membership_private, check_anoobis
+from app.rss_extras import RSSFeed
 
 
 @bp.route('/topic/<path:topic_path>', methods=['GET'])
@@ -218,51 +218,35 @@ def show_topic_rss(topic_path):
     last_topic_machine_name = topic_url_parts[-1]
     topic = Topic.query.filter(Topic.machine_name == last_topic_machine_name.strip().lower()).first()
 
-    if topic:
-        if topic.show_posts_in_children:  # include posts from child topics
-            topic_ids = get_all_child_topic_ids(topic)
-        else:
-            topic_ids = [topic.id]
-
-        community_ids = db.session.execute(
-            text('SELECT id FROM community WHERE banned is false AND private is false AND topic_id IN :topic_ids'),
-            {'topic_ids': tuple(topic_ids)}).scalars()
-        post_ids = get_deduped_post_ids('', list(community_ids), 'new')
-        post_ids = paginate_post_ids(post_ids, 0, page_length=100)
-        posts = post_ids_to_models(post_ids, 'new')
-
-        fg = FeedGenerator()
-        fg.id(f"{current_app.config['SERVER_URL']}/topic/{last_topic_machine_name}")
-        fg.title(f'{topic.name} on {g.site.name}')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/topic/{last_topic_machine_name}", rel='alternate')
-        fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-        fg.subtitle(' ')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/topic/{last_topic_machine_name}.rss", rel='self')
-        fg.language('en')
-
-        for post in posts:
-            fe = fg.add_entry()
-            fe.title(post.title)
-            if post.slug:
-                fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-            else:
-                fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-            if post.url:
-                type = mimetype_from_url(post.url)
-                if type and not type.startswith('text/'):
-                    fe.enclosure(post.url, type=type)
-            fe.description(post.body_html)
-            fe.guid(post.profile_id(), permalink=True)
-            fe.author(name=post.author.user_name)
-            fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-
-        response = make_response(fg.rss_str())
-        response.headers.set('Content-Type', 'application/rss+xml')
-        response.headers.add_header('ETag', f"{topic.id}_{hash(g.site.last_active)}")
-        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
-        return response
-    else:
+    if not topic:
         abort(404)
+
+    if topic.show_posts_in_children:  # include posts from child topics
+        topic_ids = get_all_child_topic_ids(topic)
+    else:
+        topic_ids = [topic.id]
+
+    community_ids = db.session.execute(
+        text('SELECT id FROM community WHERE banned is false AND private is false AND topic_id IN :topic_ids'),
+        {'topic_ids': tuple(topic_ids)}).scalars()
+    post_ids = get_deduped_post_ids('', list(community_ids), 'new')
+    post_ids = paginate_post_ids(post_ids, 0, page_length=100)
+    posts = post_ids_to_models(post_ids, 'new')
+
+    server_url = current_app.config['SERVER_URL']
+    feed = RSSFeed(title = f'{topic.name} on {g.site.name}',
+                   link = f"{server_url}/topic/{last_topic_machine_name}",
+                   description = ' ',
+                   logo = f"{server_url}/static/images/apple-touch-icon.png",
+                   self_link = f"{server_url}/topic/{last_topic_machine_name}.rss",
+                   language = 'en'
+                 )
+
+    response = make_response(feed.create_feed(posts, server_url))
+    response.headers.set('Content-Type', 'application/rss+xml')
+    response.headers.add_header('ETag', f"{topic.id}_{hash(g.site.last_active)}")
+    response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+    return response
 
 
 @bp.route('/topic/<topic_name>/submit', methods=['GET', 'POST'])

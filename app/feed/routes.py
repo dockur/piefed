@@ -4,7 +4,6 @@ from datetime import timezone
 from random import randint
 from typing import List
 
-from feedgen.feed import FeedGenerator
 from flask import g, current_app, request, redirect, url_for, flash, abort, make_response
 from markupsafe import Markup
 from flask_babel import _
@@ -32,8 +31,9 @@ from app.utils import show_ban_message, piefed_markdown_to_lemmy_markdown, markd
     paginate_post_ids, get_deduped_post_ids, get_request, post_ids_to_models, recently_upvoted_posts, \
     recently_downvoted_posts, joined_or_modding_communities, login_required_if_private_instance, \
     communities_banned_from, reported_posts, user_notes, login_required, moderating_communities_ids, approval_required, \
-    blocked_or_banned_instances, blocked_communities, block_honey_pot, user_pronouns, mimetype_from_url, \
+    blocked_or_banned_instances, blocked_communities, block_honey_pot, user_pronouns, \
     community_membership_private, check_anoobis
+from app.rss_extras import RSSFeed
 
 
 @bp.route('/feed/new', methods=['GET', 'POST'])
@@ -268,7 +268,7 @@ def feed_copy(feed_id: int):
         db.session.add(feed)
         db.session.commit()
 
-        # get the FeedItems from the feed being copied and 
+        # get the FeedItems from the feed being copied and
         # make sure they all come over to the new Feed
         old_feed_items = FeedItem.query.join(Feed, FeedItem.feed_id == feed_to_copy.id).all()
         for item in old_feed_items:
@@ -344,7 +344,7 @@ def feed_notification(feed_id: int):
 def feed_add_community():
     # this expects a user_id, a new_feed_id, a current_feed_id,
     # and a community_id
-    # it will get those and then add a community to 
+    # it will get those and then add a community to
     # a feed using the FeedItem model
     user_id = int(request.args.get('user_id'))
     feed_id = int(request.args.get('new_feed_id'))
@@ -372,8 +372,8 @@ def feed_add_community():
 @bp.route('/feed/list', methods=['GET'])
 @login_required
 def feed_list():
-    # this takes a user id, community id, and current_feed id, 
-    # and returns a set of html entries of the users feeds 
+    # this takes a user id, community id, and current_feed id,
+    # and returns a set of html entries of the users feeds
 
     # get the user id
     user_id = int(request.args.get('user_id'))
@@ -415,7 +415,7 @@ def show_feed(feed):
         else:
             flash(_('Could not find that feed or it is not public. Try one of these instead...'))
             return redirect(url_for('main.list_feeds'))
-    
+
     if current_user.is_anonymous:
         if current_app.config['CONTENT_WARNING']:
             if feed.nsfl:
@@ -729,53 +729,37 @@ def show_feed_rss(feed_path):
     last_feed_machine_name = feed_url_parts[-1]
     feed = Feed.query.filter(Feed.machine_name == last_feed_machine_name.strip().lower()).first()
 
-    if feed:
-        # Get the feed_ids
-        if feed.show_posts_in_children:  # include posts from child feeds
-            feed_ids = get_all_child_feed_ids(feed)
-        else:
-            feed_ids = [feed.id]
-
-        # For each feed get the community ids (FeedItem) in the feed
-        feed_community_ids = []
-        for fid in feed_ids:
-            feed_items = FeedItem.query.join(Feed, FeedItem.feed_id == fid).all()
-            for item in feed_items:
-                feed_community_ids.append(item.community_id)
-
-        post_ids = get_deduped_post_ids('', feed_community_ids, 'new')
-        post_ids = paginate_post_ids(post_ids, 0, page_length=100)
-        posts = post_ids_to_models(post_ids, 'new')
-
-        fg = FeedGenerator()
-        fg.id(f"{current_app.config['SERVER_URL']}/f/{last_feed_machine_name}")
-        fg.title(f'{feed.title} on {g.site.name}')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/f/{last_feed_machine_name}", rel='alternate')
-        fg.logo(f"{current_app.config['SERVER_URL']}/static/images/apple-touch-icon.png")
-        fg.subtitle(' ')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/f/{last_feed_machine_name}.rss", rel='self')
-        fg.language('en')
-
-        for post in posts:
-            fe = fg.add_entry()
-            fe.title(post.title)
-            if post.slug:
-                fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-            else:
-                fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-            if post.url:
-                type = mimetype_from_url(post.url)
-                if type and not type.startswith('text/'):
-                    fe.enclosure(post.url, type=type)
-            fe.description(post.body_html)
-            fe.guid(post.profile_id(), permalink=True)
-            fe.author(name=post.author.user_name)
-            fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-
-        response = make_response(fg.rss_str())
-        response.headers.set('Content-Type', 'application/rss+xml')
-        response.headers.add_header('ETag', f"{feed.id}_{hash(g.site.last_active)}")
-        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
-        return response
-    else:
+    if not feed:
         abort(404)
+
+    # Get the feed_ids
+    if feed.show_posts_in_children:  # include posts from child feeds
+        feed_ids = get_all_child_feed_ids(feed)
+    else:
+        feed_ids = [feed.id]
+
+    # For each feed get the community ids (FeedItem) in the feed
+    feed_community_ids = []
+    for fid in feed_ids:
+        feed_items = FeedItem.query.join(Feed, FeedItem.feed_id == fid).all()
+        for item in feed_items:
+            feed_community_ids.append(item.community_id)
+
+    post_ids = get_deduped_post_ids('', feed_community_ids, 'new')
+    post_ids = paginate_post_ids(post_ids, 0, page_length=100)
+    posts = post_ids_to_models(post_ids, 'new')
+
+    server_url = current_app.config['SERVER_URL']
+    feed = RSSFeed(title = f'{feed.title} on {g.site.name}',
+                   link = f"{server_url}/f/{last_feed_machine_name}",
+                   description = ' ',
+                   logo = f"{server_url}/static/images/apple-touch-icon.png",
+                   self_link = f"{server_url}/f/{last_feed_machine_name}.rss",
+                   language = 'en'
+                 )
+
+    response = make_response(feed.create_feed(posts, server_url))
+    response.headers.set('Content-Type', 'application/rss+xml')
+    response.headers.add_header('ETag', f"{feed.id}_{hash(g.site.last_active)}")
+    response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+    return response
