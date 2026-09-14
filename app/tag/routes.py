@@ -2,7 +2,6 @@ from datetime import timezone
 from random import randint
 
 import flask
-from feedgen.feed import FeedGenerator
 from flask import redirect, url_for, flash, request, make_response, current_app, abort, g
 from flask_babel import _
 from flask_login import current_user
@@ -17,9 +16,10 @@ from app.tag import bp
 from app.topic.routes import get_all_child_topic_ids
 from app.utils import render_template, permission_required, user_filters_posts, blocked_or_banned_instances, \
     blocked_users, \
-    blocked_domains, mimetype_from_url, \
+    blocked_domains, \
     blocked_communities, login_required, moderating_communities_ids, community_membership_private, \
     login_required_if_private_instance
+from app.rss_extras import RSSFeed
 
 
 @bp.route('/tag/<tag>', methods=['GET'])
@@ -70,13 +70,13 @@ def show_tag(tag):
                 topic_ids = get_all_child_topic_ids(topic)
             else:
                 topic_ids = [topic.id]
-            
+
             community_ids = db.session.execute(
                 text('SELECT id FROM community WHERE banned is false AND topic_id IN :topic_ids'),
                 {'topic_ids': tuple(topic_ids)}).scalars()
-            
+
             posts = posts.filter(Post.community_id.in_(community_ids))
-        
+
         elif category and category == 'feed' and category_id:
             feed = Feed.query.get_or_404(category_id)
             # get the feed_ids
@@ -91,7 +91,7 @@ def show_tag(tag):
                 feed_items = FeedItem.query.join(Feed, FeedItem.feed_id == fid).all()
                 for item in feed_items:
                     community_ids.append(item.community_id)
-            
+
             posts = posts.filter(Post.community_id.in_(community_ids))
 
         posts = posts.order_by(desc(Post.posted_at))
@@ -130,40 +130,18 @@ def show_tag_rss(tag):
         posts = posts.filter(Community.private == False)
         posts = posts.order_by(desc(Post.posted_at)).limit(20).all()
 
-        description = None
-        og_image = None
-        fg = FeedGenerator()
-        fg.id(f"{current_app.config['SERVER_URL']}/tag/{tag.name}")
-        fg.title(f'#{tag.display_as} on {g.site.name}')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/tag/{tag.name}", rel='alternate')
-        if og_image:
-            fg.logo(og_image)
-        else:
-            fg.logo(f"{current_app.config['SERVER_URL']}{g.site.logo_152 if g.site.logo_152 else '/static/images/apple-touch-icon.png'}")
-        if description:
-            fg.subtitle(description)
-        else:
-            fg.subtitle(' ')
-        fg.link(href=f"{current_app.config['SERVER_URL']}/tag/{tag.name}/feed", rel='self')
-        fg.language('en')
+        server_url = current_app.config['SERVER_URL']
+        image =  f"{server_url}{g.site.logo_152}" if g.site.logo_152 \
+                          else f"{server_url}/static/images/apple-touch-icon.png"
+        feed = RSSFeed(title = f'#{tag.display_as} on {g.site.name}',
+                       link = f"{server_url}/tag/{tag.name}",
+                       description = ' ',
+                       logo = image,
+                       self_link = f"{server_url}/tag/{tag.name}/feed",
+                       language = 'en'
+                     )
 
-        for post in posts:
-            fe = fg.add_entry()
-            fe.title(post.title)
-            if post.slug:
-                fe.link(href=f"{current_app.config['SERVER_URL']}{post.slug}")
-            else:
-                fe.link(href=f"{current_app.config['SERVER_URL']}/post/{post.id}")
-            if post.url:
-                type = mimetype_from_url(post.url)
-                if type and not type.startswith('text/'):
-                    fe.enclosure(post.url, type=type)
-            fe.description(post.body_html)
-            fe.guid(post.profile_id(), permalink=True)
-            fe.author(name=post.author.user_name)
-            fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-
-        response = make_response(fg.rss_str())
+        response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
         return response
     else:
@@ -287,17 +265,17 @@ def tag_cloud(type, category_id: int):
         join(Post, Post.id == post_tag.c.post_id). \
         filter(Post.community_id.in_(community_ids), Post.deleted == False). \
         group_by(Tag.id)
-    
+
     tag_list_results = tags_query.paginate(page=page, per_page=50, error_out=False)
     next_url = url_for('tag.tag_cloud', type=type, category_id=category_id, view='list',
                         page=tag_list_results.next_num) if tag_list_results.has_next else None
     prev_url = url_for('tag.tag_cloud', type=type, category_id=category_id, view='list',
                         page=tag_list_results.prev_num) if tag_list_results.has_prev and page != 1 else None
 
-    
+
     # Limit to top 50 tags by usage for performance
     tag_results = tags_query.order_by(db.desc('num_posts')).limit(50).all()
-    
+
     # Prepare tag data for JavaScript
     tags_data = []
     tag_ids = []
@@ -308,7 +286,7 @@ def tag_cloud(type, category_id: int):
             'numPosts': num_posts
         })
         tag_ids.append(tag.id)
-    
+
     # Calculate tag relationships (co-occurrence in posts)
     relationships = {}
     if tag_ids:
@@ -321,7 +299,7 @@ def tag_cloud(type, category_id: int):
                 Post.community_id.in_(community_ids),
                 Post.deleted == False
             ).subquery()
-            
+
             # Find other tags that appear in the same posts
             cooccurrence_counts = db.session.query(
                 post_tag.c.tag_id.label('tag2_id'),
@@ -331,7 +309,7 @@ def tag_cloud(type, category_id: int):
                 post_tag.c.tag_id.in_(tag_ids),
                 post_tag.c.tag_id != tag1_id
             ).group_by(post_tag.c.tag_id).all()
-            
+
             if cooccurrence_counts:
                 relationships[tag1_id] = {
                     tag2_id: count for tag2_id, count in cooccurrence_counts

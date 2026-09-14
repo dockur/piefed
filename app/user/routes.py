@@ -576,20 +576,20 @@ def user_settings():
         flash(_('Your changes have been saved.'), 'success')
 
         resp = make_response(redirect(url_for('user.user_settings')))
-        
+
         # Handle max_hours_per_day changes with restriction logic
         current_max_hours = request.cookies.get('max_hours_per_day', '')
         new_max_hours = form.max_hours_per_day.data
         new_restriction_setting = form.max_hours_change_restriction.data
-        
+
         resp.set_cookie('max_hours_change_restriction', new_restriction_setting,
                         expires=datetime(year=2099, month=12, day=30))
-        
+
         # Only handle restriction date logic if max_hours_per_day has actually changed
         if str(new_max_hours) != str(current_max_hours):
             restriction_cookie = request.cookies.get('max_hours_restriction_date')
             current_date = datetime.now()
-            
+
             if restriction_cookie and current_max_hours and int(current_max_hours) > 0:
                 restriction_date = datetime.fromisoformat(restriction_cookie)
 
@@ -610,9 +610,9 @@ def user_settings():
                 # No current restriction or no current limit set, set restriction if needed
                 if new_restriction_setting != 'anytime' and new_max_hours and int(new_max_hours) > 0:
                     future_date = _calculate_future_date(new_restriction_setting)
-                    resp.set_cookie('max_hours_restriction_date', future_date.isoformat(), 
+                    resp.set_cookie('max_hours_restriction_date', future_date.isoformat(),
                                     expires=datetime(year=2099, month=12, day=30))
-        
+
         # Set the max_hours_per_day cookie (either new value or reverted old value)
         if new_max_hours:
             resp.set_cookie('max_hours_per_day', str(new_max_hours), expires=datetime(year=2099, month=12, day=30))
@@ -621,7 +621,7 @@ def user_settings():
             # Clear restriction cookies if no limit is set
             resp.set_cookie('max_hours_restriction_date', '', expires=datetime.min)
             resp.set_cookie('max_hours_change_restriction', '', expires=datetime.min)
-        
+
         resp.set_cookie('compact_level', form.compaction.data, expires=datetime(year=2099, month=12, day=30))
         resp.set_cookie('low_bandwidth', '1' if form.low_bandwidth_mode.data else '0',
                         expires=datetime(year=2099, month=12, day=30))
@@ -730,10 +730,10 @@ def user_settings_import_export():
             file_ext = os.path.splitext(import_file.filename)[1]
             if file_ext.lower() != '.json':
                 abort(400)
-            
+
             redis_key = f"import:{user.id}:{gibberish(15)}"
             imported_data = import_file.stream.read()
-            
+
             redis_client.set(redis_key, imported_data, ex=3600)
 
             # import settings in background task
@@ -969,7 +969,7 @@ def report_profile(actor):
                             description=form.description.data,
                             type=REPORT_TYPE_USER,
                             reporter_id=current_user.id,
-                            suspect_user_id=user.id, 
+                            suspect_user_id=user.id,
                             source_instance_id=1,
                             targets=targets_data)
             db.session.add(report)
@@ -1939,7 +1939,7 @@ def user_read_posts(sort=None):
     if current_user.hide_nsfw == 1:
         posts = posts.filter(Post.nsfw == False)
 
-    # get the list of post.ids that the 
+    # get the list of post.ids that the
     # current_user has already read/voted on
     posts = posts.join(read_posts, read_posts.c.read_post_id == Post.id).filter(read_posts.c.user_id == current_user.id)
 
@@ -2192,36 +2192,36 @@ def show_profile_rss(actor):
     else:
         user = find_actor_or_create(f'{current_app.config["SERVER_URL"]}/u/{actor}', create_if_not_found=False)
 
-    if user is not None:
-        # If nothing has changed since their last visit, return HTTP 304
-        current_etag = f"{user.id}_{hash(user.last_seen)}"
-        if request_etag_matches(current_etag):
-            return return_304(current_etag, 'application/rss+xml')
-
-        limit = request.args.get('limit', 20, int)
-        limit = max(min(limit, 100), 0)
-        posts = user.posts.filter(Post.from_bot == False, Post.deleted == False,
-                                  Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(limit).all()
-
-        server_url = current_app.config['SERVER_URL']
-        description = shorten_string(user.about, 150) if user.about else ' '
-        image = user.avatar_image() if user.avatar_id \
-                                        else f"{server_url}/static/images/apple-touch-icon.png"
-        feed = RSSFeed(title = f'{user.display_name()} on {g.site.name}',
-                       link = f"{server_url}/u/{actor}",
-                       description = description,
-                       logo = image,
-                       self_link = f"{server_url}/u/{actor}/feed",
-                       language = 'en'
-                     )
-
-        response = make_response(feed.create_feed(posts, server_url))
-        response.headers.set('Content-Type', 'application/rss+xml')
-        response.headers.add_header('ETag', f"{user.id}_{hash(user.last_seen)}")
-        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
-        return response
-    else:
+    if user is None:
         abort(404)
+
+    # If nothing has changed since their last visit, return HTTP 304
+    current_etag = f"{user.id}_{hash(user.last_seen)}"
+    if request_etag_matches(current_etag):
+        return return_304(current_etag, 'application/rss+xml')
+
+    limit = request.args.get('limit', 20, int)
+    limit = max(min(limit, 100), 0)
+    posts = user.posts.filter(Post.from_bot == False, Post.deleted == False,
+                              Post.status > POST_STATUS_REVIEWING).order_by(desc(Post.created_at)).limit(limit).all()
+
+    server_url = current_app.config['SERVER_URL']
+    description = shorten_string(user.about, 150) if user.about else ' '
+    image = user.avatar_image() if user.avatar_id \
+                                    else f"{server_url}/static/images/apple-touch-icon.png"
+    feed = RSSFeed(title = f'{user.display_name()} on {g.site.name}',
+                   link = f"{server_url}/u/{actor}",
+                   description = description,
+                   logo = image,
+                   self_link = f"{server_url}/u/{actor}/feed",
+                   language = 'en'
+                 )
+
+    response = make_response(feed.create_feed(posts, server_url))
+    response.headers.set('Content-Type', 'application/rss+xml')
+    response.headers.add_header('ETag', f"{user.id}_{hash(user.last_seen)}")
+    response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+    return response
 
 
 @bp.route('/user/files', methods=['GET', 'POST'])

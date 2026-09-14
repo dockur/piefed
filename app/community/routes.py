@@ -182,7 +182,7 @@ def add_remote():
         return show_ban_message()
     form = SearchRemoteCommunity()
     new_community = None
-    
+
     if get_setting("allow_default_user_add_remote_community", True) is False and not current_user.is_admin_or_staff():
         flash(_('Adding remote communities is restricted to admin and staff users only.'))
         return redirect(url_for('main.list_communities'))
@@ -544,7 +544,7 @@ def show_community(community: Community):
     # Upcoming events
     upcoming_events = db.session.execute(text("""SELECT e.start, p.title, p.id FROM "event" e
                                                  INNER JOIN post p on e.post_id = p.id
-                                                 WHERE e.start > now() AND p.deleted is false 
+                                                 WHERE e.start > now() AND p.deleted is false
                                                  AND p.community_id = :community_id AND p.status > :reviewing
                                                  ORDER BY e.start LIMIT 5"""),
                                          {'community_id': community.id, 'reviewing': POST_STATUS_REVIEWING}).all()
@@ -642,7 +642,7 @@ def show_community(community: Community):
     else:
         recently_upvoted = []
         recently_downvoted = []
-    
+
     if not community.is_local():
         is_dead = community.instance.gone_forever
         if is_dead:
@@ -713,8 +713,9 @@ def show_community_rss(actor):
         tag = request.args.get('tag', '')
         flair = request.args.get('flair', '')
 
-        tag = Tag.query.filter(Tag.display_as == tag.strip()).first() if tag else None
+        tag = Tag.query.filter(Tag.name == tag.strip()).first() if tag else None
         flair_id = find_flair_id(flair.strip(), community.id)
+
 
         posts = Post.query.filter(Post.community_id == community.id).filter(Post.from_bot == False, Post.deleted == False,
                                   Post.status > POST_STATUS_REVIEWING, Post.private == False)
@@ -803,7 +804,7 @@ def subscribe(actor):
             return redirect('/c/' + actor)
 
 
-# this is separated out from the subscribe route so it can be used by the 
+# this is separated out from the subscribe route so it can be used by the
 # admin.admin_federation.preload_form and feed subscription process as well
 @celery.task
 def do_subscribe(actor, user_id, admin_preload=False, joined_via_feed=False):
@@ -1141,7 +1142,7 @@ def add_post(actor, type=None):
                 form.video_url.data = request.args.get('link')
             form.title.data = request.args.get('title')
 
-    # empty post to pass since add_post.html extends edit_post.html 
+    # empty post to pass since add_post.html extends edit_post.html
     # and that one checks for a post.image_id for editing image posts
     post = None
 
@@ -1422,7 +1423,7 @@ def community_mod_list(community_id: int):
 def community_make_owner(community_id: int, user_id: int):
     community = Community.query.get_or_404(community_id)
     user = User.query.get_or_404(user_id)
-    
+
     if (community.is_owner() or current_user.is_admin_or_staff()) and community.is_moderator(user):
 
         new_owner_membership = CommunityMember.query.filter(CommunityMember.community_id == community_id, CommunityMember.user_id == user.id).first()
@@ -1449,7 +1450,7 @@ def community_make_owner(community_id: int, user_id: int):
 
     else:
         abort(401)
-    
+
     return redirect(url_for("community.community_mod_list", community_id=community_id))
 
 
@@ -1459,8 +1460,8 @@ def community_remove_owner(community_id: int, user_id: int):
     community = Community.query.get_or_404(community_id)
     user = User.query.get_or_404(user_id)
 
-    if ((current_user.is_admin_or_staff() and community.is_owner(user)) or 
-        (community.is_owner() and community.is_moderator(user) and not community.is_owner(user)) or 
+    if ((current_user.is_admin_or_staff() and community.is_owner(user)) or
+        (community.is_owner() and community.is_moderator(user) and not community.is_owner(user)) or
         (community.is_owner() and user.id == current_user.id)):
 
         if community.num_owners() == 1:
@@ -2498,7 +2499,7 @@ def community_flair_edit(community_id, flair_id):
 
             if not flair.ap_id:
                 flair.ap_id = flair.get_ap_id()
-            
+
             db.session.commit()
 
             task_selector('edit_community', user_id=current_user.id, community_id=community.id)
@@ -2531,7 +2532,7 @@ def community_flair_delete(community_id, flair_id):
         db.session.commit()
 
         task_selector('edit_community', user_id=current_user.id, community_id=community.id)
-        
+
         flash(_('Flair deleted.'))
         return redirect(url_for('community.community_flair', actor=community.link()))
     else:
@@ -2555,7 +2556,7 @@ def community_leave_all():
         if subscription is not False and subscription < SUBSCRIPTION_MODERATOR:
             # send leave requests to celery - also handles db commits and cache busting
             leave_community(community_id=community.id, src=SRC_WEB, bulk_leave=True)
-    
+
     joined_feed_ids = subscribed_feeds(current_user.id)
 
     if joined_feed_ids:
@@ -2565,7 +2566,7 @@ def community_leave_all():
             if subscription != SUBSCRIPTION_OWNER:
                 # send leave requests to celery - also handles db commits and cache busting
                 leave_feed(feed=feed, src=SRC_WEB, bulk_leave=True)
-    
+
     flash(_('You are being unsubscribed from all communities and feeds. '
             'Please allow a couple minutes for the process to complete.'))
 
@@ -2800,16 +2801,16 @@ def fixup_from_remote(actor: str):
     if not current_user.is_admin():
         flash(_("This function is only for admins"), "warning")
         return redirect(url_for('activitypub.community_profile', actor=actor))
-    
+
     actor = actor.strip()
-    
+
     if "@" not in actor:
         flash(_("This is a local community"))
         return redirect(url_for('activitypub.community_profile', actor=actor))
-    
+
     community = Community.query.filter_by(ap_id=actor).first()
 
     if community:
         schedule_actor_refresh(community, override=True)
-    
+
     return redirect(url_for('activitypub.community_profile', actor=actor))
