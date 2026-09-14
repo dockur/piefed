@@ -732,8 +732,12 @@ def show_community_rss(actor):
 
         server_url = current_app.config['SERVER_URL']
         description = shorten_string(community.description, 150) if community.description else ' '
-        image = community.image.source_url if community.image_id \
-                          else f"{server_url}/static/images/apple-touch-icon.png"
+        if community.icon_id:
+            image = community.icon.source_url
+        elif community.image_id:
+            image = community.image.source_url
+        else:
+            image = f"{server_url}/static/images/apple-touch-icon.png"
         feed = RSSFeed(title = f'{community.title} on {g.site.name}',
                        link = f"{server_url}/c/{actor}",
                        description = description,
