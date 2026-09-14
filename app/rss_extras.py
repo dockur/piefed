@@ -2,7 +2,7 @@ from datetime import timezone
 from urllib.parse import urlsplit
 
 from feedgen.feed import FeedGenerator
-from app.utils import mimetype_from_url, is_video_hosting_site
+from app.utils import mimetype_from_url
 # could be used later for instance checks: from app.models import User, Community, Post, PostReply
 
 ####################################################################################################
@@ -175,14 +175,12 @@ class RSSFeed:
         medium = {'url': url}
 
         type = mimetype_from_url(url)
-        if not type and is_video_hosting_site(url):
-            type = "text/html"
         if type:
             medium['type'] = type
 
         if image and url == image.source_url:
             if not type:  # may be None, e.g. for lemmy's image_proxy URLs
-                medium['medium'] = 'Image'
+                medium['medium'] = 'image'
             size = image.filesize()
             if size > 0:
                 medium['fileSize'] = str(size)
