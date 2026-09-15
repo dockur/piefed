@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupHidRead,
         setupShareIcons,
         setupAutoReload,
+        setupPopupTooltips,
 
         // must be last - see comment above
         setupDynamicContentObserver
@@ -2617,4 +2618,24 @@ function setupAutoReload() {
             setTimeout(setupVotableElements, 2000); // so people can vote with A and Z keys
         }
     }, 60000);  // once per minute
+}
+
+function setupPopupTooltips() {
+    // Find all warning elements with a title, add the necessary bootstrap attributes
+    document.querySelectorAll('span.fe-warning[title]').forEach(el => {
+      if (!el.hasAttribute('data-bs-toggle') && !el.dataset.tooltipSetup) {     // don't mess with dropdowns that use data-bs-toggle
+        el.setAttribute('data-bs-toggle', 'tooltip');
+        el.setAttribute('data-bs-placement', 'top');
+        el.dataset.tooltipSetup = 'true';
+      }
+    });
+
+    // Initialize tooltips only for elements that haven't been initialized yet
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]:not([data-tooltip-initialized])');
+    [...tooltipTriggerList].map(el => {
+      new bootstrap.Tooltip(el, {
+          delay: { show: 750, hide: 200 }
+      });
+      el.dataset.tooltipInitialized = 'true';
+    });
 }
