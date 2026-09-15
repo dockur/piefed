@@ -181,7 +181,7 @@ class RSSFeed:
         if image and url == image.source_url:
             if not type:  # may be None, e.g. for lemmy's image_proxy URLs
                 medium['medium'] = 'image'
-            size = image.filesize()
+            size = image.filesize(False)
             if size > 0:
                 medium['fileSize'] = str(size)
 
