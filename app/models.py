@@ -1247,7 +1247,7 @@ class User(UserMixin, db.Model):
             return False
 
     def is_rss_bot(self):
-        return self.bot and self.is_local() and self.user_name == 'feed_bot'
+        return self.bot and self.user_name == 'feed_bot'
 
     def trustworthy(self):
         if self.is_admin():
