@@ -288,7 +288,7 @@ def send_post(post_id, edit=False, session=None):
               'cc': cc,
               '@context': default_context()
             }
-            for instance in set(community.following_instances() + user.following_instances(software='piefed')):
+            for instance in set(community.following_instances() + user.following_instances(software=['piefed', 'mbin', 'pylova'])):
                 if instance.inbox and instance.online() and not user.has_blocked_instance(instance.id) and not instance_banned(instance.domain):
                     if instance.software in MICROBLOG_APPS:
                         if activity == 'create':

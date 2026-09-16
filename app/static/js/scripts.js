@@ -1725,7 +1725,8 @@ function setupDynamicContent() {
         setupTranslateAll,
         setupReactionDialog,
         setupCodeBlockCopy,
-        setupShareIcons
+        setupShareIcons,
+        setupPopupTooltips
     ]);
 
 
