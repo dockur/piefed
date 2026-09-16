@@ -1886,7 +1886,7 @@ def can_create_post(user, content: Community) -> bool:
     if content.banned:
         return False
 
-    if content.is_moderator(user) or user.is_admin():
+    if user.is_rss_bot() or content.is_moderator(user) or user.is_admin():
         return True
 
     if content.restricted_to_mods:
