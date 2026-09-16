@@ -468,10 +468,12 @@ class File(db.Model):
         if purge_cdn and purge_from_cache:
             flush_cdn_cache(purge_from_cache)
 
-    def filesize(self):
+    def filesize(self, total=True):
         size = 0
         if self.file_path and os.path.exists(self.file_path):
             size += os.path.getsize(self.file_path)
+        if total is False:
+            return size
         if self.thumbnail_path and os.path.exists(self.thumbnail_path):
             size += os.path.getsize(self.thumbnail_path)
         return size
