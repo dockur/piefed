@@ -1342,7 +1342,7 @@ def register(app):
                     item_body = item.get('description') or item.get('summary') or ''
 
                     input_data = {
-                        'title': item_title,
+                        'title': shorten_string(item_title, 250),
                         'url': strip_tracking(item_url),
                         'body': shorten_string(html_to_text(item_body), 500),
                         'language_id': site_language_id(g.site),  # Default language. Can this be found in the rss feed?
