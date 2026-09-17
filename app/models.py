@@ -1246,6 +1246,9 @@ class User(UserMixin, db.Model):
         else:
             return False
 
+    def is_rss_bot(self):
+        return self.bot and self.user_name == 'feed_bot'
+
     def trustworthy(self):
         if self.is_admin():
             return True
@@ -1626,8 +1629,8 @@ class User(UserMixin, db.Model):
 
         return True
 
-    # instances that have users which follow this user. (excluding the current instance)
-    def following_instances(self, include_dormant=False, software='') -> List[Instance]:
+    # instances that have users which follow this user. (excluding the current instance). Optionally limit to instances of the specificed software type
+    def following_instances(self, include_dormant=False, software: List[str] | None = None) -> List[Instance]:
         instances = db.session.query(Instance).join(User, User.instance_id == Instance.id).\
             join(UserFollower, UserFollower.remote_user_id == User.id).filter(UserFollower.local_user_id == self.id,
                                                                               UserFollower.is_inward == True)
@@ -1635,7 +1638,10 @@ class User(UserMixin, db.Model):
             instances = instances.filter(Instance.dormant == False)
         instances = instances.filter(Instance.id != 1, Instance.gone_forever == False)
         if software:
-            instances = instances.filter(Instance.software == software)
+            if len(software) == 1:
+                instances = instances.filter(Instance.software == software[0])
+            else:
+                instances = instances.filter(Instance.software.in_(software))
         return instances.distinct().all()
 
     def is_following(self, other_user) -> str:
