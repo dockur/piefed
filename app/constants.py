@@ -1,4 +1,4 @@
-VERSION = '1.8.0-dev'
+VERSION = '1.9.0-dev'
 
 POST_TYPE_LINK = 1
 POST_TYPE_ARTICLE = 2

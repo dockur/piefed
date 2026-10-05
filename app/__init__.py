@@ -112,8 +112,8 @@ def create_app(config_class=Config):
 
     app.wsgi_app = StripCookieVaryForAnonymous(ProxyFix(app.wsgi_app, x_for=1))
 
-    app.config["API_TITLE"] = "PieFed 1.7 Alpha API"
-    app.config["API_VERSION"] = "alpha 1.7"
+    app.config["API_TITLE"] = "PieFed 1.9 Alpha API"
+    app.config["API_VERSION"] = "alpha 1.9"
     app.config["OPENAPI_VERSION"] = "3.1.1"
     if not app.config["SECRET_KEY"]:
         raise Exception('You must set SECRET_KEY to a random sequence of numbers and letters.')
