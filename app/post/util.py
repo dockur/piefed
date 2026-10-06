@@ -318,7 +318,7 @@ def user_flair_on_post(post) -> dict:
     user_subq = db.session.query(PostReply.user_id).filter(PostReply.post_id.in_(all_post_ids)).distinct()
     # Include post author
     user_subq = user_subq.union(db.session.query(db.literal(post.user_id)))
-    for u_flair in UserFlair.query.filter(UserFlair.user_id.in_(user_subq)):
+    for u_flair in UserFlair.query.filter(UserFlair.user_id.in_(user_subq), UserFlair.community_id == post.community_id):
         user_flair[u_flair.user_id] = u_flair.flair
     return user_flair
 
