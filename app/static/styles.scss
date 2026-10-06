@@ -2478,15 +2478,30 @@ form {
 }
 
 .coolfieldset legend, .coolfieldset.expanded legend {
-	background: var(--whitesmoke) url(/static/images/expanded.gif) no-repeat center left var(--spacing-4);
+	// background: var(--whitesmoke) url(/static/images/expanded.svg) no-repeat center left var(--spacing-4);
+  background-color: var(--whitesmoke);
+  background-image: url(/static/images/expanded.svg);
+  background-size: 10px auto;
+  background-repeat: no-repeat;
+  background-position: center left var(--spacing-4);
 }
 
 .coolfieldset.collapsed legend{
-	background: var(--whitesmoke) url(/static/images/collapsed.gif) no-repeat center left var(--spacing-4);
+	// background: var(--whitesmoke) url(/static/images/collapsed.svg) no-repeat center left var(--spacing-4);
+  background-color: var(--whitesmoke);
+  background-image: url(/static/images/collapsed.svg);
+  background-size: 10px auto;
+  background-repeat: no-repeat;
+  background-position: center left var(--spacing-4);
 }
 
 .coolfieldset.expanded .coolfieldset.collapsed legend {
-	background: var(--whitesmoke) url(/static/images/collapsed.gif) no-repeat center left var(--spacing-4);
+	// background: var(--whitesmoke) url(/static/images/collapsed.svg) no-repeat center left var(--spacing-4);
+  background-color: var(--whitesmoke);
+  background-image: url(/static/images/collapsed.svg);
+  background-size: 10px auto;
+  background-repeat: no-repeat;
+  background-position: center left var(--spacing-4);
 }
 
 .domain_link {
@@ -3313,15 +3328,30 @@ div:has(> input.hide_field) {
 
 
 .coolfieldset.expanded legend {
-	background: var(--whitesmoke) url(/static/images/expanded.gif) no-repeat center left var(--spacing-4);
+	// background: var(--whitesmoke) url(/static/images/expanded.svg) no-repeat center left var(--spacing-4);
+  background-color: var(--whitesmoke);
+  background-image: url(/static/images/expanded.svg);
+  background-size: 10px auto;
+  background-repeat: no-repeat;
+  background-position: center left var(--spacing-4);
 }
 
 [data-bs-theme="dark"] .coolfieldset legend {
-	background: var(--super-dark-grey) url(/static/images/expanded.gif) no-repeat center left var(--spacing-4);
+	// background: var(--super-dark-grey) url(/static/images/expanded.svg) no-repeat center left var(--spacing-4);
+  background-color: var(--super-dark-grey);
+  background-image: url(/static/images/expanded.svg);
+  background-size: 10px auto;
+  background-repeat: no-repeat;
+  background-position: center left var(--spacing-4);
 }
 
 [data-bs-theme="dark"] .coolfieldset.collapsed legend{
-	background: var(--super-dark-grey) url(/static/images/collapsed.gif) no-repeat center left var(--spacing-4);
+	// background: var(--super-dark-grey) url(/static/images/collapsed.svg) no-repeat center left var(--spacing-4);
+  background-color: var(--super-dark-grey);
+  background-image: url(/static/images/collapsed.svg);
+  background-size: 10px auto;
+  background-repeat: no-repeat;
+  background-position: center left var(--spacing-4);
 }
 
 [data-bs-theme="dark"] .post_teaser_title_a {
