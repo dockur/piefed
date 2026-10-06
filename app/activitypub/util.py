@@ -3304,6 +3304,11 @@ def process_report(user, reported, request_json, session):
                         type=type, reporter_id=user.id, suspect_user_id=reported.id,
                         source_instance_id=user.instance_id, targets=targets_data)
         session.add(report)
+        session.commit()  # Need to commit to get an id
+        
+        # Add the report id to the targets data
+        targets_data['report_id'] = report.id
+        report.targets = targets_data
 
         # Notify site admin
         already_notified = set()
@@ -3339,6 +3344,11 @@ def process_report(user, reported, request_json, session):
                         suspect_community_id=reported.community.id, in_community_id=reported.community.id,
                         source_instance_id=user.instance_id, targets=targets_data)
         session.add(report)
+        session.commit()  # Need to commit to get an id
+                
+        # Add the report id to the targets data
+        targets_data['report_id'] = report.id
+        report.targets = targets_data
 
         already_notified = set()
         for mod in reported.community.moderators():
@@ -3390,6 +3400,12 @@ def process_report(user, reported, request_json, session):
                         source_instance_id=user.instance_id,
                         targets=targets_data)
         session.add(report)
+        session.commit()  # Need to commit to get an id
+                
+        # Add the report id to the targets data
+        targets_data['report_id'] = report.id
+        report.targets = targets_data
+        
         # Notify moderators
         already_notified = set()
         for mod in post.community.moderators():

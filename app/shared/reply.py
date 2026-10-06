@@ -337,6 +337,11 @@ def report_reply(reply, input, src, auth=None):
                     source_instance_id=reporter_user.instance_id,
                     targets=targets_data)
     db.session.add(report)
+    db.session.commit()  # Need to commit to get an id
+
+    # Add the report id to the targets data
+    targets_data['report_id'] = report.id
+    report.targets = targets_data
 
     # Notify local moderators, and send Flag to remote moderators
     # if user has not selected 'report_remote', just send to remote mods not on community's or suspect_users's instances
