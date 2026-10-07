@@ -1805,6 +1805,11 @@ ul.form-multicheck-columns li {
   filter: blur(var(--spacing-24));
 }
 
+.microblog_teaser .post_teaser_article_preview p, .microblog_teaser .post_teaser_link_preview p {
+  -webkit-line-clamp: 3; /* give microblogs a bit more teaser text because there is no heading */
+  line-clamp: 3;
+}
+
 time {
   white-space: nowrap;
 }
@@ -4215,6 +4220,15 @@ body.compact-min .post_teaser .post_teaser_image_preview img {
   max-height: calc(var(--spacing-16) * 10.625); /* 170px */
   width: auto;
   min-width: inherit;
+}
+body.compact-min .post_teaser .post_teaser_article_preview p, body.compact-min .post_teaser .post_teaser_link_preview p {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+body.compact-min .microblog_teaser .post_teaser_article_preview,
+body.compact-min .microblog_teaser .post_teaser_link_preview,
+body.compact-min .microblog_teaser .post_teaser_video_preview {
+  display: inherit;
 }
 body.compact-min .community_icon {
   width: var(--spacing-20);

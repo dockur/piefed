@@ -24,6 +24,19 @@ body.compact-min {
         min-width: inherit;
       }
     }
+
+    .post_teaser_article_preview p, .post_teaser_link_preview p {
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
+  }
+
+  .microblog_teaser {
+    .post_teaser_article_preview,
+    .post_teaser_link_preview,
+    .post_teaser_video_preview {
+      display: inherit;
+    }
   }
 
   .community_icon {

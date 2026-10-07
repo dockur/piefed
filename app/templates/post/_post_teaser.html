@@ -14,7 +14,7 @@
 {% if content_blocked and content_blocked == '-1' -%}
     {# do nothing - blocked by keyword filter #}
 {% else -%}
-<div class="h-entry pb-0 post_teaser type_{{ post.type }}{{ ' reported' if post.id in reported_posts }}{{ ' blocked' if content_blocked }}{{ ' blur' if blur_content }}{{ ' my_post' if current_user.get_id() == post.user_id }}"
+<div class="h-entry pb-0 post_teaser type_{{ post.type }}{{ ' microblog_teaser' if post.microblog }}{{ ' reported' if post.id in reported_posts }}{{ ' blocked' if content_blocked }}{{ ' blur' if blur_content }}{{ ' my_post' if current_user.get_id() == post.user_id }}"
     {% if content_blocked -%} title="{{ _('Filtered: ') }}{{ content_blocked }}"{% endif %} id="post_{{ post.id }}">
     <div class="row">
         {% if post.type == POST_TYPE_ARTICLE %}

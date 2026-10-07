@@ -974,6 +974,15 @@ ul.form-multicheck-columns {
   }
 }
 
+.microblog_teaser {
+  .post_teaser_article_preview, .post_teaser_link_preview {
+    p {
+      -webkit-line-clamp: 3;  /* give microblogs a bit more teaser text because there is no heading */
+      line-clamp: 3;
+    }
+  }
+}
+
 time {
   white-space: nowrap;
 }
