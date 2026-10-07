@@ -1226,6 +1226,11 @@ def community_report(community_id: int):
                         source_instance_id=1,
                         targets=targets_data)
         db.session.add(report)
+        db.session.commit()  # Need to commit to get an id
+
+        # Add the report id to the targets data
+        targets_data['report_id'] = report.id
+        report.targets = targets_data
 
         # Notify admin
         # todo: find all instance admin(s). for now just load User.id == 1

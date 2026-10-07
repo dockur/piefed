@@ -1059,6 +1059,11 @@ def report_profile(actor):
                             source_instance_id=1,
                             targets=targets_data)
             db.session.add(report)
+            db.session.commit()  # Need to commit to get an id
+
+            # Add the report id to the targets data
+            targets_data['report_id'] = report.id
+            report.targets = targets_data
 
             # Notify site admin
             already_notified = set()
@@ -1290,7 +1295,13 @@ def notification_goto(notification_id):
             current_user.unread_notifications -= 1
         notification.read = True
         db.session.commit()
-        return redirect(notification.url)
+
+        if notification.url == "/admin/reports" and "report_id" in notification.targets:
+            dest_url = notification.url + f"#report_{notification.targets["report_id"]}"
+        else:
+            dest_url = notification.url
+
+        return redirect(dest_url)
     else:
         abort(403)
 
