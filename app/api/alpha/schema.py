@@ -430,7 +430,6 @@ class ScheduledPost(Post):
     repeat = fields.String(required=True, validate=validate.OneOf(post_repeat_list))
 
 
-
 class PostAggregates(DefaultSchema):
     comments = fields.Integer(required=True)
     downvotes = fields.Integer(required=True)
