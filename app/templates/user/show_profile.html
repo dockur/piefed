@@ -428,7 +428,7 @@
                                     <a class="w-100 btn btn-primary" href="/u/{{ user.link() }}/ban">{{ _('Ban') }}</a>
                                 </div>
                                 {% if bot_challenge is none %}
-                                    {% if not user.bot and not user.bot_override %}
+                                    {% if not user.bot and not user.bot_override and not user.reposter and not user.reposter_override %}
                                     <div class="col-4">
                                         <a class="w-100 btn btn-primary confirm_first send_post" href="#" data-url="/u/{{ user.link() }}/bot_challenge">{{ _('Ask if reposter') }}</a>
                                     </div>

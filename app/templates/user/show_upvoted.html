@@ -86,11 +86,13 @@
         {% endif %}
         {% if upvoted %}
             <table class="table table-striped">
-                <tr><th>{{ _('Post') }}</th><th>{{ _('Author') }}</th></tr>
+                <tr><th>{{ _('Post') }}</th><th>{{ _('Author') }}</th><th>{{ _('Post created') }}</th><th>{{ _('Upvoted at') }}</th></tr>
                 {% for post in upvoted %}
                 <tr>
                     <td><a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id) }}">{{ post.title|shorten }}</a></td>
                     <td><a href="/u/{{ post.author.link() }}">{{ post.author.display_name() }}</a></td>
+                    <td nowrap="nowrap">{{ post.posted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td nowrap="nowrap">{{ post.vote_created_at.strftime('%Y-%m-%d %H:%M:%S') if post.vote_created_at else '' }}</td>
                 </tr>
                 {% endfor %}
             </table>

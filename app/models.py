@@ -1887,7 +1887,7 @@ class Post(db.Model):
                     instance_id=user.instance_id,
                     indexable=user.indexable,
                     microblog=microblog,
-                    posted_at=utcnow()
+                    posted_at=ap_parse_datetime(request_json['object']['published'] if 'published' in request_json['object'] else utcnow())
                     )
         if 'type' in request_json and request_json['type'] == 'Update':
             post.edited_at = utcnow()
@@ -2759,7 +2759,7 @@ class Post(db.Model):
                 self.update_reaction_cache()
 
             # Calculate new ranking values
-            self.ranking = self.post_ranking(self.spicy_score() + self.reply_count, self.created_at)
+            self.ranking = self.post_ranking(self.spicy_score() + self.reply_count, self.posted_at)
             self.ranking_scaled = self.ranking + self.community.scale_by()
 
             db.session.commit()
@@ -2825,8 +2825,8 @@ class PostReply(db.Model):
     private = db.Column(db.Boolean, default=False, index=True)
     distinguished = db.Column(db.Boolean, default=False)
     notify_author = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, index=True, default=utcnow)
-    posted_at = db.Column(db.DateTime, index=True, default=utcnow)
+    created_at = db.Column(db.DateTime, index=True, default=utcnow) # this is when the post arrived here
+    posted_at = db.Column(db.DateTime, index=True, default=utcnow)  # this is when the original server created it
     deleted = db.Column(db.Boolean, default=False, index=True)
     deleted_by = db.Column(db.Integer, index=True)
     replies_enabled = db.Column(db.Boolean, default=True)
@@ -2920,7 +2920,8 @@ class PostReply(db.Model):
                           distinguished=distinguished, answer=answer, private=private, indexable=user.indexable,
                           ap_id=request_json['object']['id'] if request_json else None,
                           ap_create_id=request_json['id'] if request_json else None,
-                          ap_announce_id=announce_id)
+                          ap_announce_id=announce_id,
+                          posted_at=ap_parse_datetime(request_json['object']['published'] if 'published' in request_json['object'] else utcnow()))
         if request_json and request_json['type'] == 'Update':
             reply.edited_at = utcnow()
         if reply.body:
@@ -4416,3 +4417,16 @@ def _large_community_subscribers() -> float:
 def _store_files_in_s3():
     return current_app.config['S3_ACCESS_KEY'] != '' and current_app.config['S3_ACCESS_SECRET'] != '' and \
         current_app.config['S3_ENDPOINT'] != ''
+
+
+def ap_parse_datetime(dt_str: str) -> datetime:
+    """
+    Parse a datetime string in any of these formats:
+    - 2026-10-07T20:40:31.642079Z       # Lemmy
+    - 2026-10-01T22:23:03.219228+00:00  # PieFed
+    - 2026-07-24T00:59:13+00:00         # Mbin
+
+    Returns a native Python datetime.
+    """
+    dt = pendulum.parse(dt_str, strict=False)
+    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)

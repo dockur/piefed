@@ -72,7 +72,9 @@
             </h1>
         {% endif %}
 
-        <p>{{ _('As you scan the table, look for blocks where the same target or dates occur.') }}</p>
+        <p>{{ _('As you scan the table, look for blocks where the same target or dates occur.') }}
+        {{ _('Votes are sent in batches so the When column is not totally accurate.') }}
+        </p>
 
         <table class="table table-striped">
             <tr><th>{{ _('Target') }}</th><th>{{ _('Post / comment') }}</th><th>{{ _('When') }}</th></tr>

@@ -279,7 +279,7 @@ def user_post_timing(actor):
         # posts made within 60 seconds of the post before or after them
         close_together = set()
         for newer, older in zip(posts, posts[1:]):
-            if (newer.posted_at - older.posted_at).total_seconds() < 60:
+            if (newer.posted_at - older.posted_at).total_seconds() < 46:
                 close_together.add(newer.id)
                 close_together.add(older.id)
 
