@@ -2921,7 +2921,7 @@ class PostReply(db.Model):
                           ap_id=request_json['object']['id'] if request_json else None,
                           ap_create_id=request_json['id'] if request_json else None,
                           ap_announce_id=announce_id,
-                          posted_at=ap_parse_datetime(request_json['object']['published'] if 'published' in request_json['object'] else utcnow()))
+                          posted_at=ap_parse_datetime(request_json['object']['published'] if request_json and 'published' in request_json['object'] else utcnow()))
         if request_json and request_json['type'] == 'Update':
             reply.edited_at = utcnow()
         if reply.body:
