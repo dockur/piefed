@@ -1219,7 +1219,7 @@ def get_scheduled_post(auth, data):
 
     user_id = authorise_api_user(auth) if auth else None
     if not user_id:
-            raise Exception("incorrect login")
+        raise Exception("incorrect login")
 
     post_json = scheduled_post_view(post=id, variant=2, user_id=user_id)
     return post_json
