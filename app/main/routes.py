@@ -889,11 +889,12 @@ def share():
     communities = Community.query.filter_by(banned=False).join(Post).filter(Post.url == url, Post.deleted == False,
                                                                             Post.status > POST_STATUS_REVIEWING,
                                                                             Post.from_bot == False,
+                                                                            Post.from_reposter == False,
                                                                             Community.name != 'microblogs').all()
     posts_keyed_by_community = {}
     if len(communities):
         posts = Post.query.filter(Post.url == url, Post.deleted == False, Post.status > POST_STATUS_REVIEWING,
-                                  Post.microblog == False, Post.from_bot == False).all()
+                                  Post.microblog == False, Post.from_bot == False, Post.from_reposter == False).all()
         for post in posts:
             posts_keyed_by_community[post.community_id] = post
 

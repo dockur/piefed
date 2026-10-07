@@ -37,10 +37,12 @@ def show_tag(tag):
             filter(Community.banned == False, Post.deleted == False, Post.status > POST_STATUS_REVIEWING,
                    Post.private == False)
 
-        if current_user.is_anonymous or current_user.ignore_bots == 1 or current_user.ignore_reposters == 1:
+        if current_user.is_anonymous or current_user.ignore_bots == 1:
             posts = posts.filter(Post.from_bot == False)
 
         if current_user.is_authenticated:
+            if current_user.ignore_reposters == 1:
+                posts = posts.filter(Post.from_reposter == False)
             domains_ids = blocked_domains(current_user.id)
             if domains_ids:
                 posts = posts.filter(or_(Post.domain_id.not_in(domains_ids), Post.domain_id == None))
@@ -125,7 +127,7 @@ def show_tag_rss(tag):
             join(post_tag, post_tag.c.post_id == Post.id).filter(post_tag.c.tag_id == tag.id). \
             filter(Community.banned == False, Post.deleted == False, Post.status > POST_STATUS_REVIEWING)
 
-        if current_user.is_anonymous or current_user.ignore_bots == 1 or current_user.ignore_reposters == 1:
+        if current_user.is_anonymous or current_user.ignore_bots == 1:
             posts = posts.filter(Post.from_bot == False)
         posts = posts.filter(Community.private == False)
         posts = posts.order_by(desc(Post.posted_at)).limit(20).all()
@@ -380,8 +382,10 @@ def tag_posts(tag_id):
                 feed_community_ids.append(item.community_id)
         posts = posts.filter(Post.community_id.in_(feed_community_ids))
 
-    if current_user.is_anonymous or current_user.ignore_bots == 1 or current_user.ignore_reposters == 1:
+    if current_user.is_anonymous or current_user.ignore_bots == 1:
         posts = posts.filter(Post.from_bot == False)
+    if current_user.is_authenticated and current_user.ignore_reposters == 1:
+        posts = posts.filter(Post.from_reposter == False)
     posts = posts.order_by(desc(Post.posted_at)).limit(70).all()
 
     return flask.render_template('tag/tag_posts.html', posts=posts)

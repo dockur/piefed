@@ -1297,7 +1297,7 @@ def notification_goto(notification_id):
         db.session.commit()
 
         if notification.url == "/admin/reports" and "report_id" in notification.targets:
-            dest_url = notification.url + f"#report_{notification.targets["report_id"]}"
+            dest_url = notification.url + f"#report_{notification.targets['report_id']}"
         else:
             dest_url = notification.url
 

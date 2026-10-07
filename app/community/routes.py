@@ -2761,7 +2761,7 @@ def check_url_already_posted():
     if url:
         url = remove_tracking_from_link(url.strip())
         posts = Post.query.filter(Post.url == url, Post.deleted == False, Post.status > POST_STATUS_REVIEWING,
-                                  Post.microblog == False, Post.from_bot == False).all()
+                                  Post.microblog == False, Post.from_bot == False, Post.from_reposter == False).all()
         title, description = retrieve_metadata_of_url(url)
         return flask.render_template('community/check_url_posted.html', posts=posts,
                                      title=title, description=description)
