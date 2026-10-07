@@ -1487,7 +1487,7 @@ def post_alpha_user_follow(data):
 @user_bp.arguments(UserUnfollowRequest)
 @user_bp.response(200, UserUnfollowResponse)
 @user_bp.alt_response(400, schema=DefaultError)
-def post_alpha_user_follow(data):
+def post_alpha_user_unfollow(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
