@@ -13,6 +13,7 @@ default_sorts_list = ["Hot", "Top", "New", "Active", "Old", "Scaled"]
 default_comment_sorts_list = ["Hot", "Top", "New", "Old"]
 post_sort_list = ["Hot", "Top", "TopHour", "TopSixHour", "TopTwelveHour", "TopWeek", "TopDay", "TopMonth",
                   "TopThreeMonths", "TopSixMonths", "TopNineMonths", "TopYear", "TopAll", "New", "Old", "Scaled", "Active"]
+post_repeat_list = ['None', 'Daily', 'Weekly', 'Monthly']
 comment_sort_list = ["Hot", "Top", "TopAll", "New", "Old", "Controversial"]
 community_sort_list = ["Hot", "Top", "New", "Old", "Active", "TopAll", "TopPosts", "TopSubscribers", "NewFederated", "OldFederated"]
 listing_type_list = ["All", "Local", "Subscribed", "Popular", "Moderating", "ModeratorView"]
@@ -420,6 +421,16 @@ class Post(DefaultSchema):
     gallery = fields.List(fields.String(metadata={"format": "url"}))
 
 
+class ScheduledPost(Post):
+    class Meta:
+        exclude = ("published",)
+
+    created = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    next_scheduled_for = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    repeat = fields.String(required=True, validate=validate.OneOf(post_repeat_list))
+
+
+
 class PostAggregates(DefaultSchema):
     comments = fields.Integer(required=True)
     downvotes = fields.Integer(required=True)
@@ -462,8 +473,17 @@ class PostView(DefaultSchema):
     activity_alert = fields.Boolean()
     alt_text = fields.String()
     my_vote = fields.Integer()
+    blurred = fields.Boolean(metadata={"description": "Should the post be blurred per the community/user settings?"})
+    filtered = fields.Boolean(metadata={"description": "Would this post be otherwise blocked by a user filter?"})
     flair_list = fields.List(fields.Nested(CommunityFlair), metadata={"description": "See also the simpler 'flair' on post which can be used when editing"})
     can_auth_user_moderate = fields.Boolean()
+
+
+class ScheduledPostView(PostView):
+    class Meta:
+        exclude = ("post", "hidden", "read", "saved", "unread_comments", "my_vote")
+
+    scheduled_post = fields.Nested(ScheduledPost, required=True)
 
 
 class CommunityAggregates(DefaultSchema):
@@ -1342,6 +1362,17 @@ class GetPostRequest(DefaultSchema):
 
 class GetPostResponse(DefaultSchema):
     post_view = fields.Nested(PostView, required=True)
+    community_view = fields.Nested(CommunityView)
+    moderators = fields.List(fields.Nested(CommunityModeratorView))
+    cross_posts = fields.List(fields.Nested(PostView))
+
+
+class GetScheduledPostRequest(DefaultSchema):
+    id = fields.Integer(required=True)
+
+
+class GetScheduledPostResponse(DefaultSchema):
+    scheduled_post_view = fields.Nested(ScheduledPostView, required=True)
     community_view = fields.Nested(CommunityView)
     moderators = fields.List(fields.Nested(CommunityModeratorView))
     cross_posts = fields.List(fields.Nested(PostView))

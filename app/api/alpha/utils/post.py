@@ -6,7 +6,7 @@ from sqlakeyset import get_page
 from sqlalchemy.exc import IntegrityError
 
 from app import db, plugins, cache
-from app.api.alpha.views import post_view, post_report_view, reply_view, community_view, user_view, flair_view
+from app.api.alpha.views import post_view, post_report_view, reply_view, community_view, user_view, scheduled_post_view
 from app.constants import *
 from app.feed.routes import get_all_child_feed_ids
 from app.models import Post, Community, CommunityMember, utcnow, User, Feed, FeedItem, Topic, PostReply, PostVote, \
@@ -1211,6 +1211,17 @@ def get_post(auth, data):
     user_id = authorise_api_user(auth) if auth else None
 
     post_json = post_view(post=id, variant=3, user_id=user_id)
+    return post_json
+
+
+def get_scheduled_post(auth, data):
+    id = data['id']
+
+    user_id = authorise_api_user(auth) if auth else None
+    if not user_id:
+            raise Exception("incorrect login")
+
+    post_json = scheduled_post_view(post=id, variant=2, user_id=user_id)
     return post_json
 
 

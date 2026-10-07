@@ -347,6 +347,43 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
         return v5
 
 
+def scheduled_post_view(post: Post | int, variant: int, user_id: int | None = None) -> dict:
+    if isinstance(post, int):
+        post = Post.query.get(post)
+        if post is None:
+            raise NoResultFound
+
+    if not post.scheduled_for:
+        raise Exception("Not a scheduled post")
+
+    # Variant 1 - ScheduledPost schema
+    if variant == 1:
+        v1 = post_view(post, variant=1, user_id=user_id)
+        v1['created'] = v1.pop('published')
+        v1['next_scheduled_for'] = post.scheduled_for.isoformat(timespec="microseconds") + 'Z'
+        v1['repeat'] = post.repeat.capitalize() if post.repeat else "None"
+
+        return v1
+
+    # Variant 2 - ScheduledPostView schema
+    if variant == 2:
+        v2 = post_view(post, variant=3, user_id=user_id)
+        post_json = v2["post_view"]
+        del v2["post_view"]
+
+        # Clean up some stuff that isn't needed for scheduled posts
+        keys_to_remove = ["post", "hidden", "read", "saved", "unread_comments", "my_vote"]
+        for key in keys_to_remove:
+            if key in post_json:
+                del post_json[key]
+
+        post_json["scheduled_post"] = scheduled_post_view(post, variant=1, user_id=user_id)
+
+        v2['scheduled_post_view'] = post_json
+
+        return v2
+
+
 # 'user' param can be anyone (including the logged in user), 'user_id' param belongs to the user making the request
 @cache.memoize(timeout=600)
 def user_view(user: User | int, variant, stub=False, user_id=None, flair_community_id=None, usernotes=None) -> dict:
