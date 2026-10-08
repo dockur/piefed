@@ -295,7 +295,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
         elif "scheduled_for" in input and input["scheduled_for"]:
             scheduled_for = ap_parse_datetime(input["scheduled_for"])
 
-        if "repeat" in input and input["repeat"]:
+        if scheduled_for and "repeat" in input and input["repeat"]:
             repeat = input["repeat"].lower()
         else:
             repeat = None
