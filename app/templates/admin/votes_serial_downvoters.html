@@ -20,13 +20,20 @@
             <table class="table table-striped">
                 <tr>
                     <th>{{ _('Downvoter') }}</th>
+                    <th>{{ _('Victim') }}</th>
                     <th>{{ _('Vote burst') }}</th>
                     <th> </th>
                 </tr>
                 {% for row in rows %}
-                    {% set link = row.voter_ap_id if row.voter_ap_id else row.voter %}
+                    {% set link = row.voter_ap_id if row.voter_ap_id else row.voter -%}
+                    {% if row.author_domain -%}
+                        {% set victim_link = row.author + '@' + row.author_domain -%}
+                    {% else -%}
+                        {% set victim_link = row.author -%}
+                    {% endif -%}
                     <tr>
                         <td><a href="/u/{{ link }}">{{ link }}</a></td>
+                        <td><a href="/u/{{ victim_link }}">{{ victim_link }}</a></td>
                         <td>{{ row.max_downvotes_in_3min }}</td>
                         <td>
                             <a class="small" href="/u/{{ link }}/post_timing">{{ _('post timing') }}</a> |
