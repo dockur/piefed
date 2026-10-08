@@ -515,7 +515,7 @@ def get_alpha_post_list(data):
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
     resp = get_post_list(auth, data)
-    if data.get('debug'):
+    if data.get('debug') or current_app.debug:
         validated = list_posts_response.load(resp)
         return orjson_response(validated)
     else:
@@ -532,7 +532,7 @@ def get_alpha_post_list2(data):
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
     resp = get_post_list2(auth, data)
-    if data.get('debug'):
+    if data.get('debug') or current_app.debug:
         validated = ListPostsResponse().load(resp)
         return orjson_response(validated)
     else:
@@ -819,7 +819,7 @@ def get_alpha_comment_list(data):
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
     resp = get_reply_list(auth, data)
-    if data.get('debug'):
+    if data.get('debug') or current_app.debug:
         validated = list_comments_response.load(resp)
         return orjson_response(validated)
     else:
