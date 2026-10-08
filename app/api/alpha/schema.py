@@ -1579,6 +1579,7 @@ class ScheduledPostListRequest(DefaultSchema):
                   "description": "`New` means that the post with the next scheduled posting time will be returned first. `Relevance` only applies when querying with `q`"})
     community_name = fields.String(metadata={"description": "`comm_name@instance.tld` format - local communities can omit the `@instance.tld` if convenient"})
     community_id = fields.Integer()
+    include_deleted = fields.Boolean()
     limit = fields.Integer(metadata={"default": 50})
     page = fields.Integer(metadata={"default": 1})
 

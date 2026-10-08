@@ -656,6 +656,7 @@ def get_scheduled_post_list(auth, data):
     community_id = int(data['community_id']) if 'community_id' in data else None
     community_name = data['community_name'] if 'community_name' in data else None
     query = data['q'] if 'q' in data else ''
+    include_deleted = data['include_deleted'] if 'include_deleted' in data else False
 
     user_id = authorise_api_user(auth) if auth else None
     if not user_id:
@@ -666,7 +667,10 @@ def get_scheduled_post_list(auth, data):
         sort = "New"
 
     # Start by getting all scheduled posts for the user
-    scheduled_posts = Post.query.filter(Post.deleted == False, Post.status == POST_STATUS_SCHEDULED, Post.user_id == user_id)
+    scheduled_posts = Post.query.filter(Post.status == POST_STATUS_SCHEDULED, Post.user_id == user_id)
+
+    if not include_deleted:
+        scheduled_posts = scheduled_posts.filter(Post.deleted == False)
 
     # Filter by community
     if community_id or community_name:
