@@ -422,7 +422,7 @@ class Post(DefaultSchema):
 
 
 class ScheduledPost(Post):
-    class Meta:
+    class Meta(DefaultSchema.Meta):
         exclude = ("published",)
 
     created = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
@@ -479,7 +479,7 @@ class PostView(DefaultSchema):
 
 
 class ScheduledPostView(PostView):
-    class Meta:
+    class Meta(DefaultSchema.Meta):
         exclude = ("post", "hidden", "read", "saved", "unread_comments", "my_vote")
 
     scheduled_post = fields.Nested(ScheduledPost, required=True)
@@ -1448,6 +1448,10 @@ class EditScheduledPostRequest(EditPostRequest):
 class DeletePostRequest(DefaultSchema):
     post_id = fields.Integer(required=True)
     deleted = fields.Boolean(required=True)
+
+
+class DeleteScheduledPostRequest(DeletePostRequest):
+    pass
 
 
 class ReportPostRequest(DefaultSchema):

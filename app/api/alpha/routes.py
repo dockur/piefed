@@ -715,6 +715,19 @@ def post_alpha_post_delete(data):
     return GetPostResponse().load(resp)
 
 
+@post_bp.route('/post/scheduled/delete', methods=['POST'])
+@post_bp.doc(summary="Delete a scheduled post.")
+@post_bp.arguments(DeleteScheduledPostRequest)
+@post_bp.response(200, GetScheduledPostResponse)
+@post_bp.alt_response(400, schema=DefaultError)
+def post_alpha_scheduled_post_delete(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = post_post_delete(auth, data)
+    return GetScheduledPostResponse().load(resp)
+
+
 @post_bp.route('/post/report', methods=['POST'])
 @post_bp.doc(summary="Report a post.")
 @post_bp.arguments(ReportPostRequest)

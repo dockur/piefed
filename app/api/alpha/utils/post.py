@@ -1683,7 +1683,11 @@ def post_post_delete(auth, data):
     else:
         user_id, post = restore_post(post_id, SRC_API, auth)
 
-    post_json = post_view(post=post, variant=4, user_id=user_id)
+    if post.status == POST_STATUS_SCHEDULED:
+        post_json = scheduled_post_view(post=post, variant=2, user_id=user_id)
+    else:
+        post_json = post_view(post=post, variant=4, user_id=user_id)
+    
     return post_json
 
 
