@@ -26,7 +26,7 @@
                 {% for row in rows %}
                     {% set link = row.ap_id if row.ap_id else row.user_name %}
                     <tr>
-                        <td><a href="/u/{{ link }}">{{ link }}</a></td>
+                        <td><a href="/u/{{ link }}">{{ link }}</a>{% if row.reposter or row.reposter_override %}<span class="small">(reposter)</span>{% endif %}</td>
                         <td>{{ row.post_count }}</td>
                         <td>
                             <a class="small" href="/u/{{ link }}/post_timing">{{ _('post timing') }}</a> |

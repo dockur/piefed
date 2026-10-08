@@ -1,4 +1,4 @@
-SELECT u.id, u.user_name, u.ap_id, u.ap_profile_id, u.bot, u.bot_override,
+SELECT u.id, u.user_name, u.ap_id, u.ap_profile_id, u.bot, u.bot_override, u.reposter, u.reposter_override,
        p.post_count,
        COALESCE(v.other_votes, 0) AS votes_on_others,
        COALESCE(v.self_votes, 0)  AS self_votes
