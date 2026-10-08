@@ -1412,13 +1412,18 @@ class CreatePostRequest(DefaultSchema):
     title = fields.String(required=True, validate=validate_non_empty_string)
     community_id = fields.Integer(required=True)
     alt_text = fields.String(metadata={"description": "Will be used for image posts or link posts that point to images"})
-    body = fields.String()
+    body = fields.String(metadata={"format": "markdown"})
     url = fields.String(metadata={"format": "url"})
     nsfw = fields.Boolean()
     ai_generated = fields.Boolean()
     language_id = fields.Integer()
     event = fields.Nested(PostEvent, allow_none=True)
     poll = fields.Nested(PostPoll, allow_none=True)
+
+
+class CreateScheduledPostRequest(CreatePostRequest):
+    scheduled_for = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    repeat = fields.String(validate=validate.OneOf(post_repeat_list), metadata={"default": "None", "description": "Will default to `None` if field is omitted"})
 
 
 class EditPostRequest(DefaultSchema):

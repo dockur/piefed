@@ -1540,6 +1540,10 @@ def post_post(auth, data):
     language_id = data['language_id'] if 'language_id' in data else site_language_id()
     if language_id < 2:
         language_id = site_language_id()
+
+    # Scheduled post fields
+    scheduled_for = data['scheduled_for'] if 'scheduled_for' in data else None
+    repeat = data['repeat'] if 'repeat' in data else None
     
     user_id = authorise_api_user(auth)
 
@@ -1557,8 +1561,16 @@ def post_post(auth, data):
     else:
         type = POST_TYPE_ARTICLE
 
-    input = {'title': title, 'body': body, 'url': url, 'nsfw': nsfw, 'language_id': language_id, 'notify_author': True,
-             'ai_generated': ai_generated, 'image_alt_text': alt_text}
+    input = {'title': title,
+             'body': body,
+             'url': url,
+             'nsfw': nsfw,
+             'language_id': language_id,
+             'notify_author': True,
+             'ai_generated': ai_generated,
+             'image_alt_text': alt_text,
+             'scheduled_for': scheduled_for,
+             'repeat': repeat}
 
     # Add event data if present
     if 'event' in data and data['event']:
@@ -1583,7 +1595,11 @@ def post_post(auth, data):
 
     user_id, post = make_post(input, community, type, SRC_API, auth)
 
-    post_json = post_view(post=post, variant=4, user_id=user_id)
+    if not scheduled_for:
+        post_json = post_view(post=post, variant=4, user_id=user_id)
+    else:
+        post_json = scheduled_post_view(post=post, variant=2, user_id=user_id)
+    
     return post_json
 
 
