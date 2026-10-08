@@ -353,6 +353,10 @@ def scheduled_post_view(post: Post | int, variant: int, user_id: int | None = No
         if post is None:
             raise NoResultFound
 
+    # Ensure that the auth'd user is the author of the post
+    if not user_id == post.author.id:
+        raise Exception("Not authorized to view")
+
     if not post.scheduled_for:
         raise Exception("Not a scheduled post")
 

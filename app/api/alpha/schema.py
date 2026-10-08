@@ -1557,6 +1557,18 @@ class ListPostsRequest(Schema):
     ignore_sticky = fields.Boolean(metadata={"default": False, "description": "Ignores a post's sticky state when sorting"})
 
 
+class ScheduledPostListRequest(DefaultSchema):
+    q = fields.String()
+    sort = fields.String(
+        validate=validate.OneOf(["New", "Old", "Relevance"]),
+        metadata={"default": "New", 
+                  "description": "`New` means that the post with the next scheduled posting time will be returned first. `Relevance` only applies when querying with `q`"})
+    community_name = fields.String(metadata={"description": "`comm_name@instance.tld` format - local communities can omit the `@instance.tld` if convenient"})
+    community_id = fields.Integer()
+    limit = fields.Integer(metadata={"default": 50})
+    page = fields.Integer(metadata={"default": 1})
+
+
 class ListPostsRequest2(ListPostsRequest):
     page = fields.String(metadata={"default": ""})
 
@@ -1751,6 +1763,11 @@ class ImageDeleteResponse(DefaultSchema):
 
 class ListPostsResponse(Schema):
     posts = fields.List(fields.Nested(PostView), required=True)
+    next_page = fields.String(allow_none=True)
+
+
+class ScheduledPostListResponse(DefaultSchema):
+    scheduled_posts = fields.List(fields.Nested(ScheduledPostView), required=True)
     next_page = fields.String(allow_none=True)
 
 

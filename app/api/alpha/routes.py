@@ -17,7 +17,7 @@ from app.api.alpha.utils.misc import get_search, get_resolve_object, get_suggest
 from app.api.alpha.utils.post import get_post_list, get_post, post_post_like, put_post_save, put_post_subscribe, \
     post_post, put_post, post_post_delete, post_post_report, post_post_lock, post_post_feature, post_post_remove, \
     post_post_mark_as_read, get_post_replies, get_post_like_list, put_post_set_flair, get_post_list2, post_poll_vote, \
-    post_post_hide, get_post_report_list, put_post_report_resolve, get_scheduled_post
+    post_post_hide, get_post_report_list, put_post_report_resolve, get_scheduled_post, get_scheduled_post_list
 from app.api.alpha.utils.private_message import get_private_message_list, post_private_message, \
     post_private_message_mark_as_read, get_private_message_conversation, put_private_message, post_private_message_delete, \
     post_private_message_report, post_leave_conversation, get_private_message_report_list, \
@@ -537,6 +537,19 @@ def get_alpha_post_list2(data):
         return orjson_response(validated)
     else:
         return orjson_response(resp)
+
+
+@post_bp.route('/post/scheduled/list', methods=['GET'])
+@post_bp.doc(summary="List the user's scheduled posts")
+@post_bp.arguments(ScheduledPostListRequest, location="query", unknown=INCLUDE)
+@post_bp.response(200, ScheduledPostListResponse)
+@post_bp.alt_response(400, schema=DefaultError)
+def get_alpha_scheduled_post_list(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_scheduled_post_list(auth, data)
+    return ScheduledPostListResponse().load(resp)
 
 
 @post_bp.route('/post', methods=['GET'])
