@@ -437,8 +437,9 @@ def user_profile(actor):
                         "url": f"{current_app.config['SERVER_URL']}{user.cover_image()}"
                     }
             if user.about_html:
-                actor_data['summary'] = user.about_html
-                actor_data['source'] = {'content': user.about, 'mediaType': 'text/markdown'}
+                if not(user.is_local() and user.ban_posts):
+                    actor_data['summary'] = user.about_html
+                    actor_data['source'] = {'content': user.about, 'mediaType': 'text/markdown'}
             if user.matrix_user_id:
                 actor_data['matrixUserId'] = user.matrix_user_id
             if user.extra_fields.count() > 0:

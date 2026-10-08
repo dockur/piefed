@@ -168,26 +168,28 @@
                 {% if user.stripe_subscription_id %}<strong>{{ _('Donor') }}</strong><br />{% endif %}
             {% endif -%}
         </p>
-        {% if user.about_html and (user.trustworthy() or current_user.is_authenticated) -%}
-            <div class="profile_bio">
-                {{ user.about_html|safe }}
-            </div>
-        {% endif -%}
-        {% if user.extra_fields and (user.trustworthy() or current_user.is_authenticated) -%}
-            <ul class="list-group">
-                {% for field in user.extra_fields -%}
-                    <li class="list-group-item">
-                        <p class="mb-0"><strong>{{ field.label }}</strong><br>
-                           {% if field.text.startswith('http') -%}
-                                <a href="{{ field.text }}" rel="nofollow noindex ugc{{ ' me' if field.label.lower() == 'mastodon' }}">{{ field.text }}</a>
-                           {% else -%}
-                                {{ field.text }}
-                           {% endif -%}
-                        </p>
-                    </li>
-                {% endfor -%}
-            </ul>
-        {% endif -%}
+        {% if user.id == current_user.get_id() or current_user.get_id() in admin_ids or not(user.is_local() and user.ban_posts) %}
+            {% if user.about_html and (user.trustworthy() or current_user.is_authenticated) -%}
+                <div class="profile_bio">
+                    {{ user.about_html|safe }}
+                </div>
+            {% endif -%}
+            {% if user.extra_fields and (user.trustworthy() or current_user.is_authenticated) -%}
+                <ul class="list-group">
+                    {% for field in user.extra_fields -%}
+                        <li class="list-group-item">
+                            <p class="mb-0"><strong>{{ field.label }}</strong><br>
+                               {% if field.text.startswith('http') -%}
+                                    <a href="{{ field.text }}" rel="nofollow noindex ugc{{ ' me' if field.label.lower() == 'mastodon' }}">{{ field.text }}</a>
+                               {% else -%}
+                                    {{ field.text }}
+                               {% endif -%}
+                            </p>
+                        </li>
+                    {% endfor -%}
+                </ul>
+            {% endif -%}
+        {% endif %}
         <ul class="nav nav-tabs nav-justified mt-4">
           <li class="nav-item">
             <a href="#overview_tab" class="nav-link {{ 'active' if post_prev_url is none and replies_prev_url is none and show_posts_tab is none }}" id="overview-pill" data-bs-toggle="pill" role="tab" aria-current="page">{{ _('Overview') }}</a>
