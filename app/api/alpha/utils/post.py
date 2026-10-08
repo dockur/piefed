@@ -6,7 +6,7 @@ from sqlakeyset import get_page
 from sqlalchemy.exc import IntegrityError
 
 from app import db, plugins, cache
-from app.api.alpha.views import post_view, post_report_view, reply_view, community_view, user_view, flair_view
+from app.api.alpha.views import post_view, post_report_view, reply_view, community_view, user_view, scheduled_post_view
 from app.constants import *
 from app.feed.routes import get_all_child_feed_ids
 from app.models import Post, Community, CommunityMember, utcnow, User, Feed, FeedItem, Topic, PostReply, PostVote, \
@@ -644,6 +644,81 @@ def get_post_list(auth, data, user_id=None, search_type='Posts') -> dict:
     return list_json
 
 
+def get_scheduled_post_list(auth, data):
+    sort = data['sort'] if 'sort' in data else "New"
+    if 'page_cursor' in data:
+        page = int(data['page_cursor'])
+    elif 'page' in data:
+        page = int(data['page'])
+    else:
+        page = 1
+    limit = int(data['limit']) if 'limit' in data else 50
+    community_id = int(data['community_id']) if 'community_id' in data else None
+    community_name = data['community_name'] if 'community_name' in data else None
+    query = data['q'] if 'q' in data else ''
+    include_deleted = data['include_deleted'] if 'include_deleted' in data else False
+
+    user_id = authorise_api_user(auth) if auth else None
+    if not user_id:
+        raise Exception("incorrect login")
+
+    # Handle special sort case, ignore relevance sorting if not searching
+    if not query and sort == "Relevance":
+        sort = "New"
+
+    # Start by getting all scheduled posts for the user
+    scheduled_posts = Post.query.filter(Post.status == POST_STATUS_SCHEDULED, Post.user_id == user_id)
+
+    if not include_deleted:
+        scheduled_posts = scheduled_posts.filter(Post.deleted == False)
+
+    # Filter by community
+    if community_id or community_name:
+        community = None
+        if community_id:
+            community = Community.query.get(community_id)
+        else:
+            # Parse the community name to get the community
+            if '@' not in community_name:
+                community_name_lookup = f"{community_name}@{current_app.config['SERVER_NAME']}"
+            else:
+                community_name_lookup = community_name
+            name, ap_domain = community_name_lookup.split('@')
+            community = Community.query.filter_by(name=name, ap_domain=ap_domain).first()
+
+        if community:
+            scheduled_posts = scheduled_posts.filter(Post.community_id == community.id)
+        else:
+            if community_id:
+                raise Exception("Community not found")
+            else:
+                raise Exception("Community not found. Check to make sure the name is accurate as community_name is case-sensitive")
+
+    # Filter with a search
+    if query:
+        scheduled_posts = scheduled_posts.search(query, sort=sort == 'Relevance')
+
+    # Sort the results
+    if sort == "Old":
+        scheduled_posts = scheduled_posts.order_by(Post.scheduled_for.desc())
+    elif sort == "New":
+        scheduled_posts = scheduled_posts.order_by(Post.scheduled_for)
+
+    # Paginate the results
+    scheduled_posts = scheduled_posts.paginate(page=page, per_page=limit, error_out=False)
+
+    post_list = []
+
+    # Build the json for the posts
+    for scheduled_post in scheduled_posts.items:
+        post_list.append(scheduled_post_view(post=scheduled_post, variant=2, user_id=user_id)["scheduled_post_view"])
+
+    list_json = {"scheduled_posts": post_list,
+                 "next_page": str(scheduled_posts.next_num) if scheduled_posts.next_num is not None else None}
+
+    return list_json
+
+
 def get_post_votes_for_posts(user_id, post_ids):
     """Pre-fetch user votes for a list of posts to avoid N+1 queries in post_view()"""
     if not user_id or not post_ids:
@@ -1214,6 +1289,17 @@ def get_post(auth, data):
     return post_json
 
 
+def get_scheduled_post(auth, data):
+    id = data['id']
+
+    user_id = authorise_api_user(auth) if auth else None
+    if not user_id:
+        raise Exception("incorrect login")
+
+    post_json = scheduled_post_view(post=id, variant=2, user_id=user_id)
+    return post_json
+
+
 def get_post_replies(auth, data):
     sort = data['sort'] if 'sort' in data else 'New'
     max_depth = int(data['max_depth']) if 'max_depth' in data else None
@@ -1458,6 +1544,10 @@ def post_post(auth, data):
     language_id = data['language_id'] if 'language_id' in data else site_language_id()
     if language_id < 2:
         language_id = site_language_id()
+
+    # Scheduled post fields
+    scheduled_for = data['scheduled_for'] if 'scheduled_for' in data else None
+    repeat = data['repeat'] if 'repeat' in data else None
     
     user_id = authorise_api_user(auth)
 
@@ -1475,8 +1565,16 @@ def post_post(auth, data):
     else:
         type = POST_TYPE_ARTICLE
 
-    input = {'title': title, 'body': body, 'url': url, 'nsfw': nsfw, 'language_id': language_id, 'notify_author': True,
-             'ai_generated': ai_generated, 'image_alt_text': alt_text}
+    input = {'title': title,
+             'body': body,
+             'url': url,
+             'nsfw': nsfw,
+             'language_id': language_id,
+             'notify_author': True,
+             'ai_generated': ai_generated,
+             'image_alt_text': alt_text,
+             'scheduled_for': scheduled_for,
+             'repeat': repeat}
 
     # Add event data if present
     if 'event' in data and data['event']:
@@ -1501,7 +1599,11 @@ def post_post(auth, data):
 
     user_id, post = make_post(input, community, type, SRC_API, auth)
 
-    post_json = post_view(post=post, variant=4, user_id=user_id)
+    if not scheduled_for:
+        post_json = post_view(post=post, variant=4, user_id=user_id)
+    else:
+        post_json = scheduled_post_view(post=post, variant=2, user_id=user_id)
+    
     return post_json
 
 
@@ -1517,14 +1619,24 @@ def put_post(auth, data):
     language_id = data['language_id'] if 'language_id' in data else post.language_id
     tags = data['tags'] if 'tags' in data else tags_to_string(post) or ''
     flair = data['flair'] if 'flair' in data else flair_to_string(post) or ''
+    
     if language_id < 2:
         language_id = site_language_id()
+    
     if 'alt_text' in data:
         alt_text = data['alt_text']
     elif post.image and post.image.alt_text:
         alt_text = post.image.alt_text
     else:
         alt_text = ''
+
+    # Scheduled post fields
+    if post.status == POST_STATUS_SCHEDULED:
+        scheduled_for = data['scheduled_for'] if 'scheduled_for' in data else post.scheduled_for
+        repeat = data['repeat'] if 'repeat' in data else post.repeat
+    else:
+        scheduled_for = None
+        repeat = None
 
     # Determine post type - keep existing type unless explicitly changed
     type = post.type
@@ -1535,8 +1647,18 @@ def put_post(auth, data):
         else:
             type = POST_TYPE_ARTICLE
 
-    input = {'title': title, 'body': body, 'url': url, 'nsfw': nsfw, 'language_id': language_id, 'notify_author': True,
-             'tags': tags, 'flair': flair, 'ai_generated': ai_generated, 'image_alt_text': alt_text}
+    input = {'title': title,
+             'body': body,
+             'url': url,
+             'nsfw': nsfw,
+             'language_id': language_id,
+             'notify_author': True,
+             'tags': tags,
+             'flair': flair,
+             'ai_generated': ai_generated,
+             'image_alt_text': alt_text,
+             'scheduled_for': scheduled_for,
+             'repeat': repeat}
 
     # Add event data if present
     if 'event' in data and data['event']:
@@ -1548,7 +1670,11 @@ def put_post(auth, data):
 
     user_id, post = edit_post(input, post, type, SRC_API, auth=auth)
 
-    post_json = post_view(post=post, variant=4, user_id=user_id)
+    if not scheduled_for:
+        post_json = post_view(post=post, variant=4, user_id=user_id)
+    else:
+        post_json = scheduled_post_view(post=post, variant=2, user_id=user_id)
+    
     return post_json
 
 
@@ -1561,7 +1687,11 @@ def post_post_delete(auth, data):
     else:
         user_id, post = restore_post(post_id, SRC_API, auth)
 
-    post_json = post_view(post=post, variant=4, user_id=user_id)
+    if post.status == POST_STATUS_SCHEDULED:
+        post_json = scheduled_post_view(post=post, variant=2, user_id=user_id)
+    else:
+        post_json = post_view(post=post, variant=4, user_id=user_id)
+    
     return post_json
 
 

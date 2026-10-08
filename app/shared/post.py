@@ -19,7 +19,8 @@ from app.activitypub.util import make_image_sizes, notify_about_post
 from app.community.util import tags_from_string_old, end_poll_date, flair_from_form, flairs_from_string
 from app.constants import *
 from app.models import File, Notification, NotificationSubscription, Poll, PollChoice, Post, PostBookmark, PostVote, \
-    Report, Site, User, utcnow, Instance, Event, Community, CommunityFlair, votes_cast_today, post_file
+    Report, Site, User, utcnow, Instance, Event, Community, CommunityFlair, votes_cast_today, post_file, \
+    ap_parse_datetime
 from app.shared.tasks import task_selector
 from app.utils import render_template, authorise_api_user, shorten_string, gibberish, ensure_directory_exists, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, fixup_url, domain_from_url, \
@@ -267,10 +268,12 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
         image_alt_text = input['image_alt_text'] if 'image_alt_text' in input else ''
         if image_alt_text is None:
             image_alt_text = ''
+        
         if 'tags' in input:
             tags = tags_from_string_old(input['tags'])
         else:
             tags = []
+        
         if 'flair' in input:
             flair = flairs_from_string(input['flair'], post.community_id)
         elif 'flair_id' in input and input['flair_id']:
@@ -283,8 +286,23 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
             flair = [f for f in flair if f is not None]
         else:
             flair = []
+
         scheduled_for = None
         repeat = None
+
+        if "scheduled_for" in input and isinstance(input["scheduled_for"], datetime):
+            scheduled_for = input["scheduled_for"]
+        elif "scheduled_for" in input and input["scheduled_for"]:
+            scheduled_for = ap_parse_datetime(input["scheduled_for"])
+
+        if scheduled_for and "repeat" in input and input["repeat"]:
+            repeat = input["repeat"].lower()
+        else:
+            repeat = None
+
+        # Check that a scheduled post is in the future
+        if scheduled_for and utcnow() > scheduled_for:
+            raise Exception("A scheduled post must be scheduled for the future")
 
         # Parse event data from API
         event_data = input.get('event', None)

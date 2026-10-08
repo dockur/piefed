@@ -13,6 +13,7 @@ default_sorts_list = ["Hot", "Top", "New", "Active", "Old", "Scaled"]
 default_comment_sorts_list = ["Hot", "Top", "New", "Old"]
 post_sort_list = ["Hot", "Top", "TopHour", "TopSixHour", "TopTwelveHour", "TopWeek", "TopDay", "TopMonth",
                   "TopThreeMonths", "TopSixMonths", "TopNineMonths", "TopYear", "TopAll", "New", "Old", "Scaled", "Active"]
+post_repeat_list = ['None', 'Daily', 'Weekly', 'Monthly']
 comment_sort_list = ["Hot", "Top", "TopAll", "New", "Old", "Controversial"]
 community_sort_list = ["Hot", "Top", "New", "Old", "Active", "TopAll", "TopPosts", "TopSubscribers", "NewFederated", "OldFederated"]
 listing_type_list = ["All", "Local", "Subscribed", "Popular", "Moderating", "ModeratorView"]
@@ -420,6 +421,15 @@ class Post(DefaultSchema):
     gallery = fields.List(fields.String(metadata={"format": "url"}))
 
 
+class ScheduledPost(Post):
+    class Meta(DefaultSchema.Meta):
+        exclude = ("published",)
+
+    created = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    next_scheduled_for = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    repeat = fields.String(required=True, validate=validate.OneOf(post_repeat_list))
+
+
 class PostAggregates(DefaultSchema):
     comments = fields.Integer(required=True)
     downvotes = fields.Integer(required=True)
@@ -462,8 +472,17 @@ class PostView(DefaultSchema):
     activity_alert = fields.Boolean()
     alt_text = fields.String()
     my_vote = fields.Integer()
+    blurred = fields.Boolean(metadata={"description": "Should the post be blurred per the community/user settings?"})
+    filtered = fields.Boolean(metadata={"description": "Would this post be otherwise blocked by a user filter?"})
     flair_list = fields.List(fields.Nested(CommunityFlair), metadata={"description": "See also the simpler 'flair' on post which can be used when editing"})
     can_auth_user_moderate = fields.Boolean()
+
+
+class ScheduledPostView(PostView):
+    class Meta(DefaultSchema.Meta):
+        exclude = ("post", "hidden", "read", "saved", "unread_comments", "my_vote")
+
+    scheduled_post = fields.Nested(ScheduledPost, required=True)
 
 
 class CommunityAggregates(DefaultSchema):
@@ -1347,6 +1366,17 @@ class GetPostResponse(DefaultSchema):
     cross_posts = fields.List(fields.Nested(PostView))
 
 
+class GetScheduledPostRequest(DefaultSchema):
+    id = fields.Integer(required=True)
+
+
+class GetScheduledPostResponse(DefaultSchema):
+    scheduled_post_view = fields.Nested(ScheduledPostView, required=True)
+    community_view = fields.Nested(CommunityView)
+    moderators = fields.List(fields.Nested(CommunityModeratorView))
+    cross_posts = fields.List(fields.Nested(PostView))
+
+
 class GetSiteMetadataRequest(DefaultSchema):
     url = fields.String()
 
@@ -1382,13 +1412,18 @@ class CreatePostRequest(DefaultSchema):
     title = fields.String(required=True, validate=validate_non_empty_string)
     community_id = fields.Integer(required=True)
     alt_text = fields.String(metadata={"description": "Will be used for image posts or link posts that point to images"})
-    body = fields.String()
+    body = fields.String(metadata={"format": "markdown"})
     url = fields.String(metadata={"format": "url"})
     nsfw = fields.Boolean()
     ai_generated = fields.Boolean()
     language_id = fields.Integer()
     event = fields.Nested(PostEvent, allow_none=True)
     poll = fields.Nested(PostPoll, allow_none=True)
+
+
+class CreateScheduledPostRequest(CreatePostRequest):
+    scheduled_for = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    repeat = fields.String(validate=validate.OneOf(post_repeat_list), metadata={"default": "None", "description": "Will default to `None` if field is omitted"})
 
 
 class EditPostRequest(DefaultSchema):
@@ -1405,9 +1440,18 @@ class EditPostRequest(DefaultSchema):
     flair = fields.String(allow_none=True, metadata={"description": "Flair, separated by commas with no hash character"})
 
 
+class EditScheduledPostRequest(EditPostRequest):
+    scheduled_for = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    repeat = fields.String(validate=validate.OneOf(post_repeat_list))
+
+
 class DeletePostRequest(DefaultSchema):
     post_id = fields.Integer(required=True)
     deleted = fields.Boolean(required=True)
+
+
+class DeleteScheduledPostRequest(DeletePostRequest):
+    pass
 
 
 class ReportPostRequest(DefaultSchema):
@@ -1525,6 +1569,19 @@ class ListPostsRequest(Schema):
     feed_id = fields.Integer()
     topic_id = fields.Integer()
     ignore_sticky = fields.Boolean(metadata={"default": False, "description": "Ignores a post's sticky state when sorting"})
+
+
+class ScheduledPostListRequest(DefaultSchema):
+    q = fields.String()
+    sort = fields.String(
+        validate=validate.OneOf(["New", "Old", "Relevance"]),
+        metadata={"default": "New", 
+                  "description": "`New` means that the post with the next scheduled posting time will be returned first. `Relevance` only applies when querying with `q`"})
+    community_name = fields.String(metadata={"description": "`comm_name@instance.tld` format - local communities can omit the `@instance.tld` if convenient"})
+    community_id = fields.Integer()
+    include_deleted = fields.Boolean()
+    limit = fields.Integer(metadata={"default": 50})
+    page = fields.Integer(metadata={"default": 1})
 
 
 class ListPostsRequest2(ListPostsRequest):
@@ -1721,6 +1778,11 @@ class ImageDeleteResponse(DefaultSchema):
 
 class ListPostsResponse(Schema):
     posts = fields.List(fields.Nested(PostView), required=True)
+    next_page = fields.String(allow_none=True)
+
+
+class ScheduledPostListResponse(DefaultSchema):
+    scheduled_posts = fields.List(fields.Nested(ScheduledPostView), required=True)
     next_page = fields.String(allow_none=True)
 
 
