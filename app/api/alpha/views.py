@@ -52,7 +52,7 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
         if post.deleted and (user_id is None or user_id not in g.admin_ids):
             v1['body'] = ''
         if post.edited_at:
-            v1['edited_at'] = post.edited_at.isoformat(timespec="microseconds") + 'Z'
+            v1['updated'] = post.edited_at.isoformat(timespec="microseconds") + 'Z'
         if post.deleted == True:
             if post.deleted_by and post.user_id != post.deleted_by:
                 v1['removed'] = True

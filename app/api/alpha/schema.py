@@ -1440,6 +1440,11 @@ class EditPostRequest(DefaultSchema):
     flair = fields.String(allow_none=True, metadata={"description": "Flair, separated by commas with no hash character"})
 
 
+class EditScheduledPostRequest(EditPostRequest):
+    scheduled_for = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    repeat = fields.String(validate=validate.OneOf(post_repeat_list))
+
+
 class DeletePostRequest(DefaultSchema):
     post_id = fields.Integer(required=True)
     deleted = fields.Boolean(required=True)

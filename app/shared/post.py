@@ -287,20 +287,22 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
         else:
             flair = []
 
-        if "scheduled_for" in input and input["scheduled_for"]:
+        scheduled_for = None
+        repeat = None
+
+        if "scheduled_for" in input and isinstance(input["scheduled_for"], datetime):
+            scheduled_for = input["scheduled_for"]
+        elif "scheduled_for" in input and input["scheduled_for"]:
             scheduled_for = ap_parse_datetime(input["scheduled_for"])
 
-            if "repeat" in input and input["repeat"]:
-                repeat = input["repeat"].lower()
-            else:
-                repeat = None
-
-            # Check that a scheduled post is in the future
-            if utcnow() > scheduled_for:
-                raise Exception("A scheduled post must be scheduled for the future")
+        if "repeat" in input and input["repeat"]:
+            repeat = input["repeat"].lower()
         else:
-            scheduled_for = None
             repeat = None
+
+        # Check that a scheduled post is in the future
+        if scheduled_for and utcnow() > scheduled_for:
+            raise Exception("A scheduled post must be scheduled for the future")
 
         # Parse event data from API
         event_data = input.get('event', None)

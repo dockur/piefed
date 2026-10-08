@@ -689,6 +689,19 @@ def put_alpha_post(data):
     return GetPostResponse().load(resp)
 
 
+@post_bp.route('/post/scheduled', methods=['PUT'])
+@post_bp.doc(summary="Edit a scheduled post.")
+@post_bp.arguments(EditScheduledPostRequest)
+@post_bp.response(200, GetScheduledPostResponse)
+@post_bp.alt_response(400, schema=DefaultError)
+def put_alpha_scheduled_post(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_post(auth, data)
+    return GetScheduledPostResponse().load(resp)
+
+
 @post_bp.route('/post/delete', methods=['POST'])
 @post_bp.doc(summary="Delete or restore a post.")
 @post_bp.arguments(DeletePostRequest)
