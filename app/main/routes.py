@@ -1167,7 +1167,7 @@ def static_manifest():
 
     # S3 media url
     if store_files_in_s3():
-        manifest['scope_extensions'] = [{"origin": current_app.config['S3_PUBLIC_URL']}]
+        manifest['scope_extensions'] = [{"type": "origin", "origin": current_app.config['S3_PUBLIC_URL']}]
 
     # Build response with cache headers
     response = make_response(jsonify(manifest))

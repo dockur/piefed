@@ -422,6 +422,20 @@ class File(db.Model):
         thumbnail_path = self.thumbnail_path[4:] if self.thumbnail_path.startswith('app/') else self.thumbnail_path
         return f"{current_app.config['SERVER_URL']}/{thumbnail_path}"   # image paths must include fqdn (not just starting with /) because apps need to make a request from outside
 
+    def thumb_width(self):
+        if self.thumbnail_width:
+            return self.thumbnail_width
+        if self.width:
+            return self.width
+        return ''
+
+    def thumb_height(self):
+        if self.thumbnail_height:
+            return self.thumbnail_height
+        if self.width:
+            return self.height
+        return ''
+
     def is_image(self):
         common_image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.avif', '.svg+xml',
                                    '.svg+xml; charset=utf-8']

@@ -1378,6 +1378,9 @@ form .mb-3.required > label:after {
   z-index: 1031;
   text-wrap: nowrap;
   border-top-width: var(--border-2) !important;
+  /* own compositor layer - stops Chromium/Vivaldi hit-testing taps at the wrong offset after the browser toolbar hides */
+  transform: translateZ(0);
+  will-change: transform;
 }
 .mobilenav a {
   flex-grow: 1;

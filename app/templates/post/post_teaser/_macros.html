@@ -246,7 +246,7 @@
                 <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id) }}" aria-label="{{ _('Read post') }}"><span class="fe fe-reply"></span></a>
             {% else -%}
                     <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id) }}" aria-label="{{ _('Read post') }}"><img src="{{ post.image.thumbnail_url() }}" decoding="async" referrerpolicy="no-referrer"
-                        alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" /></a>
+                        alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.thumb_width() }}" height="{{ post.image.thumb_height() }}" /></a>
             {% endif -%}
         </div>
     {% endif -%}
@@ -270,7 +270,7 @@
                 <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id) }}" aria-label="{{ _('Read post') }}"><span class="fe fe-reply"></span></a>
             {% else -%}
                     <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id) }}" aria-label="{{ _('Read post') }}"><img src="{{ post.image.thumbnail_url() }}" decoding="async" referrerpolicy="no-referrer"
-                        alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" /></a>
+                         width="{{ post.image.thumb_width() }}" height="{{ post.image.thumb_height() }}" alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" /></a>
             {% endif -%}
         </div>
     {% endif -%}
@@ -295,7 +295,7 @@
                 <a href="{{ post.url }}" rel="nofollow ugc" class="post_link" target="_blank" aria-label="{{ _('Follow link') }}"><span class="fe fe-external"></span></a>
             {% else -%}
                 <a href="{{ post.url }}" rel="nofollow ugc" class="post_link" target="_blank" aria-label="{{ _('Read article') }}"><span class="fe fe-external"></span><img src="{{ post.image.thumbnail_url() }}" decoding="async" referrerpolicy="no-referrer"
-                         alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" /></a>
+                         width="{{ post.image.thumb_width() }}" height="{{ post.image.thumb_height() }}" alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" /></a>
             {% endif -%}
         </div>
     {% else %}
@@ -322,7 +322,7 @@
                 <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id) }}" aria-label="{{ _('Read post') }}"><span class="fe fe-reply"></span></a>
             {% else -%}
                 <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id) }}" aria-label="{{ _('Read post') }}"><img src="{{ post.image.thumbnail_url() }}" decoding="async" referrerpolicy="no-referrer"
-                        alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" /></a>
+                        width="{{ post.image.thumb_width() }}" height="{{ post.image.thumb_height() }}" alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" /></a>
             {% endif -%}
         </div>
     {% else -%}
