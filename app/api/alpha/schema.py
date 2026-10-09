@@ -97,6 +97,8 @@ class PersonAggregates(DefaultSchema):
     comment_count = fields.Integer(required=True)
     person_id = fields.Integer(required=True)
     post_count = fields.Integer(required=True)
+    follower_count = fields.Integer(required=True, metadata={"description": "Number of users following this account. This is total followers for local accounts, but only local followers for remote accounts."})
+    following_count = fields.Integer(required=True, metadata={"description": "Number of users this accounts follows, only non-zero for local accounts"})
 
 
 class PersonView(DefaultSchema):
