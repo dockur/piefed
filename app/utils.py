@@ -760,7 +760,7 @@ def handle_reddit_spoilers(text: str) -> str:
     placeholder = gibberish(10)
 
     # Step 1: Extract inline and block code, replacing with placeholders
-    code_snippets, text = stash_code_html(text, placeholder)
+    code_snippets, text = stash_code_md(text, placeholder)
 
     # Step 2: Do the regex matching and substitutions
     img_md = re.compile(r'>!\s?(.+?)\s?!<', re.M)
@@ -778,7 +778,7 @@ def handle_blockquotes(text: str) -> str:
     placeholder = gibberish(10)
 
     # Step 1: Extract inline and block code, replacing with placeholders
-    code_snippets, text = stash_code_html(text, placeholder)
+    code_snippets, text = stash_code_md(text, placeholder)
 
     # Step 2: Regex to capture all groups of lines preceded by > (roughly based on markdown2 regex)
     md_quotes = re.compile(r'((^[ \t]*>[ \t]?.*(\n|$))+)', re.M)
@@ -867,7 +867,7 @@ def handle_better_lists(text: str) -> str:
     placeholder = gibberish(10)
 
     # Step 1: Extract inline and block code, replacing with placeholders
-    code_snippets, text = stash_code_html(text, placeholder)
+    code_snippets, text = stash_code_md(text, placeholder)
 
     # Step 2: Split the whole entry into each newline
     text_list = text.splitlines()
