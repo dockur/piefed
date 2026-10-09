@@ -1653,7 +1653,7 @@ function setupDynamicContentObserver() {
         const targetClasses = [
             'send_post', 'confirm_first', 'showElement', 'show-more',
             'user_preview', 'hide_button', 'unhide', 'comment', 'autoresize',
-            'showPopupCommunitySidebar'
+            'showPopupCommunitySidebar', 'score'
         ];
         
         for (const mutation of mutations) {
