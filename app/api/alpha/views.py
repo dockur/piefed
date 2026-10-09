@@ -464,10 +464,8 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
             counts["following_count"] = 0
 
         if user.num_followers:
-            print("I should be here")
             counts["follower_count"] = user.num_followers
         else:
-            print("I am actually here")
             counts["follower_count"] = 0
         
         user_sub = False
