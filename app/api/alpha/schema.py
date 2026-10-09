@@ -933,7 +933,6 @@ class GetUserResponse(DefaultSchema):
     moderates = fields.List(fields.Nested(CommunityModeratorView), required=True)
     person_view = fields.Nested(PersonView, required=True)
     posts = fields.List(fields.Nested(PostView), required=True)
-    site = fields.Nested(Site)
 
 
 class UserLoginRequest(DefaultSchema):
