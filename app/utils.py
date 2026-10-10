@@ -909,6 +909,54 @@ def handle_better_lists(text: str) -> str:
     return text
 
 
+def handle_indented_codeblocks(text: str) -> str:
+    """Handles some special processing of indented code blocks (disgusting though they may be)"""
+
+    # Regex to capture groups of lines starting with at least four spaces or a tab (ignoring lines with only a \n)
+    block_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
+
+    def wrap_indented_block(match):
+        contents = match.group(0)
+
+        # Add attribute so that markdown2 later knows not to format the contents of this html tag
+        output = '<pre markdown="0"><code>'
+
+        # Figure out how much whitespace the first line of the match has - then strip that from the whole match
+        firstline = contents.splitlines()[0]
+        if firstline.startswith("\t"):
+            leading_chars = "\t"
+        else:
+            num_spaces = len(firstline) - len(firstline.lstrip())
+            leading_chars = num_spaces * " "
+
+        # Commence stripping
+        lines = contents.splitlines(keepends=True)
+        new_lines = []
+        for line in lines:
+            if line.startswith(leading_chars):
+                new_lines.append(line.removeprefix(leading_chars))
+            elif leading_chars == "\t" and line.startswith("    "):
+                new_lines.append(line.removeprefix("    "))
+            else:
+                new_lines.append(line)
+
+        # Join it all back up
+        contents = "".join(new_lines)
+
+        # Add the matched group
+        output += contents
+
+        # Close the html
+        output += '</code></pre>'
+
+        return output
+
+    # Do the regex work
+    text = re.sub(block_regex, wrap_indented_block, text)
+
+    return text
+
+
 # use this for Markdown irrespective of origin, as it can deal with both soft break newlines ('\n' used by PieFed) and hard break newlines ('  \n' or ' \\n')
 # ' \\n' will create <br /><br /> instead of just <br />, but hopefully that's acceptable.
 def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_target="_blank", test_env=False) -> str:
@@ -927,6 +975,11 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
         markdown_text = handle_naked_spoilers(markdown_text)
         markdown_text = handle_spoiler_spacing(markdown_text)
         markdown_text = handle_video_embeds(markdown_text)
+
+        # This needs to be the final pre-processing function prior to converting to html, or code blocks can get messed
+        markdown_text = handle_indented_codeblocks(markdown_text)
+
+        print(f"markdown after stashing code: {stash_code_md(markdown_text, placeholder=gibberish(10))}")
 
         try:
             md = markdown2.Markdown(extras={'middle-word-em': False,
@@ -1208,7 +1261,10 @@ def stash_code_md(text: str, placeholder: str) -> tuple[list, str]:
     def store_code(match):
         code_snippets.append(match.group(0))
         return f"{placeholder}{len(code_snippets) - 1}$"
-
+    
+    # Indented code blocks
+    text_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
+    text = re.sub(text_regex, store_code, text)
     # Fenced code blocks (```...```)
     text = re.sub(r'```[\s\S]*?```', store_code, text)
     # Inline code (`...`)
