@@ -967,128 +967,6 @@ def handle_indented_codeblocks(text: str) -> str:
 
     return text
 
-def stash_footnotes(text: str, placeholder: str) -> tuple[list, str]:
-    """
-    Stash footnote annotations so that they don't conflict with indented code blocks.
-    """
-
-    lines = text.splitlines(keepends=True)
-
-    # Regex to catch the beginning of a footnote annotation
-    footnote_beginning = re.compile(r'^\[\^.*\]:', re.M)
-
-    # Initialize stuff
-    footnote_snippets = []
-    temp_footnote = []
-    candidate_lines = []
-    footnote_continuations = ["\n", "\t", "    "]
-    output_lines = []
-    extra_line = gibberish(10)
-
-    # Add an extra line onto the end to make iterating easier, just ignore it later
-    lines.append(extra_line)
-
-    # Function to help stash a footnote
-    def get_placeholder(temp_footnote, len_snippets):
-        footnote_text = "".join(temp_footnote)
-        placeholder_text = f"{placeholder}{len_snippets}$"
-        
-        return [footnote_text, placeholder_text]
-
-    # Iterate through lines, handling the different cases
-    for line in lines:
-        # There are a bunch of different cases we can run into
-        if footnote_beginning.match(line):
-            # This line begins a new footnote
-            if temp_footnote:
-                # The previous line was part of another footnote, stash that one before beginning the new one
-                footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
-                
-                footnote_snippets.append(footnote_info[0])
-                output_lines.append(footnote_info[1] + "\n")
-
-                # If there was one or more candidate lines, append that before moving to the new footnote
-                if candidate_lines:
-                    for candidate_line in candidate_lines:
-                        output_lines.append(candidate_line)
-
-                # Stashed footnote, clear these placeholders
-                temp_footnote = []
-                candidate_lines = []
-            
-            # Start preserving the new footnote
-            temp_footnote = [line]
-
-        elif line == extra_line:
-            # This is the last line we added. Deal with any ongoing footnotes and don't include this text in the output
-            if temp_footnote:
-                # There is an ongoing footnote, stash it
-                footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
-                
-                footnote_snippets.append(footnote_info[0])
-                output_lines.append(footnote_info[1] + "\n")
-
-                # If there was one or more candidate lines, append that before moving to the new footnote
-                if candidate_lines:
-                    for candidate_line in candidate_lines:
-                        output_lines.append(candidate_line)
-                
-                # Stashed footnote, clear these placeholders
-                temp_footnote = []
-                candidate_line = ""
-
-        elif not temp_footnote:
-            # Previous line was not part of a footnote and this line doesn't start one
-            output_lines.append(line)
-
-        elif temp_footnote and not any(line.startswith(prefix) for prefix in footnote_continuations):
-            # There is an ongoing footnote, but this line isn't part of one. Stash the footnote and append the lines
-            footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
-
-            footnote_snippets.append(footnote_info[0])
-            output_lines.append(footnote_info[1] + "\n")
-
-            # If there was one or more candidate lines, append that before moving on
-            if candidate_lines:
-                for candidate_line in candidate_lines:
-                    output_lines.append(candidate_line)
-
-            # Clear the placeholders
-            temp_footnote = []
-            candidate_lines = []
-
-            # Append the current line that isn't part of a footnote
-            output_lines.append(line)
-
-        elif temp_footnote and any(line.startswith(prefix) for prefix in footnote_continuations):
-            # This line potentially continues the ongoing footnote
-            
-            # If it is just a line of whitespace, keep it provisionally before adding it to the footnote
-            if line.isspace():
-                candidate_lines.append(line)
-                continue
-
-            # This line is more than just whitespace - the footnote continues
-            # First, add any candidate lines saved up
-            if candidate_lines:
-                for candidate_line in candidate_lines:
-                    temp_footnote.append(candidate_line)
-            
-            # Then, add the non-whitespace line
-            temp_footnote.append(line)
-
-    # Done looping through the text, build the response
-    text = "".join(output_lines)
-
-    return (footnote_snippets, text)
-
-
-def pop_footnotes(footnote_snippets: list, text:str, placeholder: str) -> str:
-    for i, footnote in enumerate(footnote_snippets):
-        text = text.replace(f"{placeholder}{i}$", footnote)
-
-    return text
-
 
 # use this for Markdown irrespective of origin, as it can deal with both soft break newlines ('\n' used by PieFed) and hard break newlines ('  \n' or ' \\n')
 # ' \\n' will create <br /><br /> instead of just <br />, but hopefully that's acceptable.
@@ -1099,7 +977,7 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
 
         markdown_text = handle_reddit_spoilers(markdown_text)
 
-        # Escape <...> if it’s not a real HTML tag
+        # Escape <...> if it's not a real HTML tag
         markdown_text = escape_non_html_angle_brackets(
             markdown_text)  # To handle situations like https://ani.social/comment/9666667
 
@@ -1412,6 +1290,129 @@ def stash_code_md(text: str, placeholder: str) -> tuple[list, str]:
 def pop_code(code_snippets: list, text: str, placeholder: str) -> str:
     for i, code in enumerate(code_snippets):
         text = text.replace(f"{placeholder}{i}$", code)
+
+    return text
+
+
+def stash_footnotes(text: str, placeholder: str) -> tuple[list, str]:
+    """
+    Stash footnote annotations so that they don't conflict with indented code blocks.
+    """
+
+    lines = text.splitlines(keepends=True)
+
+    # Regex to catch the beginning of a footnote annotation
+    footnote_beginning = re.compile(r'^\[\^.*\]:', re.M)
+
+    # Initialize stuff
+    footnote_snippets = []
+    temp_footnote = []
+    candidate_lines = []
+    footnote_continuations = ["\n", "\t", "    "]
+    output_lines = []
+    extra_line = gibberish(10)
+
+    # Add an extra line onto the end to make iterating easier, just ignore it later
+    lines.append(extra_line)
+
+    # Function to help stash a footnote
+    def get_placeholder(temp_footnote, len_snippets):
+        footnote_text = "".join(temp_footnote)
+        placeholder_text = f"{placeholder}{len_snippets}$"
+        
+        return [footnote_text, placeholder_text]
+
+    # Iterate through lines, handling the different cases
+    for line in lines:
+        # There are a bunch of different cases we can run into
+        if footnote_beginning.match(line):
+            # This line begins a new footnote
+            if temp_footnote:
+                # The previous line was part of another footnote, stash that one before beginning the new one
+                footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
+                
+                footnote_snippets.append(footnote_info[0])
+                output_lines.append(footnote_info[1] + "\n")
+
+                # If there was one or more candidate lines, append that before moving to the new footnote
+                if candidate_lines:
+                    for candidate_line in candidate_lines:
+                        output_lines.append(candidate_line)
+
+                # Stashed footnote, clear these placeholders
+                temp_footnote = []
+                candidate_lines = []
+            
+            # Start preserving the new footnote
+            temp_footnote = [line]
+
+        elif line == extra_line:
+            # This is the last line we added. Deal with any ongoing footnotes and don't include this text in the output
+            if temp_footnote:
+                # There is an ongoing footnote, stash it
+                footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
+                
+                footnote_snippets.append(footnote_info[0])
+                output_lines.append(footnote_info[1] + "\n")
+
+                # If there was one or more candidate lines, append that before moving to the new footnote
+                if candidate_lines:
+                    for candidate_line in candidate_lines:
+                        output_lines.append(candidate_line)
+                
+                # Stashed footnote, clear these placeholders
+                temp_footnote = []
+                candidate_line = ""
+
+        elif not temp_footnote:
+            # Previous line was not part of a footnote and this line doesn't start one
+            output_lines.append(line)
+
+        elif temp_footnote and not any(line.startswith(prefix) for prefix in footnote_continuations):
+            # There is an ongoing footnote, but this line isn't part of one. Stash the footnote and append the lines
+            footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
+
+            footnote_snippets.append(footnote_info[0])
+            output_lines.append(footnote_info[1] + "\n")
+
+            # If there was one or more candidate lines, append that before moving on
+            if candidate_lines:
+                for candidate_line in candidate_lines:
+                    output_lines.append(candidate_line)
+
+            # Clear the placeholders
+            temp_footnote = []
+            candidate_lines = []
+
+            # Append the current line that isn't part of a footnote
+            output_lines.append(line)
+
+        elif temp_footnote and any(line.startswith(prefix) for prefix in footnote_continuations):
+            # This line potentially continues the ongoing footnote
+            
+            # If it is just a line of whitespace, keep it provisionally before adding it to the footnote
+            if line.isspace():
+                candidate_lines.append(line)
+                continue
+
+            # This line is more than just whitespace - the footnote continues
+            # First, add any candidate lines saved up
+            if candidate_lines:
+                for candidate_line in candidate_lines:
+                    temp_footnote.append(candidate_line)
+            
+            # Then, add the non-whitespace line
+            temp_footnote.append(line)
+
+    # Done looping through the text, build the response
+    text = "".join(output_lines)
+
+    return (footnote_snippets, text)
+
+
+def pop_footnotes(footnote_snippets: list, text:str, placeholder: str) -> str:
+    for i, footnote in enumerate(footnote_snippets):
+        text = text.replace(f"{placeholder}{i}$", footnote)
 
     return text
 
