@@ -58,7 +58,7 @@
         {% if post.nsfl -%}<span class="warning_badge nsfl" title="{{ _('Potentially emotionally scarring content') }}">{{ _('nsfl') }}</span>{% endif -%}
         {% if post.ai_generated and ((current_user.is_authenticated and current_user.hide_gen_ai == 2) or current_user.is_anonymous) -%}<span class="warning_badge ai_generated" title="{{ _('This post contains AI generated content') }}">{{ _('AI') }}</span>{% endif -%}
         {% if post.id in reported_posts -%}
-        <a href="{{ '/' + post.community.link() + '/moderate' }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
+        <a href="{{ '/community/' + post.community.link() + '/moderate' }}"><span class="red fe fe-report" title="{{ _('Reported. Check post for issues.') }}"></span></a>
         {% endif -%}
         {% if post.sticky -%}<span class="fe fe-sticky-right"></span>{% endif -%}
         {% if post.deleted -%}<span class="red fe fe-delete" title="{{ _('Post deleted') }}"></span>{% endif -%}
