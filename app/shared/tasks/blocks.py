@@ -156,7 +156,8 @@ def ban_person(session, user_id, mod_id, community_id, expiry, reason: str, remo
 
     # site ban
     if not community:
-        instances = session.query(Instance).filter(Instance.software.in_(['piefed', 'pylova', 'lemmy', 'mbin'])).all()
+        instances = session.query(Instance).filter(Instance.software.in_(['piefed', 'pylova', 'lemmy', 'mbin'])).\
+            filter(Instance.gone_forever == False, Instance.dormant == False).all()
         for instance in instances:
             if instance.inbox and instance.online() and instance.id != 1:
                 send_post_request(instance.inbox, object, mod.private_key, mod.public_url() + '#main-key')
