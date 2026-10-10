@@ -3360,6 +3360,14 @@ div:has(> input.hide_field) {
   background-position: center left var(--spacing-4);
 }
 
+[data-bs-theme="dark"] .coolfieldset.expanded .coolfieldset.collapsed legend {
+  background-color: var(--super-dark-grey);
+  background-image: url(/static/images/collapsed.svg);
+  background-size: 10px auto;
+  background-repeat: no-repeat;
+  background-position: center left var(--spacing-4);
+}
+
 [data-bs-theme="dark"] .post_teaser_title_a {
 
     &:visited {
