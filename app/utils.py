@@ -944,8 +944,10 @@ def handle_indented_codeblocks(text: str) -> str:
             if line.startswith(leading_chars):
                 new_lines.append(line.removeprefix(leading_chars))
             elif leading_chars == "\t" and line.startswith("    "):
+                # Default to tab = 4 spaces if needed
                 new_lines.append(line.removeprefix("    "))
             else:
+                # Shouldn't ever get here if we did our regex right, just a fallback
                 new_lines.append(line)
 
         # Join it all back up
