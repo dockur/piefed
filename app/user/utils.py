@@ -60,6 +60,36 @@ def purge_user_then_delete_task(user_id, flush):
             session.close()
 
 
+def purge_remote_user_then_delete(user_id, flush=True):
+    if current_app.debug:
+        purge_remote_user_then_delete_task(user_id, flush)
+    else:
+        purge_remote_user_then_delete_task.delay(user_id, flush)
+
+
+@celery.task
+def purge_remote_user_then_delete_task(user_id, flush):
+    with current_app.app_context():
+        session = get_task_session()
+        try:
+            with patch_db_session(session):
+                user = session.query(User).get(user_id)
+                if user:
+                    user.purge_content(flush=flush)
+
+                    from app import redis_client
+                    with redis_client.lock(f"lock:user:{user.id}", timeout=10, blocking_timeout=6):
+                        session.refresh(user) # often the removal of content will take a long time so get a fresh copy of the user to be sure the setting of the delete flag succeeds.
+                        user.deleted = True
+                        session.commit()
+
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+
 def unsubscribe_from_community(community, user):
     if community.instance.gone_forever or community.instance.dormant:
         return

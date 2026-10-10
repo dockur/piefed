@@ -11,7 +11,7 @@ WITH user_post_stats AS (
 )
 SELECT
     u.id as user_id,
-    u.user_name, u.ap_id,
+    u.user_name, u.ap_id, u.reposter, u.reposter_override,
     ups.post_count,
     ups.first_post_date,
     ups.last_post_date,
@@ -25,6 +25,6 @@ SELECT
     ) as avg_posts_per_day
 FROM user_post_stats ups
 JOIN "user" u ON ups.user_id = u.id
-where u.deleted = false and u.banned = false and not (u.bot = true or u.bot_override = true)
+where u.deleted = false and u.banned = false and not (u.bot = true or u.bot_override = true) and ups.last_post_date  >= now() - interval '1 month'
 ORDER BY avg_posts_per_day DESC
 LIMIT 100;
