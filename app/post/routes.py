@@ -986,12 +986,7 @@ def post_source(post_id: int, state: str):
         return render_template("post/_post_source_swap.html", post_body=post_body, state="hide", post_id=post_id)
     
     if state == "show":
-        if '````' in post.body:
-            post_body = '<pre><code>' + str(escape(post.body)) + '</code></pre>'
-        elif '```' in post.body:
-            post_body = markdown_to_html("````md\n" + post.body + "\n````")
-        else:
-            post_body = markdown_to_html("```md\n" + post.body + "\n```")
+        post_body = '<pre><code>' + str(escape(post.body)) + '</code></pre>'
         
         return render_template("post/_post_source_swap.html", post_body=post_body, state="show", post_id=post_id)
     
@@ -1891,12 +1886,7 @@ def post_reply_source(post_id: int, comment_id: int, state: str):
                                comment_id=comment_id, post_id=post_id)
     
     if state == "show":
-        if '````' in post_reply.body:
-            reply_body = '<pre><code>' + str(escape(post_reply.body)) + '</code></pre>'
-        elif '```' in post_reply.body:
-            reply_body = markdown_to_html("````md\n" + post_reply.body + "\n````")
-        else:
-            reply_body = markdown_to_html("```md\n" + post_reply.body + "\n```")
+        reply_body = '<pre><code>' + str(escape(post_reply.body)) + '</code></pre>'
         
         return render_template("post/_post_reply_source_swap.html", reply_body=reply_body, state="show",
                                comment_id=comment_id, post_id=post_id)

@@ -909,14 +909,77 @@ def handle_better_lists(text: str) -> str:
     return text
 
 
+def handle_indented_codeblocks(text: str) -> str:
+    """Handles some special processing of indented code blocks (disgusting though they may be)"""
+
+    # Stash footnotes since they can inadvertently interfere with indented code blocks
+    placeholder = gibberish(10)
+    footnote_snippets, text = stash_footnotes(text, placeholder)
+
+    # Regex to capture groups of lines starting with at least four spaces or a tab (ignoring lines with only a \n)
+    block_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
+
+    def wrap_indented_block(match):
+        contents = match.group(0)
+
+        if contents.isspace():
+            # This is only whitespace - don't wrap it in a code block
+            return contents
+
+        # Add attribute so that markdown2 later knows not to format the contents of this html tag
+        output = '<pre><code>'
+
+        # Figure out how much whitespace the first line of the match has - then strip that from the whole match
+        firstline = contents.splitlines()[0]
+        if firstline.startswith("\t"):
+            leading_chars = "\t"
+        else:
+            num_spaces = len(firstline) - len(firstline.lstrip())
+            leading_chars = num_spaces * " "
+
+        # Commence stripping
+        lines = contents.splitlines(keepends=True)
+        new_lines = []
+        for line in lines:
+            if line.startswith(leading_chars):
+                new_lines.append(line.removeprefix(leading_chars))
+            elif leading_chars == "\t" and line.startswith("    "):
+                # Default to tab = 4 spaces if needed
+                new_lines.append(line.removeprefix("    "))
+            else:
+                # Shouldn't ever get here if we did our regex right, just a fallback
+                new_lines.append(line)
+
+        # Join it all back up
+        contents = "".join(new_lines)
+
+        # Add the matched group
+        output += contents
+
+        # Close the html
+        output += '</code></pre>'
+
+        return output
+
+    # Do the regex work
+    text = re.sub(block_regex, wrap_indented_block, text)
+
+    # Return the footnotes
+    text = pop_footnotes(footnote_snippets, text, placeholder)
+
+    return text
+
+
 # use this for Markdown irrespective of origin, as it can deal with both soft break newlines ('\n' used by PieFed) and hard break newlines ('  \n' or ' \\n')
 # ' \\n' will create <br /><br /> instead of just <br />, but hopefully that's acceptable.
 def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_target="_blank", test_env=False) -> str:
     if markdown_text:
 
+        placeholder = gibberish(10)
+
         markdown_text = handle_reddit_spoilers(markdown_text)
 
-        # Escape <...> if it’s not a real HTML tag
+        # Escape <...> if it's not a real HTML tag
         markdown_text = escape_non_html_angle_brackets(
             markdown_text)  # To handle situations like https://ani.social/comment/9666667
 
@@ -927,6 +990,10 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
         markdown_text = handle_naked_spoilers(markdown_text)
         markdown_text = handle_spoiler_spacing(markdown_text)
         markdown_text = handle_video_embeds(markdown_text)
+
+        # These need to be the final pre-processing functions prior to converting to html, or code blocks can get mangled
+        markdown_text = handle_indented_codeblocks(markdown_text)
+        code_snippets, markdown_text = stash_code_html(markdown_text, placeholder)
 
         try:
             md = markdown2.Markdown(extras={'middle-word-em': False,
@@ -963,6 +1030,8 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
                 raw_html = apply_enhanced_image_attributes(raw_html, md)
             except:
                 raw_html = ''
+
+        raw_html = pop_code(code_snippets, raw_html, placeholder)
 
         if not allow_img:
             raw_html = escape_img(raw_html)
@@ -1208,7 +1277,10 @@ def stash_code_md(text: str, placeholder: str) -> tuple[list, str]:
     def store_code(match):
         code_snippets.append(match.group(0))
         return f"{placeholder}{len(code_snippets) - 1}$"
-
+    
+    # Indented code blocks
+    text_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
+    text = re.sub(text_regex, store_code, text)
     # Fenced code blocks (```...```)
     text = re.sub(r'```[\s\S]*?```', store_code, text)
     # Inline code (`...`)
@@ -1220,6 +1292,129 @@ def stash_code_md(text: str, placeholder: str) -> tuple[list, str]:
 def pop_code(code_snippets: list, text: str, placeholder: str) -> str:
     for i, code in enumerate(code_snippets):
         text = text.replace(f"{placeholder}{i}$", code)
+
+    return text
+
+
+def stash_footnotes(text: str, placeholder: str) -> tuple[list, str]:
+    """
+    Stash footnote annotations so that they don't conflict with indented code blocks.
+    """
+
+    lines = text.splitlines(keepends=True)
+
+    # Regex to catch the beginning of a footnote annotation
+    footnote_beginning = re.compile(r'^\[\^.*\]:', re.M)
+
+    # Initialize stuff
+    footnote_snippets = []
+    temp_footnote = []
+    candidate_lines = []
+    footnote_continuations = ["\n", "\t", "    "]
+    output_lines = []
+    extra_line = gibberish(10)
+
+    # Add an extra line onto the end to make iterating easier, just ignore it later
+    lines.append(extra_line)
+
+    # Function to help stash a footnote
+    def get_placeholder(temp_footnote, len_snippets):
+        footnote_text = "".join(temp_footnote)
+        placeholder_text = f"{placeholder}{len_snippets}$"
+        
+        return [footnote_text, placeholder_text]
+
+    # Iterate through lines, handling the different cases
+    for line in lines:
+        # There are a bunch of different cases we can run into
+        if footnote_beginning.match(line):
+            # This line begins a new footnote
+            if temp_footnote:
+                # The previous line was part of another footnote, stash that one before beginning the new one
+                footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
+                
+                footnote_snippets.append(footnote_info[0])
+                output_lines.append(footnote_info[1] + "\n")
+
+                # If there was one or more candidate lines, append that before moving to the new footnote
+                if candidate_lines:
+                    for candidate_line in candidate_lines:
+                        output_lines.append(candidate_line)
+
+                # Stashed footnote, clear these placeholders
+                temp_footnote = []
+                candidate_lines = []
+            
+            # Start preserving the new footnote
+            temp_footnote = [line]
+
+        elif line == extra_line:
+            # This is the last line we added. Deal with any ongoing footnotes and don't include this text in the output
+            if temp_footnote:
+                # There is an ongoing footnote, stash it
+                footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
+                
+                footnote_snippets.append(footnote_info[0])
+                output_lines.append(footnote_info[1] + "\n")
+
+                # If there was one or more candidate lines, append that before moving to the new footnote
+                if candidate_lines:
+                    for candidate_line in candidate_lines:
+                        output_lines.append(candidate_line)
+                
+                # Stashed footnote, clear these placeholders
+                temp_footnote = []
+                candidate_line = ""
+
+        elif not temp_footnote:
+            # Previous line was not part of a footnote and this line doesn't start one
+            output_lines.append(line)
+
+        elif temp_footnote and not any(line.startswith(prefix) for prefix in footnote_continuations):
+            # There is an ongoing footnote, but this line isn't part of one. Stash the footnote and append the lines
+            footnote_info = get_placeholder(temp_footnote, len(footnote_snippets))
+
+            footnote_snippets.append(footnote_info[0])
+            output_lines.append(footnote_info[1] + "\n")
+
+            # If there was one or more candidate lines, append that before moving on
+            if candidate_lines:
+                for candidate_line in candidate_lines:
+                    output_lines.append(candidate_line)
+
+            # Clear the placeholders
+            temp_footnote = []
+            candidate_lines = []
+
+            # Append the current line that isn't part of a footnote
+            output_lines.append(line)
+
+        elif temp_footnote and any(line.startswith(prefix) for prefix in footnote_continuations):
+            # This line potentially continues the ongoing footnote
+            
+            # If it is just a line of whitespace, keep it provisionally before adding it to the footnote
+            if line.isspace():
+                candidate_lines.append(line)
+                continue
+
+            # This line is more than just whitespace - the footnote continues
+            # First, add any candidate lines saved up
+            if candidate_lines:
+                for candidate_line in candidate_lines:
+                    temp_footnote.append(candidate_line)
+            
+            # Then, add the non-whitespace line
+            temp_footnote.append(line)
+
+    # Done looping through the text, build the response
+    text = "".join(output_lines)
+
+    return (footnote_snippets, text)
+
+
+def pop_footnotes(footnote_snippets: list, text:str, placeholder: str) -> str:
+    for i, footnote in enumerate(footnote_snippets):
+        text = text.replace(f"{placeholder}{i}$", footnote)
 
     return text
 
