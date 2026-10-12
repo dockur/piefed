@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupAutoReload,
         setupPopupTooltips,
         setupLightboxPostGallery,
+        setupHandleUrlPaste,
 
         // must be last - see comment above
         setupDynamicContentObserver
@@ -1185,6 +1186,37 @@ function setupMarkdownEditorEnabler() {
     });
 }
 
+function setupHandleUrlPaste() {
+    // Wrap selected text in a markdown-formatted link when pasting a url
+    const textareaElements = document.querySelectorAll('textarea');
+    if (textareaElements.length) {
+        // textarea tags found, set up the event listener
+        textareaElements.forEach((textareaElement) => {
+            textareaElement.addEventListener("paste", function(event) {
+                const textarea = event.target;
+                const url = event.clipboardData.getData("text/plain");
+
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+
+                // If no text selected or text isn't a url, we don't need to do any formatting
+                if (start === end || !/^https?:\/\/\S+$/i.test(url)) {
+                    return;
+                }
+
+                // Wrap the selected text in markdown link format
+                const selectedText = textarea.value.slice(start, end);
+                const markdownLink = `[${selectedText}](${url})`;
+
+                event.preventDefault();
+
+                // Replace the selection with the Markdown link
+                textarea.setRangeText(markdownLink, start, end, "end");
+            });
+        });
+    }
+}
+
 function setupPolls() {
     // Show results link
     const viewPollResults = document.getElementById('viewPollResults');
@@ -1653,7 +1685,7 @@ function setupDynamicContentObserver() {
         const targetClasses = [
             'send_post', 'confirm_first', 'showElement', 'show-more',
             'user_preview', 'hide_button', 'unhide', 'comment', 'autoresize',
-            'showPopupCommunitySidebar', 'score'
+            'showPopupCommunitySidebar', 'score', 'downarea'
         ];
         
         for (const mutation of mutations) {
@@ -1745,7 +1777,8 @@ function setupDynamicContent() {
         setupReactionDialog,
         setupCodeBlockCopy,
         setupShareIcons,
-        setupPopupTooltips
+        setupPopupTooltips,
+        setupHandleUrlPaste
     ]);
 
 
