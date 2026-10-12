@@ -1010,7 +1010,11 @@ def refresh_instance_chooser():
         }
         
         headers = {'Content-Type': 'application/json'}
-        response = httpx_client.post('https://api.fediverse.observer/', json=query, headers=headers, timeout=30)
+        try:
+            response = httpx_client.post('https://api.fediverse.observer/', json=query, headers=headers, timeout=30)
+        except httpx.HTTPError:
+            current_app.logger.error(f"fediverse.observer API is down")
+            return
         
         if response.status_code != 200:
             current_app.logger.error(f"fediverse.observer API returned {response.status_code}")
