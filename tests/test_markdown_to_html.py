@@ -518,6 +518,47 @@ And if you want to add your score to the database to help your fellow Bookworms 
         target_html = '<p><tg-spoiler>spoiler here</tg-spoiler> and <tg-spoiler>another</tg-spoiler></p>\n'
         self.assertEqual(target_html, result)
 
+    def test_indented_code_blocks(self):
+        """
+        Tests functionality around indented code blocks. They can especially interfere with footnotes.
+        """
+
+        # Basic functionality
+        markdown = "    code"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        target_html = '<pre><code>code</code></pre>\n'
+        self.assertEqual(target_html, result)
+
+        # Triple tics in indented code block
+        markdown = "    ```\n    code\n    ```"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        target_html = '<pre><code>```\ncode\n```</code></pre>\n'
+        self.assertEqual(target_html, result)
+
+        # Quad tics in indented code block
+        markdown = "    ````\n    ```\n    code\n    ```\n    ````"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        target_html = '<pre><code>````\n```\ncode\n```\n````</code></pre>\n'
+        self.assertEqual(target_html, result)
+
+        # Simple footnote and indented code block
+        markdown = "note[^1]\n\n    code\n\n[^1]: footnote"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        target_html = '<p>note<sup class="footnote-ref" id="fnref-1-fn-test"><a href="#fn-1-fn-test">1</a></sup></p>\n<pre><code>code\n</code></pre>\n<div class="footnotes">\n<hr/>\n<ol>\n<li id="fn-1-fn-test">\n<p>footnote\xa0<a class="footnoteBackLink" href="#fnref-1-fn-test">↩</a></p>\n</li>\n</ol>\n</div>\n'
+        self.assertEqual(target_html, result)
+
+        # Footnote split across lines and indented code block
+        markdown = "note[^1]\n\n    code\n\n[^1]: more\n    footnote"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        target_html = '<p>note<sup class="footnote-ref" id="fnref-1-fn-test"><a href="#fn-1-fn-test">1</a></sup></p>\n<pre><code>code\n</code></pre>\n<div class="footnotes">\n<hr/>\n<ol>\n<li id="fn-1-fn-test">\n<p>more\nfootnote\xa0<a class="footnoteBackLink" href="#fnref-1-fn-test">↩</a></p>\n</li>\n</ol>\n</div>\n'
+        self.assertEqual(target_html, result)
+
+        # Footnote with multiple formatted paragraphs and indented code block
+        markdown = "note[^1]\n\n    code\n\n[^1]: more\n\n\t`footnote`"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        target_html = '<p>note<sup class="footnote-ref" id="fnref-1-fn-test"><a href="#fn-1-fn-test">1</a></sup></p>\n<pre><code>code\n</code></pre>\n<div class="footnotes">\n<hr/>\n<ol>\n<li id="fn-1-fn-test">\n<p>more</p>\n<p><code>footnote</code>\xa0<a class="footnoteBackLink" href="#fnref-1-fn-test">↩</a></p>\n</li>\n</ol>\n</div>\n'
+        self.assertEqual(target_html, result)
+
 
 if __name__ == '__main__':
     unittest.main()

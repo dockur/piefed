@@ -457,6 +457,17 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
     # Variant 2 - views/person_view.dart
     if variant == 2:
         counts = {'person_id': user.id, 'post_count': user.post_count, 'comment_count': user.post_reply_count}
+        
+        if user.num_following:
+            counts["following_count"] = user.num_following
+        else:
+            counts["following_count"] = 0
+
+        if user.num_followers:
+            counts["follower_count"] = user.num_followers
+        else:
+            counts["follower_count"] = 0
+        
         user_sub = False
         if user_id and user_id != user.id:
             user_sub = db.session.execute(text(
@@ -558,7 +569,9 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
                 "counts": {
                     "person_id": user.id,
                     "post_count": user.post_count,
-                    "comment_count": user.post_reply_count
+                    "comment_count": user.post_reply_count,
+                    "follower_count": user.num_followers,
+                    "following_count": user.num_following
                 }
             },
             "moderates": moderating_communities_view(user),
