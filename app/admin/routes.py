@@ -2758,3 +2758,23 @@ def admin_votes_serial_downvoters():
     return render_template('admin/votes_serial_downvoters.html',
                            rows=rows,
                            roles_with=roles_with('administer all communities'))
+
+
+@bp.route('/high_posts_per_day', methods=['GET'])
+@permission_required('administer all communities')
+@login_required
+def admin_high_posts_per_day():
+    rows = db.session.execute(text(sql_file('high_posts_per_day'))).all()
+    return render_template('admin/high_posts_per_day.html',
+                           rows=rows,
+                           roles_with=roles_with('administer all communities'))
+
+
+@bp.route('/no_link_diversity', methods=['GET'])
+@permission_required('administer all communities')
+@login_required
+def admin_no_link_diversity():
+    rows = db.session.execute(text(sql_file('no_link_diversity'))).all()
+    return render_template('admin/no_link_diversity.html',
+                           rows=rows,
+                           roles_with=roles_with('administer all communities'))

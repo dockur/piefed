@@ -74,8 +74,12 @@
             <p class="mb-4"><em>{{ _('Nothing found.') }}</em></p>
         {% endif %}
         <hr />
-        <p><a href="{{ url_for('admin.admin_votes_for_noone') }}">{{ _('Also check accounts that never vote, they tend to be bots.') }}</a></p>
-        <p><a href="{{ url_for('admin.admin_votes_serial_downvoters') }}">{{ _('Serial downvoters report.') }}</a></p>
+        <p><a href="{{ url_for('admin.admin_votes_for_noone') }}">{{ _('Accounts that never vote') }}</a></p>
+        <p><a href="{{ url_for('admin.admin_votes_serial_downvoters') }}">{{ _('Serial downvoters') }}</a></p>
+        <hr>
+        <h2>{{ _('Other reports') }}</h2>
+        <p><a href="{{ url_for('admin.admin_high_posts_per_day') }}">{{ _('Creates many posts') }}</a></p>
+        <p><a href="{{ url_for('admin.admin_no_link_diversity') }}">{{ _('Always links to the same place') }}</a></p>
     </div>
 </div>
 <hr />

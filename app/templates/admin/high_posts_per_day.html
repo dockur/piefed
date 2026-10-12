@@ -1,0 +1,46 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% set active_child = 'admin_votes' %}
+
+{% block app_content %}
+{% include 'admin/_tabbed_nav.html' %}
+<br>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>{{ _('Creates many posts') }}</h2>
+        </div>
+
+        <p>{{ _('These accounts have unusually high stamina, like a bot.') }}</p>
+        {% if rows %}
+            <table class="table table-striped">
+                <tr>
+                    <th>{{ _('Account') }}</th>
+                    <th>{{ _('Average number of posts created per day') }}</th>
+                </tr>
+                {% for row in rows %}
+                    {% set link = row.ap_id if row.ap_id else row.user_name %}
+                    <tr>
+                        <td><a href="/u/{{ link }}">{{ link }}</a>{% if row.reposter or row.reposter_override %}<span class="small">(reposter)</span>{% endif %}</td>
+                        <td>{{ row.avg_posts_per_day }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="mb-4"><em>{{ _('Nothing found.') }}</em></p>
+        {% endif %}
+
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        {% include 'admin/_nav.html' %}
+    </div>
+</div>
+<hr />
+{% endblock %}
