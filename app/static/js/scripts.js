@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupPopupTooltips,
         setupLightboxPostGallery,
         setupHandleUrlPaste,
+        setupMarkdownKeyboardShortcuts,
 
         // must be last - see comment above
         setupDynamicContentObserver
@@ -1217,6 +1218,84 @@ function setupHandleUrlPaste() {
     }
 }
 
+function setupMarkdownKeyboardShortcuts() {
+    // Add some keyboard shortcuts for markdown authoring convenience
+    const textareaElements = document.querySelectorAll('textarea');
+    if (textareaElements.length) {
+        // textarea tags found, set up the event listener
+        textareaElements.forEach((textareaElement) => {
+            textareaElement.addEventListener("keydown", function(event) {
+                // If it isn't the Ctrl/Cmd key or if Alt/Shift is held down as well, stop here
+                if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) {
+                    return;
+                }
+
+                const textarea = event.target;
+                const key = event.key.toLowerCase();
+                const text = textarea.value;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selected = text.slice(start, end)
+                
+                let mdStart;  // This will be the markdown syntax to the left
+                let mdEnd;  // This will be the markdown syntax to the right
+
+                if (key === "b") {
+                    // Bold
+                    mdStart = "**";
+                    mdEnd = "**";
+                } else if (key === "i") {
+                    // Italics
+                    mdStart = "*";
+                    mdEnd = "*";
+                } else if (key === "s") {
+                    // Spoiler
+                    mdStart = "\n\n::: spoiler spoiler\n";
+                    mdEnd = "\n:::\n\n";
+                } else if (key === "m") {
+                    // In-line spoiler
+                    mdStart = "|| ";
+                    mdEnd = " ||";
+                }else {
+                    // No special key combination
+                    return;
+                }
+
+                event.preventDefault();
+
+                // No text selected, just insert notation and place cursor in the middle
+                if (start === end) {
+                    textarea.setRangeText(mdStart + mdEnd, start, end, "end");
+                    textarea.setSelectionRange(start + mdStart.length, start + mdStart.length);
+                    return;
+                }
+
+                // Check if the selected text is already wrapped in the notation, remove it if so
+                if (start >= mdStart.length &&
+                    text.slice(start - mdStart.length, start) === mdStart &&
+                    text.slice(end, end + mdEnd.length) === mdEnd
+                ) {
+                    // Remove the md notation
+                    const before = text.slice(0, start - mdStart.length);
+                    const after = text.slice(end + mdEnd.length);
+                    textarea.value = before + selected + after;
+
+                    // Reselect the original text selection
+                    textarea.setSelectionRange(start - mdStart.length, start - mdStart.length + selected.length);
+                
+                } else {
+                    // Add the markdown notation
+                    const newText = mdStart + selected + mdEnd;
+                    textarea.setRangeText(newText, start, end, "end");
+
+                    // Reselect the original text, ignoring the added markdown syntax
+                    textarea.setSelectionRange(start + mdStart.length, start + mdStart.length + selected.length);
+                }
+            });
+        });
+    }
+}
+
 function setupPolls() {
     // Show results link
     const viewPollResults = document.getElementById('viewPollResults');
@@ -1778,7 +1857,8 @@ function setupDynamicContent() {
         setupCodeBlockCopy,
         setupShareIcons,
         setupPopupTooltips,
-        setupHandleUrlPaste
+        setupHandleUrlPaste,
+        setupMarkdownKeyboardShortcuts
     ]);
 
 
