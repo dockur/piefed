@@ -19,7 +19,7 @@
             {% endif %}
             <textarea name="body" id="textarea_in_reply_to_{{ comment_id }}" class="form-control autoresize" rows="5"
                     autofocus="autofocus" required="required" aria-required="true"
-                    placeholder="{{ warning if warning else '' }}"></textarea>
+                    placeholder="{{ warning if warning else '' }}">{{ quoted_text }}</textarea>
         </div>
     </div>
     <div class="row mb-3">

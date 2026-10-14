@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupAutoReload,
         setupPopupTooltips,
         setupLightboxPostGallery,
+        setupQuotingHighlightedText,
 
         // must be last - see comment above
         setupDynamicContentObserver
@@ -1163,6 +1164,18 @@ function displayTimeTracked() {
     if(timeSpentElement && timeSpent) {
         timeSpentElement.textContent = formatTime(timeSpent)
     }
+}
+
+function setupQuotingHighlightedText() {
+    // Pre-populate reply box with highlighted text in a markdown quote
+    // Set up an htmx listener since reply textareas are dynamically loaded
+    document.addEventListener("htmx:configRequest", function (event) {
+        const target = event.detail.elt.getAttribute("hx-target");
+
+        if (target && target.startsWith("#reply_to_")) {
+            event.detail.parameters.selectedText = window.getSelection()?.toString() ?? "";
+        }
+    });
 }
 
 function setupMarkdownEditorEnabler() {
