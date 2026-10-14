@@ -13,14 +13,17 @@ from feedgen.util import xml_elem
 
 SLASH_NS = 'http://purl.org/rss/1.0/modules/slash/'
 
+
 def _set_value(entry, name, value):
     if value:
         newelem = xml_elem('{%s}' % SLASH_NS + name, entry)
         newelem.text = value
 
+
 class SlashExtension(BaseExtension):
     def extend_ns(self):
         return {'slash': SLASH_NS}
+
 
 class SlashEntryExtension(BaseExtension):
     def __init__(self):
@@ -38,8 +41,28 @@ class SlashEntryExtension(BaseExtension):
         if type(value) is not int or value < 0:
             raise ValueError('Slash Extension: Invalid comment count')
         self._comments = str(value)
-####################################################################################################
 
+
+class LanguageExtension(BaseExtension):
+    """Feed-level extension for language (no-op, we only need entry-level)."""
+    pass
+
+
+class LanguageEntryExtension(BaseExtension):
+    def __init__(self):
+        self._language = None
+
+    def extend_rss(self, entry):
+        if self._language:
+            language_elem = xml_elem('language', entry)
+            language_elem.text = self._language
+        return entry
+
+    def language(self, value):
+        self._language = value
+
+
+####################################################################################################
 
 def _is_valid_xml_utf8(pystring):
     """Check if a string is like valid UTF-8 XML content."""
@@ -84,6 +107,8 @@ class RSSFeed:
         fg = FeedGenerator()
         fg.load_extension('media', rss=True)
         fg.register_extension('slash', SlashExtension, SlashEntryExtension)
+        fg.register_extension('lang', LanguageExtension, LanguageEntryExtension)
+        fg.load_extension('dc')
 
         fg.title(title)
         fg.subtitle(description)
@@ -134,6 +159,12 @@ class RSSFeed:
             fe.author(email=cls._email_from_public_url(post.author.public_url()))
 
         fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
+        
+        # Add post language using both Dublin Core and standard RSS elements
+        if post.language and post.language.code:
+            fe.dc.dc_language(post.language.code)
+            fe.lang.language(post.language.code)
+        
         # reply_count_cross_posted is nullable and can drift negative, so fall back and clamp
         comment_count = post.reply_count_cross_posted
         if comment_count is None:
@@ -191,12 +222,13 @@ class RSSFeed:
         if type:
             medium['type'] = type
 
-        image = post.image
-        if image and url == image.source_url:
-            if not type:  # may be None, e.g. for lemmy's image_proxy URLs
-                medium['medium'] = 'image'
-            size = image.filesize(False)
-            if size > 0:
-                medium['fileSize'] = str(size)
+        if isinstance(gallery, list) and len(gallery) == 0:   # galleries have a thumbnail image that is a composite of all images in the gallery
+            image = post.image
+            if image and url == image.source_url:
+                if not type:  # may be None, e.g. for lemmy's image_proxy URLs
+                    medium['medium'] = 'image'
+                size = image.filesize(False)
+                if size > 0:
+                    medium['fileSize'] = str(size)
 
         fe.media.content(medium, group=url)  # see above
