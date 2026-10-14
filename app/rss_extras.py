@@ -125,7 +125,7 @@ class RSSFeed:
         fe.title(post.title.strip())
         link = f"{server_url}{post.slug}" if post.slug else f"{server_url}/post/{post.id}"
         fe.link(href=link)
-        fe.guid(post.profile_id(), permalink=True)
+        fe.guid(post.profile_id(), permalink=False)
 
         fe.content(content, type='CDATA')  # feedgen takes care if this is empty
         cls._add_media_content(post, fe)
