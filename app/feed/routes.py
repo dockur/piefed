@@ -758,7 +758,7 @@ def show_feed_rss(feed_path):
         response = make_response(rss_feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
         response.headers.add_header('ETag', f"{feed.id}_{hash(g.site.last_active)}")
-        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+        response.headers.add_header('Cache-Control', 'public, max-age=600')
         return response
     else:
         abort(404)

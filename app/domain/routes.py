@@ -140,7 +140,7 @@ def show_domain_rss(domain_id):
             response = make_response(feed.create_feed(posts, server_url))
             response.headers.set('Content-Type', 'application/rss+xml')
             response.headers.add_header('ETag', f"{domain.id}_{hash(domain.post_count)}")
-            response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+            response.headers.add_header('Cache-Control', 'public, max-age=600')
             return response
         else:
             abort(404)

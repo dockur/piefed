@@ -767,7 +767,7 @@ def show_community_rss(actor):
         response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
         response.headers.add_header('ETag', f"{community.id}_{hash(community.last_active)}")
-        response.headers.add_header('Cache-Control', 'no-cache, max-age=600, must-revalidate')
+        response.headers.add_header('Cache-Control', 'public, max-age=600')
         return response
     else:
         abort(404)
