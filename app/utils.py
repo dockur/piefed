@@ -5011,3 +5011,29 @@ def make_gallery_thumbnail(images, size=600):
         )
 
     return result
+
+
+def calculate_rss_cache_timeout(posts):
+    """ Calculate cache timeout based on average time between posts. Used for RSS feeds. """
+
+    if not posts:
+        return 3600
+
+    if len(posts) < 2:
+        return 3600
+
+    # Extract and sort creation timestamps
+    timestamps = sorted([post.created_at for post in posts if post.created_at])
+
+    if len(timestamps) < 2:
+        return 3600
+
+    total_seconds = 0
+    for i in range(1, len(timestamps)):
+        delta = timestamps[i] - timestamps[i-1]
+        total_seconds += delta.total_seconds()
+
+    average_seconds = total_seconds / (len(timestamps) - 1)
+    timeout = max(int(average_seconds / 3), 600)
+
+    return min(timeout, 21600)  # Between 10 minutes and 6 hours

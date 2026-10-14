@@ -22,7 +22,8 @@ from app.utils import render_template, user_filters_posts, validation_required, 
     recently_upvoted_posts, recently_downvoted_posts, blocked_or_banned_instances, blocked_users, \
     joined_or_modding_communities, \
     login_required_if_private_instance, communities_banned_from, reported_posts, user_notes, moderating_communities_ids, \
-    approval_required, block_honey_pot, user_pronouns, community_membership_private, check_anoobis
+    approval_required, block_honey_pot, user_pronouns, community_membership_private, check_anoobis, \
+    calculate_rss_cache_timeout
 from app.rss_extras import RSSFeed
 
 
@@ -229,7 +230,7 @@ def show_topic_rss(topic_path):
             {'topic_ids': tuple(topic_ids)}).scalars()
         post_ids = get_deduped_post_ids('', list(community_ids), 'new')
         post_ids = paginate_post_ids(post_ids, 0, page_length=100)
-        posts = post_ids_to_models(post_ids, 'new')
+        posts = post_ids_to_models(post_ids, 'new').all()
 
         server_url = current_app.config['SERVER_URL']
         feed = RSSFeed(title = f'{topic.name} on {g.site.name}',
@@ -243,7 +244,7 @@ def show_topic_rss(topic_path):
         response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
         response.headers.add_header('ETag', f"{topic.id}_{hash(g.site.last_active)}")
-        response.headers.add_header('Cache-Control', 'public, max-age=600')
+        response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
         return response
     else:
         abort(404)

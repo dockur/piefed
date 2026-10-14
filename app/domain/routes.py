@@ -17,7 +17,8 @@ from app.utils import render_template, permission_required, user_filters_posts, 
     blocked_or_banned_instances, \
     recently_upvoted_posts, recently_downvoted_posts, request_etag_matches, \
     return_304, joined_or_modding_communities, login_required_if_private_instance, reported_posts, \
-    moderating_communities_ids, block_honey_pot, user_pronouns, community_membership_private, check_anoobis
+    moderating_communities_ids, block_honey_pot, user_pronouns, community_membership_private, check_anoobis, \
+    calculate_rss_cache_timeout
 from app.rss_extras import RSSFeed
 
 
@@ -140,7 +141,7 @@ def show_domain_rss(domain_id):
             response = make_response(feed.create_feed(posts, server_url))
             response.headers.set('Content-Type', 'application/rss+xml')
             response.headers.add_header('ETag', f"{domain.id}_{hash(domain.post_count)}")
-            response.headers.add_header('Cache-Control', 'public, max-age=600')
+            response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
             return response
         else:
             abort(404)

@@ -43,7 +43,8 @@ from app.utils import render_template, get_setting, request_etag_matches, return
     retrieve_image_hash, possible_communities, remove_tracking_from_link, reported_posts, \
     moderating_communities_ids, user_notes, login_required, safe_order_by, filtered_out_communities, \
     num_topics, referrer, block_honey_pot, user_pronouns, get_instance_stickies, \
-    community_membership_private, favorite_communities, mimetype_from_url, check_anoobis, get_request, store_files_in_s3
+    community_membership_private, favorite_communities, mimetype_from_url, check_anoobis, get_request, \
+    store_files_in_s3, calculate_rss_cache_timeout
 from app.models import Community, CommunityMember, Post, Site, User, utcnow, Topic, Instance, \
     Notification, Language, community_language, ModLog, Feed, FeedItem, CmsPage, BannedInstances, BotChallenge
 from app.ldap_utils import test_ldap_connection, sync_user_to_ldap, login_with_ldap
@@ -1287,7 +1288,7 @@ def index_rss(feed_type=None):
     post_ids = get_deduped_post_ids(gibberish(15), community_ids, 'new',
                                     include_following=feed_type == 'subscribed' and current_user_is_authenticated)
     post_ids = paginate_post_ids(post_ids, 0, page_length=50)
-    posts = post_ids_to_models(post_ids, 'new')
+    posts = post_ids_to_models(post_ids, 'new').all()
 
     server_url = current_app.config['SERVER_URL']
     description = shorten_string(g.site.description, 150) if g.site.description else ' '
@@ -1304,7 +1305,7 @@ def index_rss(feed_type=None):
     response = make_response(feed.create_feed(posts, server_url))
     response.headers.set('Content-Type', 'application/rss+xml')
     response.headers.add_header('ETag', f"home_{hash(g.site.last_active)}")
-    response.headers.add_header('Cache-Control', 'public, max-age=600')
+    response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
     return response
 
 

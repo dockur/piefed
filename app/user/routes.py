@@ -44,7 +44,7 @@ from app.utils import render_template, markdown_to_html, user_access, markdown_t
     recently_downvoted_post_replies, reported_posts, user_notes, login_required, get_setting, filtered_out_communities, \
     moderating_communities_ids, blocked_or_banned_instances, blocked_domains, get_task_session, \
     patch_db_session, user_in_restricted_country, referrer, user_pronouns, \
-    permission_required, check_anoobis, sql_file
+    permission_required, check_anoobis, sql_file, calculate_rss_cache_timeout
 from app.rss_extras import RSSFeed
 
 @bp.route('/people', methods=['GET', 'POST'])
@@ -2321,7 +2321,7 @@ def show_profile_rss(actor):
     response = make_response(feed.create_feed(posts, server_url))
     response.headers.set('Content-Type', 'application/rss+xml')
     response.headers.add_header('ETag', f"{user.id}_{hash(user.last_seen)}")
-    response.headers.add_header('Cache-Control', 'public, max-age=600')
+    response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
     return response
 
 

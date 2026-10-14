@@ -61,7 +61,7 @@ from app.utils import get_setting, render_template, markdown_to_html, validation
     approval_required, permission_required, aged_account_required, communities_banned_from_all_users, \
     moderating_communities_ids_all_users, block_honey_pot, user_pronouns, community_membership_private, \
     show_reason_why_no_federation, can_upload_video, banned_instances, is_invalid_get_request_uri, user_ip_banned, \
-    check_anoobis
+    check_anoobis, calculate_rss_cache_timeout
 from app.shared.post import make_post, sticky_post
 from app.shared.tasks import task_selector
 from app.shared.community import leave_community
@@ -767,7 +767,7 @@ def show_community_rss(actor):
         response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
         response.headers.add_header('ETag', f"{community.id}_{hash(community.last_active)}")
-        response.headers.add_header('Cache-Control', 'public, max-age=600')
+        response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
         return response
     else:
         abort(404)
