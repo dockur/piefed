@@ -139,8 +139,7 @@ def show_tag_rss(tag):
                        link = f"{server_url}/tag/{tag.name}",
                        description = ' ',
                        logo = image,
-                       self_link = f"{server_url}/tag/{tag.name}/feed",
-                       language = 'en'
+                       self_link = f"{server_url}/tag/{tag.name}/feed"
                      )
 
         if language := request.args.get('lang'):    # filter by language

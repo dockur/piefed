@@ -42,26 +42,6 @@ class SlashEntryExtension(BaseExtension):
             raise ValueError('Slash Extension: Invalid comment count')
         self._comments = str(value)
 
-
-class LanguageExtension(BaseExtension):
-    """Feed-level extension for language (no-op, we only need entry-level)."""
-    pass
-
-
-class LanguageEntryExtension(BaseExtension):
-    def __init__(self):
-        self._language = None
-
-    def extend_rss(self, entry):
-        if self._language:
-            language_elem = xml_elem('language', entry)
-            language_elem.text = self._language
-        return entry
-
-    def language(self, value):
-        self._language = value
-
-
 ####################################################################################################
 
 def _is_valid_xml_utf8(pystring):
@@ -103,11 +83,10 @@ class RSSFeed:
     """
 
     def __init__(self, *,  title: str, link: str, description: str, logo: str|None = None, \
-                   self_link: str|None = None, language: str|None = None):
+                   self_link: str|None = None):
         fg = FeedGenerator()
         fg.load_extension('media', rss=True)
         fg.register_extension('slash', SlashExtension, SlashEntryExtension)
-        fg.register_extension('lang', LanguageExtension, LanguageEntryExtension)
         fg.load_extension('dc')
 
         fg.title(title)
@@ -116,8 +95,6 @@ class RSSFeed:
             fg.logo(logo)
         if self_link:
             fg.link(href=self_link, rel='self')
-        if language:
-            fg.language(language)
         # feedgen takes the value of the last call of link as channel link for RSS,
         # regardless of value of rel, so this must be the very last call of *link*
         fg.link(href=link, rel='alternate')
@@ -159,12 +136,11 @@ class RSSFeed:
             fe.author(email=cls._email_from_public_url(post.author.public_url()))
 
         fe.pubDate(post.created_at.replace(tzinfo=timezone.utc))
-        
+
         # Add post language using both Dublin Core and standard RSS elements
         if post.language and post.language.code:
             fe.dc.dc_language(post.language.code)
-            fe.lang.language(post.language.code)
-        
+
         # reply_count_cross_posted is nullable and can drift negative, so fall back and clamp
         comment_count = post.reply_count_cross_posted
         if comment_count is None:

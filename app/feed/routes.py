@@ -752,8 +752,7 @@ def show_feed_rss(feed_path):
                            link=f"{server_url}/f/{last_feed_machine_name}",
                            description=' ',
                            logo=f"{server_url}/static/images/apple-touch-icon.png",
-                           self_link=f"{server_url}/f/{last_feed_machine_name}.rss",
-                           language='en')
+                           self_link=f"{server_url}/f/{last_feed_machine_name}.rss")
 
         if language := request.args.get('lang'):    # filter by language
             posts = [post for post in posts if post.language_code() == language]

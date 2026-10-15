@@ -1298,8 +1298,7 @@ def index_rss(feed_type=None):
                    link = server_url,
                    description = description,
                    logo = image,
-                   self_link = f"{server_url}/feed",
-                   language = 'en'
+                   self_link = f"{server_url}/feed"
                  )
 
     if language := request.args.get('lang'):  # filter by language

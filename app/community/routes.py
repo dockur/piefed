@@ -760,8 +760,7 @@ def show_community_rss(actor):
                        link=f"{server_url}/c/{actor}",
                        description=description,
                        logo=image,
-                       self_link=f"{server_url}/c/{actor}/feed",
-                       language='en'
+                       self_link=f"{server_url}/c/{actor}/feed"
                      )
 
         if language := request.args.get('lang'):    # filter by language
@@ -1120,7 +1119,7 @@ def add_post(actor, type=None):
                 uploaded_file = request.files['image_file']
             else:
                 uploaded_file = None
-            
+
             if type != 'gallery':
                 post = make_post(form, community, post_type, SRC_WEB, uploaded_file=uploaded_file)
         except Exception as ex:
