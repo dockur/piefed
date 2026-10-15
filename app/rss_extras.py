@@ -191,20 +191,19 @@ class RSSFeed:
             fe.media.content(medium, group=url)  # without group parameter, all media:content would go into the same media:group
 
         url = post.url
-        if not url:
+        if not url:  # image is only used when post.url is not None, so the thumbnail for galleries will not be used unless it's given as URL.
             return
         medium = {'url': url}
         type = mimetype_from_url(url)
         if type:
             medium['type'] = type
 
-        if isinstance(gallery, list) and len(gallery) == 0:   # galleries have a thumbnail image that is a composite of all images in the gallery
-            image = post.image
-            if image and url == image.source_url:
-                if not type:  # may be None, e.g. for lemmy's image_proxy URLs
-                    medium['medium'] = 'image'
-                size = image.filesize(False)
-                if size > 0:
-                    medium['fileSize'] = str(size)
+        image = post.image
+        if image and url == image.source_url:
+            if not type:  # may be None, e.g. for lemmy's image_proxy URLs
+                medium['medium'] = 'image'
+            size = image.filesize(False)
+            if size > 0:
+                medium['fileSize'] = str(size)
 
         fe.media.content(medium, group=url)  # see above
