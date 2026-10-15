@@ -1302,6 +1302,9 @@ def index_rss(feed_type=None):
                    language = 'en'
                  )
 
+    if language := request.args.get('lang'):  # filter by language
+        posts = [post for post in posts if post.language_code() == language]
+
     response = make_response(feed.create_feed(posts, server_url))
     response.headers.set('Content-Type', 'application/rss+xml')
     response.headers.add_header('ETag', f"home_{hash(g.site.last_active)}")

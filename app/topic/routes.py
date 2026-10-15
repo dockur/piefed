@@ -229,7 +229,7 @@ def show_topic_rss(topic_path):
             text('SELECT id FROM community WHERE banned is false AND private is false AND topic_id IN :topic_ids'),
             {'topic_ids': tuple(topic_ids)}).scalars()
         post_ids = get_deduped_post_ids('', list(community_ids), 'new')
-        post_ids = paginate_post_ids(post_ids, 0, page_length=100)
+        post_ids = paginate_post_ids(post_ids, 0, page_length=50)
         posts = post_ids_to_models(post_ids, 'new').all()
 
         server_url = current_app.config['SERVER_URL']
@@ -240,6 +240,9 @@ def show_topic_rss(topic_path):
                        self_link = f"{server_url}/topic/{last_topic_machine_name}.rss",
                        language = 'en'
                      )
+
+        if language := request.args.get('lang'):    # filter by language
+            posts = [post for post in posts if post.language_code() == language]
 
         response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')

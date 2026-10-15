@@ -744,7 +744,7 @@ def show_feed_rss(feed_path):
                 feed_community_ids.append(item.community_id)
 
         post_ids = get_deduped_post_ids('', feed_community_ids, 'new')
-        post_ids = paginate_post_ids(post_ids, 0, page_length=100)
+        post_ids = paginate_post_ids(post_ids, 0, page_length=50)
         posts = post_ids_to_models(post_ids, 'new').all()
 
         server_url = current_app.config['SERVER_URL']
@@ -754,6 +754,9 @@ def show_feed_rss(feed_path):
                            logo=f"{server_url}/static/images/apple-touch-icon.png",
                            self_link=f"{server_url}/f/{last_feed_machine_name}.rss",
                            language='en')
+
+        if language := request.args.get('lang'):    # filter by language
+            posts = [post for post in posts if post.language_code() == language]
 
         response = make_response(rss_feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
