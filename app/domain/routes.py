@@ -134,8 +134,7 @@ def show_domain_rss(domain_id):
                            link = f"{server_url}/d/{domain_id}",
                            description = ' ',
                            logo = f"{server_url}/static/images/apple-touch-icon.png",
-                           self_link = f"{server_url}/d/{domain_id}/feed",
-                           language = 'en'
+                           self_link = f"{server_url}/d/{domain_id}/feed"
                          )
 
             response = make_response(feed.create_feed(posts, server_url))

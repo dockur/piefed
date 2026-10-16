@@ -2317,8 +2317,7 @@ def show_profile_rss(actor):
                    link = f"{server_url}/u/{actor}",
                    description = description,
                    logo = image,
-                   self_link = f"{server_url}/u/{actor}/feed",
-                   language = 'en'
+                   self_link = f"{server_url}/u/{actor}/feed"
                  )
 
     response = make_response(feed.create_feed(posts, server_url))
