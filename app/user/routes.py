@@ -1412,10 +1412,10 @@ def import_settings_task(user_id, redis_key):
                                     session.add(member)
                                     if community.subscriptions_count is None:
                                         community.subscriptions_count = 0
-                                    if community.total_subscriptions_count is None:
-                                        community.total_subscriptions_count = 0
-                                    community.subscriptions_count += 1
-                                    community.total_subscriptions_count += 1
+                                    # Only increment subscriptions_count for local users (ap_id == None)
+                                    if user.ap_id is None:
+                                        community.subscriptions_count += 1
+                                    # For remote communities, total_subscriptions_count comes from ActivityPub, not local tracking
                                     session.commit()
                                 if not community.instance.gone_forever:
                                     follow = {
@@ -1435,7 +1435,10 @@ def import_settings_task(user_id, redis_key):
                                     if not existing_member:
                                         member = CommunityMember(user_id=user.id, community_id=community.id)
                                         session.add(member)
-                                        community.subscriptions_count += 1
+                                        # Only increment subscriptions_count for local users (ap_id == None)
+                                        if user.ap_id is None:
+                                            community.subscriptions_count += 1
+                                        # For local communities, total_subscriptions_count = local + remote users
                                         community.total_subscriptions_count += 1
                                         session.commit()
                             cache.delete_memoized(community_membership, user, community)

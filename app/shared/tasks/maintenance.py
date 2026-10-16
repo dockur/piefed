@@ -312,21 +312,36 @@ def update_community_stats():
         ).all()
 
         for community in communities:
-            stmt = (
+            # Count local users only (ap_id == None) for subscriptions_count
+            stmt_local = (
                 select(func.count())
                 .select_from(CommunityMember)
                 .join(User, User.id == CommunityMember.user_id)
                 .where(
                     CommunityMember.community_id == community.id,
                     CommunityMember.is_banned == False,
-                    User.bot == False
+                    User.bot == False,
+                    User.ap_id == None,
+                    User.banned == False
                 )
             )
-            community.subscriptions_count = session.execute(stmt).scalar()
-            # ensure local communities have something their total_subscriptions_count, for use in topic and feed sidebar
-            if community.is_local() and \
-                    (community.total_subscriptions_count is None or community.total_subscriptions_count < community.subscriptions_count):
-                community.total_subscriptions_count = community.subscriptions_count
+            community.subscriptions_count = session.execute(stmt_local).scalar()
+            
+            # For local communities, count all users (local + remote) for total_subscriptions_count
+            if community.is_local():
+                stmt_total = (
+                    select(func.count())
+                    .select_from(CommunityMember)
+                    .join(User, User.id == CommunityMember.user_id)
+                    .where(
+                        CommunityMember.community_id == community.id,
+                        CommunityMember.is_banned == False,
+                        User.bot == False,
+                        User.banned == False
+                    )
+                )
+                print(f'local community updated id {community.id}')
+                community.total_subscriptions_count = session.execute(stmt_total).scalar()
 
             community.post_count = session.execute(text(
                 'SELECT COUNT(*) as c FROM post WHERE deleted is false and community_id = :community_id'

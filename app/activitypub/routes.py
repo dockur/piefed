@@ -1495,7 +1495,12 @@ def process_inbox_request(request_json, store_ap_json):
                                                                                         community_id=community_to_remove.id).delete()
                                             session.query(CommunityJoinRequest).filter_by(user_id=fm_user.id,
                                                                                              community_id=community_to_remove.id).delete()
-                                            community_to_remove.subscriptions_count -= 1
+                                            # Only decrement subscriptions_count for local users (ap_id == None)
+                                            if fm_user.ap_id is None:
+                                                community_to_remove.subscriptions_count -= 1
+                                            # Only decrement total_subscriptions_count for local communities
+                                            if community_to_remove.is_local():
+                                                community_to_remove.total_subscriptions_count -= 1
                                             session.commit()
                                             log_incoming_ap(id, APLOG_REMOVE, APLOG_SUCCESS, saved_json,
                                                             f'{fm_user.user_name} auto-unfollowed {community_to_remove.ap_public_url} during a feed/remove')
@@ -1656,7 +1661,12 @@ def process_inbox_request(request_json, store_ap_json):
                                                                                 community_id=community.id).first()
                             if member:
                                 session.delete(member)
-                                community.subscriptions_count -= 1
+                                # Only decrement subscriptions_count for local users (ap_id == None)
+                                if user.ap_id is None:
+                                    community.subscriptions_count -= 1
+                                # Only decrement total_subscriptions_count for local communities
+                                if community.is_local():
+                                    community.total_subscriptions_count -= 1
                                 community.last_active = utcnow()
                                 user.last_seen = utcnow()
                             if join_request:

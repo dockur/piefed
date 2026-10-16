@@ -964,7 +964,12 @@ def unsubscribe(actor):
                 db.session.query(CommunityJoinRequest).filter_by(user_id=current_user.id, community_id=community.id).delete()
                 db.session.query(CommunityFlairBlock).filter_by(user_id=current_user.id, community_id=community.id).delete()
 
-                community.subscriptions_count -= 1
+                # Only decrement subscriptions_count for local users (ap_id == None)
+                if current_user.ap_id is None:
+                    community.subscriptions_count -= 1
+                # Only decrement total_subscriptions_count for local communities
+                if community.is_local():
+                    community.total_subscriptions_count -= 1
                 db.session.commit()
 
                 if request.method == 'GET':

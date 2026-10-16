@@ -157,8 +157,8 @@
                         <hr>
                     {% endif %}
                     <div>
-                        <span class="badge text-bg-secondary">{{ ngettext('%(count)s Subscriber', '%(count)s Subscribers', round_invisible_digits(community.subscriptions_count), count=community.humanize_subscribers()) }}</span>
-                        <span class="badge text-bg-secondary">{{ ngettext('%(count)s Local Subscriber', '%(count)s Local Subscribers', round_invisible_digits(community.total_subscriptions_count if community.total_subscriptions_count else community.subscriptions_count), count=community.humanize_subscribers(total=False)) }}</span>
+                        <span class="badge text-bg-secondary">{{ ngettext('%(count)s Subscriber', '%(count)s Subscribers', round_invisible_digits(community.total_subscriptions_count if community.total_subscriptions_count else community.subscriptions_count), count=community.humanize_subscribers(total=True)) }}</span>
+                        <span class="badge text-bg-secondary">{{ ngettext('%(count)s Local Subscriber', '%(count)s Local Subscribers', round_invisible_digits(community.subscriptions_count), count=community.humanize_subscribers(total=False)) }}</span>
                     </div>
                     <div>
                         <span class="badge text-bg-secondary">{{ ngettext('%(count)s Post', '%(count)s Posts', round_invisible_digits(community.post_count), count=humanize_number(community.post_count)) }}</span>

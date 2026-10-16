@@ -486,7 +486,12 @@ def _feed_remove_community(community_id: int, current_feed_id: int):
                 if proceed:
                     db.session.query(CommunityMember).filter_by(user_id=user.id, community_id=community.id).delete()
                     db.session.query(CommunityJoinRequest).filter_by(user_id=user.id, community_id=community.id).delete()
-                    community.subscriptions_count -= 1
+                    # Only decrement subscriptions_count for users with ap_id == None
+                    if user.ap_id is None:
+                        community.subscriptions_count -= 1
+                    # Only decrement total_subscriptions_count for local communities
+                    if community.is_local():
+                        community.total_subscriptions_count -= 1
                     db.session.commit()
 
                 cache.delete_memoized(community_membership, user, community)

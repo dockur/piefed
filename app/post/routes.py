@@ -717,7 +717,7 @@ def continue_discussion(post_id, comment_id):
     description = shorten_string(markdown_to_text(comment.body), 200) if comment.body else None
     og_image = post.image.source_url if post.image_id else None
 
-    response = render_template('post/continue_discussion.html', title=_('Discussing %(title)s', title=post.title),
+    response = render_template('post/continue_discussion.html', title=post.title,
                                post=post, mods=mod_list, has_voted=has_voted, poll_results=poll_results,
                                poll_data=poll_data,
                                poll_choices=poll_choices, poll_total_votes=poll_total_votes,
@@ -843,7 +843,7 @@ def add_reply(post_id: int, comment_id: int):
         form.notify_author.data = True
         form.language_id.data = current_user.language_id or g.site.language_id
 
-        return render_template('post/add_reply.html', title=_('Discussing %(title)s', title=post.title), post=post,
+        return render_template('post/add_reply.html', title=post.title, post=post,
                                is_moderator=is_moderator, form=form, comment=in_reply_to,
                                markdown_editor=current_user.is_authenticated and current_user.markdown_editor,
                                mods=mod_list,
