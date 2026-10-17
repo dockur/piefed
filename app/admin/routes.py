@@ -1171,8 +1171,7 @@ def activity_json(activity_id):
         is_valid_json = False
 
     if is_valid_json:
-        json_md = "```json\n" + pretty_json + "\n```"
-        json_html = markdown_to_html(json_md)
+        json_html = '<pre><code>\n' + pretty_json + '\n</code></pre>'
     else:
         json_md = "`" + pretty_json + "`"
         json_html = markdown_to_html(json_md)
