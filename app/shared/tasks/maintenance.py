@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date
 import random
 import re
 import os
@@ -6,6 +6,7 @@ import time
 
 import httpx
 import boto3
+import orjson
 from flask import current_app
 from sqlalchemy import text, select, func
 
@@ -18,7 +19,7 @@ from app.models import Notification, SendQueue, CommunityBan, CommunityMember, U
 from app.shared.post import delete_post
 from app.utils import get_task_session, download_defeds, instance_banned, get_request_instance, get_request, \
     shorten_string, patch_db_session, archive_post, get_setting, set_setting, communities_banned_from_all_users, \
-    banned_instances, blocked_or_banned_instances, get_emoji_replacements, store_files_in_s3
+    banned_instances, blocked_or_banned_instances, get_emoji_replacements, store_files_in_s3, ensure_directory_exists
 
 
 @celery.task
@@ -605,6 +606,8 @@ def monitor_healthy_instances():
                         if 'software' in node_json:
                             instance.software = node_json['software']['name'].lower()[:50]
                             instance.version = node_json['software']['version'][:50]
+                            instance.active_1mo = node_json['usage']['users']['activeMonth']
+                            instance.active_6mo = node_json['usage']['users']['activeHalfyear']
                             instance.failures = 0
                             instance.dormant = False
                             instance.gone_forever = False
@@ -1017,37 +1020,33 @@ def archive_user(user_id, session):
 
 @celery.task
 def refresh_instance_chooser():
+    main_list = get_setting('main_instance_list', 'piefed.social')
+
     session = get_task_session()
     try:
-        # Make GraphQL request to fediverse.observer API
-        query = {
-            "query": '{ nodes(softwarename:"piefed" status: "UP") { domain uptime_alltime monthsmonitored } }'
-        }
-        
-        headers = {'Content-Type': 'application/json'}
+        # Make request to main instance list
         try:
-            response = httpx_client.post('https://api.fediverse.observer/', json=query, headers=headers, timeout=30)
-        except httpx.HTTPError:
-            current_app.logger.error(f"fediverse.observer API is down")
+            response = get_request(f'https://{main_list}/static/media/known_instances.json?cache_bust={date.today()}')
+        except Exception as e:
+            current_app.logger.error(f'{main_list} API is down')
             return
-        
+
         if response.status_code != 200:
-            current_app.logger.error(f"fediverse.observer API returned {response.status_code}")
+            current_app.logger.error(f"{main_list} API returned {response.status_code}")
             return
             
         response_data = response.json()
-        if not response_data or 'data' not in response_data or 'nodes' not in response_data['data']:
-            current_app.logger.error("Invalid response from fediverse.observer API")
+        if not response_data:
+            current_app.logger.error(f"Invalid response from {main_list} API")
             return
             
         observer_domains = set()
         
         # Shuffle the nodes list so instances are processed in random order each time
-        nodes = response_data['data']['nodes']
-        random.shuffle(nodes)
+        random.shuffle(response_data)
         
-        # Process each domain from fediverse.observer
-        for node in nodes:
+        # Process each domain from main list
+        for node in response_data:
             domain = node['domain']
             observer_domains.add(domain)
             
@@ -1067,8 +1066,7 @@ def refresh_instance_chooser():
                     chooser_data = chooser_response.json()
 
                     chooser_data['uptime'] = node['uptime_alltime']
-                    chooser_data['monthsmonitored'] = node['monthsmonitored']
-                    
+
                     # Update or create InstanceChooser record
                     instance_chooser = session.query(InstanceChooser).filter_by(domain=domain).first()
                     if not instance_chooser:
@@ -1099,7 +1097,7 @@ def refresh_instance_chooser():
                     session.delete(existing)
             session.commit()
         
-        # Remove InstanceChooser records for domains not in fediverse.observer
+        # Remove InstanceChooser records for domains not in main list
         existing_records = session.query(InstanceChooser).all()
         for record in existing_records:
             if record.domain not in observer_domains:
@@ -1107,6 +1105,66 @@ def refresh_instance_chooser():
         
         session.commit()
         
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+    if get_setting('crawl_known_instances', False):
+        build_instance_list.delay()
+
+
+@celery.task
+def build_instance_list():
+    """ Generate a json file at /static/media/known_instances.json for other instances to populate their instance chooser with """
+
+    session = get_task_session()
+    try:
+        min_version = '1.6.0'
+        result = [{
+            'domain': current_app.config['SERVER_NAME'],
+            'uptime_alltime': ''    # One day we will have real values for this. Must be a string, e.g. '98.5'
+        }]
+        already_seen = {current_app.config['SERVER_NAME']}
+
+        # Initially, get the list of instances we already know about, from previous federation traffic. monitor_healthy_instances() keeps this up to date.
+        locally_known_instances = session.query(Instance).filter(Instance.software == 'piefed', Instance.version >= min_version,
+                                                                 Instance.dormant == False, Instance.gone_forever == False)
+        for instance in locally_known_instances:
+            result.append({
+                'domain': instance.domain,
+                'uptime_alltime': ''
+            })
+            already_seen.add(instance.domain)
+
+            # For each of the already known instances, ask them which instances they know about.
+            try:
+                federated_instances_response = get_request(f'https://{instance.domain}/api/v3/federated_instances')
+            except Exception as e:
+                current_app.logger.warning(f"Failed to get federated_instances from {instance.domain}: {str(e)}")
+                continue
+
+            if federated_instances_response.status_code == 200:
+                federated_instances_data = federated_instances_response.json()
+
+                for federated_instance in federated_instances_data['federated_instances']['linked']:
+                    domain = federated_instance['domain']
+                    software = federated_instance['software'] if 'software' in federated_instance else ''
+                    version = federated_instance['version'] if 'version' in federated_instance else ''
+                    if domain not in already_seen and software == 'piefed' and version >= min_version:
+                        result.append({
+                            'domain': domain,
+                            'uptime_alltime': ''
+                        })
+                        already_seen.add(instance.domain)
+
+        # Save result to file
+        ensure_directory_exists('app/static/media')
+        with open("app/static/media/known_instances.json", "wb") as f:
+            f.write(orjson.dumps(result))
+
+
     except Exception:
         session.rollback()
         raise

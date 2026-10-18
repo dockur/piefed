@@ -85,6 +85,8 @@ class SiteMiscForm(FlaskForm):
 
 class InstanceChooserForm(FlaskForm):
     enable_instance_chooser = BooleanField(_l('Enable instance chooser'))
+    main_instance_list = StringField(_l('Retrieve list of instances from'))
+    crawl_known_instances = BooleanField(_l('Publish instance list'))
     elevator_pitch = StringField(_l('One-sentence elevator pitch'), validators=[Length(max=90)])
     number_of_admins = IntegerField(_l('Number of admins with emergency access'))
     financial_stability = BooleanField(_l('Non-admins donate enough to pay for hosting'))

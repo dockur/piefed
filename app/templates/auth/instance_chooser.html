@@ -114,7 +114,6 @@
                   <li><strong>{{ _('Newbie friendly') }}:</strong> <span id="modal-newbie"></span></li>
                   <li><strong>{{ _('Primary language') }}:</strong> <span id="modal-language"></span></li>
                   <li><strong>{{ _('Registration') }}:</strong> <span id="modal-registration"></span></li>
-                  <li><strong>{{ _('Defederation') }}:</strong> <span id="modal-defederation"></span></li>
                 </ul>
               </div>
               <div class="col-md-6">
@@ -557,40 +556,6 @@
         } else {
             tosLink.classList.add('d-none');
         }
-        
-        // Handle federation status
-        const watchedDomains = {
-            'hexbear.net': 'hexbear-status',
-            'hilariouschaos.com': 'hilariouschaos-status',
-            'lemmygrad.ml': 'lemmygrad-status',
-            'lemmy.ml': 'lemmy-status',
-            'gregtech.eu': 'lemvotes-status',
-        };
-        
-        const defederatedDomains = instance.defederation || [];
-
-        countDefederated = 0;
-        
-        Object.entries(watchedDomains).forEach(([domain, elementId]) => {
-            const statusElement = document.getElementById(elementId);
-            const isDefederated = defederatedDomains.includes(domain);
-            
-            if (isDefederated) {
-                countDefederated += 1
-            }
-        });
-
-        if(countDefederated >= 3)
-            defederationQuality = 'Good';
-        else if(countDefederated === 2)
-            defederationQuality = 'Ok';
-        else if(countDefederated === 1)
-            defederationQuality = 'Minimal';
-        else if(countDefederated < 1)
-            defederationQuality = 'None';
-
-        const defederationElement = document.getElementById('modal-defederation')
-        defederationElement.innerHTML = defederationQuality;
         
         // Show the modal
         const modal = new bootstrap.Modal(document.getElementById('instanceModal'));

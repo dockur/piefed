@@ -18,7 +18,7 @@ from app.post.util import tags_to_string, flair_to_string
 from app.utils import blocked_communities, blocked_or_banned_instances, blocked_users, communities_banned_from, \
     get_setting, \
     num_topics, moderating_communities_ids, moderating_communities, joined_communities, \
-    moderating_communities_ids_all_users, community_membership_private
+    moderating_communities_ids_all_users, community_membership_private, months_since
 from app.shared.community import get_comm_flair_list
 from app.shared.post import get_post_flair_list
 
@@ -1381,7 +1381,8 @@ def site_instance_chooser_view():
         'trusts': list(set([instance.domain for instance in trusted_list])),
         'tos_url': g.site.tos_url or '',
         'registration_mode': g.site.registration_mode,
-        'software': 'piefed'
+        'software': 'piefed',
+        'monthsmonitored': months_since(g.site.created_at)
     }
     return result
 

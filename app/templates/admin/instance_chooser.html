@@ -19,13 +19,20 @@
             {{ render_field(form.enable_instance_chooser) }}
             {{ render_field(form.elevator_pitch) }}
 
-            <h3>{{ _('Instance strength / maturity') }}</h3>
+            <h3 class="mt-4">{{ _('Instance strength / maturity') }}</h3>
             <p>{{ _("These are used to create the Maturity indicator. More is better but none are required.") }}</p>
             {{ render_field(form.number_of_admins) }}
             {{ render_field(form.financial_stability) }}
             {{ render_field(form.daily_backups) }}
 
-            {{ render_field(form.submit) }}
+            <h3 class="mt-4">{{ _('Data sharing') }}</h3>
+            {{ render_field(form.crawl_known_instances) }}
+            {{ render_field(form.main_instance_list) }}
+            <p class="small field_hint">{{ _('This can be set to any instance that you know has the "Publish instance list" checkbox ticked.') }}</p>
+
+            <div class="mt-4">
+                {{ render_field(form.submit) }}
+            </div>
         </form>
     </div>
 </div>

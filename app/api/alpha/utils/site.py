@@ -60,6 +60,8 @@ def get_site_instance_chooser_search(query_params):
         instance_data['domain'] = instance.domain
         instance_data['id'] = instance.id
         instance_data['language'] = instance_data['language']['name']
+        if 'uptime' not in instance_data:
+            instance_data['uptime'] = ''
         result['result'].append(instance_data)
     return result
 

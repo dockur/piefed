@@ -5037,3 +5037,10 @@ def calculate_rss_cache_timeout(posts):
     timeout = max(int(average_seconds / 3), 600)
 
     return min(timeout, 21600)  # Between 10 minutes and 6 hours
+
+
+def months_since(dt: datetime):
+    """ How many months have passed since dt """
+
+    now = datetime.now()
+    return (now.year - dt.year) * 12 + now.month - dt.month

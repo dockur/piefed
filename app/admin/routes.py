@@ -376,6 +376,8 @@ def admin_instance_chooser():
         set_setting('number_of_admins', form.number_of_admins.data)
         set_setting('financial_stability', form.financial_stability.data)
         set_setting('daily_backups', form.daily_backups.data)
+        set_setting('main_instance_list', form.main_instance_list.data or 'piefed.social')
+        set_setting('crawl_known_instances', form.crawl_known_instances.data)
         flash(_('Settings saved. It might take up to 24 hours before other instances show your changes.'))
     elif request.method == 'GET':
         form.enable_instance_chooser.data = get_setting('enable_instance_chooser', False)
@@ -383,6 +385,8 @@ def admin_instance_chooser():
         form.number_of_admins.data = get_setting('number_of_admins', 0)
         form.financial_stability.data = get_setting('financial_stability', False)
         form.daily_backups.data = get_setting('daily_backups', False)
+        form.main_instance_list.data = get_setting('main_instance_list', 'piefed.social')
+        form.crawl_known_instances.data = get_setting('crawl_known_instances', False)
 
     return render_template('admin/instance_chooser.html', title=_('Misc settings'), form=form,
                            roles_with=roles_with('change instance settings'))

@@ -31,6 +31,7 @@ from sqlalchemy import desc, text
 from app.main.forms import ShareLinkForm
 from app.main.util import sidebar_active_communities, sidebar_new_instances, sidebar_upcoming_events, \
     sidebar_new_communities, _base_list_communities_context, reload_url
+from app.shared.tasks.maintenance import refresh_instance_chooser
 from app.translation import LibreTranslateAPI
 from app.utils import render_template, get_setting, request_etag_matches, return_304, blocked_domains, \
     ap_datetime, shorten_string, user_filters_home, \
@@ -696,7 +697,7 @@ def honey_pot(whatever=None):
 @bp.route('/test')
 @debug_mode_only
 def test():
-    #refresh_instance_chooser()
+    refresh_instance_chooser()
     #p = Post.query.get(42)
     #p.delete_dependencies()
     #db.session.delete(p)

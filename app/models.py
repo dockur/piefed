@@ -110,6 +110,8 @@ class Instance(db.Model):
     nodeinfo_href = db.Column(db.String(100))
     admin_note = db.Column(db.Text)
     popular = db.Column(db.Boolean, default=True)  # New communities from here have their popular flag set
+    active_6mo = db.Column(db.Integer, default=0)
+    active_1mo = db.Column(db.Integer, default=0)
 
     __table_args__ = (
         Index('ix_instance_created_at_active', created_at.desc(),
