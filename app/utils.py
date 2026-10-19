@@ -916,6 +916,10 @@ def handle_indented_codeblocks(text: str) -> str:
     placeholder = gibberish(10)
     footnote_snippets, text = stash_footnotes(text, placeholder)
 
+    # Stash normal codeblocks
+    code_placeholder = gibberish(10)
+    code_snippets, text = stash_code_md(text, code_placeholder, ignore_indented=True)
+
     # Regex to capture groups of lines starting with at least four spaces or a tab (ignoring lines with only a \n)
     block_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
 
@@ -934,8 +938,7 @@ def handle_indented_codeblocks(text: str) -> str:
         if firstline.startswith("\t"):
             leading_chars = "\t"
         else:
-            num_spaces = len(firstline) - len(firstline.lstrip())
-            leading_chars = num_spaces * " "
+            leading_chars = "    "
 
         # Commence stripping
         lines = contents.splitlines(keepends=True)
@@ -960,12 +963,15 @@ def handle_indented_codeblocks(text: str) -> str:
         output += '</code></pre>'
 
         return output
-
+    
     # Do the regex work
     text = re.sub(block_regex, wrap_indented_block, text)
 
     # Return the footnotes
     text = pop_footnotes(footnote_snippets, text, placeholder)
+
+    # Return the codeblocks
+    text = pop_code(code_snippets, text, code_placeholder)
 
     return text
 
@@ -1271,18 +1277,22 @@ def stash_code_html(text: str, placeholder: str) -> tuple[list, str]:
     return (code_snippets, text)
 
 
-def stash_code_md(text: str, placeholder: str) -> tuple[list, str]:
+def stash_code_md(text: str, placeholder: str, ignore_indented: bool = False) -> tuple[list, str]:
     code_snippets = []
 
     def store_code(match):
         code_snippets.append(match.group(0))
         return f"{placeholder}{len(code_snippets) - 1}$"
-    
-    # Indented code blocks
-    text_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
-    text = re.sub(text_regex, store_code, text)
+
     # Fenced code blocks (```...```)
-    text = re.sub(r'```[\s\S]*?```', store_code, text)
+    fenced_regex = re.compile(r'^```[^\n]*\n([\s\S]*?)^```[ \t]*$', re.M)
+    text = re.sub(fenced_regex, store_code, text)
+
+    if not ignore_indented:
+        # Indented code blocks
+        text_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
+        text = re.sub(text_regex, store_code, text)
+    
     # Inline code (`...`)
     text = re.sub(r'`[^`\n]+`', store_code, text)
 

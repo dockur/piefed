@@ -263,6 +263,19 @@ And if you want to add your score to the database to help your fellow Bookworms 
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
         self.assertEqual(result, correct_html)
 
+    def test_indents_in_fenced_code(self):
+        """Make sure indented sections are properly included in fenced code blocks."""
+        
+        markdown = "```python\ndef testing():\n    print('stuff')\n```"
+        correct_html = '<div class="codehilite">\n<pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">testing</span><span class="p">():</span>\n    <span class="nb">print</span><span class="p">(</span><span class="s1">\'stuff\'</span><span class="p">)</span>\n</code></pre>\n</div>\n'
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        self.assertEqual(result, correct_html)
+
+        markdown = "```\ndef testing():\n    print('stuff')\n```"
+        correct_html = "<pre><code>def testing():\n    print('stuff')\n</code></pre>\n"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        self.assertEqual(result, correct_html)
+
     def test_code_block_link(self):
         """Test code blocks formatting containing a link"""
 
