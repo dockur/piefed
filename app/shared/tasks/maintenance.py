@@ -1148,9 +1148,14 @@ def build_instance_list():
                 continue
 
             if federated_instances_response.status_code == 200:
-                federated_instances_data = federated_instances_response.json()
+                try:
+                    federated_instances_data = federated_instances_response.json()
+                    linked = federated_instances_data['federated_instances']['linked']
+                except (ValueError, KeyError, TypeError) as e:
+                    current_app.logger.warning(f"Bad federated_instances response from {instance.domain}: {str(e)}")
+                    continue
 
-                for federated_instance in federated_instances_data['federated_instances']['linked']:
+                for federated_instance in linked:
                     domain = federated_instance['domain']
                     software = federated_instance['software'] if 'software' in federated_instance else ''
                     version = federated_instance['version'] if 'version' in federated_instance else ''
@@ -1159,7 +1164,7 @@ def build_instance_list():
                             'domain': domain,
                             'uptime_alltime': ''
                         })
-                        already_seen.add(instance.domain)
+                        already_seen.add(domain)
 
         # Save result to file
         ensure_directory_exists('app/static/media')
