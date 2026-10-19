@@ -421,7 +421,7 @@ def find_hashtag_or_create(hashtag: str) -> Tag:
     if hashtag[0] == '#':
         hashtag = hashtag[1:]
 
-    existing_tag = Tag.query.filter(Tag.name == hashtag.lower()).first()
+    existing_tag = db.session.query(Tag).filter(Tag.name == hashtag.lower()).first()
     if existing_tag:
         return existing_tag
     else:
