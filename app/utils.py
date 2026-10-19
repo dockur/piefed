@@ -963,7 +963,7 @@ def handle_indented_codeblocks(text: str) -> str:
         output += '</code></pre>'
 
         return output
-    
+
     # Do the regex work
     text = re.sub(block_regex, wrap_indented_block, text)
 
