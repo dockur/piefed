@@ -1033,6 +1033,8 @@ def refresh_instance_chooser():
 
         if response.status_code != 200:
             current_app.logger.error(f"{main_list} API returned {response.status_code}")
+            if get_setting('crawl_known_instances', False) and main_list == current_app.config['SERVER_NAME']:
+                build_instance_list.delay()
             return
             
         response_data = response.json()

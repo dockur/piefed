@@ -697,7 +697,7 @@ def honey_pot(whatever=None):
 @bp.route('/test')
 @debug_mode_only
 def test():
-    refresh_instance_chooser()
+    #refresh_instance_chooser()
     #p = Post.query.get(42)
     #p.delete_dependencies()
     #db.session.delete(p)
