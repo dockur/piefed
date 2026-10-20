@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1.4
+# Rebuild trigger: 2026-10-21
 FROM python:3.13-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
