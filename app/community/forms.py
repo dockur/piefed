@@ -233,6 +233,7 @@ class CreatePostForm(FlaskForm):
                                   ('weekly', _l('Weekly')), ('monthly', _l('Monthly'))],
                          render_kw={'class': 'form-select'})
     timezone = SelectField(_l('Timezone'), validators=[DataRequired()], render_kw={'id': 'timezone', "class": "form-control"})
+    og_image_url = HiddenField()
     submit = SubmitField(_l('Publish'))
 
     def __init__(self, *args, **kwargs):

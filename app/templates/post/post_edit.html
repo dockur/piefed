@@ -16,12 +16,15 @@
     function checkAndCopyTitle(curr_url = "", swapped = {}) {
       const retrieved = document.getElementById('retrieved_title');
       const retrieved_description = document.getElementById('retrieved_description');
+      const retrieved_image = document.getElementById('retrieved_image')
       const title = document.getElementById('title');
       const body = document.getElementById('body');
       const link_url = document.getElementById('link_url');
+      const og_image_url = document.getElementById('og_image_url');
       let skip = false;
       let swapped_title = false;
       let swapped_body = false;
+      let swapped_image = false;
 
       if (link_url && (link_url.value != curr_url)) {
         if (curr_url in swapped) {
@@ -31,6 +34,7 @@
         swapped[curr_url] = false;
         retrieved.value = "";
         retrieved_description.value = "";
+        retrieved_image.value = "";
       } else {
         skip = true;
       }
@@ -46,7 +50,12 @@
             swapped_body = true;
         }
 
-        swapped[curr_url] = swapped_title || swapped_body;
+        if (retrieved_image && og_image_url && retrieved_image.value && !og_image_url.value) {
+            og_image_url.value = retrieved_image.value;
+            swapped_image = true;
+        }
+
+        swapped[curr_url] = swapped_title || swapped_body || swapped_image;
       }
 
       setTimeout(checkAndCopyTitle, 1000, curr_url, swapped); // Check every second
@@ -331,6 +340,7 @@
 </div>
             </fieldset>
 
+            {{ render_field(form.og_image_url) }}
             {{ render_field(form.submit) }}
         </form>
         <p>&nbsp;</p>
@@ -344,16 +354,6 @@
         })();"
            title="{{ _('Drag this to your bookmarks bar') }}"
            style="cursor: grab; text-decoration: underline;">{{ _('Share on PieFed') }}</a></p>
-    <script src="/static/js/tomselect/tom-select.complete.min.js" nonce={{ nonce }}></script>
-    <script nonce="{{ nonce }}">
-      document.addEventListener("DOMContentLoaded", () => {
-        new TomSelect(".tom-select", {
-          plugins: ['dropdown_input'],
-          create: false,
-          maxOptions: 2000,
-       })
-    });
-    </script>
     </main>
 
     {% include "_side_pane.html" %}

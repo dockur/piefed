@@ -266,6 +266,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
         language_id = input['language_id']
         timezone = input['timezone'] if 'timezone' in input else user.timezone
         image_alt_text = input['image_alt_text'] if 'image_alt_text' in input else ''
+        og_image_url = input.get('og_image_url')
         if image_alt_text is None:
             image_alt_text = ''
         
@@ -354,6 +355,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
         ai_generated = input.ai_generated.data
         notify_author = input.notify_author.data
         language_id = input.language_id.data
+        og_image_url = input.og_image_url.data
         tags = tags_from_string_old(input.tags.data)
         if input.flair:
             flair = flair_from_form(input.flair.data)
@@ -657,15 +659,19 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
                         db.session.add(file)
                 post.url = url
             else:
-                opengraph = opengraph_parse(thumbnail_url)
-                if opengraph and (opengraph.get('og:image', '') != '' or opengraph.get('og:image:url', '') != ''):
-                    filename = opengraph.get('og:image') or opengraph.get('og:image:url')
-                    if not filename.startswith('/'):
-                        file = url_to_thumbnail_file(filename)
-                        if file:
-                            file.alt_text = shorten_string(opengraph.get('og:title'), 295)
-                            post.image = file
-                            db.session.add(file)
+                filename = ''
+                if og_image_url:
+                    filename = og_image_url
+                else:
+                    opengraph = opengraph_parse(thumbnail_url)
+                    if opengraph and (opengraph.get('og:image', '') != '' or opengraph.get('og:image:url', '') != ''):
+                        filename = opengraph.get('og:image') or opengraph.get('og:image:url')
+                if filename and not filename.startswith('/'):
+                    file = url_to_thumbnail_file(filename)
+                    if file:
+                        file.alt_text = shorten_string(post.title, 295)
+                        post.image = file
+                        db.session.add(file)
 
                 post.url = embed_url
 
