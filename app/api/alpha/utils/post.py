@@ -1542,6 +1542,7 @@ def post_post(auth, data):
     ai_generated = data['ai_generated'] if 'ai_generated' in data else False
     alt_text = data['alt_text'] if 'alt_text' in data else title
     language_id = data['language_id'] if 'language_id' in data else site_language_id()
+    og_image_url = data.get('og_image_url', '')
     if language_id < 2:
         language_id = site_language_id()
 
@@ -1574,7 +1575,8 @@ def post_post(auth, data):
              'ai_generated': ai_generated,
              'image_alt_text': alt_text,
              'scheduled_for': scheduled_for,
-             'repeat': repeat}
+             'repeat': repeat,
+             'og_image_url': og_image_url}
 
     # Add event data if present
     if 'event' in data and data['event']:
@@ -1590,6 +1592,7 @@ def post_post(auth, data):
     post_data = {
         "title": title,
         "content": body,
+        "og_image_url": og_image_url,
         "community": community.name,
         "community_id": community.id,
         "post_type": type,

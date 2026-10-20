@@ -1415,6 +1415,7 @@ class CreatePostRequest(DefaultSchema):
     alt_text = fields.String(metadata={"description": "Will be used for image posts or link posts that point to images"})
     body = fields.String(metadata={"format": "markdown"})
     url = fields.String(metadata={"format": "url"})
+    og_image_url = fields.String(metadata={"format": "url", "description": "Thumbnail image, retrieved from og:image in linked web page"})
     nsfw = fields.Boolean()
     ai_generated = fields.Boolean()
     language_id = fields.Integer()
