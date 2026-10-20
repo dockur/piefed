@@ -148,9 +148,8 @@ class RSSFeed:
         fe.slash.comments(max(0, comment_count or 0))
 
         if post.community:
-            fe.category(term=post.community.name)  # keep this?
-            fqname = post.community.ap_id or f"{post.community.name}@{post.community.ap_domain}"
-            fe.category(term=fqname)
+            fe.category(term=post.community.name)
+            fe.category(term=post.community.lemmy_link(), scheme='lemmy-link')
         for flair in set([flair.flair for flair in post.flair]):
             fe.category(term=flair, scheme='flair')
         for tag in set([tag.display_as for tag in post.tags]):
