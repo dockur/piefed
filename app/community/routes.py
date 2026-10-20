@@ -61,7 +61,7 @@ from app.utils import get_setting, render_template, markdown_to_html, validation
     approval_required, permission_required, aged_account_required, communities_banned_from_all_users, \
     moderating_communities_ids_all_users, block_honey_pot, user_pronouns, community_membership_private, \
     show_reason_why_no_federation, can_upload_video, banned_instances, is_invalid_get_request_uri, user_ip_banned, \
-    check_anoobis, calculate_rss_cache_timeout
+    check_anoobis, calculate_rss_cache_timeout, opengraph_parse
 from app.shared.post import make_post, sticky_post
 from app.shared.tasks import task_selector
 from app.shared.community import leave_community
@@ -2769,9 +2769,9 @@ def check_url_already_posted():
         url = remove_tracking_from_link(url.strip())
         posts = Post.query.filter(Post.url == url, Post.deleted == False, Post.status > POST_STATUS_REVIEWING,
                                   Post.microblog == False, Post.from_bot == False, Post.from_reposter == False).all()
-        title, description = retrieve_metadata_of_url(url)
+        title, description, image = retrieve_metadata_of_url(url)
         return flask.render_template('community/check_url_posted.html', posts=posts,
-                                     title=title, description=description)
+                                     title=title, description=description, image=image)
     else:
         abort(404)
 
@@ -2824,33 +2824,18 @@ def get_sidebar(community_id):
 def retrieve_metadata_of_url(url):
     title = ''
     description = ''
+    image = ''
     if is_invalid_get_request_uri(url):
         return '', ''
     try:
-        response = httpx_client.get(url, timeout=10, follow_redirects=False)
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, 'html.parser')
-
-            # Try og:title first
-            og_title = soup.find('meta', property='og:title')
-            if og_title and og_title.get('content'):
-                title = og_title.get('content').strip()
-
-            if title == '':
-                # Fall back to HTML title
-                title_tag = soup.find('title')
-                if title_tag:
-                    title = title_tag.get_text().strip()
-
-            meta_description = soup.find('meta', {'name': 'description'})
-            if meta_description and meta_description.get('content'):
-                description = meta_description.get('content').strip()
-
-            return title, description
-        else:
-            return title, description
+        metadata = opengraph_parse(url)
+        if metadata:
+            title = metadata.get('og:title', '')
+            description = metadata.get('description', '')
+            image = metadata.get('og:image', '')
+        return title, description, image
     except Exception:
-        return title, description
+        return title, description, image
 
 
 @bp.route('/c/<actor>/fixup_from_remote')

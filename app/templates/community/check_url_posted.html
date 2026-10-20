@@ -33,3 +33,6 @@
 {% if description -%}
 <input id="retrieved_description" type="hidden" value="{{ description }}" hx-swap-oob="true">
 {% endif -%}
+{% if image -%}
+<input id="retrieved_image" type="hidden" value="{{ image }}" hx-swap-oob="true">
+{% endif -%}
