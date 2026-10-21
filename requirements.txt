@@ -16,7 +16,7 @@ httpx[http2]~=0.28.0
 pyjwt==2.8.0
 SQLAlchemy-Searchable==2.1.0
 SQLAlchemy-Utils==0.41.1
-cryptography==48.0.0
+cryptography~=50.0.0
 Bootstrap-Flask==2.5.0
 pyld==2.0.4
 boto3~=1.39.0
@@ -39,7 +39,7 @@ captcha
 pytest
 stripe~=12.0.0
 Authlib~=1.7.0
-webauthn~=2.5.0
+webauthn~=3.0.0
 ldap3~=2.9.0
 sqlalchemy~=2.0.0
 orjson~=3.11.0
