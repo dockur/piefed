@@ -289,7 +289,7 @@ class GetSiteInstanceChooserSearchResponseItem(DefaultSchema):
     trusts = fields.List(fields.String(), required=True)
     registration_mode = fields.String(required=True)
     language = fields.String(required=True)
-    monthsmonitored = fields.Integer(required=True)
+    monthsmonitored = fields.Integer(required=False)
 
 
 class GetSiteInstanceChooserSearchResponse(DefaultSchema):

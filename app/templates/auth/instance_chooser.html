@@ -351,7 +351,7 @@
                         <button class="btn btn-outline-secondary more-info-btn mt-2" data-id="${instance.id}" style="float: right;">{{ _('More') }}</button>
                         {{ _('Stability') }}: ${instance.maturity} <br>
                         {{ _('Newbie friendly') }}: ${instance.newbie_friendly ? 'Yes' : 'No'}  <br>
-                        {{ _('Age') }}: ${instance.monthsmonitored ? instance.monthsmonitored + ' months' : 'New'}
+                        {{ _('Age') }}: ${instance.monthsmonitored == null ? 'Unknown' : (instance.monthsmonitored ? instance.monthsmonitored + ' months' : 'New')}
                     </div>
                 </div>
             </div>
@@ -542,7 +542,7 @@
         
         // Populate instance info
         document.getElementById('modal-maturity').textContent = instance.maturity || 'Unknown';
-        document.getElementById('modal-months').textContent = instance.monthsmonitored ? `${instance.monthsmonitored} months` : 'Unknown';
+        document.getElementById('modal-months').textContent = instance.monthsmonitored == null ? 'Unknown' : (instance.monthsmonitored ? `${instance.monthsmonitored} months` : 'New');
         document.getElementById('modal-uptime').textContent = instance.uptime ? `${instance.uptime}%` : 'Unknown';
         document.getElementById('modal-newbie').textContent = instance.newbie_friendly ? 'Yes' : 'No';
         document.getElementById('modal-language').textContent = instance.language || 'Not specified';
