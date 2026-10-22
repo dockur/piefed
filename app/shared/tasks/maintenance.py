@@ -1067,7 +1067,8 @@ def refresh_instance_chooser():
                 if chooser_response.status_code == 200:
                     chooser_data = chooser_response.json()
 
-                    chooser_data['uptime'] = node['uptime_alltime']
+                    uptime = node.get('uptime_alltime')
+                    chooser_data['uptime'] = str(uptime) if uptime else ''
 
                     # Update or create InstanceChooser record
                     instance_chooser = session.query(InstanceChooser).filter_by(domain=domain).first()

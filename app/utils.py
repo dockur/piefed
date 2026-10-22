@@ -395,11 +395,13 @@ def allowlist_html(html: str, a_target='_blank', test_env=False) -> str:
             "|".join(re.escape(k) for k in emoji_replacements),
             re.IGNORECASE
         )
-
-        clean_html = pattern.sub(
-            lambda m: "<img referrerpolicy='no-referrer' width=30 height=30 src='" + emoji_replacements[m.group(0).lower()] + "'>",
-            clean_html
-        )
+        try:
+            clean_html = pattern.sub(
+                lambda m: "<img referrerpolicy='no-referrer' width=30 height=30 src='" + emoji_replacements[m.group(0).lower()] + "'>",
+                clean_html
+            )
+        except KeyError:
+            pass
 
     # bring back the <code> snippets
     clean_html = pop_code(code_snippets, clean_html, code_placeholder)

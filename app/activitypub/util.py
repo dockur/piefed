@@ -2219,7 +2219,7 @@ def ban_user(blocker, blocked, community, core_activity):
             new_ban.reason = shorten_string(reason, 255)
 
             ban_until = None
-            if 'expires' in core_activity:
+            if 'expires' in core_activity and core_activity['expires']:
                 try:
                     ban_until = datetime.fromisoformat(core_activity['expires'])
                 except ValueError:
@@ -2477,10 +2477,11 @@ def create_post_reply(store_ap_json, community: Community, in_reply_to, request_
                     # ignore Mentions in comments from MBIN if they're just there because a local user authored a comment further up in the comment chain
                     # (direct replies will generate a different kind of Notification)
                     # note: can't just check for any Notifications (reply or mention) 'cos local users could conceivably have turned inbox replies off
-                    ids = tuple(ids)
-                    user_ids = db.session.execute(text('SELECT user_id FROM "post_reply" WHERE id IN :ids'), {'ids': ids}).scalars()
-                    if recipient.id in user_ids:
-                        continue
+                    if len(ids):
+                        ids = tuple(ids)
+                        user_ids = db.session.execute(text('SELECT user_id FROM "post_reply" WHERE id IN :ids'), {'ids': ids}).scalars()
+                        if recipient.id in user_ids:
+                            continue
 
                     # if checking for previous comments seems overly-involved, a cheaper solution is perhaps to just be to reject Mentions from MBIN in comments with a depth > 0
 
@@ -2835,10 +2836,11 @@ def update_post_reply_from_activity(reply: PostReply, request_json: dict):
                                             continue
 
                                     # ignore Mentions generated because a local user authored a comment further up in the comment chain
-                                    ids = tuple(ids)
-                                    user_ids = db.session.execute(text('SELECT user_id FROM "post_reply" WHERE id IN :ids'), {'ids': ids}).scalars()
-                                    if recipient.id in user_ids:
-                                        continue
+                                    if len(ids):
+                                        ids = tuple(ids)
+                                        user_ids = db.session.execute(text('SELECT user_id FROM "post_reply" WHERE id IN :ids'), {'ids': ids}).scalars()
+                                        if recipient.id in user_ids:
+                                            continue
 
                                 blocked_senders = blocked_users(recipient.id)
                                 if reply.user_id not in blocked_senders:
