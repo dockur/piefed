@@ -33,7 +33,6 @@ var DownArea = (function () {
             _a['bold-italic'] = { fn: this.addBoldItalic },
             _a['normal-link'] = { fn: this.addLink },
             _a['quick-link'] = { fn: this.addLink, args: [1] },
-            _a['email'] = { fn: this.addEmail },
             _a['image'] = { fn: this.addImage },
             _a['blockquote'] = { fn: this.addBlockquote },
             _a['u-list'] = { fn: this.addUnorderedList },
@@ -137,7 +136,7 @@ var DownArea = (function () {
             var linkDropdown = document.createElement('div');
             linkDropdown.classList.add('downarea-tool-dropdown');
             linkDropdown.id = 'link-dropdown';
-            linkDropdown.innerHTML = "<ul>\n                            <li data-action=\"normal-link\">Normal</li>\n                            <li data-action=\"quick-link\">Quick</li>\n                            <li data-action=\"email\">Email</li>\n                        </ul>";
+            linkDropdown.innerHTML = "<ul>\n                            <li data-action=\"normal-link\">[Normal]()</li>\n                            <li data-action=\"quick-link\">&lt;Quick&gt;</li>\n                        </ul>";
             linkTool.appendChild(linkDropdown);
         }
         if (this.hiddenTools.indexOf('image') < 0) {
@@ -595,13 +594,13 @@ var DownArea = (function () {
         var link = '';
         var offset = 0;
         if (type === 0) {
-            link = '[](https://)';
+            link = '[]()';
             offset = link.length - 1;
             if (self.textarea.selectionStart != self.textarea.selectionEnd) {
                 end = self.textarea.value.substr(self.textarea.selectionEnd);
                 var range = self.textarea.value.slice(self.textarea.selectionStart, self.textarea.selectionEnd);
                 var rangeIsURL = range.match(/https?:\/\/(.+)/);
-                link = rangeIsURL ? "[](".concat(range.trim(), ")") : "[".concat(range.trim(), "](https://)");
+                link = rangeIsURL ? "[](".concat(range.trim(), ")") : "[".concat(range.trim(), "]()");
                 offset = rangeIsURL ? range.trim().length + 3 : 1;
             }
         }
@@ -624,29 +623,6 @@ var DownArea = (function () {
         }
         self.textarea.value = "".concat(start).concat(link).concat(end);
         self.textarea.selectionStart = start.length + link.length - offset;
-        self.textarea.selectionEnd = self.textarea.selectionStart;
-        self.textarea.focus();
-    };
-    DownArea.prototype.addEmail = function (self) {
-        var start = self.textarea.value.substr(0, self.textarea.selectionStart);
-        var end = self.textarea.value.substr(self.textarea.selectionStart);
-        var emailLink = '<@>';
-        var offset = emailLink.length - 1;
-        if (self.textarea.selectionStart != self.textarea.selectionEnd) {
-            end = self.textarea.value.substr(self.textarea.selectionEnd);
-            var range = self.textarea.value.slice(self.textarea.selectionStart, self.textarea.selectionEnd);
-            emailLink = "<".concat(range, ">");
-            offset = 1;
-        }
-        if (start.length && start[start.length - 1] != '\n' && start[start.length - 1] != ' ') {
-            emailLink = " ".concat(emailLink);
-        }
-        if (end.length && end[0] != '\n' && end[0] != ' ') {
-            emailLink = "".concat(emailLink, " ");
-            offset += 1;
-        }
-        self.textarea.value = "".concat(start).concat(emailLink).concat(end);
-        self.textarea.selectionStart = start.length + emailLink.length - offset;
         self.textarea.selectionEnd = self.textarea.selectionStart;
         self.textarea.focus();
     };
