@@ -33,6 +33,7 @@ def get_search(auth, data):
     search_type = 'Posts' if type == 'Url' else type
     search_json = search_view(search_type)
     if type == 'Communities':
+        data['show_nsfw'] = data.get('nsfw') in ('Include', 'Only')
         search_json['communities'] = get_community_list(auth, data)['communities']
     elif type == 'Posts' or type == 'Url':
         search_json['posts'] = get_post_list(auth, data, search_type=type)['posts']
