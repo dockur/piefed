@@ -68,7 +68,7 @@ def get_alpha_site():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
-    with limiter.limit('20/minute'):
+    with limiter.limit('20/minute', exempt_when=is_trusted_request):
         resp = get_site(auth)
     validated = get_site_response.load(resp)
     return orjson_response(validated)
@@ -267,7 +267,7 @@ def post_alpha_community_block(data):
 def post_alpha_community(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('10/day'):
+    with limiter.limit('10/day', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         resp = post_community(auth, data)
         return CommunityResponse().load(resp)
@@ -469,7 +469,7 @@ def post_alpha_feed_follow(data):
 def post_alpha_feed(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('10/day'):
+    with limiter.limit('10/day', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         resp = post_feed(auth, data)
         return FeedView().load(resp)
@@ -604,7 +604,7 @@ def post_alpha_post_metadata(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
-    with limiter.limit('20/minute'):
+    with limiter.limit('20/minute', exempt_when=is_trusted_request):
         return GetSiteMetadataResponse().load(get_site_metadata(auth, data))
 
 
@@ -655,7 +655,7 @@ def put_alpha_post_subscribe(data):
 def post_alpha_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('3/minute'):
+    with limiter.limit('3/minute', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         resp = post_post(auth, data)
         return GetPostResponse().load(resp)
@@ -670,7 +670,7 @@ def post_alpha_post(data):
 def post_alpha_scheduled_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('3/minute'):
+    with limiter.limit('3/minute', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         resp = post_post(auth, data)
         return GetScheduledPostResponse().load(resp)
@@ -941,7 +941,7 @@ def put_alpha_comment_subscribe(data):
 def post_alpha_comment(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('3/minute'):
+    with limiter.limit('3/minute', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         resp = post_reply(auth, data)
         return GetCommentResponse().load(resp)
@@ -1152,7 +1152,7 @@ def post_alpha_conversation_leave(data):
 def post_alpha_private_message(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('3/minute'):
+    with limiter.limit('3/minute', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         resp = post_private_message(auth, data)
         return PrivateMessageResponse().load(resp)
@@ -1354,7 +1354,7 @@ def post_alpha_user_logout():
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
     resp = post_user_logout(auth)
-    with limiter.limit('5/minute'):
+    with limiter.limit('5/minute', exempt_when=is_trusted_request):
         return LogoutResponse().load(resp)
 
 
@@ -1634,7 +1634,7 @@ def get_alpha_user_get_captcha():
 def post_alpha_upload_image(files_data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('15/hour'):
+    with limiter.limit('15/hour', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         image_file = files_data['file']
         resp = post_upload_image(auth, image_file)
@@ -1650,7 +1650,7 @@ def post_alpha_upload_image(files_data):
 def post_alpha_upload_community_image(files_data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('20/day'):
+    with limiter.limit('20/day', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         image_file = files_data['file']
         resp = post_upload_community_image(auth, image_file)
@@ -1666,7 +1666,7 @@ def post_alpha_upload_community_image(files_data):
 def post_alpha_upload_user_image(files_data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
-    with limiter.limit('20/day'):
+    with limiter.limit('20/day', exempt_when=is_trusted_request):
         auth = request.headers.get('Authorization')
         image_file = files_data['file']
         resp = post_upload_user_image(auth, image_file)
