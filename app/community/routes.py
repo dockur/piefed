@@ -1664,7 +1664,7 @@ def community_ban_user(community_id: int, user_id: int):
                 if posts:
                     flash(_('Posts by %(name)s have been deleted.', name=user.display_name()))
             if form.delete_post_replies.data:
-                post_replies = PostReply.query.filter(PostReply.user_id == user.id, Post.community_id == community.id).all()
+                post_replies = PostReply.query.filter(PostReply.user_id == user.id, PostReply.community_id == community.id).all()
                 for post_reply in post_replies:
                     delete_post_reply_from_community(post_reply.id, current_user.id)
                 if post_replies:
