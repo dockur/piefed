@@ -168,7 +168,7 @@ def process_webfinger_request(resource):
 
 
 @bp.route('/.well-known/nodeinfo')
-@cache.cached(timeout=600)
+@cache.cached(timeout=3600)
 def nodeinfo():
     nodeinfo_data = {"links": [{"rel": "http://nodeinfo.diaspora.software/ns/schema/2.0",
                                 "href": f"{current_app.config['SERVER_URL']}/nodeinfo/2.0"},
@@ -190,7 +190,7 @@ def host_meta():
 
 @bp.route('/nodeinfo/2.0')
 @bp.route('/nodeinfo/2.0.json')
-@cache.cached(timeout=600)
+@cache.cached(timeout=3600)
 def nodeinfo2():
     nodeinfo_data = {
         "version": "2.0",
@@ -217,7 +217,7 @@ def nodeinfo2():
 
 @bp.route('/nodeinfo/2.1')
 @bp.route('/nodeinfo/2.1.json')
-@cache.cached(timeout=600)
+@cache.cached(timeout=3600)
 def nodeinfo21():
     nodeinfo_data = {
         "version": "2.1",
@@ -258,7 +258,7 @@ def nodeinfo21():
 
 
 @bp.route('/api/v1/instance')
-@cache.cached(timeout=600)
+@cache.cached(timeout=3600)
 def api_v1_instance():
     retval = {
         'title': g.site.name,
