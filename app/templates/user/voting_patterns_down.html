@@ -80,7 +80,7 @@
             <tr><th>{{ _('Target') }}</th><th>{{ _('Post / comment') }}</th><th>{{ _('When') }}</th></tr>
         {% for vote in votes -%}
             <tr>
-                <td>{{ vote.author_id }}</td>
+                <td>{% if authors[vote.author_id] %}<a href="/u/{{ authors[vote.author_id].link() }}">{{ authors[vote.author_id].link() }}</a>{% else %}{{ vote.author_id }}{% endif %}</td>
                 <td><a href="/{{ vote.kind }}/{{ vote.item_id }}">{{ _('view') }}</a></td>
                 <td>{{ vote.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
             </tr>

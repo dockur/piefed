@@ -257,9 +257,12 @@ def user_voting_patterns_down(actor):
             order by created_at desc """
         votes_cast = db.session.execute(text(downvote_sql), {'user_id': user.id}).all()
 
+        author_ids = {vote.author_id for vote in votes_cast if vote.author_id}
+        authors = {author.id: author for author in User.query.filter(User.id.in_(author_ids)).all()} if author_ids else {}
+
         return render_template('user/voting_patterns_down.html', user=user,
                                title=_('Downvoting history of %(user_name)s', user_name=user.user_name),
-                               votes=votes_cast
+                               votes=votes_cast, authors=authors
                                )
 
 
