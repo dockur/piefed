@@ -88,7 +88,8 @@ def unsubscribe_from_community(community, user):
 
 
 def send_newsletter(form):
-    recipients = User.query.filter(User.newsletter == True, User.banned == False, User.ap_id == None).\
+    recipients = User.query.filter(User.newsletter == True, User.ap_id == None, User.verified.is_(True),
+                                   User.banned.is_(False), User.deleted.is_(False)).\
         order_by(desc(User.id)).limit(40000)
 
     from app.email import send_email

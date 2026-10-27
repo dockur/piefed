@@ -1133,6 +1133,12 @@ class User(UserMixin, db.Model):
             'idx_user_user_name_lower',
             db.text('lower(user_name)')
         ),
+        # Counts of active local users (nodeinfo, site stats). postgresql_where must match the where part of those queries exactly.
+        db.Index(
+            'idx_user_local_active_last_seen',
+            'last_seen',
+            postgresql_where=db.text('ap_id is null AND verified is true AND banned is false AND deleted is false')
+        ),
     )
 
     def __repr__(self):
@@ -3932,7 +3938,8 @@ class Site(db.Model):
 
     def active_now(self):
         return db.session.execute(text(
-            "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= CURRENT_DATE - INTERVAL '5 minutes' AND ap_id is null AND verified is true AND banned is false AND deleted is false")).scalar()
+            "SELECT COUNT(*) as c FROM \"user\" WHERE last_seen >= :since AND ap_id is null AND verified is true AND banned is false AND deleted is false"),
+            {'since': utcnow() - timedelta(minutes=5)}).scalar()
 
     def active_daily(self):
         from app.activitypub.util import active_day

@@ -93,7 +93,8 @@ def get_user_list(auth, data):
     user_id = authorise_api_user(auth) if auth else None
 
     if type == 'Local':
-        users = User.query.filter_by(instance_id=1, deleted=False, verified=True)
+        users = User.query.filter(User.ap_id == None, User.verified.is_(True),
+                                  User.banned.is_(False), User.deleted.is_(False))
     else:
         users = User.query.filter(User.deleted == False)
 

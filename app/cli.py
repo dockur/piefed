@@ -1552,6 +1552,9 @@ def register(app):
                     site = Site.query.get(1)
                     users_to_notify = User.query.join(Notification, User.id == Notification.user_id).filter(
                         User.ap_id == None,
+                        User.verified.is_(True),
+                        User.banned.is_(False),
+                        User.deleted.is_(False),
                         Notification.created_at > User.last_seen,
                         Notification.read == False,
                         User.email_unread_sent == False,  # they have not been emailed since last activity
