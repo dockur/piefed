@@ -2686,8 +2686,9 @@ class Post(db.Model):
 
     def vote(self, user: User, vote_direction: str, emoji: str | None):
         from app import redis_client
-        if vote_direction == 'downvote':
-            if self.author.has_blocked_user(user.id) or self.author.has_blocked_instance(user.instance_id):
+        from app.utils import blocked_users, blocked_instances
+        if vote_direction == 'downvote' and self.author.is_local():
+            if user.id in blocked_users(self.user_id) or user.instance_id in blocked_instances(self.user_id):
                 return None
         with redis_client.lock(f"lock:post:{self.id}", timeout=10, blocking_timeout=6):
             existing_vote = PostVote.query.filter_by(user_id=user.id, post_id=self.id).first()
@@ -3242,7 +3243,10 @@ class PostReply(db.Model):
 
     def vote(self, user: User, vote_direction: str, emoji: str):
         from app import redis_client
-        from app.utils import wilson_confidence_lower_bound
+        from app.utils import wilson_confidence_lower_bound, blocked_users, blocked_instances
+        if vote_direction == 'downvote' and self.author.is_local():
+            if user.id in blocked_users(self.user_id) or user.instance_id in blocked_instances(self.user_id):
+                return None
         with redis_client.lock(f"lock:post_reply:{self.id}", timeout=10, blocking_timeout=6):
             existing_vote = db.session.query(PostReplyVote).filter_by(user_id=user.id, post_reply_id=self.id).first()
             if existing_vote and vote_direction == 'reversal':  # api sends '1' for upvote, '-1' for downvote, and '0' for reversal
@@ -3899,7 +3903,7 @@ class Site(db.Model):
     allowlist = db.Column(db.Text, default='')
     blocklist = db.Column(db.Text, default='')
     blocked_phrases = db.Column(db.Text, default='')  # discard incoming content with these phrases
-    auto_decline_referrers = db.Column(db.Text, default='rdrama.net\nahrefs.com\nkiwifarms.sh\nkiwifarms.st')  # automatically decline registration requests if the referrer is one of these
+    auto_decline_referrers = db.Column(db.Text, default='rdrama.net\nahrefs.com\nkiwifarms.net\nkiwifarms.st')  # automatically decline registration requests if the referrer is one of these
     created_at = db.Column(db.DateTime, default=utcnow)
     updated = db.Column(db.DateTime, default=utcnow)
     last_active = db.Column(db.DateTime, default=utcnow)
