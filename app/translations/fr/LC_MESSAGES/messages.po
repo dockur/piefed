@@ -1,19 +1,19 @@
-
 msgid ""
 msgstr ""
-"Project-Id-Version:  piefed\n"
+"Project-Id-Version: piefed\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-10-05 21:04+1300\n"
-"PO-Revision-Date: 2026-10-05 08:02+0000\n"
+"PO-Revision-Date: 2026-10-12 19:42+0000\n"
 "Last-Translator: Snoopy <snoopy@users.noreply.translate.piefed.social>\n"
 "Language: fr\n"
-"Language-Team: French <http://translate.piefed.social/projects/piefed"
-"/main-web-app/fr/>\n"
+"Language-Team: French <http://translate.piefed.social/projects/piefed/main-"
+"web-app/fr/>\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+"X-Generator: Weblate 2026.9\n"
 
 #: app/__init__.py:55
 msgid "Please log in to access this page."
@@ -202,7 +202,7 @@ msgstr "Rubriques/flux"
 #: app/templates/post/add_reply_inline.html:27 app/utils.py:3644
 #: app/utils.py:3646 app/utils.py:3650
 msgid "Comment"
-msgstr "Commenter"
+msgstr "Commentaire"
 
 #: app/templates/chat/conversation.html:37 app/utils.py:3652
 msgid "Chat"
@@ -1112,9 +1112,8 @@ msgid "This profile is a bot"
 msgstr "Ce profil est un robot"
 
 #: app/admin/forms.py:266 app/admin/forms.py:330 app/user/forms.py:36
-#, fuzzy
 msgid "This profile is a reposter"
-msgstr "Ce profil est un robot"
+msgstr "Ce profil est un réplicateur"
 
 #: app/admin/forms.py:267 app/admin/forms.py:333
 msgid "Email address is verified"
@@ -1212,9 +1211,8 @@ msgid "Flag their posts as from a bot"
 msgstr "Marquer leurs messages comme provenant d'un bot"
 
 #: app/admin/forms.py:331
-#, fuzzy
 msgid "Flag their posts as from a reposter (bot)"
-msgstr "Marquer leurs messages comme provenant d'un bot"
+msgstr "Marquer leurs messages comme provenant d'un réplicateur (bot)"
 
 #: app/admin/forms.py:332
 msgid "Suppress cross-posts"
@@ -1963,9 +1961,8 @@ msgid "Label as AI"
 msgstr "Étiqueter comme IA"
 
 #: app/auth/forms.py:141 app/user/forms.py:209
-#, fuzzy
 msgid "Posts by reposters"
-msgstr "Publications des reposteurs"
+msgstr "Publications des réplicateurs"
 
 #: app/auth/forms.py:147 app/user/forms.py:215
 msgid "AI-generated posts"
@@ -3149,22 +3146,22 @@ msgid "Your post was not accepted because %(reason)s"
 msgstr "Votre publication n'a pas été acceptée en raison de %(reason)s"
 
 #: app/community/routes.py:1141
-#, fuzzy
 msgid ""
 "Because your account has not posted before we will review your post "
 "before allowing it to be published. Please wait."
 msgstr ""
-"Comme votre compte est nouveau, nous analysons votre publication avant de"
-" d'autoriser sa publication. Veuillez patienter."
+"Comme votre compte n'a jamais publié de message auparavant, nous allons "
+"vérifier votre publication avant d'en autoriser sa publication. Veuillez "
+"patienter."
 
 #: app/community/routes.py:1144
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your post has been created. <a href=\"/post/%(post_id)d/edit\">Edit "
 "it</a> if you notice any typos!"
 msgstr ""
-"Publications créée. <a href=\"/post/%(post_id)d/edit\">Modifiez-la</a> si"
-" vous remarquez des erreurs !"
+"Publication créée. <a href=\"/post/%(post_id)d/edit\">Modifiez-la</a> si "
+"vous remarquez des erreurs !"
 
 #: app/community/routes.py:1199
 #, python-format
@@ -3980,9 +3977,8 @@ msgid ""
 "Your changes have been saved. <a href=\"/post/%(post_id)d/edit\">Edit "
 "it</a> if you notice any typos!"
 msgstr ""
-"Vos modificatioms ont été enregistrée. <a "
-"href=\"/post/%(post_id)d/edit\">Modifiez</a> si vous remarquez des "
-"erreurs !"
+"Vos modifications ont été enregistrée. <a href=\"/post/%(post_id)d/edit\">"
+"Modifiez</a> si vous remarquez des erreurs !"
 
 #: app/post/routes.py:1081
 #, python-format
@@ -4635,9 +4631,8 @@ msgstr "Compte robot"
 #: app/templates/post/add_reply_inline_result.html:27
 #: app/templates/post/post_embed.html:18
 #: app/templates/themes/dillo/_macros.html:21
-#, fuzzy
 msgid "Reposter account"
-msgstr "Compte reposteur"
+msgstr "Compte réplicateur"
 
 #: app/templates/_macros.html:49
 #: app/templates/post/add_reply_inline_result.html:34
@@ -5883,7 +5878,7 @@ msgstr "Autorisations"
 #: app/templates/admin/votes.html:15 app/templates/user/show_profile.html:164
 #: app/templates/user/user_preview.html:29
 msgid "Votes"
-msgstr "Voter pour"
+msgstr "Votes"
 
 #: app/templates/admin/_tabbed_nav.html:5
 msgid "Site"
@@ -6968,7 +6963,7 @@ msgstr "Toutes ces statistiques concernent l'activité des %(days)d derniers jou
 #: app/templates/admin/votes.html:21
 #, fuzzy
 msgid "Accounts that only ever vote on one person"
-msgstr "Comptes qui ne votent systématiquement que pour une seule personne"
+msgstr "Comptes votants systématiquement que pour une seule personne"
 
 #: app/templates/admin/votes.html:23 app/templates/admin/votes.html:51
 msgid "This check took too long to run and was stopped. Try Recheck now."
@@ -6977,7 +6972,7 @@ msgstr ""
 "relancer la vérification maintenant."
 
 #: app/templates/admin/votes.html:30
-#, fuzzy, python-format
+#, python-format
 msgid "cast %(votes)d votes against"
 msgstr "a exprimé %(votes)d votes contre"
 
@@ -7198,14 +7193,12 @@ msgstr ""
 
 #: app/templates/auth/filter_selection.html:20
 #: app/templates/user/filters.html:27
-#, fuzzy
 msgid ""
 "Reposters automatically copy popular content from reddit, etc, which can "
 "feel inauthentic."
 msgstr ""
-"Les reposteurices copient automatiquement les publications provenant de "
-"Reddit, etc., ce qui peut donner une impression d'un manque "
-"d'authenticité."
+"Les réplicateurs copient automatiquement les publications provenant de "
+"Reddit, etc., ce qui peut donner une impression d'un manque d'authenticité."
 
 #: app/templates/auth/filter_selection.html:23
 #, fuzzy
@@ -11150,19 +11143,16 @@ msgid "Moderate user"
 msgstr "Modérer l'utilisateurice"
 
 #: app/templates/user/show_profile.html:433
-#, fuzzy
 msgid "Ask if reposter"
-msgstr "Demander si c'est une reposteurice"
+msgstr "Demander si c'est un réplicateur"
 
 #: app/templates/user/show_profile.html:438
-#, fuzzy
 msgid "Reposter challenge result pending"
-msgstr "Résultat du défis «Reposteurice ?» en attente"
+msgstr "Résultat du défis «Réplicateur ?» en attente"
 
 #: app/templates/user/show_profile.html:440
-#, fuzzy
 msgid "Not a reposter"
-msgstr "Pas une reposteurice"
+msgstr "Pas un réplicateur"
 
 #: app/templates/user/show_profile.html:481
 #, fuzzy
@@ -12889,4 +12879,3 @@ msgstr "Votre don a été annulé."
 #~ "erreur, veuillez nous en informer afin"
 #~ " que nous puissions le réparer et "
 #~ "améliorer PieFed pour tout le monde."
-

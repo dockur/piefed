@@ -1189,14 +1189,19 @@ def microblog_content_to_link(html: str, exclude: str):
 
 def first_paragraph(html):
     soup = BeautifulSoup(html, 'html.parser')
-    first_para = soup.find('p')
-    if first_para:
+
+    # Get all <p> tags, but ignore any that are inside a <details> tag (spoiler block)
+    paragraphs = [paragraph for paragraph in soup.find_all('p')
+                      if not paragraph.find_parent('details')]
+
+    if paragraphs:
+        first_para = paragraphs[0]
         if first_para.text.strip() == 'Summary' or \
                 first_para.text.strip() == '*Summary*' or \
                 first_para.text.strip() == 'Comments' or \
                 first_para.text.lower().startswith('cross-posted from:'):
-            second_paragraph = first_para.find_next('p')
-            if second_paragraph:
+            if len(paragraphs) > 1:
+                second_paragraph = paragraphs[1]
                 return f'<p>{second_paragraph.text}</p>'
         return allowlist_html(f'<p>{first_para.text}</p>')
     else:
