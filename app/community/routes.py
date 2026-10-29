@@ -637,20 +637,24 @@ def show_community(community: Community):
         next_url = url_for('activitypub.community_profile',
                            actor=community.ap_id if community.ap_id is not None else community.name,
                            page=posts.next_num, sort=sort, layout=post_layout,
-                           content_type=content_type) if posts.has_next else None
+                           content_type=content_type,
+                           microblog_mode=microblog_mode if microblog_mode != 'following' else None) if posts.has_next else None
         prev_url = url_for('activitypub.community_profile',
                            actor=community.ap_id if community.ap_id is not None else community.name,
                            page=posts.prev_num, sort=sort, layout=post_layout,
-                           content_type=content_type) if posts.has_prev and page != 1 else None
+                           content_type=content_type,
+                           microblog_mode=microblog_mode if microblog_mode != 'following' else None) if posts.has_prev and page != 1 else None
     else:
         next_url = url_for('activitypub.community_profile',
                            actor=community.ap_id if community.ap_id is not None else community.name,
                            page=comments.next_num, sort=sort, layout=post_layout,
-                           content_type=content_type) if comments.has_next else None
+                           content_type=content_type,
+                           microblog_mode=microblog_mode if microblog_mode != 'following' else None) if comments.has_next else None
         prev_url = url_for('activitypub.community_profile',
                            actor=community.ap_id if community.ap_id is not None else community.name,
                            page=comments.prev_num, sort=sort, layout=post_layout,
-                           content_type=content_type) if comments.has_prev and page != 1 else None
+                           content_type=content_type,
+                           microblog_mode=microblog_mode if microblog_mode != 'following' else None) if comments.has_prev and page != 1 else None
 
     # Voting history
     if current_user.is_authenticated:
