@@ -2303,6 +2303,7 @@ def post_cross_post(post_id: int):
             response.delete_cookie('post_title')
             response.delete_cookie('post_description')
             response.delete_cookie('post_tags')
+            response.delete_cookie('post_community')
             return response
         else:
             flash(_('Could not find that community.'), 'error')

@@ -187,7 +187,7 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
 
     if current_user.is_anonymous:
         rss_feed = [
-            (_('Local posts'), f'index/feed/local'),
+            (_('Local posts'), 'index/feed/local'),
         ]
     else:
         rss_feed = [
@@ -883,6 +883,7 @@ def share():
         response.delete_cookie('post_title')
         response.delete_cookie('post_description')
         response.delete_cookie('post_tags')
+        response.delete_cookie('post_community')
         return response
 
     if request.cookies.get('cross_post_community_id'):

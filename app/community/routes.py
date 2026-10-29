@@ -1159,9 +1159,11 @@ def add_post(actor, type=None):
         resp.delete_cookie('post_title')
         resp.delete_cookie('post_description')
         resp.delete_cookie('post_tags')
+        resp.delete_cookie('post_community')
         return resp
     else:  # GET
-        form.communities.data = community.id
+        target_community_id = request.cookies.get('post_community') or community.id
+        form.communities.data = int(target_community_id)
         form.notify_author.data = True
         if post_type == POST_TYPE_POLL:
             form.finish_in.data = '3d'

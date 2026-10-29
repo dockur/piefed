@@ -206,6 +206,7 @@ function setupPostTypeSwitcher() {
             setCookie('post_title', document.getElementById('title').value, 0.1);
             setCookie('post_description', document.getElementById('body').value, 0.1);
             setCookie('post_tags', document.getElementById('tags').value, 0.1);
+            setCookie('post_community', document.getElementById('communities').value, 0.1);
         };
     });
 
@@ -213,16 +214,20 @@ function setupPostTypeSwitcher() {
     var title = document.getElementById('title');
     var body = document.getElementById('body');
     var tags = document.getElementById('tags');
-    if(typeSwitcher && title && body && tags) {
+    var community = document.getElementById('communities');
+    if(typeSwitcher && title && body && tags && community) {
         var cookie_title = getCookie('post_title');
         var cookie_description = getCookie('post_description');
         var cookie_tags = getCookie('post_tags');
+        var cookie_community = getCookie('post_community');
         if(cookie_title)
             title.value = cookie_title;
         if(cookie_description)
             body.value = cookie_description;
         if(cookie_tags)
             tags.value = cookie_tags;
+        if(cookie_community)
+            community.value = cookie_community;
     }
 }
 
