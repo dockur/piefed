@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-10-05 21:04+1300\n"
-"PO-Revision-Date: 2026-10-02 05:49+0000\n"
+"PO-Revision-Date: 2026-10-13 18:00+0000\n"
 "Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
 "Language: ceb\n"
-"Language-Team: Cebuano <http://translate.piefed.social/projects/piefed"
-"/main-web-app/ceb/>\n"
+"Language-Team: Cebuano <http://translate.piefed.social/projects/piefed/main-"
+"web-app/ceb/>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+"X-Generator: Weblate 2026.9\n"
 
 #: app/__init__.py:55
 msgid "Please log in to access this page."
@@ -285,9 +286,8 @@ msgid "You have a new follower"
 msgstr "Aduna ka'y usa ka bag-ong tigsunod"
 
 #: app/activitypub/routes.py:1037
-#, fuzzy
 msgid "Someone is requesting to follow you"
-msgstr "Anaay gusto nga mu-follow nimo"
+msgstr "Anaay request nga mu-follow nimo"
 
 #: app/activitypub/util.py:2688
 #, python-format
@@ -358,7 +358,6 @@ msgid "Terms of service url"
 msgstr "Mga termino sa serbisyo nga URL"
 
 #: app/admin/forms.py:26
-#, fuzzy
 msgid "General instance contact email address"
 msgstr "Kinatibuk-ang email address sa kontak sa Instance"
 
@@ -381,13 +380,14 @@ msgid "Enable downvotes"
 msgstr "I-enable ang downvotes"
 
 #: app/admin/forms.py:32
-#, fuzzy
 msgid "Ignore comments that are just a gif reaction"
-msgstr "I-filter ang mga komento nga sama sa “ingon ani”"
+msgstr "Ibaliwala ang mga komento nga mga gif reaction ra"
 
 #: app/admin/forms.py:33
 msgid "Stop local 4chan screenshot posts and notify about remote ones"
 msgstr ""
+"Hunonga ang mga lokal nga post sa screenshot sa 4chan ug pahibalu-a bahin sa "
+"mga remote"
 
 #: app/admin/forms.py:34
 msgid "Filter out comments that are simply a form of \"this\""
@@ -477,9 +477,8 @@ msgid "Registration approved email"
 msgstr "Email nga giaprobahan ang pagrehistro"
 
 #: app/admin/forms.py:55
-#, fuzzy
 msgid "Manually approve posts by new accounts"
-msgstr "Manwal nga pag-aprubar sa mga followers"
+msgstr "Manwal nga pag-aprubar sa mga post sa bag-ong account"
 
 #: app/admin/forms.py:57
 msgid "Provide a list of topics to subscribe to"
@@ -523,11 +522,9 @@ msgid "Additional JS"
 msgstr "Dugang nga JS"
 
 #: app/admin/forms.py:66
-#, fuzzy
 msgid "Trim read posts table after this many days"
 msgstr ""
-"I-trim ang table sa mga nabasa nga post pagkahuman niini nga daghang mga "
-"adlaw"
+"I-trim ang mga nabasa nga post table pagkahuman niini nga daghang mga adlaw"
 
 #: app/admin/forms.py:67 app/templates/_view_filter_nav.html:9
 #: app/templates/_view_filter_nav.html:23 app/templates/admin/reports.html:20
@@ -1002,7 +999,6 @@ msgstr "Gamit ug duha ka-letter nga country code, usa ka code matag linya."
 #: app/templates/instance/list_instances.html:44
 #: app/templates/instance/list_instances.html:101
 #: app/templates/instance/list_instances.html:184
-#, fuzzy
 msgid "Dormant"
 msgstr "Dormant"
 
@@ -1114,9 +1110,8 @@ msgid "This profile is a bot"
 msgstr "Kini nga profile usa ka bot"
 
 #: app/admin/forms.py:266 app/admin/forms.py:330 app/user/forms.py:36
-#, fuzzy
 msgid "This profile is a reposter"
-msgstr "Kini nga profile usa ka bot"
+msgstr "Kini nga profile usa ka reposter"
 
 #: app/admin/forms.py:267 app/admin/forms.py:333
 msgid "Email address is verified"
@@ -1216,9 +1211,8 @@ msgid "Flag their posts as from a bot"
 msgstr "Markahi ang ilang mga post nga gikan sa usa ka bot"
 
 #: app/admin/forms.py:331
-#, fuzzy
 msgid "Flag their posts as from a reposter (bot)"
-msgstr "Markahi ang ilang mga post nga gikan sa usa ka bot"
+msgstr "I-flag ang ilang mga post nga gikan sa usa ka reposter"
 
 #: app/admin/forms.py:332
 msgid "Suppress cross-posts"
@@ -1307,7 +1301,6 @@ msgid "Write your content in Markdown format..."
 msgstr "Isulat ang imong content sa Markdown format..."
 
 #: app/admin/forms.py:395
-#, fuzzy
 msgid "A page with this URL already exists."
 msgstr "Adunay page nga sama niini nga URL."
 
@@ -1338,14 +1331,12 @@ msgid "Category"
 msgstr "Kategorya"
 
 #: app/admin/forms.py:409
-#, fuzzy
 msgid "Filter"
-msgstr "Mga Filter"
+msgstr "Filter"
 
 #: app/admin/forms.py:414
-#, fuzzy
 msgid "Json file that was exported from another instance"
-msgstr "Paghimo ug Feed gikan sa laing instance"
+msgstr "Json file nga gi-export gikan sa laing Instance"
 
 #: app/admin/routes.py:75
 msgid "Storage used"
@@ -1416,7 +1407,7 @@ msgid "Federation settings - preload"
 msgstr "Mga setting sa Federation - i-preload"
 
 #: app/admin/routes.py:890
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Based on current filters, the subscription process for "
 "%(communities_to_join)d of %(candidate_communities)d community launched "
@@ -1426,12 +1417,12 @@ msgid_plural ""
 "%(communities_to_join)d of %(candidate_communities)d communities launched"
 " in background, check admin/activities for details"
 msgstr[0] ""
-"Base sa karon nga mga filter, ang proseso sa subscription para sa "
-"%(communities_to_join)d sa %(candidate_communities)d nga komunidad "
-"giilunsad sa background, susiha ang admin/activities para sa mga detalye"
+"Base sa karon nga mga filter, ang proseso sa subscription para sa %"
+"(communities_to_join)d sa %(candidate_communities)d nga komunidad giilunsad "
+"sa background, susiha ang admin/activities para sa mga detalye"
 msgstr[1] ""
-"Base sa karon nga mga filter, ang proseso sa subscription para sa "
-"%(communities_to_join)d sa %(candidate_communities)d nga mga komunidad "
+"Base sa karon nga mga filter, ang proseso sa subscription para sa %"
+"(communities_to_join)d sa %(candidate_communities)d nga mga komunidad "
 "giilunsad sa background, susiha ang admin/activities para sa mga detalye"
 
 #: app/admin/routes.py:897
@@ -1443,9 +1434,8 @@ msgid "Ban imports started in a background process."
 msgstr "Magsugod ang pagban sa pag-import sa usa ka proseso sa background."
 
 #: app/admin/routes.py:932
-#, fuzzy
 msgid "Ban imports requested, but no json provided."
-msgstr "I-ban ang mga imports nga girequest, apan wala’y gihatag nga JSON."
+msgstr "I-ban ang mga imports nga girequest, apan wala’y gihatag nga json."
 
 #: app/admin/routes.py:992
 msgid "Federation settings - ban lists"
@@ -1512,11 +1502,12 @@ msgid ""
 "A community is considered unmoderated when mods have been inactive for 3 "
 "months or are bots."
 msgstr ""
+"Ang usa ka komunidad giisip nga walay moderation kung ang mga moderator "
+"wala’y aktibidad sulod sa 3 ka bulan o mga bot."
 
 #: app/admin/routes.py:1286
-#, fuzzy
 msgid "Unmoderated communities"
-msgstr "Mas daghang mga komunidad"
+msgstr "Mga komunidad nga walay moderation"
 
 #: app/admin/routes.py:1358 app/admin/routes.py:1527 app/admin/routes.py:1555
 #: app/admin/routes.py:1853 app/admin/routes.py:2173 app/admin/routes.py:2240
@@ -1557,22 +1548,19 @@ msgid "Topics"
 msgstr "Mga hilisgutan"
 
 #: app/admin/routes.py:1493
-#, fuzzy
 msgid "Topics imported successfully!"
-msgstr "Malampuson ang pag-upload!"
+msgstr "Mga topic nga gi-import nga malampuson!"
 
 #: app/admin/routes.py:1498
-#, fuzzy, python-format
+#, python-format
 msgid "Error importing topics: %(error)s"
-msgstr "Sayop sa pag-block sa instance: %(error)s"
+msgstr "Error sa pag-import sa mga topic: %(error)s"
 
 #: app/admin/routes.py:1502
-#, fuzzy
 msgid "No file uploaded"
-msgstr "Tugotan ang pag-upload sa file sa video"
+msgstr "Walay na-upload nga file"
 
 #: app/admin/routes.py:1504
-#, fuzzy
 msgid "Topic import"
 msgstr "Mga topic alert"
 
@@ -1614,9 +1602,8 @@ msgid "Deleted content"
 msgstr "Gipapas nga sulod"
 
 #: app/admin/routes.py:1686 app/templates/admin/content.html:20
-#, fuzzy
 msgid "Approval queue"
-msgstr "Aprobahi"
+msgstr "Linyahan sa pag-aprubar"
 
 #: app/admin/routes.py:1757
 msgid "Registration approved."
@@ -1627,9 +1614,8 @@ msgid "Registration denied. User removed from the database."
 msgstr "Gibalibaran ang pagrehistro. Gitangtang ang tiggamit gikan sa database."
 
 #: app/admin/routes.py:1805
-#, fuzzy
 msgid "Manually approve posts"
-msgstr "Manwal nga pag-aprubar sa mga followers"
+msgstr "Manwal nga pag-aprubar sa mga post"
 
 #: app/admin/routes.py:1839
 msgid ""
@@ -1700,14 +1686,13 @@ msgid "Edit instance"
 msgstr "I-edit ang instance"
 
 #: app/admin/routes.py:2219
-#, fuzzy
 msgid "Message sent."
-msgstr "Mensahe"
+msgstr "Napadala ang mensahe."
 
 #: app/admin/routes.py:2222 app/templates/instance/overview.html:47
-#, fuzzy, python-format
+#, python-format
 msgid "Contact instance admins on %(instance_name)s"
-msgstr "Magdonar ngadto sa %(instance_name)s"
+msgstr "Kontaka ang mga admin sa Instance sa %(instance_name)s"
 
 #: app/admin/routes.py:2242
 msgid "Problem adding instance to database"
@@ -1775,7 +1760,6 @@ msgid "CMS Pages"
 msgstr "Mga Panid sa CMS"
 
 #: app/admin/routes.py:2426 app/admin/routes.py:2448
-#, fuzzy
 msgid "Page saved."
 msgstr "Page saved."
 
@@ -1814,16 +1798,17 @@ msgstr "Gipapas ang Emoji."
 
 #: app/admin/routes.py:2546
 msgid "Filter out emoji with this in their url"
-msgstr ""
+msgstr "I-filter ang mga emoji gamit niini sa ilang url"
 
 #: app/admin/routes.py:2609
-#, fuzzy
 msgid "File deleted."
-msgstr "Nadelete na ang filter"
+msgstr "Nadelete na ang filter."
 
 #: app/admin/routes.py:2621
 msgid "Files deleted in the background - this might take a while."
 msgstr ""
+"Mga file nga gitangtang sa background - mahimo kini makagugol ug pipila ka "
+"oras."
 
 #: app/admin/routes.py:2653
 #, fuzzy, python-format
@@ -1970,9 +1955,8 @@ msgid "Label as AI"
 msgstr "Markahi kini nga AI"
 
 #: app/auth/forms.py:141 app/user/forms.py:209
-#, fuzzy
 msgid "Posts by reposters"
-msgstr "Mga post sa mga bot"
+msgstr "Mga post gikan sa mga re-poster"
 
 #: app/auth/forms.py:147 app/user/forms.py:215
 msgid "AI-generated posts"
@@ -2671,12 +2655,12 @@ msgstr "Ilisan ang hulagway"
 
 #: app/community/forms.py:385
 msgid "This image file size is too large."
-msgstr ""
+msgstr "Ang gidak-on niini nga file sa hulagway dako kaayo."
 
 #: app/community/forms.py:393
-#, fuzzy
 msgid "Galleries cannot be posted to local communities."
-msgstr "Dili mahimong i-post ang mga hulagway sa mga lokal nga komunidad."
+msgstr ""
+"Dili mahimo ang pag-post sa mga gallery ngadto sa mga lokal nga komunidad."
 
 #: app/community/forms.py:400
 msgid "Start"
@@ -2927,11 +2911,8 @@ msgstr ""
 "niini nga flair"
 
 #: app/community/forms.py:611
-#, fuzzy
 msgid "Block posts with this flair"
-msgstr ""
-"I-blur ang mga hulagway ug mga thumbnail para sa mga post nga adunay "
-"niini nga flair"
+msgstr "I-block ang mga post gamit niining flair"
 
 #: app/community/forms.py:629
 #, fuzzy
@@ -12386,4 +12367,3 @@ msgstr "Ang imong donasyon gi-cancel na."
 #~ "will review your post before allowing"
 #~ " it to be published. Please wait."
 #~ msgstr ""
-
