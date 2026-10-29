@@ -197,6 +197,14 @@ And if you want to add your score to the database to help your fellow Bookworms 
         self.assertTrue("&lt;Book Title and Volume&gt;" in result)
         self.assertTrue("<blockquote>" in result)
 
+    def test_escaped_angle_brackets(self):
+        """Test user-escaped angle brackets aren't garbled."""
+
+        markdown = r"\<stuff\>"  # use raw string to avoid syntax error from slashes
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        correct_html = "<p>&lt;stuff&gt;</p>\n"
+        self.assertEqual(result, correct_html)
+
     def test_disallowed_tags(self):
         """Test that disallowed tags are removed"""
         markdown = "Paragraph with <script>alert('xss')</script> script."

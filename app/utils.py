@@ -562,6 +562,26 @@ def handle_bold_em(text: str) -> str:
     return text
 
 
+def handle_escaped_angle_brackets(text: str) -> str:
+    """
+    Handles cases where users try to escape the < and > characters with a leading slash "\" ironically leading to them
+    not being rendered properly.
+    """
+
+    placeholder = gibberish(10)
+    
+    # Step 1: Extract inline and block code, replacing with placeholders
+    code_snippets, text = stash_code_md(text, placeholder)
+
+    # Step 2: Replace \< and \> with just < or > instead
+    text = re.sub(r"\\([<>])", r"\1", text)
+
+    # Step 3: Restore code blocks
+    text = pop_code(code_snippets=code_snippets, text=text, placeholder=placeholder)
+
+    return text
+
+
 def escape_img(raw_html: str) -> str:
     """Prevents embedding images for places where an image would break formatting."""
 
@@ -987,9 +1007,11 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
 
         markdown_text = handle_reddit_spoilers(markdown_text)
 
-        # Escape <...> if it's not a real HTML tag
-        markdown_text = escape_non_html_angle_brackets(
-            markdown_text)  # To handle situations like https://ani.social/comment/9666667
+        # Ironically, need to unescape angle brackets that users escaped in their markdown (e.g. \< becomes <)
+        # This prevents it from being garbled by escape_non_html_angle_brackets next
+        markdown_text = handle_escaped_angle_brackets(markdown_text)
+        # Escape <...> if it's not a real HTML tag to handle situations like https://ani.social/comment/9666667
+        markdown_text = escape_non_html_angle_brackets(markdown_text)
 
         markdown_text = handle_blockquotes(markdown_text) # handle blockquotes ourselves to do it better in some cases
         markdown_text = handle_bold_em(markdown_text)  # Some preprocessing to better handle bold and italics
