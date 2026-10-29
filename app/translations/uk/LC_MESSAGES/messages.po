@@ -7,19 +7,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-05 21:04+1300\n"
+"POT-Creation-Date: 2026-10-29 22:19+1300\n"
 "PO-Revision-Date: 2026-10-06 00:57+0000\n"
 "Last-Translator: Denys Nykula <nykula@ukr.net>\n"
 "Language: uk\n"
-"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed/"
-"main-web-app/uk/>\n"
+"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed"
+"/main-web-app/uk/>\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
-"X-Generator: Weblate 2026.9\n"
 
 #: app/__init__.py:55
 msgid "Please log in to access this page."
@@ -35,16 +34,16 @@ msgstr "Нагадування: %(title)s"
 msgid "Reminder: comment on %(title)s"
 msgstr "Нагадування: коментар до %(title)s"
 
-#: app/cli.py:1587 app/main/routes.py:814
+#: app/cli.py:1590 app/main/routes.py:816
 msgid "[PieFed] You have unread notifications"
 msgstr "[PieFed] Нові сповіщення"
 
-#: app/cli.py:1776 app/shared/post.py:145
+#: app/cli.py:1779 app/shared/post.py:146
 #, python-format
 msgid "Replies to my post %(post_title)s"
 msgstr "Відповіді на мій допис %(post_title)s"
 
-#: app/cli.py:1786 app/models.py:2974 app/shared/reply.py:121
+#: app/cli.py:1789 app/models.py:3000 app/shared/reply.py:121
 #, python-format
 msgid "Replies to my comment on %(post_title)s"
 msgstr "Відповіді на мій коментар до %(post_title)s"
@@ -65,168 +64,168 @@ msgstr "[PieFed] Підтвердьте електронну пошту"
 msgid "Your application has been approved - welcome to PieFed"
 msgstr "Заявку схвалено. Вітаємо в PieFed"
 
-#: app/models.py:2894
+#: app/models.py:2919
 msgid "Comments are disabled on this post"
 msgstr "Коментарі до цього допису вимкнено"
 
-#: app/models.py:2897
+#: app/models.py:2922
 msgid "Banned from commenting"
 msgstr "Коментування заблоковано"
 
-#: app/models.py:2927
+#: app/models.py:2953
 msgid "Blocked phrase in comment"
 msgstr "Коментар містить заблоковану фразу"
 
-#: app/models.py:2938
+#: app/models.py:2964
 msgid "Replier blocked"
 msgstr "Коментатора заблоковано"
 
-#: app/models.py:2941
+#: app/models.py:2967
 msgid "Duplicate reply"
 msgstr "Дубль відповіді"
 
-#: app/models.py:2948
+#: app/models.py:2974
 msgid "Gif comment ignored"
 msgstr "GIF-коментар відхилено"
 
-#: app/models.py:2951
+#: app/models.py:2977
 msgid "Low quality reply"
 msgstr "Недостатньо змістовна відповідь"
 
-#: app/models.py:3808
+#: app/models.py:3837
 msgid "Added moderator"
 msgstr "Додає модератора"
 
-#: app/models.py:3809
+#: app/models.py:3838
 msgid "Removed moderator"
 msgstr "Вилучає модератора"
 
-#: app/models.py:3810
+#: app/models.py:3839
 msgid "Featured post"
 msgstr "Рекомендує допис"
 
-#: app/models.py:3811
+#: app/models.py:3840
 msgid "Unfeatured post"
 msgstr "Скасовує рекомендацію допису"
 
-#: app/models.py:3812
+#: app/models.py:3841
 msgid "Deleted post"
 msgstr "Видаляє допис"
 
-#: app/models.py:3813
+#: app/models.py:3842
 msgid "Un-deleted post"
 msgstr "Відновлює допис"
 
-#: app/models.py:3814
+#: app/models.py:3843
 msgid "Deleted comment"
 msgstr "Видаляє коментар"
 
-#: app/models.py:3815
+#: app/models.py:3844
 msgid "Un-deleted comment"
 msgstr "Відновлює коментар"
 
-#: app/models.py:3816
+#: app/models.py:3845
 msgid "Deleted community"
 msgstr "Видаляє спільноту"
 
-#: app/models.py:3817
+#: app/models.py:3846
 msgid "Deleted account"
 msgstr "Видаляє обліковий запис"
 
-#: app/models.py:3818
+#: app/models.py:3847
 msgid "Restored account"
 msgstr "Відновлює обліковий запис"
 
-#: app/models.py:3819
+#: app/models.py:3848
 msgid "Banned account"
 msgstr "Блокує обліковий запис"
 
-#: app/models.py:3820
+#: app/models.py:3849
 msgid "Un-banned account"
 msgstr "Розблоковує обліковий запис"
 
-#: app/models.py:3821
+#: app/models.py:3850
 msgid "Lock post"
 msgstr "Замикає допис"
 
-#: app/models.py:3822
+#: app/models.py:3851
 msgid "Un-lock post"
 msgstr "Відмикає допис"
 
-#: app/models.py:3823
+#: app/models.py:3852
 msgid "Lock comment"
 msgstr "Замикає коментар"
 
-#: app/models.py:3824
+#: app/models.py:3853
 msgid "Un-lock comment"
 msgstr "Відмикає коментар"
 
-#: app/models.py:3825
+#: app/models.py:3854
 msgid "Move post"
 msgstr "Посуває допис"
 
-#: app/utils.py:701
+#: app/utils.py:723
 msgid "You can download a copy of the file instead."
 msgstr "Можете натомість завантажити копію файлу."
 
-#: app/utils.py:707
+#: app/utils.py:729
 msgid "Your browser does not support playing HTML5 video."
 msgstr "Браузер не підтримує відтворення HTML5-відео."
 
-#: app/utils.py:709
+#: app/utils.py:731
 #, python-format
 msgid "Here is a description of the content: %s"
 msgstr "Опис вмісту: %s"
 
 #: app/auth/routes.py:173 app/auth/util.py:459 app/post/routes.py:863
-#: app/shared/auth.py:68 app/utils.py:2691
+#: app/shared/auth.py:68 app/utils.py:2925
 msgid "You have been banned."
 msgstr "Вас заблоковано."
 
-#: app/utils.py:3144
+#: app/utils.py:3378
 msgid "Wrong Captcha text."
 msgstr "Хибний текст капчі."
 
-#: app/admin/constants.py:15 app/admin/forms.py:281 app/admin/forms.py:346
-#: app/utils.py:3638
+#: app/admin/constants.py:15 app/admin/forms.py:284 app/admin/forms.py:349
+#: app/utils.py:3872
 msgid "User"
 msgstr "Користувач"
 
-#: app/community/forms.py:212 app/templates/admin/communities.html:41
+#: app/community/forms.py:213 app/templates/admin/communities.html:41
 #: app/templates/community/check_url_posted.html:11
 #: app/templates/list_communities.html:211
 #: app/templates/search/_search_form.html:27
-#: app/templates/user/filters.html:181 app/utils.py:3640
+#: app/templates/user/filters.html:181 app/utils.py:3874
 msgid "Community"
 msgstr "Спільнота"
 
-#: app/utils.py:3642 app/utils.py:3648
+#: app/utils.py:3876 app/utils.py:3882
 msgid "Topic/feed"
 msgstr "Тема/стрічка"
 
 #: app/admin/constants.py:17 app/post/forms.py:20
-#: app/templates/post/add_reply_inline.html:27 app/utils.py:3644
-#: app/utils.py:3646 app/utils.py:3650
+#: app/templates/post/add_reply_inline.html:32 app/utils.py:3878
+#: app/utils.py:3880 app/utils.py:3884
 msgid "Comment"
 msgstr "Коментар"
 
-#: app/templates/chat/conversation.html:37 app/utils.py:3652
+#: app/templates/chat/conversation.html:37 app/utils.py:3886
 msgid "Chat"
 msgstr "Чат"
 
-#: app/admin/forms.py:228 app/admin/forms.py:283 app/admin/forms.py:348
+#: app/admin/forms.py:231 app/admin/forms.py:286 app/admin/forms.py:351
 #: app/admin/routes.py:109 app/templates/admin/permissions.html:22
 #: app/templates/base.html:270 app/templates/themes/dillo/base.html:143
 #: app/templates/user/show_profile.html:151
 #: app/templates/user/show_profile.html:152
 #: app/templates/user/user_preview.html:14
-#: app/templates/user/user_preview.html:15 app/utils.py:3654 app/utils.py:3656
-#: app/utils.py:3658 app/utils.py:3664 app/utils.py:3668 app/utils.py:3670
+#: app/templates/user/user_preview.html:15 app/utils.py:3888 app/utils.py:3890
+#: app/utils.py:3892 app/utils.py:3898 app/utils.py:3902 app/utils.py:3904
 msgid "Admin"
 msgstr "Адміністратор"
 
 #: app/templates/admin/approve_registrations.html:26
-#: app/templates/admin/approve_registrations.html:82 app/utils.py:3660
+#: app/templates/admin/approve_registrations.html:82 app/utils.py:3894
 msgid "Answer"
 msgstr "Відповідь"
 
@@ -247,23 +246,23 @@ msgstr "Відповідь"
 #: app/templates/themes/dillo/_view_filter_nav.html:15
 #: app/templates/user/alerts/_filter.html:3
 #: app/templates/user/notifications.html:24 app/user/forms.py:100
-#: app/utils.py:3674
+#: app/utils.py:3908
 msgid "All"
 msgstr "Усе"
 
-#: app/community/forms.py:57 app/utils.py:3925
+#: app/community/forms.py:57 app/utils.py:4159
 msgid "- cannot be in Url. Use _ instead?"
 msgstr "Посилання не може містити «-». Замінити на «_»?"
 
-#: app/utils.py:3941
+#: app/utils.py:4175
 msgid "Feed urls can only contain letters, numbers, and underscores."
 msgstr "Адреси стрічок можуть містити лише літери, цифри й підкреслення."
 
-#: app/utils.py:3951
+#: app/utils.py:4185
 msgid "A Feed with this url already exists."
 msgstr "Стрічка з такою адресою вже існує."
 
-#: app/utils.py:4514
+#: app/utils.py:4748
 #, python-format
 msgid ""
 "You have blocked %(instance_name)s which hosts this community so none of "
@@ -272,47 +271,47 @@ msgstr ""
 "Ви блокуєте сервер спільноти – %(instance_name)s. Жодних ваших дописів чи"
 " коментарів не буде туди надіслано."
 
-#: app/utils.py:4519
+#: app/utils.py:4753
 #, python-format
 msgid "You have been banned from %(instance_name)s which hosts this community."
 msgstr "Вас блокує сервер спільноти — %(instance_name)s."
 
-#: app/activitypub/routes.py:576 app/activitypub/routes.py:580
+#: app/activitypub/routes.py:578 app/activitypub/routes.py:582
 msgid "Community not found on this instance"
 msgstr "Спільноти не знайдено на сервері"
 
-#: app/activitypub/routes.py:1027 app/shared/user.py:264
+#: app/activitypub/routes.py:1029 app/shared/user.py:257
 #: app/templates/user/notifs/13.html:5
 msgid "You have a new follower"
 msgstr "У вас новий підписник"
 
-#: app/activitypub/routes.py:1037
+#: app/activitypub/routes.py:1039
 msgid "Someone is requesting to follow you"
 msgstr "Хтось просить дозволу на вас підписатись"
 
-#: app/activitypub/util.py:2688
+#: app/activitypub/util.py:2690
 #, python-format
 msgid "Reply to %(post_title)s"
 msgstr "Відповідь на %(post_title)s"
 
-#: app/activitypub/util.py:2730
+#: app/activitypub/util.py:2732
 #, python-format
 msgid "Reply to comment on %(post_title)s"
 msgstr "Відповісти на коментар до %(post_title)s"
 
-#: app/activitypub/util.py:3344 app/shared/post.py:1043
+#: app/activitypub/util.py:3357 app/shared/post.py:1072
 msgid "A post has been reported"
 msgstr "Надіслано скаргу про допис"
 
-#: app/activitypub/util.py:3395 app/shared/reply.py:350
+#: app/activitypub/util.py:3414 app/shared/reply.py:355
 msgid "A comment has been reported"
 msgstr "Надіслано скаргу про коментар"
 
-#: app/activitypub/util.py:4071 app/templates/communities_menu.html:38
+#: app/activitypub/util.py:4090 app/templates/communities_menu.html:38
 msgid "Microblogs"
 msgstr "Мікроблоги"
 
-#: app/activitypub/util.py:4072 app/activitypub/util.py:4074
+#: app/activitypub/util.py:4091 app/activitypub/util.py:4093
 msgid "Microblog posts from around the fediverse."
 msgstr "Дописи з мікроблогів федіверсу."
 
@@ -362,14 +361,14 @@ msgstr "Адреса умов надання послуг"
 msgid "General instance contact email address"
 msgstr "Загальна контактна електронна пошта сервера"
 
-#: app/admin/forms.py:27 app/admin/forms.py:83 app/admin/forms.py:92
-#: app/admin/forms.py:112 app/admin/forms.py:189 app/admin/forms.py:211
-#: app/admin/forms.py:224 app/admin/forms.py:236 app/admin/forms.py:243
-#: app/admin/forms.py:251 app/admin/forms.py:286 app/admin/forms.py:354
-#: app/admin/forms.py:382 app/admin/forms.py:405 app/admin/forms.py:410
-#: app/auth/forms.py:149 app/community/forms.py:137 app/community/forms.py:151
-#: app/community/forms.py:564 app/community/forms.py:607
-#: app/community/forms.py:613 app/community/forms.py:631 app/domain/forms.py:13
+#: app/admin/forms.py:27 app/admin/forms.py:83 app/admin/forms.py:94
+#: app/admin/forms.py:114 app/admin/forms.py:192 app/admin/forms.py:214
+#: app/admin/forms.py:227 app/admin/forms.py:239 app/admin/forms.py:246
+#: app/admin/forms.py:254 app/admin/forms.py:289 app/admin/forms.py:357
+#: app/admin/forms.py:385 app/admin/forms.py:408 app/admin/forms.py:413
+#: app/auth/forms.py:149 app/community/forms.py:138 app/community/forms.py:152
+#: app/community/forms.py:566 app/community/forms.py:609
+#: app/community/forms.py:615 app/community/forms.py:633 app/domain/forms.py:13
 #: app/feed/forms.py:25 app/feed/forms.py:77 app/post/forms.py:24
 #: app/post/forms.py:96 app/post/forms.py:103
 #: app/templates/admin/permissions.html:41 app/user/forms.py:234
@@ -387,7 +386,8 @@ msgstr "Фільтрувати коментарі, які містять лиш�
 #: app/admin/forms.py:33
 msgid "Stop local 4chan screenshot posts and notify about remote ones"
 msgstr ""
-"Відхиляти місцеві дописи зі знімками екрана 4chan і сповіщати про віддалені"
+"Відхиляти місцеві дописи зі знімками екрана 4chan і сповіщати про "
+"віддалені"
 
 #: app/admin/forms.py:34
 msgid "Filter out comments that are simply a form of \"this\""
@@ -585,68 +585,77 @@ msgid "Enable instance chooser"
 msgstr "Брати участь у виборі сервера"
 
 #: app/admin/forms.py:88
+msgid "Retrieve list of instances from"
+msgstr ""
+
+#: app/admin/forms.py:89
+#, fuzzy
+msgid "Publish instance list"
+msgstr "Порушує правила сервера"
+
+#: app/admin/forms.py:90
 msgid "One-sentence elevator pitch"
 msgstr "Одне речення про сервер"
 
-#: app/admin/forms.py:89
+#: app/admin/forms.py:91
 msgid "Number of admins with emergency access"
 msgstr "Кількість адміністраторів із доступом у випадку форс-мажору"
 
-#: app/admin/forms.py:90
+#: app/admin/forms.py:92
 msgid "Non-admins donate enough to pay for hosting"
 msgstr "Користувачі роблять достатньо внесків для хостингу"
 
-#: app/admin/forms.py:91
+#: app/admin/forms.py:93
 msgid "This instance has automated daily backups"
 msgstr "На сервері автоматизовано щоденне резервне копіювання"
 
-#: app/admin/forms.py:96
+#: app/admin/forms.py:98
 msgid "Federation mode"
 msgstr "Режим федерації"
 
-#: app/admin/forms.py:97
+#: app/admin/forms.py:99
 msgid "Blocklist - deny federation with specified instances"
 msgstr "Список блокування — вилучити з федерації зазначені сервери"
 
-#: app/admin/forms.py:98
+#: app/admin/forms.py:100
 msgid "Allowlist - only allow federation with specified instances"
 msgstr "Список дозволу — федерація лише з зазначеними серверами"
 
-#: app/admin/forms.py:100
+#: app/admin/forms.py:102
 msgid "Allow federation with these instances"
 msgstr "Дозволити федерацію з серверами"
 
-#: app/admin/forms.py:101
+#: app/admin/forms.py:103
 msgid "Allowlist mode"
 msgstr "Режим списку дозволів"
 
-#: app/admin/forms.py:102
+#: app/admin/forms.py:104
 msgid "Weak"
 msgstr "Слабко"
 
-#: app/admin/forms.py:103
+#: app/admin/forms.py:105
 msgid "Strong"
 msgstr "Сильно"
 
-#: app/admin/forms.py:104
+#: app/admin/forms.py:106
 msgid "Intense"
 msgstr "Потужно"
 
-#: app/admin/forms.py:106
+#: app/admin/forms.py:108
 msgid "Deny federation with these instances"
 msgstr "Заборонити федерацію з серверами"
 
-#: app/admin/forms.py:107
+#: app/admin/forms.py:109
 msgid "Auto-defederate from any instance defederated by"
 msgstr "Блокувати всі сервери, які блокує"
 
-#: app/admin/forms.py:108
+#: app/admin/forms.py:110
 msgid "Discard all posts, comments and PMs with these phrases (one per line)"
 msgstr ""
 "Відхиляти всі дописи, коментарі й приватні повідомлення з фразами (по "
 "одній на рядок)"
 
-#: app/admin/forms.py:109
+#: app/admin/forms.py:111
 msgid ""
 "Discard all posts and comments by users with these words in their name "
 "(one per line)"
@@ -654,7 +663,7 @@ msgstr ""
 "Відхиляти всі дописи й коментарі користувачів зі словами в імені (по "
 "одному на рядок)"
 
-#: app/admin/forms.py:110
+#: app/admin/forms.py:112
 msgid ""
 "Discard all posts and comments by users with these phrases in their bio "
 "(one per line)"
@@ -662,78 +671,78 @@ msgstr ""
 "Відхиляти всі дописи й коментарі користувачів з фразами в біографії (по "
 "одному на рядок)"
 
-#: app/admin/forms.py:111
+#: app/admin/forms.py:113
 msgid "Automatically add new remote communities"
 msgstr "Автоматично додавати нові віддалені спільноти"
 
-#: app/admin/forms.py:116
+#: app/admin/forms.py:118
 msgid "Closing down announcement for home page"
 msgstr "Оголошення про закриття на головній сторінці"
 
-#: app/admin/forms.py:117
+#: app/admin/forms.py:119
 msgid "Yes, close my instance"
 msgstr "Так, закрити мій сервер"
 
-#: app/admin/forms.py:121 app/admin/forms.py:127
+#: app/admin/forms.py:123 app/admin/forms.py:129
 msgid "Number of Communities to add"
 msgstr "Кількість спільнот для додання"
 
-#: app/admin/forms.py:122
+#: app/admin/forms.py:124
 msgid "Add Communities"
 msgstr "Додати спільноти"
 
-#: app/admin/forms.py:126
+#: app/admin/forms.py:128
 msgid "Remote Server"
 msgstr "Віддалений сервер"
 
-#: app/admin/forms.py:128
+#: app/admin/forms.py:130
 msgid "Communities must have at least this many posts"
 msgstr "Спільноти повинні мати принаймні стільки дописів"
 
-#: app/admin/forms.py:129
+#: app/admin/forms.py:131
 msgid "Communities must have at least this many active users in the past week."
 msgstr ""
 "Спільноти повинні мати принаймні стільки активних користувачів за минулий"
 " тиждень."
 
-#: app/admin/forms.py:130
+#: app/admin/forms.py:132
 msgid "Dry Run"
 msgstr "Лише перевірити"
 
-#: app/admin/forms.py:131
+#: app/admin/forms.py:133
 msgid "Scan"
 msgstr "Сканувати"
 
-#: app/admin/forms.py:135
+#: app/admin/forms.py:137
 msgid "Import Bans List Json File"
 msgstr "JSON-файл зі списком блокувань для імпорту"
 
-#: app/admin/forms.py:136 app/admin/forms.py:415
+#: app/admin/forms.py:138 app/admin/forms.py:418
 #: app/templates/user/import_export.html:24 app/user/forms.py:148
 msgid "Import"
 msgstr "Імпорт"
 
-#: app/admin/forms.py:137 app/templates/user/import_export.html:28
+#: app/admin/forms.py:139 app/templates/user/import_export.html:28
 #: app/user/forms.py:147
 msgid "Export"
 msgstr "Експорт"
 
-#: app/admin/forms.py:141 app/community/forms.py:86 app/community/forms.py:141
-#: app/community/forms.py:217 app/templates/admin/cms_pages.html:24
+#: app/admin/forms.py:143 app/community/forms.py:86 app/community/forms.py:142
+#: app/community/forms.py:218 app/templates/admin/cms_pages.html:24
 #: app/templates/community/community_rss_feeds.html:30
 #: app/templates/post/post_block_image_purge_posts.html:19
 #: app/templates/user/scheduled_posts.html:25
 msgid "Title"
 msgstr "Назва"
 
-#: app/admin/forms.py:142 app/admin/forms.py:247 app/community/forms.py:25
-#: app/community/forms.py:618 app/feed/forms.py:13 app/feed/forms.py:65
+#: app/admin/forms.py:144 app/admin/forms.py:250 app/community/forms.py:25
+#: app/community/forms.py:620 app/feed/forms.py:13 app/feed/forms.py:65
 #: app/templates/community/community_rss_feeds.html:31
 #: app/templates/community/community_wiki_list.html:34
 msgid "Url"
 msgstr "Адреса"
 
-#: app/admin/forms.py:143 app/community/forms.py:26 app/community/forms.py:87
+#: app/admin/forms.py:145 app/community/forms.py:26 app/community/forms.py:87
 #: app/feed/forms.py:14 app/feed/forms.py:66 app/templates/admin/home.html:58
 #: app/templates/admin/reports/comment_report.html:54
 #: app/templates/admin/reports/post_report.html:62
@@ -744,134 +753,134 @@ msgstr "Адреса"
 msgid "Description"
 msgstr "Опис"
 
-#: app/admin/forms.py:144 app/community/forms.py:28 app/community/forms.py:89
+#: app/admin/forms.py:146 app/community/forms.py:28 app/community/forms.py:89
 #: app/feed/forms.py:19 app/feed/forms.py:71
 msgid "Icon image"
 msgstr "Піктограма"
 
-#: app/admin/forms.py:145 app/community/forms.py:29 app/community/forms.py:90
+#: app/admin/forms.py:147 app/community/forms.py:29 app/community/forms.py:90
 #: app/feed/forms.py:20 app/feed/forms.py:72
 msgid "Banner image"
 msgstr "Банер"
 
-#: app/admin/forms.py:146
+#: app/admin/forms.py:148
 msgid "Rules"
 msgstr "Правила"
 
-#: app/admin/forms.py:147 app/community/forms.py:92
+#: app/admin/forms.py:149 app/community/forms.py:92
 msgid "NSFW community"
 msgstr "NSFW-спільнота"
 
-#: app/admin/forms.py:148 app/community/forms.py:32
+#: app/admin/forms.py:150 app/community/forms.py:32
 msgid "Only AI-generated content"
 msgstr "Лише вміст, згенерований «ШІ»"
 
-#: app/admin/forms.py:149
+#: app/admin/forms.py:151
 msgid "Banned - no new posts accepted"
 msgstr "Блокується — нові дописи не приймаються"
 
-#: app/admin/forms.py:150 app/community/forms.py:94
+#: app/admin/forms.py:152 app/community/forms.py:94
 msgid "Only accept posts from current instance"
 msgstr "Приймати дописи лише з цього сервера"
 
-#: app/admin/forms.py:151 app/community/forms.py:105
+#: app/admin/forms.py:153 app/community/forms.py:105
 msgid "Only moderators can post"
 msgstr "Лише модератори можуть писати"
 
-#: app/admin/forms.py:152 app/community/forms.py:106
+#: app/admin/forms.py:154 app/community/forms.py:106
 msgid "New moderators wanted"
 msgstr "Потрібні модератори"
 
-#: app/admin/forms.py:153 app/community/forms.py:107
+#: app/admin/forms.py:155 app/community/forms.py:107
 #: app/templates/community/_community_nav.html:174
 #: app/templates/community/_community_nav.html:491
 msgid "Everyone"
 msgstr "Усі"
 
-#: app/admin/forms.py:154 app/community/forms.py:108
+#: app/admin/forms.py:156 app/community/forms.py:108
 msgid "Nobody"
 msgstr "Ніхто"
 
-#: app/admin/forms.py:155 app/community/forms.py:109 app/community/forms.py:146
+#: app/admin/forms.py:157 app/community/forms.py:109 app/community/forms.py:147
 msgid "Community members"
 msgstr "Учасники спільноти"
 
-#: app/admin/forms.py:156 app/community/forms.py:110 app/user/forms.py:126
+#: app/admin/forms.py:158 app/community/forms.py:110 app/user/forms.py:126
 msgid "This instance"
 msgstr "Цей сервер"
 
-#: app/admin/forms.py:157 app/community/forms.py:111
+#: app/admin/forms.py:159 app/community/forms.py:111
 #: app/templates/instance/list_instances.html:80 app/user/forms.py:127
 msgid "Trusted instances"
 msgstr "Довірені сервери"
 
-#: app/admin/forms.py:160 app/community/forms.py:114
+#: app/admin/forms.py:162 app/community/forms.py:114
 msgid "Accept downvotes from"
 msgstr "Хто може засуджувати"
 
-#: app/admin/forms.py:162
+#: app/admin/forms.py:164
 msgid "Posts can be popular"
 msgstr "Дописи можуть бути популярними"
 
-#: app/admin/forms.py:163
+#: app/admin/forms.py:165
 msgid "Posts show in All list"
 msgstr "Дописи видно в «Усіх»"
 
-#: app/admin/forms.py:164
+#: app/admin/forms.py:166
 msgid "Low quality / toxic - upvotes in here don't add to reputation"
 msgstr ""
 "Недостатньо змістовне чи токсичне — схвалення тут не додаються до "
 "репутації"
 
-#: app/admin/forms.py:165
+#: app/admin/forms.py:167
 msgid "Forever"
 msgstr "Завжди"
 
-#: app/admin/forms.py:166
+#: app/admin/forms.py:168
 msgid "1 week"
 msgstr "1 тиждень"
 
-#: app/admin/forms.py:167
+#: app/admin/forms.py:169
 msgid "2 weeks"
 msgstr "2 тижні"
 
-#: app/admin/forms.py:168
+#: app/admin/forms.py:170
 msgid "1 month"
 msgstr "1 місяць"
 
-#: app/admin/forms.py:169
+#: app/admin/forms.py:171
 msgid "2 months"
 msgstr "2 місяці"
 
-#: app/admin/forms.py:170
+#: app/admin/forms.py:172
 msgid "3 months"
 msgstr "3 місяці"
 
-#: app/admin/forms.py:171
+#: app/admin/forms.py:173
 msgid "6 months"
 msgstr "6 місяців"
 
-#: app/admin/forms.py:172
+#: app/admin/forms.py:174
 msgid "1 year"
 msgstr "1 рік"
 
-#: app/admin/forms.py:173
+#: app/admin/forms.py:175
 msgid "2 years"
 msgstr "2 роки"
 
-#: app/admin/forms.py:174
+#: app/admin/forms.py:176
 msgid "5 years"
 msgstr "5 років"
 
-#: app/admin/forms.py:175
+#: app/admin/forms.py:177
 msgid "10 years"
 msgstr "10 років"
 
-#: app/admin/forms.py:177
+#: app/admin/forms.py:179
 msgid "Retain content"
 msgstr "Зберігати дописи"
 
-#: app/admin/forms.py:178 app/community/forms.py:116
+#: app/admin/forms.py:180 app/community/forms.py:116
 #: app/templates/admin/communities.html:46
 #: app/templates/admin/communities.html:47
 #: app/templates/admin/communities.html:100
@@ -879,7 +888,7 @@ msgstr "Зберігати дописи"
 msgid "Topic"
 msgstr "Тема"
 
-#: app/admin/forms.py:179 app/community/forms.py:119
+#: app/admin/forms.py:181 app/community/forms.py:120
 #: app/templates/community/_community_nav.html:154
 #: app/templates/community/_community_nav.html:377
 #: app/templates/community/_community_nav.html:518
@@ -887,15 +896,15 @@ msgstr "Тема"
 msgid "List"
 msgstr "Перелік"
 
-#: app/admin/forms.py:180 app/community/forms.py:120
+#: app/admin/forms.py:182 app/community/forms.py:121
 msgid "Masonry"
 msgstr "Мозаїка"
 
-#: app/admin/forms.py:181 app/community/forms.py:121
+#: app/admin/forms.py:183 app/community/forms.py:122
 msgid "Wide masonry"
 msgstr "Широка мозаїка"
 
-#: app/admin/forms.py:182 app/community/forms.py:122
+#: app/admin/forms.py:184 app/community/forms.py:123
 #: app/templates/admin/communities.html:69
 #: app/templates/admin/communities.html:104
 #: app/templates/community/_community_nav.html:150
@@ -904,36 +913,41 @@ msgstr "Широка мозаїка"
 msgid "Layout"
 msgstr "Макет"
 
-#: app/admin/forms.py:183 app/admin/forms.py:221 app/community/forms.py:27
+#: app/admin/forms.py:185 app/admin/forms.py:224 app/community/forms.py:27
 #: app/community/forms.py:88
 msgid "Posting warning"
 msgstr "Засторога при створенні допису"
 
-#: app/admin/forms.py:184 app/community/forms.py:45 app/community/forms.py:117
+#: app/admin/forms.py:186
+#, fuzzy
+msgid "Posting warning override"
+msgstr "Засторога при створенні допису"
+
+#: app/admin/forms.py:187 app/community/forms.py:45 app/community/forms.py:117
 msgid "Languages"
 msgstr "Мови"
 
-#: app/admin/forms.py:185
+#: app/admin/forms.py:188
 msgid "Override remote language setting"
 msgstr "Замістити віддалений параметр мови"
 
-#: app/admin/forms.py:186
+#: app/admin/forms.py:189
 msgid "Override remote AI content setting"
 msgstr "Замістити віддалений параметр «ШІ»-вмісту"
 
-#: app/admin/forms.py:187
+#: app/admin/forms.py:190
 msgid "Always show translation icon on posts"
 msgstr "Завжди показувати піктограму перекладу в дописах"
 
-#: app/admin/forms.py:188
+#: app/admin/forms.py:191
 msgid "Old posts can be archived"
 msgstr "Старі дописи можна архівувати"
 
-#: app/admin/forms.py:195 app/community/forms.py:53 app/feed/forms.py:31
+#: app/admin/forms.py:198 app/community/forms.py:53 app/feed/forms.py:31
 msgid "Url is required."
 msgstr "Адреса обов'язкова."
 
-#: app/admin/forms.py:206 app/community/forms.py:24 app/community/forms.py:617
+#: app/admin/forms.py:209 app/community/forms.py:24 app/community/forms.py:619
 #: app/feed/forms.py:12 app/feed/forms.py:64
 #: app/templates/admin/approve_registrations.html:23
 #: app/templates/admin/approve_registrations.html:79
@@ -953,35 +967,35 @@ msgstr "Адреса обов'язкова."
 msgid "Name"
 msgstr "Назва"
 
-#: app/admin/forms.py:206
+#: app/admin/forms.py:209
 msgid "Human readable name for the topic."
 msgstr "Дружня до читача назва теми."
 
-#: app/admin/forms.py:207 app/community/forms.py:142
+#: app/admin/forms.py:210 app/community/forms.py:143
 msgid "Slug"
 msgstr "Фрагмент адреси"
 
-#: app/admin/forms.py:207
+#: app/admin/forms.py:210
 msgid "A short and unique identifier that becomes part of the URL."
 msgstr "Короткий унікальний ідентифікатор, який стає частиною адреси."
 
-#: app/admin/forms.py:208
+#: app/admin/forms.py:211
 msgid "Parent topic"
 msgstr "Батьківська тема"
 
-#: app/admin/forms.py:209
+#: app/admin/forms.py:212
 msgid "Show posts from child topics"
 msgstr "Показувати дописи з дочірніх тем"
 
-#: app/admin/forms.py:210 app/templates/admin/topics.html:43
+#: app/admin/forms.py:213 app/templates/admin/topics.html:43
 msgid "Countries"
 msgstr "Країни"
 
-#: app/admin/forms.py:210
+#: app/admin/forms.py:213
 msgid "Use two-letter country codes, one per line."
 msgstr "Дволітерні коди країн — по одному на рядок."
 
-#: app/admin/forms.py:215 app/templates/admin/instances.html:24
+#: app/admin/forms.py:218 app/templates/admin/instances.html:24
 #: app/templates/admin/instances.html:93
 #: app/templates/instance/list_instances.html:44
 #: app/templates/instance/list_instances.html:101
@@ -989,12 +1003,12 @@ msgstr "Дволітерні коди країн — по одному на ря
 msgid "Dormant"
 msgstr "Неактивне"
 
-#: app/admin/forms.py:216 app/templates/admin/instances.html:25
+#: app/admin/forms.py:219 app/templates/admin/instances.html:25
 #: app/templates/admin/instances.html:91
 msgid "Gone forever"
 msgstr "Уже не відновиться"
 
-#: app/admin/forms.py:217 app/templates/admin/instances.html:26
+#: app/admin/forms.py:220 app/templates/admin/instances.html:26
 #: app/templates/admin/instances.html:54 app/templates/admin/instances.html:55
 #: app/templates/admin/instances.html:87
 #: app/templates/instance/list_instances.html:81
@@ -1002,55 +1016,55 @@ msgstr "Уже не відновиться"
 msgid "Trusted"
 msgstr "Довірене"
 
-#: app/admin/forms.py:218 app/templates/admin/instances.html:27
+#: app/admin/forms.py:221 app/templates/admin/instances.html:27
 #: app/templates/instance/list_instances.html:88
 #: app/templates/instance/list_instances.html:128
 msgid "Silenced"
 msgstr "Стишено"
 
-#: app/admin/forms.py:219
+#: app/admin/forms.py:222
 msgid "Hide from instance chooser"
 msgstr "Сховати з вибору сервера"
 
-#: app/admin/forms.py:220
+#: app/admin/forms.py:223
 msgid "Communities become popular when added"
 msgstr "Показ допомагає популярності спільноти"
 
-#: app/admin/forms.py:222
+#: app/admin/forms.py:225
 msgid "Notes about this instance (only visible to other admins)"
 msgstr "Нотатки про сервер (бачить лише адміністрація)"
 
-#: app/admin/forms.py:223
+#: app/admin/forms.py:226
 msgid "Inbox"
 msgstr "Вхідні"
 
-#: app/admin/forms.py:229 app/chat/forms.py:10
+#: app/admin/forms.py:232 app/chat/forms.py:10
 #: app/templates/admin/activities.html:33
 msgid "Message"
 msgstr "Повідомлення"
 
-#: app/admin/forms.py:230 app/chat/forms.py:11
+#: app/admin/forms.py:233 app/chat/forms.py:11
 msgid "Type a message here..."
 msgstr "Напишіть повідомлення…"
 
-#: app/admin/forms.py:231 app/chat/routes.py:89
+#: app/admin/forms.py:234 app/chat/routes.py:89
 msgid "Send"
 msgstr "Надіслати"
 
-#: app/admin/forms.py:235
+#: app/admin/forms.py:238
 msgid "Domain (not including https://)"
 msgstr "Домен (без https://)"
 
-#: app/admin/forms.py:240 app/admin/forms.py:248
+#: app/admin/forms.py:243 app/admin/forms.py:251
 #: app/templates/admin/blocked_images.html:19
 msgid "Hash"
 msgstr "Контрольна сума"
 
-#: app/admin/forms.py:241 app/admin/forms.py:249
+#: app/admin/forms.py:244 app/admin/forms.py:252
 msgid "Filename"
 msgstr "Назва файлу"
 
-#: app/admin/forms.py:242 app/admin/forms.py:250
+#: app/admin/forms.py:245 app/admin/forms.py:253
 #: app/templates/admin/blocked_images.html:21
 #: app/templates/admin/blocked_images.html:28
 #: app/templates/user/show_profile.html:154
@@ -1058,266 +1072,266 @@ msgstr "Назва файлу"
 msgid "Note"
 msgstr "Нотатка"
 
-#: app/admin/forms.py:255 app/auth/forms.py:15 app/auth/forms.py:26
-#: app/community/forms.py:155 app/community/forms.py:207
+#: app/admin/forms.py:258 app/auth/forms.py:15 app/auth/forms.py:26
+#: app/community/forms.py:156 app/community/forms.py:208
 msgid "User name"
 msgstr "Користувацьке ім'я"
 
-#: app/admin/forms.py:257 app/user/forms.py:13
+#: app/admin/forms.py:260 app/user/forms.py:13
 msgid "Email address"
 msgstr "Електронна пошта"
 
-#: app/admin/forms.py:258 app/auth/forms.py:18 app/auth/forms.py:30
+#: app/admin/forms.py:261 app/auth/forms.py:18 app/auth/forms.py:30
 #: app/auth/forms.py:114
 msgid "Password"
 msgstr "Пароль"
 
-#: app/admin/forms.py:260 app/auth/forms.py:32 app/auth/forms.py:115
+#: app/admin/forms.py:263 app/auth/forms.py:32 app/auth/forms.py:115
 msgid "Repeat password"
 msgstr "Повторіть пароль"
 
-#: app/admin/forms.py:261 app/user/forms.py:16
+#: app/admin/forms.py:264 app/user/forms.py:16
 msgid "Bio"
 msgstr "Біографія"
 
-#: app/admin/forms.py:262 app/user/forms.py:31
+#: app/admin/forms.py:265 app/user/forms.py:31
 msgid "Matrix User ID"
 msgstr "Адреса в Matrix"
 
-#: app/admin/forms.py:263 app/user/forms.py:33
+#: app/admin/forms.py:266 app/user/forms.py:33
 msgid "Avatar image"
 msgstr "Аватар"
 
-#: app/admin/forms.py:264 app/user/forms.py:34
+#: app/admin/forms.py:267 app/user/forms.py:34
 msgid "Top banner image"
 msgstr "Банер"
 
-#: app/admin/forms.py:265 app/admin/forms.py:328 app/user/forms.py:35
+#: app/admin/forms.py:268 app/admin/forms.py:331 app/user/forms.py:35
 msgid "This profile is a bot"
 msgstr "Профіль бота"
 
-#: app/admin/forms.py:266 app/admin/forms.py:330 app/user/forms.py:36
+#: app/admin/forms.py:269 app/admin/forms.py:333 app/user/forms.py:36
 msgid "This profile is a reposter"
 msgstr "Це профіль репостів"
 
-#: app/admin/forms.py:267 app/admin/forms.py:333
+#: app/admin/forms.py:270 app/admin/forms.py:336
 msgid "Email address is verified"
 msgstr "Електронну пошту підтверджено"
 
-#: app/admin/forms.py:268 app/admin/forms.py:334
+#: app/admin/forms.py:271 app/admin/forms.py:337
 #: app/templates/admin/approve_registrations.html:56
 #: app/templates/admin/users.html:60 app/templates/admin/users.html:99
 #: app/templates/admin/users.html:100
 msgid "Banned"
 msgstr "Заблоковано"
 
-#: app/admin/forms.py:269 app/user/forms.py:62
+#: app/admin/forms.py:272 app/user/forms.py:62
 msgid "Subscribe to email newsletter"
 msgstr "Підписатись на розсилку"
 
-#: app/admin/forms.py:270 app/admin/forms.py:338 app/auth/forms.py:131
+#: app/admin/forms.py:273 app/admin/forms.py:341 app/auth/forms.py:131
 #: app/auth/forms.py:135 app/user/forms.py:199 app/user/forms.py:203
 msgid "Show"
 msgstr "Показувати"
 
-#: app/admin/forms.py:271 app/admin/forms.py:339 app/auth/forms.py:132
+#: app/admin/forms.py:274 app/admin/forms.py:342 app/auth/forms.py:132
 #: app/auth/forms.py:136 app/user/forms.py:200 app/user/forms.py:204
 #: app/user/forms.py:228
 msgid "Hide completely"
 msgstr "Ховати зовсім"
 
-#: app/admin/forms.py:272 app/admin/forms.py:340
+#: app/admin/forms.py:275 app/admin/forms.py:343
 msgid "Blur"
 msgstr "Розмивати"
 
-#: app/admin/forms.py:273 app/admin/forms.py:341 app/user/forms.py:228
+#: app/admin/forms.py:276 app/admin/forms.py:344 app/user/forms.py:228
 msgid "Make semi-transparent"
 msgstr "Робити напівпрозорими"
 
-#: app/admin/forms.py:274 app/auth/forms.py:139 app/user/forms.py:64
+#: app/admin/forms.py:277 app/auth/forms.py:139 app/user/forms.py:64
 #: app/user/forms.py:207
 msgid "Posts by bots"
 msgstr "Дописи ботів"
 
-#: app/admin/forms.py:276 app/admin/forms.py:342 app/auth/forms.py:143
+#: app/admin/forms.py:279 app/admin/forms.py:345 app/auth/forms.py:143
 #: app/user/forms.py:65 app/user/forms.py:211
 msgid "NSFW posts"
 msgstr "NSFW-дописи"
 
-#: app/admin/forms.py:278 app/admin/forms.py:344 app/auth/forms.py:145
+#: app/admin/forms.py:281 app/admin/forms.py:347 app/auth/forms.py:145
 #: app/user/forms.py:66 app/user/forms.py:213
 msgid "NSFL posts"
 msgstr "NSFL-дописи"
 
-#: app/admin/forms.py:282 app/admin/forms.py:347
+#: app/admin/forms.py:285 app/admin/forms.py:350
 #: app/templates/admin/permissions.html:21
 #: app/templates/user/show_profile.html:152
 #: app/templates/user/user_preview.html:15
 msgid "Staff"
 msgstr "Персонал"
 
-#: app/admin/forms.py:285 app/admin/forms.py:350
+#: app/admin/forms.py:288 app/admin/forms.py:353
 msgid "Role"
 msgstr "Роль"
 
-#: app/admin/forms.py:291 app/auth/forms.py:49
+#: app/admin/forms.py:294 app/auth/forms.py:49
 msgid "An account with this email address already exists."
 msgstr "Обліковий запис із цією електронною поштою вже існує."
 
-#: app/admin/forms.py:295 app/auth/forms.py:56
+#: app/admin/forms.py:298 app/auth/forms.py:56
 msgid "User names cannot contain @."
 msgstr "Користувацькі імена не можуть містити @."
 
-#: app/admin/forms.py:299 app/auth/forms.py:65
+#: app/admin/forms.py:302 app/auth/forms.py:65
 msgid "This username was used in the past and cannot be reused."
 msgstr "Ім'я колись використовувалось. Повторне використання неможливе."
 
-#: app/admin/forms.py:301 app/auth/forms.py:67
+#: app/admin/forms.py:304 app/auth/forms.py:67
 msgid "An account with this user name already exists."
 msgstr "Обліковий запис із таким користувацьким іменем уже існує."
 
-#: app/admin/forms.py:304
+#: app/admin/forms.py:307
 msgid "A community with this name exists so it cannot be used for a user."
 msgstr "Так уже названо спільноту, тож користувачу треба інше ім'я."
 
-#: app/admin/forms.py:311 app/admin/forms.py:324 app/auth/forms.py:83
+#: app/admin/forms.py:314 app/admin/forms.py:327 app/auth/forms.py:83
 #: app/auth/forms.py:99
 msgid "This password is too common."
 msgstr "Пароль надто поширений."
 
-#: app/admin/forms.py:321 app/auth/forms.py:96
+#: app/admin/forms.py:324 app/auth/forms.py:96
 msgid "This password is not secure."
 msgstr "Пароль небезпечний."
 
-#: app/admin/forms.py:329
+#: app/admin/forms.py:332
 msgid "Flag their posts as from a bot"
 msgstr "Зазначати, що дописи надіслані ботом"
 
-#: app/admin/forms.py:331
+#: app/admin/forms.py:334
 msgid "Flag their posts as from a reposter (bot)"
 msgstr "Зазначати, що дописи — репости бота"
 
-#: app/admin/forms.py:332
+#: app/admin/forms.py:335
 msgid "Suppress cross-posts"
 msgstr "Перешкоджати перехресному розміщенню"
 
-#: app/admin/forms.py:335
+#: app/admin/forms.py:338
 msgid "Ban posts"
 msgstr "Блокувати дописи"
 
-#: app/admin/forms.py:336
+#: app/admin/forms.py:339
 msgid "Ban comments"
 msgstr "Блокувати коментарі"
 
-#: app/admin/forms.py:337
+#: app/admin/forms.py:340
 msgid "Can send PMs"
 msgstr "Може надсилати приватні повідомлення"
 
-#: app/admin/forms.py:351
+#: app/admin/forms.py:354
 msgid "Remove avatar"
 msgstr "Вилучити аватар"
 
-#: app/admin/forms.py:352
+#: app/admin/forms.py:355
 msgid "Remove banner"
 msgstr "Вилучити банер"
 
-#: app/admin/forms.py:353
+#: app/admin/forms.py:356
 msgid "Notes about this user (only visible to other admins)"
 msgstr "Нотатки про користувача (бачить лише адміністрація)"
 
-#: app/admin/forms.py:358
+#: app/admin/forms.py:361
 msgid "Subject"
 msgstr "Тема"
 
-#: app/admin/forms.py:359
+#: app/admin/forms.py:362
 msgid "Body (text)"
 msgstr "Текст (простий)"
 
-#: app/admin/forms.py:360
+#: app/admin/forms.py:363
 msgid "Body (html)"
 msgstr "Текст (HTML-код)"
 
-#: app/admin/forms.py:361
+#: app/admin/forms.py:364
 msgid "Test mode"
 msgstr "Лише перевірити"
 
-#: app/admin/forms.py:362 app/admin/routes.py:2058
+#: app/admin/forms.py:365 app/admin/routes.py:2063
 msgid "Send newsletter"
 msgstr "Надіслати розсилку"
 
-#: app/admin/forms.py:366
+#: app/admin/forms.py:369
 msgid "New url"
 msgstr "Нова адреса"
 
-#: app/admin/forms.py:367
+#: app/admin/forms.py:370
 msgid "Set new owner"
 msgstr "Встановити нового власника"
 
-#: app/admin/forms.py:368 app/dev/forms.py:29
+#: app/admin/forms.py:371 app/dev/forms.py:29
 #: app/templates/list_communities.html:83
 #: app/templates/post/_flair_choices.html:18 app/topic/forms.py:12
 msgid "Submit"
 msgstr "Надіслати"
 
-#: app/admin/forms.py:373
+#: app/admin/forms.py:376
 msgid "A local community at that url already exists"
 msgstr "Місцева спільнота з такою адресою вже існує"
 
-#: app/admin/forms.py:377
+#: app/admin/forms.py:380
 msgid "URL path"
 msgstr "Шлях в адресі"
 
-#: app/admin/forms.py:378
+#: app/admin/forms.py:381
 msgid "e.g., /about-us"
 msgstr "як-от /about-us"
 
-#: app/admin/forms.py:379
+#: app/admin/forms.py:382
 msgid "Page title"
 msgstr "Назва сторінки"
 
-#: app/admin/forms.py:380
+#: app/admin/forms.py:383
 msgid "Content (Markdown)"
 msgstr "Текст (Markdown-розмітка)"
 
-#: app/admin/forms.py:381
+#: app/admin/forms.py:384
 msgid "Write your content in Markdown format..."
 msgstr "Напишіть текст у форматі Markdown…"
 
-#: app/admin/forms.py:395
+#: app/admin/forms.py:398
 msgid "A page with this URL already exists."
 msgstr "Сторінка з такою адресою вже існує."
 
-#: app/admin/forms.py:399
+#: app/admin/forms.py:402
 msgid "Token or character"
 msgstr "Шаблон чи символ"
 
-#: app/admin/forms.py:400
+#: app/admin/forms.py:403
 msgid "e.g., :happy: or a single character like 👍"
 msgstr "як-от :happy: чи один символ на зразок 👍"
 
-#: app/admin/forms.py:401 app/community/forms.py:274 app/community/forms.py:290
+#: app/admin/forms.py:404 app/community/forms.py:276 app/community/forms.py:292
 #: app/templates/admin/cms_pages.html:25 app/templates/admin/emoji.html:26
 msgid "URL"
 msgstr "URL-адреса"
 
-#: app/admin/forms.py:402
+#: app/admin/forms.py:405
 msgid "e.g. https://..."
 msgstr "як-от https://…"
 
-#: app/admin/forms.py:403 app/templates/admin/emoji.html:28
+#: app/admin/forms.py:406 app/templates/admin/emoji.html:28
 #: app/templates/user/filters.html:51
 msgid "Keywords"
 msgstr "Ключові слова"
 
-#: app/admin/forms.py:404 app/templates/admin/emoji.html:27
+#: app/admin/forms.py:407 app/templates/admin/emoji.html:27
 msgid "Category"
 msgstr "Категорія"
 
-#: app/admin/forms.py:409
+#: app/admin/forms.py:412
 msgid "Filter"
 msgstr "Фільтр"
 
-#: app/admin/forms.py:414
+#: app/admin/forms.py:417
 msgid "Json file that was exported from another instance"
 msgstr "JSON-файл, експортований з іншого сервера"
 
@@ -1335,12 +1349,12 @@ msgstr "Параметри збережено."
 msgid "Site profile"
 msgstr "Профіль сайту"
 
-#: app/admin/routes.py:364 app/admin/routes.py:387
+#: app/admin/routes.py:364 app/admin/routes.py:391
 #: app/templates/admin/_nav.html:6 app/templates/admin/misc.html:19
 msgid "Misc settings"
 msgstr "Різні параметри"
 
-#: app/admin/routes.py:379
+#: app/admin/routes.py:381
 msgid ""
 "Settings saved. It might take up to 24 hours before other instances show "
 "your changes."
@@ -1348,25 +1362,25 @@ msgstr ""
 "Параметри збережено. Зміни проявляться на інших серверах протягом 24 "
 "годин."
 
-#: app/admin/routes.py:431
+#: app/admin/routes.py:435
 msgid "Admin settings saved"
 msgstr "Адміністративні параметри збережено"
 
-#: app/admin/routes.py:447
+#: app/admin/routes.py:451
 msgid "Federation settings"
 msgstr "Параметри федерації"
 
-#: app/admin/routes.py:512
+#: app/admin/routes.py:516
 #, python-format
 msgid "%d out of %d communities were excluded using current filters"
 msgstr "%d із %d спільнот сховано поточними фільтрами"
 
-#: app/admin/routes.py:562 app/admin/routes.py:886
+#: app/admin/routes.py:566 app/admin/routes.py:890
 #, python-format
 msgid "Results: %(results)s"
 msgstr "Результати: %(results)s"
 
-#: app/admin/routes.py:566
+#: app/admin/routes.py:570
 #, python-format
 msgid ""
 "Subscription process for %(communities_to_add)d of "
@@ -1389,11 +1403,11 @@ msgstr[2] ""
 "%(parsed_communities_sorted)d) спільнот, докладніше на адміністративній "
 "вкладці «Діяльність»"
 
-#: app/admin/routes.py:573
+#: app/admin/routes.py:577
 msgid "Federation settings - preload"
 msgstr "Параметри федерації — попереднє завантаження"
 
-#: app/admin/routes.py:890
+#: app/admin/routes.py:894
 #, python-format
 msgid ""
 "Based on current filters, the subscription process for "
@@ -1416,23 +1430,23 @@ msgstr[2] ""
 "%(communities_to_join)d з %(candidate_communities)d) спільнот, докладніше"
 " на адміністративній вкладці «Діяльність»"
 
-#: app/admin/routes.py:897
+#: app/admin/routes.py:901
 msgid "Federation settings - remote scan"
 msgstr "Параметри федерації — віддалене сканування"
 
-#: app/admin/routes.py:929
+#: app/admin/routes.py:933
 msgid "Ban imports started in a background process."
 msgstr "Імпорт блокувань розпочато в фоновому режимі."
 
-#: app/admin/routes.py:932
+#: app/admin/routes.py:936
 msgid "Ban imports requested, but no json provided."
 msgstr "Запитано імпорт блокувань, але не надано JSON."
 
-#: app/admin/routes.py:992
+#: app/admin/routes.py:996
 msgid "Federation settings - ban lists"
 msgstr "Параметри федерації — списки блокування"
 
-#: app/admin/routes.py:1128
+#: app/admin/routes.py:1132
 msgid ""
 "LOG_ACTIVITYPUB_TO_DB is off so no incoming activities are being logged "
 "to the database."
@@ -1440,18 +1454,18 @@ msgstr ""
 "LOG_ACTIVITYPUB_TO_DB вимкнено, тож до бази даних не пишеться журналу "
 "вхідних дій."
 
-#: app/admin/routes.py:1151
+#: app/admin/routes.py:1155
 msgid "ActivityPub Log"
 msgstr "Журнал ActivityPub"
 
-#: app/admin/routes.py:1180 app/templates/admin/activity_json.html:13
+#: app/admin/routes.py:1183 app/templates/admin/activity_json.html:13
 msgid "Activity JSON"
 msgstr "JSON-код дії"
 
-#: app/admin/routes.py:1219 app/community/routes.py:609
-#: app/community/routes.py:2142 app/community/routes.py:2194
-#: app/feed/forms.py:18 app/feed/forms.py:70 app/main/routes.py:454
-#: app/post/routes.py:225 app/post/routes.py:498 app/post/routes.py:2312
+#: app/admin/routes.py:1222 app/community/routes.py:609
+#: app/community/routes.py:2166 app/community/routes.py:2218
+#: app/feed/forms.py:18 app/feed/forms.py:70 app/main/routes.py:456
+#: app/post/routes.py:225 app/post/routes.py:498 app/post/routes.py:2317
 #: app/templates/admin/_nav.html:9 app/templates/admin/_tabbed_nav.html:10
 #: app/templates/admin/instances.html:50 app/templates/base.html:201
 #: app/templates/base.html:213 app/templates/base.html:346
@@ -1476,40 +1490,40 @@ msgstr "JSON-код дії"
 #: app/templates/search/_search_form.html:10
 #: app/templates/user/alerts/_type.html:4 app/templates/user/filters.html:82
 #: app/templates/user/notifications.html:74
-#: app/templates/user/show_profile.html:452
+#: app/templates/user/show_profile.html:454
 msgid "Communities"
 msgstr "Спільноти"
 
-#: app/admin/routes.py:1240
+#: app/admin/routes.py:1243
 msgid "Communities with no topic"
 msgstr "Спільноти без теми"
 
-#: app/admin/routes.py:1262
+#: app/admin/routes.py:1265
 msgid "Communities with low_quality == True"
 msgstr "Недостатньо змістовні спільноти"
 
-#: app/admin/routes.py:1284
+#: app/admin/routes.py:1287
 msgid ""
 "A community is considered unmoderated when mods have been inactive for 3 "
 "months or are bots."
 msgstr ""
-"Спільнота вважається немодерованою, якщо модератори неактивні вже 3 місяці "
-"чи є ботами."
+"Спільнота вважається немодерованою, якщо модератори неактивні вже 3 "
+"місяці чи є ботами."
 
-#: app/admin/routes.py:1286
+#: app/admin/routes.py:1289
 msgid "Unmoderated communities"
 msgstr "Немодеровані спільноти"
 
-#: app/admin/routes.py:1358 app/admin/routes.py:1527 app/admin/routes.py:1555
-#: app/admin/routes.py:1853 app/admin/routes.py:2173 app/admin/routes.py:2240
-#: app/admin/routes.py:2333 app/admin/routes.py:2361 app/admin/routes.py:2541
-#: app/community/routes.py:1334 app/community/routes.py:2090
-#: app/community/routes.py:2255 app/community/routes.py:2483
-#: app/community/routes.py:2788 app/domain/routes.py:45
+#: app/admin/routes.py:1362 app/admin/routes.py:1532 app/admin/routes.py:1560
+#: app/admin/routes.py:1858 app/admin/routes.py:2178 app/admin/routes.py:2245
+#: app/admin/routes.py:2338 app/admin/routes.py:2366 app/admin/routes.py:2546
+#: app/community/routes.py:1357 app/community/routes.py:2114
+#: app/community/routes.py:2279 app/community/routes.py:2507
+#: app/community/routes.py:2812 app/domain/routes.py:46
 msgid "Saved"
 msgstr "Збережено"
 
-#: app/admin/routes.py:1362
+#: app/admin/routes.py:1366
 msgid ""
 "This is a remote community - most settings here will be regularly "
 "overwritten with data from the original server."
@@ -1517,96 +1531,96 @@ msgstr ""
 "Це віддалена спільнота. Більшість параметрів регулярно оновлюватимуться "
 "даними з сервера оригіналу."
 
-#: app/admin/routes.py:1386 app/community/routes.py:1363
+#: app/admin/routes.py:1391 app/community/routes.py:1387
 msgid "Edit community"
 msgstr "Редагувати спільноту"
 
-#: app/admin/routes.py:1402 app/community/routes.py:1431
+#: app/admin/routes.py:1407 app/community/routes.py:1455
 msgid "Community deleted"
 msgstr "Спільноту видалено"
 
-#: app/admin/routes.py:1445 app/community/routes.py:594
-#: app/community/routes.py:2129 app/community/routes.py:2181
+#: app/admin/routes.py:1450 app/community/routes.py:594
+#: app/community/routes.py:2153 app/community/routes.py:2205
 #: app/post/routes.py:211 app/post/routes.py:479
 #: app/templates/admin/_nav.html:10 app/templates/admin/_tabbed_nav.html:11
 #: app/templates/admin/topics.html:38 app/templates/auth/choose_topics.html:69
 #: app/templates/explore.html:12 app/templates/explore_menu.html:37
 #: app/templates/themes/dillo/base.html:66
 #: app/templates/themes/dillo/base.html:90
-#: app/templates/topic/show_topic.html:17
+#: app/templates/topic/show_topic.html:21
 #: app/templates/user/alerts/_type.html:5
 msgid "Topics"
 msgstr "Теми"
 
-#: app/admin/routes.py:1493
+#: app/admin/routes.py:1498
 msgid "Topics imported successfully!"
 msgstr "Теми успішно імпортовано!"
 
-#: app/admin/routes.py:1498
+#: app/admin/routes.py:1503
 #, python-format
 msgid "Error importing topics: %(error)s"
 msgstr "Помилка імпорту тем: %(error)s"
 
-#: app/admin/routes.py:1502
+#: app/admin/routes.py:1507
 msgid "No file uploaded"
 msgstr "Файлів не вивантажено"
 
-#: app/admin/routes.py:1504
+#: app/admin/routes.py:1509
 msgid "Topic import"
 msgstr "Імпорт тем"
 
-#: app/admin/routes.py:1530 app/templates/admin/topics.html:38
+#: app/admin/routes.py:1535 app/templates/admin/topics.html:38
 msgid "Add topic"
 msgstr "Додати тему"
 
-#: app/admin/routes.py:1564
+#: app/admin/routes.py:1569
 msgid "Edit topic"
 msgstr "Редагувати тему"
 
-#: app/admin/routes.py:1576
+#: app/admin/routes.py:1581
 msgid "Topic deleted"
 msgstr "Тему видалено"
 
-#: app/admin/routes.py:1578
+#: app/admin/routes.py:1583
 msgid "Cannot delete topic with communities assigned to it."
 msgstr "Неможливо видалити тему, з якою пов'язані спільноти."
 
-#: app/admin/routes.py:1627 app/templates/admin/_nav.html:13
+#: app/admin/routes.py:1632 app/templates/admin/_nav.html:13
 #: app/templates/admin/_tabbed_nav.html:14
 #: app/templates/admin/instances.html:51 app/templates/admin/users.html:15
 #: app/templates/user/alerts/_type.html:7
 msgid "Users"
 msgstr "Користувачі"
 
-#: app/admin/routes.py:1654
+#: app/admin/routes.py:1659
 msgid "Bad / Most downvoted"
 msgstr "Погані / найбільш засуджені"
 
-#: app/admin/routes.py:1664
+#: app/admin/routes.py:1669
 msgid "Likely spam"
 msgstr "Імовірно спам"
 
-#: app/admin/routes.py:1676
+#: app/admin/routes.py:1681
 msgid "Deleted content"
 msgstr "Видалені дописи"
 
-#: app/admin/routes.py:1686 app/templates/admin/content.html:20
+#: app/admin/routes.py:1691 app/templates/admin/content.html:20
 msgid "Approval queue"
 msgstr "Черга схвалення"
 
-#: app/admin/routes.py:1757
+#: app/admin/routes.py:1762
 msgid "Registration approved."
 msgstr "Реєстрацію схвалено."
 
-#: app/admin/routes.py:1793
+#: app/admin/routes.py:1798
 msgid "Registration denied. User removed from the database."
 msgstr "Реєстрацію відхилено. Користувача вилучено з бази даних."
 
-#: app/admin/routes.py:1805
+#: app/admin/routes.py:1810
 msgid "Manually approve posts"
 msgstr "Вручну схвалювати дописи"
 
-#: app/admin/routes.py:1839
+#: app/admin/routes.py:1844
 msgid ""
 "Permissions are cached for 50 seconds so new admin roles won't take "
 "effect immediately."
@@ -1614,7 +1628,7 @@ msgstr ""
 "Дозволи кешуються на 50 секунд, тож нові адміністраційні ролі почнуть "
 "діяти не одразу."
 
-#: app/admin/routes.py:1857
+#: app/admin/routes.py:1862
 msgid ""
 "This is a remote user - most settings here will be regularly overwritten "
 "with data from the original server."
@@ -1622,35 +1636,35 @@ msgstr ""
 "Це віддалений користувач — більшість параметрів періодично "
 "оновлюватимуться даними з сервера оригіналу."
 
-#: app/admin/routes.py:1874
+#: app/admin/routes.py:1879
 msgid "Edit user"
 msgstr "Редагувати користувача"
 
-#: app/admin/routes.py:1895
+#: app/admin/routes.py:1900
 msgid "Verification email sent!"
 msgstr "Лист підтвердження надіслано!"
 
-#: app/admin/routes.py:1897
+#: app/admin/routes.py:1902
 msgid "Problem sending email: "
 msgstr "Не вдалося надіслати лист: "
 
-#: app/admin/routes.py:1956
+#: app/admin/routes.py:1961
 msgid "User added"
 msgstr "Користувача додано"
 
-#: app/admin/routes.py:1959
+#: app/admin/routes.py:1964
 msgid "Add user"
 msgstr "Додати користувача"
 
-#: app/admin/routes.py:1968
+#: app/admin/routes.py:1973
 msgid "This user cannot be deleted."
 msgstr "Видалити цього користувача неможливо."
 
-#: app/admin/routes.py:1982
+#: app/admin/routes.py:1987
 msgid "User deleted"
 msgstr "Користувача видалено"
 
-#: app/admin/routes.py:2042 app/templates/admin/reports.html:15
+#: app/admin/routes.py:2047 app/templates/admin/reports.html:15
 #: app/templates/admin/users.html:66 app/templates/admin/users.html:104
 #: app/templates/community/_community_moderation_nav.html:8
 #: app/templates/community/community_moderate.html:20
@@ -1658,142 +1672,142 @@ msgstr "Користувача видалено"
 msgid "Reports"
 msgstr "Скарги"
 
-#: app/admin/routes.py:2055
+#: app/admin/routes.py:2060
 msgid "Newsletter sent"
 msgstr "Розсилку надіслано"
 
-#: app/admin/routes.py:2080
+#: app/admin/routes.py:2085
 msgid "Settings saved"
 msgstr "Параметри збережено"
 
-#: app/admin/routes.py:2085 app/templates/user/show_profile.html:152
+#: app/admin/routes.py:2090 app/templates/user/show_profile.html:152
 msgid "Role permissions"
 msgstr "Дозволи ролі"
 
-#: app/admin/routes.py:2189
+#: app/admin/routes.py:2194
 msgid "Edit instance"
 msgstr "Редагувати сервер"
 
-#: app/admin/routes.py:2219
+#: app/admin/routes.py:2224
 msgid "Message sent."
 msgstr "Повідомлення надіслано."
 
-#: app/admin/routes.py:2222 app/templates/instance/overview.html:47
+#: app/admin/routes.py:2227 app/templates/instance/overview.html:47
 #, python-format
 msgid "Contact instance admins on %(instance_name)s"
 msgstr "Сконтактувати з адміністрацією сервера %(instance_name)s"
 
-#: app/admin/routes.py:2242
+#: app/admin/routes.py:2247
 msgid "Problem adding instance to database"
 msgstr "Помилка додання сервера до бази даних"
 
-#: app/admin/routes.py:2258
+#: app/admin/routes.py:2263
 #, python-format
 msgid "Set community owner to %(user_name)s"
 msgstr "Зробити %(user_name)s власником спільноти"
 
-#: app/admin/routes.py:2297
+#: app/admin/routes.py:2302
 #, python-format
 msgid ""
 "%(community_name)s is now %(new_url)s. Contact the initiator of this "
 "request to let them know."
 msgstr "%(community_name)s тепер %(new_url)s. Повідомте автора запиту."
 
-#: app/admin/routes.py:2300
+#: app/admin/routes.py:2305
 msgid "Ensure this community has the right moderators."
 msgstr "Переконайтесь, що спільноті коректно призначено модераторів."
 
-#: app/admin/routes.py:2305
+#: app/admin/routes.py:2310
 msgid "Move community"
 msgstr "Посунути спільноту"
 
-#: app/admin/routes.py:2316 app/templates/admin/_nav.html:35
+#: app/admin/routes.py:2321 app/templates/admin/_nav.html:35
 msgid "Blocked images"
 msgstr "Блоковані зображення"
 
-#: app/admin/routes.py:2340
+#: app/admin/routes.py:2345
 msgid "Edit blocked image"
 msgstr "Редагувати блоковане зображення"
 
-#: app/admin/routes.py:2364
+#: app/admin/routes.py:2369
 msgid ""
 "Provide the url of an image or the hash (and file name) of it, but not "
 "both."
 msgstr "Зазначте або адресу зображення, або контрольну суму й назву файлу."
 
-#: app/admin/routes.py:2366 app/templates/admin/blocked_images.html:14
+#: app/admin/routes.py:2371 app/templates/admin/blocked_images.html:14
 #: app/templates/admin/edit_blocked_image.html:15
 msgid "Add blocked image"
 msgstr "Додати блоковане зображення"
 
-#: app/admin/routes.py:2381 app/post/routes.py:2182
+#: app/admin/routes.py:2386 app/post/routes.py:2187
 #, python-format
 msgid "%(count)s posts deleted."
 msgstr "%(count)s дописів видалено."
 
-#: app/admin/routes.py:2387 app/post/routes.py:2194
+#: app/admin/routes.py:2392 app/post/routes.py:2199
 #: app/templates/post/post_block_image_purge_posts.html:15
 msgid "Posts containing blocked images"
 msgstr "Дописи з блокованими зображеннями"
 
-#: app/admin/routes.py:2401
+#: app/admin/routes.py:2406
 msgid "Blocked image deleted"
 msgstr "Блоковане зображення видалено"
 
-#: app/admin/routes.py:2412
+#: app/admin/routes.py:2417
 msgid "CMS Pages"
 msgstr "CMS-сторінки"
 
-#: app/admin/routes.py:2426 app/admin/routes.py:2448
+#: app/admin/routes.py:2431 app/admin/routes.py:2453
 msgid "Page saved."
 msgstr "Сторінку збережено."
 
-#: app/admin/routes.py:2429
+#: app/admin/routes.py:2434
 msgid "Add CMS Page"
 msgstr "Додати CMS-сторінку"
 
-#: app/admin/routes.py:2451
+#: app/admin/routes.py:2456
 msgid "Edit page"
 msgstr "Редагувати сторінку"
 
-#: app/admin/routes.py:2462
+#: app/admin/routes.py:2467
 msgid "Page deleted."
 msgstr "Сторінку видалено."
 
-#: app/admin/routes.py:2478 app/templates/admin/_nav.html:25
+#: app/admin/routes.py:2483 app/templates/admin/_nav.html:25
 #: app/templates/admin/_tabbed_nav.html:29 app/templates/admin/emoji.html:15
 msgid "Emoji"
 msgstr "Емоджі"
 
-#: app/admin/routes.py:2493 app/admin/routes.py:2514
+#: app/admin/routes.py:2498 app/admin/routes.py:2519
 msgid "Emoji saved."
 msgstr "Емоджі збережено."
 
-#: app/admin/routes.py:2496
+#: app/admin/routes.py:2501
 msgid "Add Emoji"
 msgstr "Додати емоджі"
 
-#: app/admin/routes.py:2517
+#: app/admin/routes.py:2522
 msgid "Edit Emoji"
 msgstr "Редагувати емоджі"
 
-#: app/admin/routes.py:2529
+#: app/admin/routes.py:2534
 msgid "Emoji deleted."
 msgstr "Емоджі видалено."
 
-#: app/admin/routes.py:2546
+#: app/admin/routes.py:2551
 msgid "Filter out emoji with this in their url"
 msgstr "Фільтрувати емоджі, URL-адреси яких містять"
 
-#: app/admin/routes.py:2609
+#: app/admin/routes.py:2614
 msgid "File deleted."
 msgstr "Файл видалено."
 
-#: app/admin/routes.py:2621
+#: app/admin/routes.py:2626
 msgid "Files deleted in the background - this might take a while."
 msgstr "Файли видаляються в фоновому режимі — це може тривати доволі довго."
 
-#: app/admin/routes.py:2653
+#: app/admin/routes.py:2658
 #, python-format
 msgid "%(num)d second"
 msgid_plural "%(num)d seconds"
@@ -1801,7 +1815,7 @@ msgstr[0] "%(num)d секунда"
 msgstr[1] "%(num)d секунди"
 msgstr[2] "%(num)d секунд"
 
-#: app/admin/routes.py:2655
+#: app/admin/routes.py:2660
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
@@ -1809,7 +1823,7 @@ msgstr[0] "%(num)d хвилина"
 msgstr[1] "%(num)d хвилини"
 msgstr[2] "%(num)d хвилин"
 
-#: app/admin/routes.py:2657
+#: app/admin/routes.py:2662
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
@@ -1817,7 +1831,7 @@ msgstr[0] "%(num)d година"
 msgstr[1] "%(num)d години"
 msgstr[2] "%(num)d годин"
 
-#: app/admin/routes.py:2658
+#: app/admin/routes.py:2663
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
@@ -1825,12 +1839,12 @@ msgstr[0] "%(num)d день"
 msgstr[1] "%(num)d дні"
 msgstr[2] "%(num)d днів"
 
-#: app/admin/util.py:97
+#: app/admin/util.py:98
 msgid "No recipients"
 msgstr "Нема отримувачів"
 
-#: app/admin/util.py:121 app/community/forms.py:231
-#: app/community/routes.py:1873 app/feed/util.py:18
+#: app/admin/util.py:122 app/community/forms.py:232
+#: app/community/routes.py:1897 app/feed/util.py:18
 #: app/templates/admin/activities.html:52 app/user/forms.py:125
 msgid "None"
 msgstr "Немає"
@@ -1999,7 +2013,7 @@ msgstr ""
 "Ви долучилися до кількох спільнот за інтересами. Щоб знайти інші "
 "спільноти, скористайтеся меню «Огляд» чи головною сторінкою."
 
-#: app/auth/onboarding.py:74 app/main/routes.py:307 app/main/routes.py:1454
+#: app/auth/onboarding.py:74 app/main/routes.py:309 app/main/routes.py:1459
 msgid ""
 "You did not choose any topics. Would you like to choose individual "
 "communities instead?"
@@ -2017,8 +2031,8 @@ msgstr ""
 msgid "Account under review"
 msgstr "Обліковий запис на розгляді"
 
-#: app/auth/routes.py:90 app/main/routes.py:1334 app/main/routes.py:1362
-#: app/main/routes.py:1400 app/templates/auth/permission_denied.html:12
+#: app/auth/routes.py:90 app/main/routes.py:1339 app/main/routes.py:1367
+#: app/main/routes.py:1405 app/templates/auth/permission_denied.html:12
 #: app/templates/chat/blocked.html:13 app/templates/chat/denied.html:14
 #: app/templates/topic/suggestion_denied.html:14
 msgid "Sorry"
@@ -2232,12 +2246,12 @@ msgstr "Порушення прав на торговельну марку"
 msgid "Self-harm or suicide"
 msgstr "Самоушкодження чи самогубство"
 
-#: app/chat/forms.py:27 app/community/forms.py:546 app/post/forms.py:41
+#: app/chat/forms.py:27 app/community/forms.py:548 app/post/forms.py:41
 #: app/user/forms.py:182
 msgid "Other"
 msgstr "Інше"
 
-#: app/chat/forms.py:28 app/community/forms.py:199 app/community/forms.py:548
+#: app/chat/forms.py:28 app/community/forms.py:200 app/community/forms.py:550
 #: app/post/forms.py:42 app/post/forms.py:80 app/post/forms.py:85
 #: app/templates/chat/ban_from_mod.html:14
 #: app/templates/chat/ban_from_mod.html:28 app/user/forms.py:160
@@ -2245,12 +2259,12 @@ msgstr "Інше"
 msgid "Reason"
 msgstr "Підстава"
 
-#: app/chat/forms.py:29 app/community/forms.py:549 app/post/forms.py:43
+#: app/chat/forms.py:29 app/community/forms.py:551 app/post/forms.py:43
 #: app/user/forms.py:184
 msgid "More info"
 msgstr "Докладніше"
 
-#: app/chat/forms.py:31 app/community/forms.py:551 app/post/forms.py:45
+#: app/chat/forms.py:31 app/community/forms.py:553 app/post/forms.py:45
 #: app/templates/community/community_moderate_subscribers.html:89
 #: app/templates/user/show_profile.html:142 app/user/forms.py:186
 msgid "Report"
@@ -2274,11 +2288,11 @@ msgstr "Розмову видалено"
 msgid "Instance blocked."
 msgstr "Сервер блокується."
 
-#: app/chat/routes.py:229
+#: app/chat/routes.py:234
 msgid "This conversation has been reported, thank you!"
 msgstr "Скаргу на розмову надіслано, дякуємо!"
 
-#: app/chat/routes.py:234
+#: app/chat/routes.py:239
 msgid "Report conversation"
 msgstr "Скарга на розмову"
 
@@ -2287,7 +2301,7 @@ msgstr "Скарга на розмову"
 msgid "Community theme"
 msgstr "Оформлення спільноти"
 
-#: app/community/forms.py:31 app/community/forms.py:223 app/post/forms.py:93
+#: app/community/forms.py:31 app/community/forms.py:224 app/post/forms.py:93
 #: app/templates/auth/instance_chooser.html:45
 #: app/templates/list_communities.html:162
 #: app/templates/post/_flair_choices.html:13
@@ -2347,105 +2361,109 @@ msgstr "Спільнота з цією адресою вже існує."
 msgid "This name was used in the past and cannot be reused."
 msgstr "Назва колись використовувалась. Повторне використання неможливе."
 
-#: app/community/forms.py:124 app/templates/community/add_post.html:13
+#: app/community/forms.py:119
+msgid "Default hashtag on new posts"
+msgstr ""
+
+#: app/community/forms.py:125 app/templates/community/add_post.html:13
 #: app/templates/search/_search_form.html:45
 msgid "Link"
 msgstr "Посилання"
 
-#: app/community/forms.py:125 app/templates/community/add_post.html:14
+#: app/community/forms.py:126 app/templates/community/add_post.html:14
 #: app/templates/search/_search_form.html:44
 msgid "Discussion"
 msgstr "Обговорення"
 
-#: app/community/forms.py:126 app/community/forms.py:306
-#: app/community/forms.py:354 app/community/forms.py:368
+#: app/community/forms.py:127 app/community/forms.py:308
+#: app/community/forms.py:356 app/community/forms.py:370
 #: app/templates/community/add_post.html:15
 #: app/templates/search/_search_form.html:46
 msgid "Image"
 msgstr "Зображення"
 
-#: app/community/forms.py:127 app/templates/community/add_post.html:21
+#: app/community/forms.py:128 app/templates/community/add_post.html:21
 #: app/templates/search/_search_form.html:47
 msgid "Video"
 msgstr "Відео"
 
-#: app/community/forms.py:128 app/templates/community/add_post.html:23
+#: app/community/forms.py:129 app/templates/community/add_post.html:23
 #: app/templates/community/add_post.html:25
 #: app/templates/search/_search_form.html:48
 msgid "Poll"
 msgstr "Опитування"
 
-#: app/community/forms.py:129 app/templates/community/add_post.html:28
+#: app/community/forms.py:130 app/templates/community/add_post.html:28
 #: app/templates/community/add_post.html:30
 msgid "Event"
 msgstr "Подія"
 
-#: app/community/forms.py:131
+#: app/community/forms.py:132
 msgid "Default post type"
 msgstr "Усталений тип допису"
 
-#: app/community/forms.py:133
+#: app/community/forms.py:134
 msgid "Friendly urls"
 msgstr "Дружні посилання"
 
-#: app/community/forms.py:134
+#: app/community/forms.py:135
 msgid "Post ids only"
 msgstr "Лише ідентифікатори дописів"
 
-#: app/community/forms.py:135
+#: app/community/forms.py:136
 msgid "Post url structure to use in this community"
 msgstr "Структура адрес у цій спільноті"
 
-#: app/community/forms.py:143 app/community/forms.py:218 app/post/forms.py:15
+#: app/community/forms.py:144 app/community/forms.py:219 app/post/forms.py:15
 msgid "Body"
 msgstr "Текст"
 
-#: app/community/forms.py:144
+#: app/community/forms.py:145
 msgid "Mods and admins"
 msgstr "Модератори й адміністрація"
 
-#: app/community/forms.py:145
+#: app/community/forms.py:146
 msgid "Trusted accounts"
 msgstr "Довірені облікові записи"
 
-#: app/community/forms.py:147
+#: app/community/forms.py:148
 msgid "Any account"
 msgstr "Будь-який обліковий запис"
 
-#: app/community/forms.py:149
+#: app/community/forms.py:150
 msgid "Who can edit"
 msgstr "Хто може редагувати"
 
-#: app/community/forms.py:156 app/community/forms.py:208
+#: app/community/forms.py:157 app/community/forms.py:209
 msgid "Find"
 msgstr "Пошук"
 
-#: app/community/forms.py:160
+#: app/community/forms.py:161
 msgid "Amend the report description if necessary"
 msgstr "Змініть опис скарги за потреби"
 
-#: app/community/forms.py:161
+#: app/community/forms.py:162
 msgid "Escalate report"
 msgstr "Ескалювати скаргу"
 
-#: app/community/forms.py:165
+#: app/community/forms.py:166
 msgid "Note for mod log"
 msgstr "Примітка для журналу модерування"
 
-#: app/community/forms.py:166
+#: app/community/forms.py:167
 msgid "Also resolve all other reports about the same thing."
 msgstr "Також задовольнити всі інші скарги з цього приводу."
 
-#: app/community/forms.py:167
+#: app/community/forms.py:168
 #: app/templates/community/community_moderate_report_resolve.html:13
 msgid "Resolve report"
 msgstr "Задовольнити скаргу"
 
-#: app/community/forms.py:171 app/templates/community/add_remote.html:26
+#: app/community/forms.py:172 app/templates/community/add_remote.html:26
 msgid "Community address"
 msgstr "Адреса спільноти"
 
-#: app/community/forms.py:174 app/feed/forms.py:106 app/search/routes.py:225
+#: app/community/forms.py:175 app/feed/forms.py:106 app/search/routes.py:225
 #: app/templates/admin/communities.html:19
 #: app/templates/admin/communities.html:20
 #: app/templates/admin/instances.html:16 app/templates/admin/instances.html:17
@@ -2470,49 +2488,49 @@ msgstr "Адреса спільноти"
 msgid "Search"
 msgstr "Пошук"
 
-#: app/community/forms.py:180
+#: app/community/forms.py:181
 msgid "Address is required."
 msgstr "Адреса обов'язкова."
 
-#: app/community/forms.py:186
+#: app/community/forms.py:187
 msgid "Address must start with !"
 msgstr "Адреса має починатися зі !"
 
-#: app/community/forms.py:189
+#: app/community/forms.py:190
 msgid "Address must include @"
 msgstr "Адреса має містити @"
 
-#: app/community/forms.py:192
+#: app/community/forms.py:193
 msgid "/ cannot be in address"
 msgstr "Адреса не може містити /"
 
-#: app/community/forms.py:200
+#: app/community/forms.py:201
 msgid "Ban until"
 msgstr "Блокувати до"
 
-#: app/community/forms.py:201
+#: app/community/forms.py:202
 msgid "Also delete all their posts"
 msgstr "Також видалити всі дописи"
 
-#: app/community/forms.py:202
+#: app/community/forms.py:203
 msgid "Also delete all their comments"
 msgstr "Також видалити всі коментарі"
 
-#: app/community/forms.py:203 app/templates/admin/users.html:115
+#: app/community/forms.py:204 app/templates/admin/users.html:115
 #: app/templates/community/community_moderate_subscribers.html:91
-#: app/templates/user/show_profile.html:428 app/user/forms.py:164
+#: app/templates/user/show_profile.html:430 app/user/forms.py:164
 msgid "Ban"
 msgstr "Блокування"
 
-#: app/community/forms.py:219 app/templates/tag/tag.html:16
+#: app/community/forms.py:220 app/templates/tag/tag.html:16
 #: app/templates/tag/tag_cloud.html:57 app/templates/tag/tags.html:12
 #: app/templates/tag/tags.html:21 app/templates/tag/tags_blocked.html:12
 #: app/templates/tag/tags_blocked.html:21
 msgid "Tags"
 msgstr "Теги"
 
-#: app/community/forms.py:220 app/community/forms.py:563
-#: app/community/forms.py:603 app/community/forms.py:619 app/post/forms.py:92
+#: app/community/forms.py:221 app/community/forms.py:565
+#: app/community/forms.py:605 app/community/forms.py:621 app/post/forms.py:92
 #: app/templates/_side_pane.html:110
 #: app/templates/community/_community_moderation_nav.html:26
 #: app/templates/community/community_changed.html:2
@@ -2522,20 +2540,20 @@ msgstr "Теги"
 msgid "Flair"
 msgstr "Позначка"
 
-#: app/community/forms.py:222 app/templates/post/post_options.html:67
+#: app/community/forms.py:223 app/templates/post/post_options.html:67
 msgid "Sticky"
 msgstr "Закріплення"
 
-#: app/community/forms.py:224 app/post/forms.py:94
+#: app/community/forms.py:225 app/post/forms.py:94
 msgid "Gore/gross"
 msgstr "Кров/огида"
 
-#: app/community/forms.py:225 app/post/forms.py:95
+#: app/community/forms.py:226 app/post/forms.py:95
 #: app/templates/post/_flair_choices.html:15
 msgid "AI generated"
 msgstr "Згенероване «ШІ»"
 
-#: app/community/forms.py:226 app/post/forms.py:17
+#: app/community/forms.py:227 app/post/forms.py:17
 #: app/templates/post/_post_notification_toggle.html:5
 #: app/templates/post/_reply_notification_toggle.html:4
 #: app/templates/post/reply/_macros.html:35
@@ -2543,119 +2561,119 @@ msgstr "Згенероване «ШІ»"
 msgid "Notify about replies"
 msgstr "Сповіщати про відповіді"
 
-#: app/community/forms.py:227 app/post/forms.py:19
+#: app/community/forms.py:228 app/post/forms.py:19
 #: app/templates/auth/instance_chooser.html:29
 #: app/templates/list_communities.html:144
 #: app/templates/search/_search_form.html:51
 msgid "Language"
 msgstr "Мова"
 
-#: app/community/forms.py:229
+#: app/community/forms.py:230
 msgid "Publish at"
 msgstr "Оприлюднити"
 
-#: app/community/forms.py:230
+#: app/community/forms.py:231
 msgid "Repeat"
 msgstr "Повтор"
 
-#: app/community/forms.py:231 app/templates/user/scheduled_posts.html:38
+#: app/community/forms.py:232 app/templates/user/scheduled_posts.html:38
 msgid "Daily"
 msgstr "Щодня"
 
-#: app/community/forms.py:232 app/templates/user/scheduled_posts.html:40
+#: app/community/forms.py:233 app/templates/user/scheduled_posts.html:40
 msgid "Weekly"
 msgstr "Щотижня"
 
-#: app/community/forms.py:232 app/templates/user/scheduled_posts.html:42
+#: app/community/forms.py:233 app/templates/user/scheduled_posts.html:42
 msgid "Monthly"
 msgstr "Щомісяця"
 
-#: app/community/forms.py:234 app/community/forms.py:404
+#: app/community/forms.py:235 app/community/forms.py:406
 #: app/templates/user/scheduled_posts.html:27
 #: app/templates/user/scheduled_posts.html:35 app/user/forms.py:37
 msgid "Timezone"
 msgstr "Часовий пояс"
 
-#: app/community/forms.py:235
+#: app/community/forms.py:237
 msgid "Publish"
 msgstr "Оприлюднити"
 
-#: app/community/forms.py:244
+#: app/community/forms.py:246
 msgid "NSFW posts are not allowed."
 msgstr "NSFW-дописи заборонено."
 
-#: app/community/forms.py:251
+#: app/community/forms.py:253
 msgid "NSFL posts are not allowed."
 msgstr "NSFL-дописи заборонено."
 
-#: app/community/forms.py:259
+#: app/community/forms.py:261
 msgid "Choose a time in the future."
 msgstr "Виберіть час у майбутньому."
 
-#: app/community/forms.py:279
+#: app/community/forms.py:281
 msgid "Alt text (for links to images)"
 msgstr "Альтернативний текст (для посилань на зображення)"
 
-#: app/community/forms.py:284 app/community/forms.py:423
+#: app/community/forms.py:286 app/community/forms.py:425
 #, python-format
 msgid "Links to %(domain)s are not allowed."
 msgstr "Посилання на %(domain)s заборонено."
 
-#: app/community/forms.py:292
+#: app/community/forms.py:294
 msgid "Video file (mp4 or webm)"
 msgstr "Відеофайл (mp4 або webm)"
 
-#: app/community/forms.py:299
+#: app/community/forms.py:301
 #, python-format
 msgid "Videos from %(domain)s are not allowed."
 msgstr "Відео з %(domain)s заборонено."
 
-#: app/community/forms.py:305 app/community/forms.py:369
+#: app/community/forms.py:307 app/community/forms.py:371
 msgid "Alt text"
 msgstr "Альтернативний текст"
 
-#: app/community/forms.py:347 app/community/forms.py:362
-#: app/community/forms.py:478
+#: app/community/forms.py:349 app/community/forms.py:364
+#: app/community/forms.py:480
 msgid "Images cannot be posted to local communities."
 msgstr "Зображень не можна надсилати до місцевих спільнот."
 
-#: app/community/forms.py:353
+#: app/community/forms.py:355
 msgid "Replace Image"
 msgstr "Замінити зображення"
 
-#: app/community/forms.py:385
+#: app/community/forms.py:387
 msgid "This image file size is too large."
 msgstr "Файл зображення завеликий."
 
-#: app/community/forms.py:393
+#: app/community/forms.py:395
 msgid "Galleries cannot be posted to local communities."
 msgstr "Галерей не можна надсилати до місцевих спільнот."
 
-#: app/community/forms.py:400
+#: app/community/forms.py:402
 msgid "Start"
 msgstr "Початок"
 
-#: app/community/forms.py:401
+#: app/community/forms.py:403
 msgid "End"
 msgstr "Кінець"
 
-#: app/community/forms.py:402
+#: app/community/forms.py:404
 msgid "Banner"
 msgstr "Банер"
 
-#: app/community/forms.py:403
+#: app/community/forms.py:405
 msgid "More information link"
 msgstr "Посилання на докладнішу інформацію"
 
-#: app/community/forms.py:406
+#: app/community/forms.py:408
 msgid "Cost"
 msgstr "Вартість"
 
-#: app/community/forms.py:407
+#: app/community/forms.py:409
 msgid "Maximum number of attendees"
 msgstr "Максимум учасників"
 
-#: app/community/forms.py:408 app/templates/admin/instances.html:23
+#: app/community/forms.py:410 app/templates/admin/instances.html:23
 #: app/templates/admin/instances.html:95
 #: app/templates/instance/list_instances.html:39
 #: app/templates/instance/list_instances.html:98
@@ -2663,85 +2681,85 @@ msgstr "Максимум учасників"
 msgid "Online"
 msgstr "Онлайн"
 
-#: app/community/forms.py:409
+#: app/community/forms.py:411
 msgid "Online link"
 msgstr "Посилання на онлайн"
 
-#: app/community/forms.py:410
+#: app/community/forms.py:412
 msgid "Address"
 msgstr "Адреса"
 
-#: app/community/forms.py:411
+#: app/community/forms.py:413
 msgid "City"
 msgstr "Місто"
 
-#: app/community/forms.py:412
+#: app/community/forms.py:414
 msgid "Country"
 msgstr "Країна"
 
-#: app/community/forms.py:418
+#: app/community/forms.py:420
 msgid "Free"
 msgstr "Безкоштовно"
 
-#: app/community/forms.py:418 app/templates/user/choose_plan.html:39
+#: app/community/forms.py:420 app/templates/user/choose_plan.html:39
 msgid "Donation"
 msgstr "Внесок"
 
-#: app/community/forms.py:418
+#: app/community/forms.py:420
 msgid "Paid"
 msgstr "Платно"
 
-#: app/community/forms.py:439 app/community/forms.py:441
+#: app/community/forms.py:441 app/community/forms.py:443
 msgid "This time is in the past."
 msgstr "Час у минулому."
 
-#: app/community/forms.py:444
+#: app/community/forms.py:446
 msgid "Start must be less than end."
 msgstr "Початок має бути меншим за кінець."
 
-#: app/community/forms.py:450
+#: app/community/forms.py:452
 msgid "Online link is required for online events."
 msgstr "Посилання на онлайн обов'язкове для онлайн-подій."
 
-#: app/community/forms.py:455
+#: app/community/forms.py:457
 msgid "Address is required for physical events."
 msgstr "Адреса обов'язкова для фізичних подій."
 
-#: app/community/forms.py:458
+#: app/community/forms.py:460
 msgid "City is required for physical events."
 msgstr "Місто обов'язкове для фізичних подій."
 
-#: app/community/forms.py:461
+#: app/community/forms.py:463
 msgid "Country is required for physical events."
 msgstr "Країна обов'язкова для фізичних подій."
 
-#: app/community/forms.py:484
+#: app/community/forms.py:486
 msgid "Mode"
 msgstr "Режим"
 
-#: app/community/forms.py:484
+#: app/community/forms.py:486
 msgid "Voters choose one option"
 msgstr "Проголосувати можна за один варіант"
 
-#: app/community/forms.py:485
+#: app/community/forms.py:487
 msgid "Voters choose many options"
 msgstr "Проголосувати можна за декілька варіантів"
 
-#: app/community/forms.py:488 app/community/forms.py:621
+#: app/community/forms.py:490 app/community/forms.py:623
 msgid "30 minutes"
 msgstr "30 хвилин"
 
-#: app/community/forms.py:489 app/community/forms.py:622
+#: app/community/forms.py:491 app/community/forms.py:624
 #: app/templates/_home_nav.html:20 app/templates/_home_nav.html:56
 msgid "1 hour"
 msgstr "1 година"
 
-#: app/community/forms.py:490 app/community/forms.py:623
+#: app/community/forms.py:492 app/community/forms.py:625
 #: app/templates/_home_nav.html:23 app/templates/_home_nav.html:61
 msgid "6 hours"
 msgstr "6 годин"
 
-#: app/community/forms.py:491 app/community/forms.py:624
+#: app/community/forms.py:493 app/community/forms.py:626
 #: app/templates/_home_nav.html:26 app/templates/_home_nav.html:66
 #: app/templates/community/_community_nav.html:76
 #: app/templates/community/_community_nav.html:321
@@ -2750,156 +2768,156 @@ msgstr "6 годин"
 msgid "12 hours"
 msgstr "12 годин"
 
-#: app/community/forms.py:492 app/community/forms.py:625
+#: app/community/forms.py:494 app/community/forms.py:627
 #: app/templates/admin/content.html:35
 msgid "1 day"
 msgstr "1 день"
 
-#: app/community/forms.py:493 app/community/forms.py:626
+#: app/community/forms.py:495 app/community/forms.py:628
 #: app/templates/admin/content.html:36
 msgid "3 days"
 msgstr "3 дні"
 
-#: app/community/forms.py:494 app/community/forms.py:627
+#: app/community/forms.py:496 app/community/forms.py:629
 #: app/templates/admin/content.html:37 app/templates/admin/users.html:34
 msgid "7 days"
 msgstr "7 днів"
 
-#: app/community/forms.py:496
+#: app/community/forms.py:498
 msgid "End voting in"
 msgstr "Кінець голосування через"
 
-#: app/community/forms.py:498
+#: app/community/forms.py:500
 msgid "Accept votes from this instance only"
 msgstr "Приймати голоси лише з цього сервера"
 
-#: app/community/forms.py:520
+#: app/community/forms.py:522
 msgid "Polls can't be scheduled more than once"
 msgstr "Запланувати опитування можна лише один раз"
 
-#: app/community/forms.py:529
+#: app/community/forms.py:531
 msgid "Polls need options for people to choose from"
 msgstr "В опитуванні треба з чогось вибирати"
 
-#: app/community/forms.py:532
+#: app/community/forms.py:534
 msgid "Provide at least two choices"
 msgstr "Зазначте принаймні два варіанти"
 
-#: app/community/forms.py:535
+#: app/community/forms.py:537
 msgid "Maximum 15 choices"
 msgstr "Максимум 15 варіантів"
 
-#: app/community/forms.py:540
+#: app/community/forms.py:542
 msgid "Breaks instance rules"
 msgstr "Порушує правила сервера"
 
-#: app/community/forms.py:541
+#: app/community/forms.py:543
 msgid "Abandoned by moderators"
 msgstr "Покинуте модераторами"
 
-#: app/community/forms.py:542
+#: app/community/forms.py:544
 msgid "Cult"
 msgstr "Культ"
 
-#: app/community/forms.py:543
+#: app/community/forms.py:545
 msgid "Scam"
 msgstr "Шахрайство"
 
-#: app/community/forms.py:544
+#: app/community/forms.py:546
 msgid "Alt-right pipeline"
 msgstr "Права пропаганда"
 
-#: app/community/forms.py:545 app/post/forms.py:32
+#: app/community/forms.py:547 app/post/forms.py:32
 msgid "Hate / genocide"
 msgstr "Насилля/геноцид"
 
-#: app/community/forms.py:568 app/community/routes.py:1434
-#: app/templates/community/community_edit.html:97
+#: app/community/forms.py:570 app/community/routes.py:1458
+#: app/templates/community/community_edit.html:98
 #: app/templates/themes/dillo/_side_pane.html:99
 msgid "Delete community"
 msgstr "Видалити спільноту"
 
-#: app/community/forms.py:572
+#: app/community/forms.py:574
 msgid "Accept invitation"
 msgstr "Прийняти запрошення"
 
-#: app/community/forms.py:576
+#: app/community/forms.py:578
 msgid "Full URL"
 msgstr "Повна адреса"
 
-#: app/community/forms.py:579
+#: app/community/forms.py:581
 msgid "Retrieve"
 msgstr "Завантажити"
 
-#: app/community/forms.py:583
+#: app/community/forms.py:585
 msgid "To"
 msgstr "До"
 
-#: app/community/forms.py:584
+#: app/community/forms.py:586
 msgid "Email addresses or fediverse handles, one per line"
 msgstr "Електронна пошта чи адреси в федіверсі, по одній адресі на рядок"
 
-#: app/community/forms.py:586 app/templates/community/invite.html:16
+#: app/community/forms.py:588 app/templates/community/invite.html:16
 msgid "Invite"
 msgstr "Запрошення"
 
-#: app/community/forms.py:590
+#: app/community/forms.py:592
 msgid "Use new lines instead of commas."
 msgstr "Пишіть з нового рядка, не через кому."
 
-#: app/community/forms.py:593
+#: app/community/forms.py:595
 msgid "Maximum of 50 at a time."
 msgstr "Максимум 50 за один раз."
 
-#: app/community/forms.py:597
+#: app/community/forms.py:599
 msgid "The old community is locked"
 msgstr "Стару спільноту замкнено"
 
-#: app/community/forms.py:598
+#: app/community/forms.py:600
 msgid "Move notification post in old community"
 msgstr "Допис у старій спільноті зі сповіщенням про посування"
 
-#: app/community/forms.py:599
+#: app/community/forms.py:601
 msgid "Request move"
 msgstr "Запит на посування"
 
-#: app/community/forms.py:604
+#: app/community/forms.py:606
 msgid "Text color"
 msgstr "Колір тексту"
 
-#: app/community/forms.py:605
+#: app/community/forms.py:607
 msgid "Background color"
 msgstr "Колір тла"
 
-#: app/community/forms.py:606
+#: app/community/forms.py:608
 msgid "Blur images and thumbnails for posts with this flair"
 msgstr "Розмивати зображення й мініатюри дописів із цією позначкою"
 
-#: app/community/forms.py:611
+#: app/community/forms.py:613
 msgid "Block posts with this flair"
 msgstr "Блокувати дописи з цією позначкою"
 
-#: app/community/forms.py:629
+#: app/community/forms.py:631
 msgid "Polling frequency"
 msgstr "Частота опитування"
 
-#: app/community/forms.py:635
+#: app/community/forms.py:637
 msgid "Delete RSS feed"
 msgstr "Видалити RSS-стрічку"
 
-#: app/community/forms.py:639
+#: app/community/forms.py:641
 msgid "Fediverse handles"
 msgstr "Імена з федіверсу"
 
-#: app/community/forms.py:640
+#: app/community/forms.py:642
 msgid "Fediverse handles, such as @person@example.org, one per line"
 msgstr "Імена з федіверсу, як-от @person@example.org, по одному на рядок"
 
-#: app/community/forms.py:642
+#: app/community/forms.py:644
 msgid "Mastodon CSV"
 msgstr "CSV-файл із Mastodon"
 
-#: app/community/forms.py:644 app/instance/routes.py:234
+#: app/community/forms.py:646 app/instance/routes.py:234
 #: app/templates/explore_menu.html:57 app/templates/instance/add_people.html:18
 #: app/templates/instance/add_people.html:21
 msgid "Add people"
@@ -2922,8 +2940,8 @@ msgstr "Створити спільноту"
 msgid "Adding remote communities is restricted to admin and staff users only."
 msgstr "Додавати віддалені спільноти можуть лише адміністрація й персонал."
 
-#: app/community/routes.py:199 app/community/routes.py:2720
-#: app/feed/routes.py:95 app/feed/routes.py:702 app/user/routes.py:2205
+#: app/community/routes.py:199 app/community/routes.py:2744
+#: app/feed/routes.py:95 app/feed/routes.py:702 app/user/routes.py:2222
 msgid ""
 "Sorry, that instance is blocked, check https://gui.fediseer.com/ for "
 "reasons."
@@ -2948,17 +2966,17 @@ msgstr ""
 "Можете скористатися пошуком <a "
 "href=\"https://lemmyverse.net/communities\">Lemmyverse.net</a>."
 
-#: app/community/routes.py:213 app/community/routes.py:2723
+#: app/community/routes.py:213 app/community/routes.py:2747
 msgid "Community not found."
 msgstr "Спільноти не знайдено."
 
-#: app/community/routes.py:215 app/community/routes.py:2726
+#: app/community/routes.py:215 app/community/routes.py:2750
 msgid ""
 "Community not found. If you are searching for a nsfw community it is "
 "blocked by this instance."
 msgstr "Спільноти не знайдено. Якщо шукаєте NSFW-спільноту, цей сервер її блокує."
 
-#: app/community/routes.py:221 app/community/routes.py:2730
+#: app/community/routes.py:221 app/community/routes.py:2754
 #, python-format
 msgid "That community is banned from %(site)s."
 msgstr "%(site)s блокує спільноту."
@@ -2982,9 +3000,9 @@ msgstr "Спільнота блокує вас до %(when)s."
 msgid "You have been banned from this community."
 msgstr "Спільнота блокує вас."
 
-#: app/community/routes.py:577 app/community/routes.py:2114
-#: app/community/routes.py:2166 app/instance/routes.py:302
-#: app/post/routes.py:194 app/post/routes.py:464 app/post/routes.py:2308
+#: app/community/routes.py:577 app/community/routes.py:2138
+#: app/community/routes.py:2190 app/instance/routes.py:302
+#: app/post/routes.py:194 app/post/routes.py:464 app/post/routes.py:2313
 #: app/templates/base.html:272 app/templates/base.html:342
 #: app/templates/chat/conversation.html:36
 #: app/templates/community/community_edit.html:13
@@ -3006,7 +3024,7 @@ msgstr "Спільнота блокує вас."
 #: app/templates/instance/overview.html:13
 #: app/templates/instance/people.html:14 app/templates/tag/tag.html:15
 #: app/templates/themes/dillo/base.html:145
-#: app/templates/topic/show_topic.html:16 app/templates/user/alerts.html:13
+#: app/templates/topic/show_topic.html:20 app/templates/user/alerts.html:13
 #: app/templates/user/block_community.html:14
 #: app/templates/user/block_domain.html:14
 #: app/templates/user/block_instance.html:14
@@ -3035,9 +3053,9 @@ msgstr "Спільнота блокує вас."
 #: app/templates/user/show_upvoted.html:28
 #: app/templates/user/show_upvoted.html:45
 #: app/templates/user/show_upvoted.html:75
-#: app/templates/user/voting_patterns.html:118
-#: app/templates/user/voting_patterns.html:131
-#: app/templates/user/voting_patterns.html:157
+#: app/templates/user/voting_patterns.html:113
+#: app/templates/user/voting_patterns.html:126
+#: app/templates/user/voting_patterns.html:152
 #: app/templates/user/voting_patterns_down.html:26
 #: app/templates/user/voting_patterns_down.html:39
 #: app/templates/user/voting_patterns_down.html:65
@@ -3055,48 +3073,48 @@ msgstr "Домівка"
 msgid "Feeds"
 msgstr "Стрічки"
 
-#: app/community/routes.py:666 app/post/routes.py:307
+#: app/community/routes.py:670 app/post/routes.py:307
 msgid ""
 "This instance no longer online, so posts and comments will only be "
 "visible locally"
 msgstr "Сервер більше не онлайн, тож дописи й коментарі буде видно лише локально"
 
-#: app/community/routes.py:821
+#: app/community/routes.py:827
 #: app/templates/community/community_moderate_subscribers.html:57
 #: app/templates/user/show_profile.html:155
 #: app/templates/user/user_preview.html:23
 msgid "Joined"
 msgstr "Долучається"
 
-#: app/community/routes.py:866 app/shared/tasks/follows.py:51
+#: app/community/routes.py:872 app/shared/tasks/follows.py:51
 msgid "You cannot join this community"
 msgstr "Ви не можете долучитись до цієї спільноти"
 
-#: app/community/routes.py:897 app/community/routes.py:1016
+#: app/community/routes.py:903 app/community/routes.py:1027
 #: app/shared/tasks/follows.py:96
 #, python-format
 msgid "You joined %(community_name)s"
 msgstr "Ви долучилися до «%(community_name)s»"
 
-#: app/community/routes.py:968
+#: app/community/routes.py:979
 #, python-format
 msgid "You left %(community_name)s"
 msgstr "Ви вийшли з «%(community_name)s»"
 
-#: app/community/routes.py:974 app/feed/routes.py:670
+#: app/community/routes.py:985 app/feed/routes.py:670
 msgid "You need to make someone else the owner before unsubscribing."
 msgstr "Перш ніж відписатись, зробіть власником когось іншого."
 
-#: app/community/routes.py:1111
+#: app/community/routes.py:1122
 msgid "At least one image is required for a gallery post."
 msgstr "У галереї має бути хоча б одне зображення."
 
-#: app/community/routes.py:1124
+#: app/community/routes.py:1135
 #, python-format
 msgid "Your post was not accepted because %(reason)s"
 msgstr "Допис відхилено: %(reason)s"
 
-#: app/community/routes.py:1141
+#: app/community/routes.py:1152
 msgid ""
 "Because your account has not posted before we will review your post "
 "before allowing it to be published. Please wait."
@@ -3104,59 +3122,59 @@ msgstr ""
 "Ви ще не надсилали дописів. Тож ми переглянемо допис, перш ніж схвалити "
 "публікацію. Зачекайте, будь ласка."
 
-#: app/community/routes.py:1144
+#: app/community/routes.py:1155
 #, python-format
 msgid ""
 "Your post has been created. <a href=\"/post/%(post_id)d/edit\">Edit "
 "it</a> if you notice any typos!"
 msgstr ""
-"Допис створено. <a href=\"/post/%(post_id)d/edit\">Відредагуйте</a>, якщо "
-"знайдете одрук!"
+"Допис створено. <a href=\"/post/%(post_id)d/edit\">Відредагуйте</a>, якщо"
+" знайдете одрук!"
 
-#: app/community/routes.py:1199
+#: app/community/routes.py:1216
 #, python-format
 msgid "This community prefers posts in %(language_names)s"
 msgstr "Мови спільноти: %(language_names)s"
 
-#: app/community/routes.py:1201
+#: app/community/routes.py:1218
 msgid "Add post to community"
 msgstr "Додати пост до спільноти"
 
-#: app/community/routes.py:1229
+#: app/community/routes.py:1251
 msgid "A community has been reported"
 msgstr "Надіслано скаргу на спільноту"
 
-#: app/community/routes.py:1242
+#: app/community/routes.py:1264
 msgid "Community has been reported, thank you!"
 msgstr "Скаргу на спільноту надіслано, дякуємо!"
 
-#: app/community/routes.py:1245
+#: app/community/routes.py:1267
 msgid "Report community"
 msgstr "Скарга на спільноту"
 
-#: app/community/routes.py:1382
+#: app/community/routes.py:1406
 msgid "Icon removed!"
 msgstr "Піктограму вилучено!"
 
-#: app/community/routes.py:1398 app/user/routes.py:440
+#: app/community/routes.py:1422 app/user/routes.py:443
 msgid "Banner removed!"
 msgstr "Банери вилучено!"
 
-#: app/community/routes.py:1406 app/templates/_side_pane.html:155
+#: app/community/routes.py:1430 app/templates/_side_pane.html:155
 msgid "Disable theme"
 msgstr "Вимкнути тему"
 
-#: app/community/routes.py:1411 app/templates/_side_pane.html:155
+#: app/community/routes.py:1435 app/templates/_side_pane.html:155
 msgid "Enable theme"
 msgstr "Увімкнути тему"
 
-#: app/community/routes.py:1454
+#: app/community/routes.py:1478
 #: app/templates/community/community_mod_list.html:43
 #, python-format
 msgid "Moderators for %(community)s"
 msgstr "Модератори «%(community)s»"
 
-#: app/community/routes.py:1507
+#: app/community/routes.py:1531
 msgid ""
 "A community must have one or more owners. Make someone else an owner "
 "before removing this owner."
@@ -3164,150 +3182,149 @@ msgstr ""
 "Спільнота мусить мати власника. Перш ніж вилучити цього власника, зробіть"
 " власником когось іще."
 
-#: app/community/routes.py:1561
+#: app/community/routes.py:1585
 #: app/templates/community/community_find_moderator.html:14
 #, python-format
 msgid "Add moderator to %(community)s"
 msgstr "Додати модератора «%(community)s»"
 
-#: app/community/routes.py:1591 app/post/routes.py:1466 app/user/routes.py:1714
+#: app/community/routes.py:1615 app/post/routes.py:1476 app/user/routes.py:1731
 #, python-format
 msgid "Posts in %(name)s will be hidden."
 msgstr "Дописи %(name)s буде сховано."
 
-#: app/community/routes.py:1638
+#: app/community/routes.py:1662
 #, python-format
 msgid "%(name)s has been banned."
 msgstr "%(name)s блокується."
 
-#: app/community/routes.py:1645
+#: app/community/routes.py:1669
 #, python-format
 msgid "Posts by %(name)s have been deleted."
 msgstr "Дописи %(name)s видалено."
 
-#: app/community/routes.py:1651
+#: app/community/routes.py:1675
 #, python-format
 msgid "Comments by %(name)s have been deleted."
 msgstr "Коментарі %(name)s видалено."
 
-#: app/community/routes.py:1686
+#: app/community/routes.py:1710
 msgid "Ban from community"
 msgstr "Блокувати в спільноті"
 
-#: app/community/routes.py:1712
+#: app/community/routes.py:1736
 #, python-format
 msgid "%(name)s has been unbanned."
 msgstr "%(name)s більше не блокується."
 
-#: app/community/routes.py:1800
+#: app/community/routes.py:1824
 msgid "Your request has been sent to the site admins."
 msgstr "Запит надіслано адміністрації."
 
-#: app/community/routes.py:1833 app/community/routes.py:1993
+#: app/community/routes.py:1857 app/community/routes.py:2017
 #, python-format
 msgid "Moderation of %(community)s"
 msgstr "Модерування %(community)s"
 
-#: app/community/routes.py:1854
+#: app/community/routes.py:1878
 #, python-format
 msgid "RSS feeds for %(community)s"
 msgstr "RSS-стрічки %(community)s"
 
-#: app/community/routes.py:1897
+#: app/community/routes.py:1921
 #, python-format
 msgid "Edit rss feed %(name)s"
 msgstr "Редагувати RSS-стрічку %(name)s"
 
-#: app/community/routes.py:1897
+#: app/community/routes.py:1921
 #: app/templates/community/community_rss_feeds.html:22
 msgid "Add RSS feed"
 msgstr "Додати RSS-стрічку"
 
-#: app/community/routes.py:1919 app/templates/translation.html:1
+#: app/community/routes.py:1943 app/templates/translation.html:1
 msgid "Are you sure?"
 msgstr "Точно?"
 
-#: app/community/routes.py:1920
+#: app/community/routes.py:1944
 msgid "Deleting this feed will also delete any posts created from it."
-msgstr ""
-"Якщо видалити стрічку, створені на її основі дописи також буде видалено."
+msgstr "Якщо видалити стрічку, створені на її основі дописи також буде видалено."
 
-#: app/community/routes.py:2059
+#: app/community/routes.py:2083
 msgid "Community Wiki"
 msgstr "Вікі спільноти"
 
-#: app/community/routes.py:2093
+#: app/community/routes.py:2117
 #: app/templates/community/community_wiki_list.html:26
 msgid "Add wiki page"
 msgstr "Додати вікісторінку"
 
-#: app/community/routes.py:2226
+#: app/community/routes.py:2250
 msgid "Reverted to old version of the page."
 msgstr "Стару версію сторінки відновлено."
 
-#: app/community/routes.py:2266
+#: app/community/routes.py:2290
 msgid "Edit wiki page"
 msgstr "Редагувати вікісторінку"
 
-#: app/community/routes.py:2291
+#: app/community/routes.py:2315
 #, python-format
 msgid "%(title)s revisions"
 msgstr "Версії «%(title)s»"
 
-#: app/community/routes.py:2312
+#: app/community/routes.py:2336
 msgid "Page deleted"
 msgstr "Сторінку видалено"
 
-#: app/community/routes.py:2340
+#: app/community/routes.py:2364
 #, python-format
 msgid "Mod Log of %(community)s"
 msgstr "Журнал модерування %(community)s"
 
-#: app/community/routes.py:2369
+#: app/community/routes.py:2393
 msgid "Admin has been notified about this report."
 msgstr "Адміністрація отримає сповіщення про цю скаргу."
 
-#: app/community/routes.py:2419
+#: app/community/routes.py:2443
 msgid "Report resolved."
 msgstr "Скаргу задоволено."
 
-#: app/community/routes.py:2459
+#: app/community/routes.py:2483
 msgid "Report ignored."
 msgstr "Скаргу відхилено."
 
-#: app/community/routes.py:2488
+#: app/community/routes.py:2512
 #, python-format
 msgid "Set your flair in %(community_name)s"
 msgstr "Налаштуйте собі позначку в %(community_name)s"
 
-#: app/community/routes.py:2506 app/templates/community/community_flair.html:21
+#: app/community/routes.py:2530 app/templates/community/community_flair.html:21
 #, python-format
 msgid "Flair in %(community)s"
 msgstr "Позначка в %(community)s"
 
-#: app/community/routes.py:2531
+#: app/community/routes.py:2555
 msgid "Flair added."
 msgstr "Позначку додано."
 
-#: app/community/routes.py:2533
+#: app/community/routes.py:2557
 msgid "Flair updated."
 msgstr "Позначку оновлено."
 
-#: app/community/routes.py:2553
+#: app/community/routes.py:2577
 #, python-format
 msgid "Edit %(flair_name)s in %(community_name)s"
 msgstr "Редагувати %(flair_name)s у %(community_name)s"
 
-#: app/community/routes.py:2555
+#: app/community/routes.py:2579
 #, python-format
 msgid "Add flair in %(community_name)s"
 msgstr "Додати позначку в %(community_name)s"
 
-#: app/community/routes.py:2575
+#: app/community/routes.py:2599
 msgid "Flair deleted."
 msgstr "Позначку видалено."
 
-#: app/community/routes.py:2609
+#: app/community/routes.py:2633
 msgid ""
 "You are being unsubscribed from all communities and feeds. Please allow a"
 " couple minutes for the process to complete."
@@ -3315,15 +3332,15 @@ msgstr ""
 "Ви відписуєтесь від усіх спільнот і стрічок. Зачекайте кілька хвилин, "
 "поки цей процес завершиться."
 
-#: app/community/routes.py:2626
+#: app/community/routes.py:2650
 msgid "Sorry your account is too new to do this."
 msgstr "На жаль, ваш обліковий запис надто новий для цього."
 
-#: app/community/routes.py:2631
+#: app/community/routes.py:2655
 msgid "Sorry, you cannot invite people to this community."
 msgstr "На жаль, вам не можна запрошувати людей до цієї спільноти."
 
-#: app/community/routes.py:2653
+#: app/community/routes.py:2677
 #, python-format
 msgid "Invited %(num)d person"
 msgid_plural "Invited %(num)d people"
@@ -3331,7 +3348,7 @@ msgstr[0] "Запрошено %(num)d людину"
 msgstr[1] "Запрошено %(num)d людей"
 msgstr[2] "Запрошено %(num)d людей"
 
-#: app/community/routes.py:2654
+#: app/community/routes.py:2678
 #, python-format
 msgid "using %(num)d chat message"
 msgid_plural "using %(num)d chat messages"
@@ -3339,7 +3356,7 @@ msgstr[0] "за допомогою %(num)d повідомлення в чата�
 msgstr[1] "за допомогою %(num)d повідомлень у чатах"
 msgstr[2] "за допомогою %(num)d повідомлень у чатах"
 
-#: app/community/routes.py:2655
+#: app/community/routes.py:2679
 #, python-format
 msgid "and %(num)d email"
 msgid_plural "and %(num)d emails"
@@ -3347,7 +3364,7 @@ msgstr[0] "та %(num)d електронного листа"
 msgstr[1] "та %(num)d електронних листів"
 msgstr[2] "та %(num)d електронних листів"
 
-#: app/community/routes.py:2659
+#: app/community/routes.py:2683
 #, python-format
 msgid ""
 "This community can only be accessed by people who have a %(domain)s "
@@ -3358,41 +3375,41 @@ msgstr ""
 "запису на іншому сервері недостатньо — щоб долучитися, слід створити "
 "обліковий запис ще й тут."
 
-#: app/community/routes.py:2660
+#: app/community/routes.py:2684
 msgid "Invite to community"
 msgstr "Запросити до спільноти"
 
-#: app/community/routes.py:2674
+#: app/community/routes.py:2698
 #, python-format
 msgid "Ask %(token)s to send an invite to %(current_user)s"
 msgstr "Попрохати %(token)s надіслати запрошення %(current_user)s"
 
-#: app/community/routes.py:2681
+#: app/community/routes.py:2705
 msgid "You are already a member."
 msgstr "Ви вже долучились."
 
-#: app/community/routes.py:2695
+#: app/community/routes.py:2719
 #, python-format
 msgid "Accept invitation to %(community_name)s"
 msgstr "Прийняти запрошення до %(community_name)s"
 
-#: app/community/routes.py:2733
+#: app/community/routes.py:2757
 msgid "Search result for remote community"
 msgstr "Віддалена спільнота в результатах пошуку"
 
-#: app/community/routes.py:2737
+#: app/community/routes.py:2761
 msgid "Searching for remote communities requires login"
 msgstr "Увійдіть, щоб шукати віддалені спільноти"
 
-#: app/community/routes.py:2794
+#: app/community/routes.py:2818
 msgid "Community membership"
 msgstr "Членство в спільноті"
 
-#: app/community/routes.py:2841
+#: app/community/routes.py:2850
 msgid "This function is only for admins"
 msgstr "Функція лише для адміністраторів"
 
-#: app/community/routes.py:2847
+#: app/community/routes.py:2856
 msgid "This is a local community"
 msgstr "Це місцева спільнота"
 
@@ -3460,26 +3477,26 @@ msgstr "Корисний контекст"
 msgid "Recommendation"
 msgstr "Рекомендація"
 
-#: app/domain/routes.py:197
+#: app/domain/routes.py:199
 msgid "All domains have been unbanned."
 msgstr "Усі домени розблоковано."
 
-#: app/domain/routes.py:208
+#: app/domain/routes.py:210
 #, python-format
 msgid "%(name)s blocked."
 msgstr "%(name)s блокується."
 
-#: app/domain/routes.py:226
+#: app/domain/routes.py:228
 #, python-format
 msgid "%(name)s un-blocked."
 msgstr "%(name)s більше не блокується."
 
-#: app/domain/routes.py:251 app/tag/routes.py:207
+#: app/domain/routes.py:253 app/tag/routes.py:211
 #, python-format
 msgid "%(name)s banned for all users and all content deleted."
 msgstr "«%(name)s» заблоковано для всіх користувачів. Усі дописи видалено."
 
-#: app/domain/routes.py:263 app/tag/routes.py:219
+#: app/domain/routes.py:265 app/tag/routes.py:223
 #, python-format
 msgid "%(name)s un-banned for all users."
 msgstr "«%(name)s» розблоковано для всіх користувачів."
@@ -3618,9 +3635,9 @@ msgstr "Люди з %(instance)s"
 #: app/templates/user/show_upvoted.html:29
 #: app/templates/user/show_upvoted.html:46
 #: app/templates/user/show_upvoted.html:76
-#: app/templates/user/voting_patterns.html:119
-#: app/templates/user/voting_patterns.html:132
-#: app/templates/user/voting_patterns.html:158
+#: app/templates/user/voting_patterns.html:114
+#: app/templates/user/voting_patterns.html:127
+#: app/templates/user/voting_patterns.html:153
 #: app/templates/user/voting_patterns_down.html:27
 #: app/templates/user/voting_patterns_down.html:40
 #: app/templates/user/voting_patterns_down.html:66
@@ -3661,82 +3678,82 @@ msgstr "Спільнота, з якою слід поділитись посил
 msgid "Next"
 msgstr "Далі"
 
-#: app/main/routes.py:188 app/main/routes.py:193
+#: app/main/routes.py:190 app/main/routes.py:195
 msgid "Local posts"
 msgstr "Місцеві дописи"
 
-#: app/main/routes.py:192 app/templates/_view_filter_nav.html:7
+#: app/main/routes.py:194 app/templates/_view_filter_nav.html:7
 #: app/templates/_view_filter_nav.html:20
 #: app/templates/themes/dillo/_view_filter_nav.html:4
 msgid "Posts from joined communities"
 msgstr "Дописи з ваших спільнот"
 
-#: app/main/routes.py:194 app/templates/_view_filter_nav.html:10
+#: app/main/routes.py:196 app/templates/_view_filter_nav.html:10
 #: app/templates/_view_filter_nav.html:24
 #: app/templates/themes/dillo/_view_filter_nav.html:11
 msgid "Posts from popular communities"
 msgstr "Дописи з популярних спільнот"
 
-#: app/main/routes.py:195
+#: app/main/routes.py:197
 msgid "All posts"
 msgstr "Усі дописи"
 
-#: app/main/routes.py:258 app/templates/explore_menu.html:45
+#: app/main/routes.py:260 app/templates/explore_menu.html:45
 #: app/templates/themes/dillo/base.html:73
 #: app/templates/themes/dillo/base.html:98 app/templates/topics_menu.html:9
 msgid "Browse by topic"
 msgstr "Переглянути за темою"
 
-#: app/main/routes.py:539
+#: app/main/routes.py:541
 msgid "Moderation Log"
 msgstr "Журнал модерування"
 
-#: app/main/routes.py:913
+#: app/main/routes.py:916
 #, python-format
 msgid "Failed to look up %(url)s"
 msgstr "Помилка пошуку %(url)s"
 
-#: app/main/routes.py:927
+#: app/main/routes.py:930
 msgid "Protocol handler"
 msgstr "Обробник протоколу"
 
-#: app/main/routes.py:1062
+#: app/main/routes.py:1065
 msgid "Please click the link in your email inbox to verify your account."
 msgstr "Щоб підтвердити обліковий запис, натисніть посилання в електронному листі."
 
-#: app/main/routes.py:1331
+#: app/main/routes.py:1336
 msgid "<a href=\"/r/random\">Try another random community</a>"
 msgstr "<a href=\"/r/random\">Глянути іншу довільну спільноту</a>"
 
-#: app/main/routes.py:1334 app/main/routes.py:1362
+#: app/main/routes.py:1339 app/main/routes.py:1367
 msgid "No communities found."
 msgstr "Спільнот не знайдено."
 
-#: app/main/routes.py:1359
+#: app/main/routes.py:1364
 msgid "<a href=\"/r/randnsfw\">Try another random community</a>"
 msgstr "<a href=\"/r/randnsfw\">Глянути іншу довільну спільноту</a>"
 
-#: app/main/routes.py:1373
+#: app/main/routes.py:1378
 msgid "Content warning"
 msgstr "Чутливий вміст"
 
-#: app/main/routes.py:1401
+#: app/main/routes.py:1406
 msgid "You took too long to respond so your account has been flagged as a bot."
 msgstr "Ви надто довго не відповідали, тож ваш обліковий запис позначено як бота."
 
-#: app/main/routes.py:1405
+#: app/main/routes.py:1410
 msgid "Thanks!"
 msgstr "Спасибі!"
 
-#: app/main/routes.py:1406
+#: app/main/routes.py:1411
 msgid "You have confirmed that your account is operated by a human."
 msgstr "Ви підтвердили, що обліковим записом керує людина."
 
-#: app/main/routes.py:1414
+#: app/main/routes.py:1419
 msgid "This page is intentionally left blank."
 msgstr "Сторінка зумисне порожня."
 
-#: app/main/routes.py:1414
+#: app/main/routes.py:1419
 msgid "We don't track you, so there's not much data to make graphs of."
 msgstr "Ми не стежимо за вами, тож робити графіки нема з чого."
 
@@ -3760,7 +3777,7 @@ msgstr "«ШІ»-вміст потребує позначки"
 msgid "Sharing personal info - doxing"
 msgstr "Розголошує особисті дані — доксинг"
 
-#: app/post/forms.py:57 app/post/routes.py:1517
+#: app/post/forms.py:57 app/post/routes.py:1527
 #: app/templates/post/post_mea_culpa.html:13
 msgid "I changed my mind"
 msgstr "Тепер я іншої думки"
@@ -3803,7 +3820,7 @@ msgstr "Домен Mastodon-сервера"
 #: app/post/forms.py:121 app/templates/post/_post_full.html:518
 #: app/templates/post/post_options.html:45
 #: app/templates/post/post_options.html:223
-#: app/templates/user/voting_patterns.html:45
+#: app/templates/user/voting_patterns.html:40
 msgid "Share"
 msgstr "Поділитись"
 
@@ -3867,11 +3884,6 @@ msgstr "Голос надіслано."
 msgid "This comment has been deleted and is only visible to staff and admins."
 msgstr "Коментар видалено. Його видно лише персоналу й адміністрації."
 
-#: app/post/routes.py:720 app/post/routes.py:846
-#, python-format
-msgid "Discussing %(title)s"
-msgstr "Обговорення «%(title)s»"
-
 #: app/post/routes.py:807 app/post/routes.py:869
 msgid "Comments have been disabled."
 msgstr "Коментарі вимкнено."
@@ -3889,61 +3901,61 @@ msgstr "Вам не можна коментувати в цій спільнот
 msgid "This comment cannot be replied to."
 msgstr "Відповісти на коментар не можна."
 
-#: app/post/routes.py:984
+#: app/post/routes.py:999
 msgid "Something went wrong and a post could not be found."
 msgstr "Щось пішло не так. Допису не знайдено."
 
-#: app/post/routes.py:1079
+#: app/post/routes.py:1089
 #, python-format
 msgid ""
 "Your changes have been saved. <a href=\"/post/%(post_id)d/edit\">Edit "
 "it</a> if you notice any typos!"
 msgstr ""
-"Зміни збережено. <a href=\"/post/%(post_id)d/edit\">Відредагуйте</a>, якщо "
-"знайдете одрук!"
+"Зміни збережено. <a href=\"/post/%(post_id)d/edit\">Відредагуйте</a>, "
+"якщо знайдете одрук!"
 
-#: app/post/routes.py:1081
+#: app/post/routes.py:1091
 #, python-format
 msgid "Your edit was not accepted because %(reason)s"
 msgstr "Редагування відхилено: %(reason)s"
 
-#: app/post/routes.py:1162 app/templates/post/post_edit.html:123
+#: app/post/routes.py:1172 app/templates/post/post_edit.html:132
 msgid "Edit post"
 msgstr "Редагувати допис"
 
-#: app/post/routes.py:1186
+#: app/post/routes.py:1196
 msgid "Post deleted."
 msgstr "Допис видалено."
 
-#: app/post/routes.py:1197
+#: app/post/routes.py:1207
 #, python-format
 msgid "Are you sure you want to delete the post \"%(post_title)s\"?"
 msgstr "Точно видалити допис «%(post_title)s»?"
 
-#: app/post/routes.py:1212
+#: app/post/routes.py:1222
 msgid "Post has been restored."
 msgstr "Допис відновлено."
 
-#: app/post/routes.py:1226
+#: app/post/routes.py:1236
 msgid "Post purged."
 msgstr "Допис стерто."
 
-#: app/post/routes.py:1298 app/post/routes.py:1323
+#: app/post/routes.py:1308 app/post/routes.py:1333
 #, python-format
 msgid "Reminder added for %(when)s"
 msgstr "Додано нагадування %(when)s"
 
-#: app/post/routes.py:1303
+#: app/post/routes.py:1313
 #, python-format
 msgid "Creating a reminder about \"%(post_title)s\""
 msgstr "Створення нагадування про «%(post_title)s»"
 
-#: app/post/routes.py:1328
+#: app/post/routes.py:1338
 #, python-format
 msgid "Creating a reminder about comment by %(author)s on \"%(post_title)s\""
 msgstr "Створення нагадування про коментар %(author)s до «%(post_title)s»"
 
-#: app/post/routes.py:1386
+#: app/post/routes.py:1396
 msgid ""
 "Moderators have already assessed reports regarding this post, no further "
 "reports are necessary."
@@ -3951,85 +3963,85 @@ msgstr ""
 "Модератори вже розглянули скарги на допис. Скаржитися додатково не "
 "потрібно."
 
-#: app/post/routes.py:1390
+#: app/post/routes.py:1400
 msgid "Post has already been reported, thank you!"
 msgstr "На допис уже поскаржились, дякуємо!"
 
-#: app/post/routes.py:1394
+#: app/post/routes.py:1404
 msgid "Post has been reported, thank you!"
 msgstr "Скаргу на допис надіслано, дякуємо!"
 
-#: app/post/routes.py:1399
+#: app/post/routes.py:1409
 msgid "Report post"
 msgstr "Скарга на допис"
 
-#: app/post/routes.py:1410 app/post/routes.py:1810 app/user/routes.py:1669
+#: app/post/routes.py:1420 app/post/routes.py:1820 app/user/routes.py:1686
 #, python-format
 msgid "%(name)s has been blocked."
 msgstr "%(name)s блокується."
 
-#: app/post/routes.py:1441 app/user/routes.py:1748
+#: app/post/routes.py:1451 app/user/routes.py:1765
 #, python-format
 msgid "Posts linking to %(name)s will be hidden."
 msgstr "Дописи з посиланнями на %(name)s буде сховано."
 
-#: app/post/routes.py:1488 app/post/routes.py:1839 app/user/routes.py:966
-#: app/user/routes.py:1776
+#: app/post/routes.py:1498 app/post/routes.py:1849 app/user/routes.py:969
+#: app/user/routes.py:1793
 #, python-format
 msgid "Content from %(name)s will be hidden."
 msgstr "Дописи з %(name)s буде сховано."
 
-#: app/post/routes.py:1527
+#: app/post/routes.py:1537
 #, python-format
 msgid "%(name)s has been stickied."
 msgstr "%(name)s закріплено."
 
-#: app/post/routes.py:1529
+#: app/post/routes.py:1539
 #, python-format
 msgid "%(name)s has been un-stickied."
 msgstr "%(name)s відкріплено."
 
-#: app/post/routes.py:1541
+#: app/post/routes.py:1551
 #, python-format
 msgid "%(name)s has been stickied to the instance."
 msgstr "%(name)s закріплено на сервері."
 
-#: app/post/routes.py:1544
+#: app/post/routes.py:1554
 #, python-format
 msgid "%(name)s has been un-stickied from the instance."
 msgstr "%(name)s відкріплено на сервері."
 
-#: app/post/routes.py:1562
+#: app/post/routes.py:1572
 #, python-format
 msgid "%(name)s has been hidden."
 msgstr "%(name)s сховано."
 
-#: app/post/routes.py:1564
+#: app/post/routes.py:1574
 #, python-format
 msgid "%(name)s has been un-hidden."
 msgstr "%(name)s більше не сховано."
 
-#: app/post/routes.py:1639
+#: app/post/routes.py:1649
 #, python-format
 msgid "Set flair for %(post_title)s"
 msgstr "Налаштувати позначку «%(post_title)s»"
 
-#: app/post/routes.py:1684 app/post/routes.py:2430 app/post/routes.py:2469
-#: app/post/routes.py:2479 app/user/routes.py:2136 app/user/routes.py:2159
-#: app/user/routes.py:2183 app/user/routes.py:2446 app/user/routes.py:2470
+#: app/post/routes.py:1694 app/post/routes.py:2435 app/post/routes.py:2474
+#: app/post/routes.py:2484 app/user/routes.py:2153 app/user/routes.py:2176
+#: app/user/routes.py:2200 app/user/routes.py:2462 app/user/routes.py:2486
 msgid "Done"
 msgstr "Готово"
 
-#: app/post/routes.py:1722 app/post/routes.py:2303
+#: app/post/routes.py:1732 app/post/routes.py:2308
 msgid "Could not find that community."
 msgstr "Спільноти не знайдено."
 
-#: app/post/routes.py:1725 app/templates/post/post_move.html:14
+#: app/post/routes.py:1735 app/templates/post/post_move.html:14
 #, python-format
 msgid "Move \"%(post_title)s\""
 msgstr "Посунути «%(post_title)s»"
 
-#: app/post/routes.py:1782
+#: app/post/routes.py:1792
 msgid ""
 "Moderators have already assessed reports regarding this comment, no "
 "further reports are necessary."
@@ -4037,61 +4049,61 @@ msgstr ""
 "Модератори вже розглянули скарги на коментар. Скаржитися додатково не "
 "потрібно."
 
-#: app/post/routes.py:1787
+#: app/post/routes.py:1797
 msgid "Comment has already been reported, thank you!"
 msgstr "На коментар уже поскаржились, дякуємо!"
 
-#: app/post/routes.py:1792
+#: app/post/routes.py:1802
 msgid "Comment has been reported, thank you!"
 msgstr "Скаргу на коментар надіслано, дякуємо!"
 
-#: app/post/routes.py:1797
+#: app/post/routes.py:1807
 msgid "Report comment"
 msgstr "Скарга на коментар"
 
-#: app/post/routes.py:1888 app/templates/post/_post_reply_source_swap.html:7
+#: app/post/routes.py:1898 app/templates/post/_post_reply_source_swap.html:7
 #: app/templates/post/_post_source_swap.html:7
 msgid "Something went wrong and a comment could not be found."
 msgstr "Щось пішло не так. Коментаря не знайдено."
 
-#: app/post/routes.py:1934
+#: app/post/routes.py:1939
 msgid "Edit comment"
 msgstr "Редагувати коментар"
 
-#: app/post/routes.py:1956
+#: app/post/routes.py:1961
 msgid "Delete all my comments in this chain"
 msgstr "Видалити всі мої коментарі в цьому ланцюжку"
 
-#: app/post/routes.py:1996
+#: app/post/routes.py:2001
 #, python-format
 msgid "Deleted %(num_deleted)s comments."
 msgstr "Видалено коментарів: %(num_deleted)s."
 
-#: app/post/routes.py:1999
+#: app/post/routes.py:2004
 msgid "Are you sure you want to delete this comment?"
 msgstr "Точно видалити коментар?"
 
-#: app/post/routes.py:2025 app/shared/reply.py:287 app/shared/reply.py:457
+#: app/post/routes.py:2030 app/shared/reply.py:287 app/shared/reply.py:462
 msgid "Comment restored."
 msgstr "Коментар відновлено."
 
-#: app/post/routes.py:2102
+#: app/post/routes.py:2107
 msgid "Comment purged."
 msgstr "Коментар стерто."
 
-#: app/post/routes.py:2104
+#: app/post/routes.py:2109
 msgid "Comments that have been replied to cannot be purged."
 msgstr "Коментарі, на які є відповіді, стерти неможливо."
 
-#: app/post/routes.py:2157
+#: app/post/routes.py:2162
 msgid "Image blocked. Now delete matching posts."
 msgstr "Зображення блокується. Тепер видаліть пов'язані дописи."
 
-#: app/post/routes.py:2164
+#: app/post/routes.py:2169
 msgid "Are you sure you want to block this image?"
 msgstr "Точно блокувати зображення?"
 
-#: app/post/routes.py:2165
+#: app/post/routes.py:2170
 msgid ""
 "All posts that use this image will be deleted and future posts of the "
 "image will be rejected."
@@ -4099,27 +4111,27 @@ msgstr ""
 "Всі дописи з цим зображенням буде видалено. Майбутні дописи з цим "
 "зображенням буде відхилено."
 
-#: app/post/routes.py:2221 app/post/routes.py:2250
+#: app/post/routes.py:2226 app/post/routes.py:2255
 msgid "Voting Activity"
 msgstr "Історія голосування"
 
-#: app/post/routes.py:2319
+#: app/post/routes.py:2324
 msgid "Cross post"
 msgstr "Перехресне розміщення"
 
-#: app/post/routes.py:2405
+#: app/post/routes.py:2410
 msgid "Set AI flag on this post"
 msgstr "Позначити допис «ШІ»"
 
-#: app/post/routes.py:2421 app/post/routes.py:2461
+#: app/post/routes.py:2426 app/post/routes.py:2466
 msgid "Not configured."
 msgstr "Не налаштовано."
 
-#: app/post/routes.py:2459
+#: app/post/routes.py:2464
 msgid "Body text is too short to be sure."
 msgstr "Текст закороткий."
 
-#: app/post/routes.py:2494 app/templates/post/_post_full.html:521
+#: app/post/routes.py:2499 app/templates/post/_post_full.html:521
 msgid "Share on Mastodon"
 msgstr "Поділитись у Mastodon"
 
@@ -4181,17 +4193,17 @@ msgstr ""
 msgid "You cannot leave your own feed"
 msgstr "Неможливо відписатись від власної стрічки"
 
-#: app/shared/post.py:1117
+#: app/shared/post.py:1146
 #, python-format
 msgid "%(name)s has been locked."
 msgstr "%(name)s замкнено."
 
-#: app/shared/post.py:1121
+#: app/shared/post.py:1150
 #, python-format
 msgid "%(name)s has been unlocked."
 msgstr "%(name)s відімкнено."
 
-#: app/shared/post.py:1148
+#: app/shared/post.py:1177
 #, python-format
 msgid "%(name)s has been moved."
 msgstr "%(name)s посунуто."
@@ -4200,38 +4212,38 @@ msgstr "%(name)s посунуто."
 msgid "Your comment has been added."
 msgstr "Коментар додано."
 
-#: app/shared/reply.py:230 app/user/routes.py:392 app/user/routes.py:662
-#: app/user/routes.py:832 app/user/routes.py:1524 app/user/routes.py:1573
-#: app/user/routes.py:1601 app/user/routes.py:2093
+#: app/shared/reply.py:230 app/user/routes.py:395 app/user/routes.py:665
+#: app/user/routes.py:835 app/user/routes.py:1541 app/user/routes.py:1590
+#: app/user/routes.py:1618 app/user/routes.py:2110
 msgid "Your changes have been saved."
 msgstr "Зміни збережено."
 
-#: app/shared/reply.py:421
+#: app/shared/reply.py:426
 msgid "Comment deleted."
 msgstr "Коментар видалено."
 
-#: app/shared/reply.py:498
+#: app/shared/reply.py:503
 msgid "Comment has been locked."
 msgstr "Коментар замкнено."
 
-#: app/shared/reply.py:502
+#: app/shared/reply.py:507
 msgid "Comment has been unlocked."
 msgstr "Коментар відімкнено."
 
-#: app/shared/reply.py:523
+#: app/shared/reply.py:528
 msgid "Comment is collapsible."
 msgstr "Коментар можна згорнути."
 
-#: app/shared/reply.py:527
+#: app/shared/reply.py:532
 msgid "Comment will not be collapsed when loading the post."
 msgstr "Коментар не буде згорнуто при завантаженні допису."
 
-#: app/shared/reply.py:543
+#: app/shared/reply.py:548
 #, python-format
 msgid "Your answer was chosen as an answer to %(post_title)s"
 msgstr "Вашу відповідь обрано як основну відповідь на %(post_title)s"
 
-#: app/shared/user.py:30 app/user/routes.py:922 app/user/routes.py:1658
+#: app/shared/user.py:30 app/user/routes.py:925 app/user/routes.py:1675
 msgid "You cannot block yourself."
 msgstr "Неможливо блокувати себе."
 
@@ -4239,15 +4251,15 @@ msgstr "Неможливо блокувати себе."
 msgid "You cannot block admin or staff."
 msgstr "Неможливо блокувати адміністратора чи когось із персоналу."
 
-#: app/shared/user.py:71 app/user/routes.py:997
+#: app/shared/user.py:71 app/user/routes.py:1000
 msgid "You cannot unblock yourself."
 msgstr "Неможливо розблокувати себе."
 
-#: app/shared/user.py:162
+#: app/shared/user.py:163
 msgid "Purged user was a remote instance admin."
 msgstr "Стертий користувач адмініструє віддалений сервер."
 
-#: app/shared/user.py:164
+#: app/shared/user.py:165
 msgid "Purged user with role permissions."
 msgstr "Стерто користувача з дозволами ролі."
 
@@ -4260,25 +4272,25 @@ msgstr ""
 "%(actor)s блокується. Весь їхній вміст видаляється. Зачекайте кілька "
 "хвилин."
 
-#: app/shared/user.py:183
+#: app/shared/user.py:176
 #, python-format
 msgid "%(actor)s has been banned, deleted and all their content deleted."
 msgstr "%(actor)s блокується. Весь їхній вміст видаляється."
 
-#: app/shared/user.py:193
+#: app/shared/user.py:186
 msgid "Banned user was a remote instance admin."
 msgstr "Блокований користувач адмініструє віддалений сервер."
 
-#: app/shared/user.py:195
+#: app/shared/user.py:188
 msgid "Banned user with role permissions."
 msgstr "Заблоковано користувача з дозволами ролі."
 
-#: app/shared/user.py:197
+#: app/shared/user.py:190
 #, python-format
 msgid "%(actor)s has been banned."
 msgstr "%(actor)s блокується."
 
-#: app/shared/user.py:255
+#: app/shared/user.py:248
 msgid "Someone wants to follow you"
 msgstr "Хтось хоче на вас підписатись"
 
@@ -4499,16 +4511,16 @@ msgstr "Раціональне спілкування"
 
 #: app/templates/_insert_image_dialog.html:4
 #: app/templates/community/_body_edit_preview.html:11
-#: app/templates/post/add_reply_inline.html:43 app/templates/post/post.html:119
+#: app/templates/post/add_reply_inline.html:48 app/templates/post/post.html:123
 #: app/templates/post/post_reply_edit.html:45
 msgid "Insert image"
 msgstr "Додати зображення"
 
 #: app/templates/_insert_image_dialog.html:5
 #: app/templates/auth/instance_chooser.html:78
-#: app/templates/auth/instance_chooser.html:132
-#: app/templates/auth/instance_chooser.html:144
-#: app/templates/auth/instance_chooser.html:160 app/templates/base.html:358
+#: app/templates/auth/instance_chooser.html:131
+#: app/templates/auth/instance_chooser.html:143
+#: app/templates/auth/instance_chooser.html:159 app/templates/base.html:358
 #: app/templates/base.html:379
 msgid "Close"
 msgstr "Закрити"
@@ -4584,7 +4596,7 @@ msgstr "Нотатка про користувача: %(note)s"
 #: app/templates/community/add_post.html:3
 #: app/templates/feed/_feed_nav.html:142 app/templates/feed/show_feed.html:153
 #: app/templates/themes/dillo/_side_pane.html:17
-#: app/templates/topic/show_topic.html:93
+#: app/templates/topic/show_topic.html:97
 msgid "Create post"
 msgstr "Новий допис"
 
@@ -4604,7 +4616,7 @@ msgid "Pending"
 msgstr "У черзі"
 
 #: app/templates/_side_pane.html:21
-#: app/templates/auth/instance_chooser.html:342
+#: app/templates/auth/instance_chooser.html:341
 #: app/templates/community/_community_nav.html:141
 #: app/templates/community/_join_button.html:3
 #: app/templates/community/add_remote.html:53
@@ -4630,10 +4642,10 @@ msgstr "Долучитися"
 #: app/templates/themes/dillo/_side_pane.html:96
 #: app/templates/themes/dillo/base.html:50 app/templates/user/_user_nav.html:5
 #: app/templates/user/_user_nav.html:17 app/templates/user/post_timing.html:91
-#: app/templates/user/show_profile.html:367
-#: app/templates/user/show_upvoted.html:112
-#: app/templates/user/voting_patterns.html:185
-#: app/templates/user/voting_patterns_down.html:102
+#: app/templates/user/show_profile.html:369
+#: app/templates/user/show_upvoted.html:114
+#: app/templates/user/voting_patterns.html:180
+#: app/templates/user/voting_patterns_down.html:104
 msgid "Settings"
 msgstr "Параметри"
 
@@ -4654,7 +4666,7 @@ msgid "Show only %(flair_name)s"
 msgstr "Показати лише %(flair_name)s"
 
 #: app/templates/_side_pane.html:57 app/templates/feed/show_feed.html:177
-#: app/templates/topic/show_topic.html:110
+#: app/templates/topic/show_topic.html:114
 msgid "Explore Tag Cloud"
 msgstr "Оглянути хмару тегів"
 
@@ -4824,8 +4836,8 @@ msgstr[2] "%(count)s користувачів за півроку"
 #: app/templates/donate.html:37 app/templates/feed/show_feed.html:205
 #: app/templates/search/results.html:103 app/templates/tag/tag.html:81
 #: app/templates/themes/dillo/_side_pane.html:62
-#: app/templates/topic/show_topic.html:133
-#: app/templates/user/show_profile.html:256
+#: app/templates/topic/show_topic.html:137
+#: app/templates/user/show_profile.html:258
 msgid "RSS feed"
 msgstr "RSS-стрічка"
 
@@ -4841,7 +4853,7 @@ msgstr "Пов'язані спільноти"
 #: app/templates/themes/dillo/_side_pane.html:80
 #: app/templates/themes/dillo/index.html:34
 #: app/templates/themes/dillo/index.html:68
-#: app/templates/topic/show_topic.html:131
+#: app/templates/topic/show_topic.html:135
 msgid "More communities"
 msgstr "Більше спільнот"
 
@@ -4990,7 +5002,7 @@ msgstr "На головну сторінку"
 
 #: app/templates/base.html:172 app/templates/base.html:285
 #: app/templates/themes/dillo/base.html:59
-#: app/templates/user/notifications.html:20 app/user/routes.py:1277
+#: app/templates/user/notifications.html:20 app/user/routes.py:1285
 msgid "Notifications"
 msgstr "Сповіщення"
 
@@ -5006,6 +5018,8 @@ msgstr "Огляд"
 msgid "Donate"
 msgstr "Підтримати"
 
+#: app/templates/admin/high_posts_per_day.html:22
+#: app/templates/admin/no_link_diversity.html:22
 #: app/templates/admin/votes_for_noone.html:22 app/templates/base.html:224
 #: app/templates/themes/dillo/base.html:128
 msgid "Account"
@@ -5017,7 +5031,7 @@ msgid "View profile"
 msgstr "Переглянути профіль"
 
 #: app/templates/base.html:231 app/templates/themes/dillo/base.html:131
-#: app/templates/user/edit_profile.html:20 app/user/routes.py:410
+#: app/templates/user/edit_profile.html:20 app/user/routes.py:413
 msgid "Edit profile"
 msgstr "Редагувати профіль"
 
@@ -5027,12 +5041,12 @@ msgstr "Чати"
 
 #: app/templates/base.html:237 app/templates/themes/dillo/base.html:133
 #: app/templates/user/bookmarks.html:17 app/templates/user/bookmarks.html:20
-#: app/templates/user/bookmarks_comments.html:17 app/user/routes.py:1821
+#: app/templates/user/bookmarks_comments.html:17 app/user/routes.py:1838
 msgid "Bookmarks"
 msgstr "Закладки"
 
 #: app/templates/base.html:240 app/templates/user/follow_requests.html:16
-#: app/user/routes.py:2422
+#: app/user/routes.py:2438
 msgid "Follow requests"
 msgstr "Запити на підписку"
 
@@ -5041,12 +5055,12 @@ msgid "Activity alerts"
 msgstr "Сповіщення про дії"
 
 #: app/templates/base.html:246 app/templates/user/scheduled_posts.html:15
-#: app/user/routes.py:1952
+#: app/user/routes.py:1969
 msgid "Scheduled posts"
 msgstr "Заплановані дописи"
 
 #: app/templates/base.html:249 app/templates/user/hidden_posts.html:15
-#: app/user/routes.py:1964
+#: app/user/routes.py:1981
 msgid "Hidden posts"
 msgstr "Сховані дописи"
 
@@ -5103,7 +5117,7 @@ msgstr "Встановити застосунок PieFed"
 msgid "Domains"
 msgstr "Домени"
 
-#: app/templates/auth/instance_chooser.html:123 app/templates/base.html:333
+#: app/templates/auth/instance_chooser.html:122 app/templates/base.html:333
 msgid "Terms of service"
 msgstr "Умови надання послуг"
 
@@ -5251,7 +5265,7 @@ msgstr "Мої стрічки"
 #: app/templates/themes/dillo/base.html:84
 #: app/templates/themes/dillo/base.html:121
 #: app/templates/themes/dillo/base.html:124
-#: app/templates/user/show_profile.html:618
+#: app/templates/user/show_profile.html:620
 msgid "Public Feeds"
 msgstr "Загальнодоступні стрічки"
 
@@ -5277,7 +5291,7 @@ msgstr "Щоб налаштувати стрічку за інтересами, 
 #: app/templates/admin/content.html:79 app/templates/admin/instances.html:103
 #: app/templates/admin/media.html:44 app/templates/admin/reports.html:39
 #: app/templates/admin/users.html:122
-#: app/templates/community/community.html:176
+#: app/templates/community/community.html:180
 #: app/templates/community/community_moderate.html:71
 #: app/templates/community/community_moderate_subscribers.html:99
 #: app/templates/domain/domain.html:37 app/templates/domain/domains.html:48
@@ -5289,7 +5303,7 @@ msgstr "Щоб налаштувати стрічку за інтересами, 
 #: app/templates/search/results.html:51 app/templates/tag/tag.html:29
 #: app/templates/tag/tags.html:48 app/templates/tag/tags_blocked.html:48
 #: app/templates/themes/dillo/index.html:38
-#: app/templates/topic/show_topic.html:74 app/templates/user/alerts.html:25
+#: app/templates/topic/show_topic.html:78 app/templates/user/alerts.html:25
 #: app/templates/user/bookmarks.html:30
 #: app/templates/user/bookmarks_comments.html:34
 #: app/templates/user/files.html:49 app/templates/user/hidden_posts.html:33
@@ -5302,7 +5316,7 @@ msgstr "Поділ на сторінки"
 #: app/templates/admin/content.html:82 app/templates/admin/instances.html:106
 #: app/templates/admin/media.html:47 app/templates/admin/reports.html:42
 #: app/templates/admin/users.html:125
-#: app/templates/community/community.html:179
+#: app/templates/community/community.html:183
 #: app/templates/community/community_moderate.html:74
 #: app/templates/community/community_moderate_comments.html:37
 #: app/templates/community/community_moderate_subscribers.html:102
@@ -5316,14 +5330,14 @@ msgstr "Поділ на сторінки"
 #: app/templates/tag/tag_cloud.html:91 app/templates/tag/tags.html:51
 #: app/templates/tag/tags_blocked.html:51
 #: app/templates/themes/dillo/index.html:41
-#: app/templates/topic/show_topic.html:77 app/templates/user/alerts.html:28
+#: app/templates/topic/show_topic.html:81 app/templates/user/alerts.html:28
 #: app/templates/user/bookmarks.html:33
 #: app/templates/user/bookmarks_comments.html:37
 #: app/templates/user/files.html:52 app/templates/user/hidden_posts.html:36
 #: app/templates/user/read_posts.html:35
-#: app/templates/user/show_profile.html:237
-#: app/templates/user/show_profile.html:268
-#: app/templates/user/show_profile.html:297
+#: app/templates/user/show_profile.html:239
+#: app/templates/user/show_profile.html:270
+#: app/templates/user/show_profile.html:299
 msgid "Previous page"
 msgstr "Попередня сторінка"
 
@@ -5332,7 +5346,7 @@ msgstr "Попередня сторінка"
 #: app/templates/admin/content.html:87 app/templates/admin/instances.html:111
 #: app/templates/admin/media.html:52 app/templates/admin/reports.html:47
 #: app/templates/admin/users.html:130
-#: app/templates/community/community.html:184
+#: app/templates/community/community.html:188
 #: app/templates/community/community_moderate.html:79
 #: app/templates/community/community_moderate_comments.html:42
 #: app/templates/community/community_moderate_subscribers.html:107
@@ -5346,14 +5360,14 @@ msgstr "Попередня сторінка"
 #: app/templates/tag/tag_cloud.html:110 app/templates/tag/tags.html:56
 #: app/templates/tag/tags_blocked.html:56
 #: app/templates/themes/dillo/index.html:46
-#: app/templates/topic/show_topic.html:82 app/templates/user/alerts.html:33
+#: app/templates/topic/show_topic.html:86 app/templates/user/alerts.html:33
 #: app/templates/user/bookmarks.html:38
 #: app/templates/user/bookmarks_comments.html:42
 #: app/templates/user/files.html:57 app/templates/user/hidden_posts.html:41
 #: app/templates/user/read_posts.html:40
-#: app/templates/user/show_profile.html:242
-#: app/templates/user/show_profile.html:273
-#: app/templates/user/show_profile.html:302
+#: app/templates/user/show_profile.html:244
+#: app/templates/user/show_profile.html:275
+#: app/templates/user/show_profile.html:304
 msgid "Next page"
 msgstr "Наступна сторінка"
 
@@ -5404,7 +5418,7 @@ msgstr "Щоб читати дописи, долучіться до кілько
 msgid "Most shortcuts are the same as what reddit has."
 msgstr "Більшість скорочень такі самі, як у Reddit."
 
-#: app/templates/community/community.html:51
+#: app/templates/community/community.html:55
 #: app/templates/feed/show_feed.html:42
 #: app/templates/keyboard_shortcuts.html:14 app/templates/user/alerts.html:11
 #: app/templates/user/block_community.html:12
@@ -5589,7 +5603,7 @@ msgstr "Упорядкувати за кількістю дописів"
 #: app/templates/user/_bookmarks_nav.html:5
 #: app/templates/user/alerts/_type.html:2
 #: app/templates/user/show_profile.html:158
-#: app/templates/user/show_profile.html:196
+#: app/templates/user/show_profile.html:198
 #: app/templates/user/user_preview.html:26
 msgid "Posts"
 msgstr "Дописи"
@@ -5611,7 +5625,7 @@ msgstr "Дописи"
 #: app/templates/user/_bookmarks_nav.html:8
 #: app/templates/user/alerts/_type.html:3
 #: app/templates/user/show_profile.html:159
-#: app/templates/user/show_profile.html:199
+#: app/templates/user/show_profile.html:201
 #: app/templates/user/user_preview.html:27
 msgid "Comments"
 msgstr "Коментарі"
@@ -5650,7 +5664,7 @@ msgid "Choose a topic"
 msgstr "Оберіть тему"
 
 #: app/templates/list_topics.html:38 app/templates/topic/suggest_topics.html:14
-#: app/topic/routes.py:308
+#: app/topic/routes.py:311
 msgid "Suggest a topic"
 msgstr "Запропонувати тему"
 
@@ -5699,7 +5713,7 @@ msgstr "Модератор користувач@сервер"
 #: app/templates/community/community_modlog.html:28
 #: app/templates/community/community_wiki_revisions.html:32
 #: app/templates/modlog.html:59 app/templates/post/_post_full.html:212
-#: app/templates/user/voting_patterns_down.html:78
+#: app/templates/user/voting_patterns_down.html:80
 msgid "When"
 msgstr "Коли"
 
@@ -6032,8 +6046,8 @@ msgstr "Редагувати"
 #: app/templates/community/community_wiki_edit.html:32
 #: app/templates/community/community_wiki_list.html:56
 #: app/templates/feed/_feed_table_row.html:28
-#: app/templates/post/add_reply_inline.html:96 app/templates/post/post.html:43
-#: app/templates/post/post_edit.html:103
+#: app/templates/post/add_reply_inline.html:101 app/templates/post/post.html:43
+#: app/templates/post/post_edit.html:112
 #: app/templates/post/post_options.html:28
 #: app/templates/post/post_reply_edit.html:74
 #: app/templates/post/post_reply_options.html:28
@@ -6097,7 +6111,7 @@ msgid "Yes, Delete This Page"
 msgstr "Так, видалити сторінку"
 
 #: app/templates/admin/cms_page_delete.html:47
-#: app/templates/post/add_reply_inline.html:41
+#: app/templates/post/add_reply_inline.html:46
 msgid "Cancel"
 msgstr "Скасувати"
 
@@ -6113,7 +6127,7 @@ msgstr "Текст у форматі Markdown буде перетворено н
 
 #: app/templates/admin/cms_page_edit.html:38
 #: app/templates/community/_body_edit_preview.html:9
-#: app/templates/post/add_reply_inline.html:34 app/templates/post/post.html:118
+#: app/templates/post/add_reply_inline.html:39 app/templates/post/post.html:122
 #: app/templates/post/post_reply_edit.html:44
 msgid "Preview"
 msgstr "Попередній перегляд"
@@ -6265,7 +6279,7 @@ msgstr "Редагувати %(community_name)s"
 msgid "Will not be overwritten by remote server"
 msgstr "Не буде перезаписано віддаленим сервером"
 
-#: app/templates/admin/edit_community.html:73
+#: app/templates/admin/edit_community.html:74
 msgid "Convert to local community"
 msgstr "Перетворити на місцеву спільноту"
 
@@ -6421,6 +6435,29 @@ msgstr ""
 msgid "Input should be in the form of <strong>https://server-name.tld</strong>"
 msgstr "Підтримуваний формат введення: <strong>https://server-name.tld</strong>"
 
+#: app/templates/admin/high_posts_per_day.html:15
+#: app/templates/admin/votes.html:81
+#, fuzzy
+msgid "Creates many posts"
+msgstr "Новий допис"
+
+#: app/templates/admin/high_posts_per_day.html:18
+#, fuzzy
+msgid "These accounts have unusually high stamina, like a bot."
+msgstr "Ці облікові записи ніколи не голосують — імовірно боти."
+
+#: app/templates/admin/high_posts_per_day.html:23
+msgid "Average number of posts created per day"
+msgstr ""
+
+#: app/templates/admin/high_posts_per_day.html:34
+#: app/templates/admin/no_link_diversity.html:34
+#: app/templates/admin/votes.html:46 app/templates/admin/votes.html:74
+#: app/templates/admin/votes_for_noone.html:39
+#: app/templates/admin/votes_serial_downvoters.html:47
+msgid "Nothing found."
+msgstr "Нічого не знайдено."
+
 #: app/templates/admin/home.html:18
 msgid "Resource usage"
 msgstr "Споживання ресурсів"
@@ -6506,6 +6543,16 @@ msgid ""
 msgstr ""
 "Використовується в індикаторі стабільності. Чим більше, тим краще. Але не"
 " обов'язково."
+
+#: app/templates/admin/instance_chooser.html:28
+msgid "Data sharing"
+msgstr ""
+
+#: app/templates/admin/instance_chooser.html:31
+msgid ""
+"This can be set to any instance that you know has the \"Publish instance "
+"list\" checkbox ticked."
+msgstr ""
 
 #: app/templates/admin/instance_contact.html:13
 msgid ""
@@ -6702,6 +6749,22 @@ msgid ""
 "to continue?"
 msgstr "Пам'ятайте, ця дія незворотна. Точно продовжити?"
 
+#: app/templates/admin/no_link_diversity.html:15
+#: app/templates/admin/votes.html:82
+#, fuzzy
+msgid "Always links to the same place"
+msgstr "Де фільтрувати"
+
+#: app/templates/admin/no_link_diversity.html:18
+#, fuzzy
+msgid "These accounts always create posts to the same domain, like a bot."
+msgstr "Ці облікові записи ніколи не голосують — імовірно боти."
+
+#: app/templates/admin/no_link_diversity.html:23
+#, fuzzy
+msgid "Posts created"
+msgstr "Автор допису"
+
 #: app/templates/admin/permissions.html:23
 msgid "User ID #1"
 msgstr "Користувач з ідентифікатором 1"
@@ -6716,9 +6779,9 @@ msgid ""
 "slogan, basic info for the sidebar and a logo. This information appears "
 "in link previews in social media."
 msgstr ""
-"Налаштуйте сервер: його назву, коротке гасло, основні дані бічної панелі й "
-"логотип. Ці дані видно при попередньому перегляді посилань у соціальних "
-"мережах."
+"Налаштуйте сервер: його назву, коротке гасло, основні дані бічної панелі "
+"й логотип. Ці дані видно при попередньому перегляді посилань у соціальних"
+" мережах."
 
 #: app/templates/admin/site.html:27
 msgid "Provide a square image, minimum 50 pixels wide but ideally 152+ pixels."
@@ -6836,7 +6899,7 @@ msgstr "Блоковані коментарі"
 #: app/templates/community/community_moderate_subscribers.html:149
 #: app/templates/domain/domain.html:71
 #: app/templates/domain/domains_blocked.html:50 app/templates/tag/tag.html:54
-#: app/templates/user/show_profile.html:424
+#: app/templates/user/show_profile.html:426
 msgid "Unban"
 msgstr "Розблокувати"
 
@@ -6845,7 +6908,7 @@ msgid "Recheck now"
 msgstr "Повторити перевірку"
 
 #: app/templates/admin/votes.html:19
-#: app/templates/user/voting_patterns.html:165
+#: app/templates/user/voting_patterns.html:160
 #, python-format
 msgid "All these statistics are for activity in the last %(days)d days."
 msgstr ""
@@ -6887,12 +6950,6 @@ msgstr "Це %(pct)d%% їхніх голосів."
 msgid "voting patterns"
 msgstr "закономірності голосування"
 
-#: app/templates/admin/votes.html:46 app/templates/admin/votes.html:74
-#: app/templates/admin/votes_for_noone.html:39
-#: app/templates/admin/votes_serial_downvoters.html:40
-msgid "Nothing found."
-msgstr "Нічого не знайдено."
-
 #: app/templates/admin/votes.html:49
 msgid "The same username on several servers, voting for itself"
 msgstr "Одне ім'я на кількох серверах, голосує за себе"
@@ -6923,17 +6980,20 @@ msgid "cast %(votes)d upvotes for"
 msgstr ""
 
 #: app/templates/admin/votes.html:77
-msgid "Also check accounts that never vote, they tend to be bots."
-msgstr ""
-"Перевірте також облікові записи, які ніколи не голосують. Зазвичай це боти."
+#: app/templates/admin/votes_for_noone.html:15
+#, fuzzy
+msgid "Accounts that never vote"
+msgstr "Облікові записи, які завжди голосують щодо когось одного"
 
 #: app/templates/admin/votes.html:78
-msgid "Serial downvoters report."
-msgstr "Скарга на масові голоси проти."
+#: app/templates/admin/votes_serial_downvoters.html:15
+msgid "Serial downvoters"
+msgstr "Масові голоси проти"
 
-#: app/templates/admin/votes_for_noone.html:15
-msgid "Does not vote"
-msgstr "Не голосує"
+#: app/templates/admin/votes.html:80
+#, fuzzy
+msgid "Other reports"
+msgstr "Скарги"
 
 #: app/templates/admin/votes_for_noone.html:18
 msgid "These accounts never vote on anyone else, like a bot."
@@ -6944,18 +7004,14 @@ msgid "Posts in last 7 days"
 msgstr "Дописи за 7 днів"
 
 #: app/templates/admin/votes_for_noone.html:32
-#: app/templates/admin/votes_serial_downvoters.html:32
+#: app/templates/admin/votes_serial_downvoters.html:39
 msgid "post timing"
 msgstr "час дописування"
 
 #: app/templates/admin/votes_for_noone.html:33
-#: app/templates/admin/votes_serial_downvoters.html:33
+#: app/templates/admin/votes_serial_downvoters.html:40
 msgid "voting"
 msgstr "голосування"
-
-#: app/templates/admin/votes_serial_downvoters.html:15
-msgid "Serial downvoters"
-msgstr "Масові голоси проти"
 
 #: app/templates/admin/votes_serial_downvoters.html:18
 msgid ""
@@ -6970,10 +7026,14 @@ msgid "Downvoter"
 msgstr "Голосує проти"
 
 #: app/templates/admin/votes_serial_downvoters.html:23
+msgid "Victim"
+msgstr ""
+
+#: app/templates/admin/votes_serial_downvoters.html:24
 msgid "Vote burst"
 msgstr "Масово голосує"
 
-#: app/templates/admin/votes_serial_downvoters.html:34
+#: app/templates/admin/votes_serial_downvoters.html:41
 msgid "downvotes"
 msgstr "голоси проти"
 
@@ -7142,8 +7202,8 @@ msgstr "Нема NSFW-дописів"
 
 #: app/templates/auth/instance_chooser.html:58
 #: app/templates/community/community_wiki_edit.html:27
-#: app/templates/post/add_reply_inline.html:91 app/templates/post/post.html:38
-#: app/templates/post/post_edit.html:98
+#: app/templates/post/add_reply_inline.html:96 app/templates/post/post.html:38
+#: app/templates/post/post_edit.html:107
 #: app/templates/post/post_reply_edit.html:69
 msgid "Loading..."
 msgstr "Завантаження…"
@@ -7181,12 +7241,12 @@ msgid "Instance Info"
 msgstr "Про сервер"
 
 #: app/templates/auth/instance_chooser.html:111
-#: app/templates/auth/instance_chooser.html:353
+#: app/templates/auth/instance_chooser.html:352
 msgid "Stability"
 msgstr "Стабільність"
 
 #: app/templates/auth/instance_chooser.html:112
-#: app/templates/auth/instance_chooser.html:355
+#: app/templates/auth/instance_chooser.html:354
 msgid "Age"
 msgstr "Вік"
 
@@ -7195,27 +7255,23 @@ msgid "Uptime"
 msgstr "Онлайн"
 
 #: app/templates/auth/instance_chooser.html:114
-#: app/templates/auth/instance_chooser.html:354
+#: app/templates/auth/instance_chooser.html:353
 msgid "Newbie friendly"
 msgstr "Підходить новачкам"
 
-#: app/templates/auth/instance_chooser.html:117
-msgid "Defederation"
-msgstr "Блокування серверів"
-
-#: app/templates/auth/instance_chooser.html:121
+#: app/templates/auth/instance_chooser.html:120
 msgid "Links"
 msgstr "Посилання"
 
-#: app/templates/auth/instance_chooser.html:124
+#: app/templates/auth/instance_chooser.html:123
 msgid "Visit server"
 msgstr "Відвідати сервер"
 
-#: app/templates/auth/instance_chooser.html:143
+#: app/templates/auth/instance_chooser.html:142
 msgid "Help"
 msgstr "Довідка"
 
-#: app/templates/auth/instance_chooser.html:149
+#: app/templates/auth/instance_chooser.html:148
 msgid ""
 "There's not much risk involved in this decision - you can always export "
 "your subscriptions and settings and import then into another server if "
@@ -7225,7 +7281,7 @@ msgstr ""
 "налаштування, а тоді імпортувати їх на інший сервер, якщо перший вибір "
 "вас розчарує."
 
-#: app/templates/auth/instance_chooser.html:150
+#: app/templates/auth/instance_chooser.html:149
 msgid ""
 "The servers are listed in order of how fast they are - look for ones with"
 " a rocket or lightning icon."
@@ -7233,7 +7289,7 @@ msgstr ""
 "Сервери впорядковані за швидкістю. Піктограма ракети чи блискавки вказує "
 "на хороше значення."
 
-#: app/templates/auth/instance_chooser.html:151
+#: app/templates/auth/instance_chooser.html:150
 msgid ""
 "Stability is a rough measure of how organized the admin team is and how "
 "much support they have, not uptime."
@@ -7242,7 +7298,7 @@ msgstr ""
 "команда й скільки підтримки вона може надавати. Перебої в роботі не "
 "впливають на це значення."
 
-#: app/templates/auth/instance_chooser.html:152
+#: app/templates/auth/instance_chooser.html:151
 msgid ""
 "Newbie friendly servers have set up some starter-packs to help you find "
 "interesting communities more easily."
@@ -7250,7 +7306,7 @@ msgstr ""
 "Дружні до новачків сервери налаштовують стартові набори, щоб ви легше "
 "знаходили цікаві спільноти."
 
-#: app/templates/auth/instance_chooser.html:153
+#: app/templates/auth/instance_chooser.html:152
 msgid ""
 "Age is how long the server has been online for. Generally older ones are "
 "more likely to be around for the long term."
@@ -7258,20 +7314,20 @@ msgstr ""
 "Вік сервера визначається за тим, скільки часу він уже онлайн. Якщо сервер"
 " витримав випробування віком, він імовірно існуватиме ще тривалий час."
 
-#: app/templates/auth/instance_chooser.html:154
+#: app/templates/auth/instance_chooser.html:153
 msgid ""
 "The language of the server only matters when need to communicate with the"
 " admins."
 msgstr "Від мови сервера залежить лише легкість спілкування з адміністрацією."
 
-#: app/templates/auth/instance_chooser.html:155
+#: app/templates/auth/instance_chooser.html:154
 msgid "Click 'more' on a server to read a longer description of it."
 msgstr "Щоб прочитати докладніший опис сервера, натисніть «Більше»."
 
-#: app/templates/auth/instance_chooser.html:352
+#: app/templates/auth/instance_chooser.html:351
 #: app/templates/community/community_wiki_edit.html:31
-#: app/templates/post/add_reply_inline.html:95 app/templates/post/post.html:42
-#: app/templates/post/post_edit.html:102
+#: app/templates/post/add_reply_inline.html:100 app/templates/post/post.html:42
+#: app/templates/post/post_edit.html:111
 #: app/templates/post/post_reply_edit.html:73
 #: app/templates/user/show_profile.html:116
 msgid "More"
@@ -7453,8 +7509,8 @@ msgstr ""
 " модераторам."
 
 #: app/templates/chat/conversation.html:34
-#: app/templates/community/community.html:16
-#: app/templates/community/community.html:89
+#: app/templates/community/community.html:20
+#: app/templates/community/community.html:93
 #: app/templates/community/community_edit.html:11
 #: app/templates/community/community_flair.html:11
 #: app/templates/community/community_membership.html:11
@@ -7476,7 +7532,7 @@ msgstr ""
 #: app/templates/instance/people.html:12 app/templates/instance/posts.html:13
 #: app/templates/post/_breadcrumb_nav.html:1
 #: app/templates/post/post_embed_code.html:15 app/templates/tag/tag.html:13
-#: app/templates/topic/show_topic.html:14
+#: app/templates/topic/show_topic.html:18
 #: app/templates/user/delete_account.html:11
 #: app/templates/user/edit_filters.html:12
 #: app/templates/user/file_delete.html:11
@@ -7491,9 +7547,9 @@ msgstr ""
 #: app/templates/user/show_upvoted.html:26
 #: app/templates/user/show_upvoted.html:43
 #: app/templates/user/show_upvoted.html:73
-#: app/templates/user/voting_patterns.html:116
-#: app/templates/user/voting_patterns.html:129
-#: app/templates/user/voting_patterns.html:155
+#: app/templates/user/voting_patterns.html:111
+#: app/templates/user/voting_patterns.html:124
+#: app/templates/user/voting_patterns.html:150
 #: app/templates/user/voting_patterns_down.html:24
 #: app/templates/user/voting_patterns_down.html:37
 #: app/templates/user/voting_patterns_down.html:63
@@ -7544,7 +7600,7 @@ msgid "Report conversation with \"%(member_names)s\""
 msgstr "Поскаржитись на розмову з «%(member_names)s»"
 
 #: app/templates/community/_body_edit_preview.html:27
-#: app/templates/post/add_reply.html:49 app/templates/post/post.html:160
+#: app/templates/post/add_reply.html:49 app/templates/post/post.html:164
 #: app/templates/user/edit_profile.html:52
 msgid "Enable markdown editor"
 msgstr "Увімкнути Markdown-редактор"
@@ -7670,8 +7726,8 @@ msgstr "Дописи"
 
 #: app/templates/community/_community_nav.html:171
 #: app/templates/community/_community_nav.html:488
-#: app/templates/user/show_profile.html:203
-#: app/templates/user/show_profile.html:323
+#: app/templates/user/show_profile.html:205
+#: app/templates/user/show_profile.html:325
 msgid "Following"
 msgstr "Підписки"
 
@@ -7700,7 +7756,7 @@ msgid "About community"
 msgstr "Про спільноту"
 
 #: app/templates/community/_community_nav.html:417
-#: app/templates/topic/show_topic.html:96
+#: app/templates/topic/show_topic.html:100
 msgid "Create feed"
 msgstr "Створити стрічку"
 
@@ -7798,7 +7854,7 @@ msgid "Comments can be designated as the answer."
 msgstr "Коментарі можна позначати як відповіді."
 
 #: app/templates/community/add_local.html:39
-#: app/templates/community/community_edit.html:76
+#: app/templates/community/community_edit.html:77
 msgid "Access control"
 msgstr "Контроль доступу"
 
@@ -7808,7 +7864,7 @@ msgid "Only people using %(name)s can post or reply"
 msgstr "Лише користувачі %(name)s можуть надсилати дописи чи відповіді"
 
 #: app/templates/community/add_local.html:46
-#: app/templates/community/community_edit.html:82
+#: app/templates/community/community_edit.html:83
 msgid "Private communities do not federate and are only visible to members"
 msgstr "Приватні спільноти не підлягають федерації, і їх бачать лише учасники"
 
@@ -7895,30 +7951,30 @@ msgstr "Цим посиланням уже десь ділилися:"
 msgid "Post Title"
 msgstr "Назва допису"
 
-#: app/templates/community/community.html:39
-#: app/templates/community/community.html:76
-#: app/templates/community/community.html:110
+#: app/templates/community/community.html:43
+#: app/templates/community/community.html:80
+#: app/templates/community/community.html:114
 #: app/templates/post/_post_full.html:40
 #: app/templates/post/post_teaser/_macros.html:57
 #: app/templates/themes/dillo/post/post_teaser/_macros.html:42
 msgid "Not safe for work"
 msgstr "Небезпечно на роботі"
 
-#: app/templates/community/community.html:42
-#: app/templates/community/community.html:79
-#: app/templates/community/community.html:113
+#: app/templates/community/community.html:46
+#: app/templates/community/community.html:83
+#: app/templates/community/community.html:117
 msgid "Not safe for life"
 msgstr "Небезпечно в принципі"
 
-#: app/templates/community/community.html:123
+#: app/templates/community/community.html:127
 msgid "You need to be a member to see the contents of this private community."
 msgstr "Щоб переглядати приватну спільноту, треба до неї долучитись."
 
-#: app/templates/community/community.html:159
+#: app/templates/community/community.html:163
 msgid "No posts in this community yet."
 msgstr "У спільноті ще нема дописів."
 
-#: app/templates/community/community.html:171
+#: app/templates/community/community.html:175
 msgid "No comments in this community yet."
 msgstr "У спільноті ще нема коментарів."
 
@@ -7990,16 +8046,16 @@ msgstr "Видалити зображення"
 #: app/templates/user/show_upvoted.html:35
 #: app/templates/user/show_upvoted.html:53
 #: app/templates/user/show_upvoted.html:60
-#: app/templates/user/voting_patterns.html:125
-#: app/templates/user/voting_patterns.html:139
-#: app/templates/user/voting_patterns.html:146
+#: app/templates/user/voting_patterns.html:120
+#: app/templates/user/voting_patterns.html:134
+#: app/templates/user/voting_patterns.html:141
 #: app/templates/user/voting_patterns_down.html:33
 #: app/templates/user/voting_patterns_down.html:47
 #: app/templates/user/voting_patterns_down.html:54
 msgid "Profile pic"
 msgstr "Аватар"
 
-#: app/templates/community/community_edit.html:73
+#: app/templates/community/community_edit.html:74
 msgid "Some languages, e.g. Japanese, do not work well with friendly urls."
 msgstr "Дружні посилання несумісні з деякими мовами, наприклад із японською."
 
@@ -8076,12 +8132,12 @@ msgid "Review comments in %(community)s"
 msgstr "Перевірте коментарі %(community)s"
 
 #: app/templates/community/community_moderate_comments.html:34
-#: app/templates/user/show_profile.html:294
+#: app/templates/user/show_profile.html:296
 msgid "Comment pagination"
 msgstr "Поділ коментарів на сторінки"
 
 #: app/templates/community/community_moderate_comments.html:47
-#: app/templates/user/show_profile.html:309
+#: app/templates/user/show_profile.html:311
 msgid "No comments yet."
 msgstr "Ще нема коментарів."
 
@@ -8230,78 +8286,78 @@ msgid "No rss feeds yet"
 msgstr "RSS-стрічок ще нема"
 
 #: app/templates/community/community_wiki_edit.html:28
-#: app/templates/post/add_reply_inline.html:92 app/templates/post/post.html:39
-#: app/templates/post/post_edit.html:99
+#: app/templates/post/add_reply_inline.html:97 app/templates/post/post.html:39
+#: app/templates/post/post_edit.html:108
 #: app/templates/post/post_reply_edit.html:70
 msgid "No images found."
 msgstr "Зображень не знайдено."
 
 #: app/templates/community/community_wiki_edit.html:29
-#: app/templates/post/add_reply_inline.html:93 app/templates/post/post.html:40
-#: app/templates/post/post_edit.html:100
+#: app/templates/post/add_reply_inline.html:98 app/templates/post/post.html:40
+#: app/templates/post/post_edit.html:109
 #: app/templates/post/post_reply_edit.html:71
 msgid "Error loading images."
 msgstr "Помилка завантаження зображень."
 
 #: app/templates/community/community_wiki_edit.html:30
-#: app/templates/post/add_reply_inline.html:94 app/templates/post/post.html:41
-#: app/templates/post/post_edit.html:101
+#: app/templates/post/add_reply_inline.html:99 app/templates/post/post.html:41
+#: app/templates/post/post_edit.html:110
 #: app/templates/post/post_reply_edit.html:72
 msgid "Insert"
 msgstr "Вставити"
 
 #: app/templates/community/community_wiki_edit.html:33
-#: app/templates/post/add_reply_inline.html:97 app/templates/post/post.html:44
-#: app/templates/post/post_edit.html:104
+#: app/templates/post/add_reply_inline.html:102 app/templates/post/post.html:44
+#: app/templates/post/post_edit.html:113
 #: app/templates/post/post_reply_edit.html:75
 msgid "Are you sure you want to delete this image?"
 msgstr "Точно видалити зображення?"
 
 #: app/templates/community/community_wiki_edit.html:34
-#: app/templates/post/add_reply_inline.html:98 app/templates/post/post.html:45
-#: app/templates/post/post_edit.html:105
+#: app/templates/post/add_reply_inline.html:103 app/templates/post/post.html:45
+#: app/templates/post/post_edit.html:114
 #: app/templates/post/post_reply_edit.html:76
 msgid "Failed to delete image. Please try again."
 msgstr "Помилка видалення зображення. Повторіть спробу."
 
 #: app/templates/community/community_wiki_edit.html:35
-#: app/templates/post/add_reply_inline.html:99 app/templates/post/post.html:46
-#: app/templates/post/post_edit.html:106
+#: app/templates/post/add_reply_inline.html:104 app/templates/post/post.html:46
+#: app/templates/post/post_edit.html:115
 #: app/templates/post/post_reply_edit.html:77
 msgid "Please select a file."
 msgstr "Виберіть файл."
 
 #: app/templates/community/community_wiki_edit.html:36
-#: app/templates/post/add_reply_inline.html:100 app/templates/post/post.html:47
-#: app/templates/post/post_edit.html:107
+#: app/templates/post/add_reply_inline.html:105 app/templates/post/post.html:47
+#: app/templates/post/post_edit.html:116
 #: app/templates/post/post_reply_edit.html:78
 msgid "Please select an image file."
 msgstr "Виберіть файл зображення."
 
 #: app/templates/community/community_wiki_edit.html:37
-#: app/templates/post/add_reply_inline.html:101 app/templates/post/post.html:48
-#: app/templates/post/post_edit.html:108
+#: app/templates/post/add_reply_inline.html:106 app/templates/post/post.html:48
+#: app/templates/post/post_edit.html:117
 #: app/templates/post/post_reply_edit.html:79
 msgid "Uploading..."
 msgstr "Вивантаження…"
 
 #: app/templates/community/community_wiki_edit.html:38
-#: app/templates/post/add_reply_inline.html:102 app/templates/post/post.html:49
-#: app/templates/post/post_edit.html:109
+#: app/templates/post/add_reply_inline.html:107 app/templates/post/post.html:49
+#: app/templates/post/post_edit.html:118
 #: app/templates/post/post_reply_edit.html:80
 msgid "Upload successful!"
 msgstr "Вивантаження успішне!"
 
 #: app/templates/community/community_wiki_edit.html:39
-#: app/templates/post/add_reply_inline.html:103 app/templates/post/post.html:50
-#: app/templates/post/post_edit.html:110
+#: app/templates/post/add_reply_inline.html:108 app/templates/post/post.html:50
+#: app/templates/post/post_edit.html:119
 #: app/templates/post/post_reply_edit.html:81
 msgid "Upload failed. Please try again."
 msgstr "Помилка вивантаження. Повторіть спробу."
 
 #: app/templates/community/community_wiki_edit.html:40
-#: app/templates/post/add_reply_inline.html:104 app/templates/post/post.html:51
-#: app/templates/post/post_edit.html:111
+#: app/templates/post/add_reply_inline.html:109 app/templates/post/post.html:51
+#: app/templates/post/post_edit.html:120
 #: app/templates/post/post_reply_edit.html:82
 msgid "Failed to upload pasted image. Please try again."
 msgstr "Помилка вивантаження вставленого зображення. Повторіть спробу."
@@ -8620,7 +8676,7 @@ msgid "Curated by "
 msgstr "Куратор — "
 
 #: app/templates/feed/show_feed.html:199
-#: app/templates/topic/show_topic.html:127
+#: app/templates/topic/show_topic.html:131
 msgid "Number of subscribers"
 msgstr "Кількість підписок"
 
@@ -8733,7 +8789,7 @@ msgstr "Додати віддалених людей"
 
 #: app/templates/instance/people.html:69
 #: app/templates/user/show_profile.html:111
-#: app/templates/user/show_profile.html:330
+#: app/templates/user/show_profile.html:332
 #: app/templates/user/user_preview.html:65
 msgid "Unfollow"
 msgstr "Відписатися"
@@ -8996,7 +9052,7 @@ msgstr "Перекласти"
 msgid "Set flair"
 msgstr "Налаштувати позначку"
 
-#: app/templates/post/_post_preview.html:10
+#: app/templates/post/_post_preview.html:12
 msgid "Update Preview"
 msgstr "Оновити попередній перегляд"
 
@@ -9214,14 +9270,14 @@ msgstr ""
 "target=\"_blank\" rel=\"nofollow\">вищими стандартами поведінки</a>, ніж "
 "деінде. Поважайте інших."
 
-#: app/templates/post/add_reply.html:28 app/templates/post/post.html:106
-#: app/templates/post/post_edit.html:304
+#: app/templates/post/add_reply.html:28 app/templates/post/post.html:110
+#: app/templates/post/post_edit.html:314
 #: app/templates/post/post_reply_edit.html:31
 #: app/templates/search/_search_form.html:26
 msgid "More options"
 msgstr "Більше опцій"
 
-#: app/templates/post/add_reply_inline.html:7 app/templates/post/post.html:99
+#: app/templates/post/add_reply_inline.html:7 app/templates/post/post.html:103
 #, python-format
 msgid ""
 "Warning: You are writing in a language that isn't the same as the user "
@@ -9260,19 +9316,19 @@ msgid ""
 "your reply."
 msgstr "Автора допису заблоковано чи видалено, тож він не побачить відповіді."
 
-#: app/templates/post/post.html:171
+#: app/templates/post/post.html:175
 msgid "Verify your email address to comment"
 msgstr "Щоб коментувати, підтвердьте електронну пошту"
 
-#: app/templates/post/post.html:175
+#: app/templates/post/post.html:179
 msgid "Log in to comment"
 msgstr "Увійдіть, щоб коментувати"
 
-#: app/templates/post/post.html:178
+#: app/templates/post/post.html:182
 msgid "Comments are disabled."
 msgstr "Коментарі вимкнено."
 
-#: app/templates/post/post.html:187 app/templates/post/post.html:189
+#: app/templates/post/post.html:191 app/templates/post/post.html:193
 msgid "Loading comments..."
 msgstr "Завантаження коментарів…"
 
@@ -9298,44 +9354,44 @@ msgstr "Дата"
 msgid "Cross-post %(post_name)s"
 msgstr "Перехресно розмістити %(post_name)s"
 
-#: app/templates/post/post_edit.html:161 app/templates/post/post_edit.html:202
+#: app/templates/post/post_edit.html:171 app/templates/post/post_edit.html:212
 msgid "Describe the image, to help visually impaired people."
 msgstr "Опишіть зображення, щоб допомогти незрячим."
 
-#: app/templates/post/post_edit.html:168
+#: app/templates/post/post_edit.html:178
 #, python-format
 msgid "Image %(num)d"
 msgstr "Зображення %(num)d"
 
-#: app/templates/post/post_edit.html:172
+#: app/templates/post/post_edit.html:182
 msgid "Current image"
 msgstr "Поточне зображення"
 
-#: app/templates/post/post_edit.html:176 app/templates/post/post_edit.html:184
+#: app/templates/post/post_edit.html:186 app/templates/post/post_edit.html:194
 msgid "Gallery image"
 msgstr "Зображення галереї"
 
-#: app/templates/post/post_edit.html:190
+#: app/templates/post/post_edit.html:200
 msgid "No alt text"
 msgstr "Без альтернативного тексту"
 
-#: app/templates/post/post_edit.html:205
+#: app/templates/post/post_edit.html:215
 msgid "Mastodon will only display the first four images."
 msgstr "Mastodon покаже лише перші чотири зображення."
 
-#: app/templates/post/post_edit.html:210
+#: app/templates/post/post_edit.html:220
 msgid ""
 "Upload new images to add or replace existing ones. Empty fields will be "
 "ignored."
 msgstr ""
-"Щоб додати чи замінити зображення, вивантажте нові. Порожніми полями буде "
-"знехтувано."
+"Щоб додати чи замінити зображення, вивантажте нові. Порожніми полями буде"
+" знехтувано."
 
-#: app/templates/post/post_edit.html:213
+#: app/templates/post/post_edit.html:223
 msgid "Provide a URL ending with .mp4 or .webm."
 msgstr "Зазначте URL-адресу, що закінчується на .mp4 чи .webm."
 
-#: app/templates/post/post_edit.html:214
+#: app/templates/post/post_edit.html:224
 msgid ""
 "<a href=\"https://dansup.github.io/media-transcode/\" "
 "target=\"_blank\">Convert video files before uploading</a>, if necessary."
@@ -9343,7 +9399,7 @@ msgstr ""
 "За потреби <a href=\"https://dansup.github.io/media-transcode/\" "
 "target=\"_blank\">конвертуйте відеофайли</a> перед вивантаженням."
 
-#: app/templates/post/post_edit.html:217
+#: app/templates/post/post_edit.html:227
 msgid ""
 "Either provide an url OR upload a file but not both. Use common codecs "
 "like h.264 and mp3."
@@ -9351,53 +9407,53 @@ msgstr ""
 "Або зазначте адресу, або вивантажте файл — але не водночас. "
 "Використовуйте поширені кодеки, як-от h.264 чи mp3."
 
-#: app/templates/post/post_edit.html:224
+#: app/templates/post/post_edit.html:234
 msgid ""
 "Check for AI-generated text by pasting it into <a "
 "href=\"https://gptzero.me/\" target=\"_blank\">gptzero.me</a>. If found, "
 "tick the checkbox in \"More options\"."
 msgstr ""
-"Перевірте, чи текст не згенеровано «ШІ», за допомогою <a href=\"https://"
-"gptzero.me/\" target=\"_blank\">gptzero.me</a>. Якщо знайдено збіг, "
-"відкрийте «Більше опцій» і поставте відповідну пташку."
+"Перевірте, чи текст не згенеровано «ШІ», за допомогою <a "
+"href=\"https://gptzero.me/\" target=\"_blank\">gptzero.me</a>. Якщо "
+"знайдено збіг, відкрийте «Більше опцій» і поставте відповідну пташку."
 
-#: app/templates/post/post_edit.html:230
+#: app/templates/post/post_edit.html:240
 msgid "Poll choices"
 msgstr "Варіанти відповіді"
 
-#: app/templates/post/post_edit.html:232
+#: app/templates/post/post_edit.html:242
 msgid "First choice"
 msgstr "Перший варіант"
 
-#: app/templates/post/post_edit.html:235
+#: app/templates/post/post_edit.html:245
 msgid "Second choice"
 msgstr "Другий варіант"
 
-#: app/templates/post/post_edit.html:276
+#: app/templates/post/post_edit.html:286
 msgid "Add choice"
 msgstr "Додати варіант"
 
-#: app/templates/post/post_edit.html:301
+#: app/templates/post/post_edit.html:311
 msgid "Separate each tag with a comma."
 msgstr "Розділяйте теги комами."
 
-#: app/templates/post/post_edit.html:318
+#: app/templates/post/post_edit.html:328
 msgid "Hey, did you know? Scheduled posts have a templating system for titles."
 msgstr "До речі, заголовок запланованого допису може бути шаблонним."
 
-#: app/templates/post/post_edit.html:323
+#: app/templates/post/post_edit.html:333
 msgid "Tags available"
 msgstr "Доступні теги"
 
-#: app/templates/post/post_edit.html:324
+#: app/templates/post/post_edit.html:334
 msgid "Example"
 msgstr "Приклад"
 
-#: app/templates/post/post_edit.html:325
+#: app/templates/post/post_edit.html:335
 msgid "...will generate"
 msgstr "…буде згенеровано"
 
-#: app/templates/post/post_edit.html:337
+#: app/templates/post/post_edit.html:348
 msgid ""
 "Drag this link to your bookmarks bar to create a quick way to share what "
 "you find"
@@ -9405,11 +9461,11 @@ msgstr ""
 "Щоб швидко ділитись цікавими сторінками, додайте наступне посилання в "
 "закладки"
 
-#: app/templates/post/post_edit.html:344
+#: app/templates/post/post_edit.html:355
 msgid "Drag this to your bookmarks bar"
 msgstr "Посуньте це до панелі закладок"
 
-#: app/templates/post/post_edit.html:345
+#: app/templates/post/post_edit.html:356
 msgid "Share on PieFed"
 msgstr "Поділитись у PieFed"
 
@@ -9938,15 +9994,15 @@ msgstr "Сповіщення про дії"
 msgid "Notify about every new post. Not advisable in high traffic topics!"
 msgstr "Сповіщати про кожен допис. Не рекомендовано в активних темах!"
 
-#: app/templates/topic/show_topic.html:29
+#: app/templates/topic/show_topic.html:33
 msgid "Sub-topics"
 msgstr "Підтеми"
 
-#: app/templates/topic/show_topic.html:59
+#: app/templates/topic/show_topic.html:63
 msgid "No posts in this topic yet."
 msgstr "На цю тему ще нема дописів."
 
-#: app/templates/topic/show_topic.html:120
+#: app/templates/topic/show_topic.html:124
 msgid "Topic communities"
 msgstr "Тематичні спільноти"
 
@@ -9984,10 +10040,10 @@ msgstr "Більше параметрів:"
 #: app/templates/user/_user_nav.html:6 app/templates/user/_user_nav.html:20
 #: app/templates/user/edit_profile.html:35
 #: app/templates/user/post_timing.html:88
-#: app/templates/user/show_profile.html:364
-#: app/templates/user/show_upvoted.html:109
-#: app/templates/user/voting_patterns.html:182
-#: app/templates/user/voting_patterns_down.html:99
+#: app/templates/user/show_profile.html:366
+#: app/templates/user/show_upvoted.html:111
+#: app/templates/user/voting_patterns.html:177
+#: app/templates/user/voting_patterns_down.html:101
 msgid "Profile"
 msgstr "Профіль"
 
@@ -9996,7 +10052,7 @@ msgid "Blocks & Filters"
 msgstr "Блокування й фільтри"
 
 #: app/templates/user/_user_nav.html:8 app/templates/user/_user_nav.html:26
-#: app/user/routes.py:835
+#: app/user/routes.py:838
 msgid "Import & Export"
 msgstr "Імпорт і експорт"
 
@@ -10007,7 +10063,7 @@ msgstr "Ключі доступу"
 
 #: app/templates/user/_user_nav.html:10 app/templates/user/_user_nav.html:32
 #: app/templates/user/connect_oauth.html:17
-#: app/templates/user/connect_oauth.html:20 app/user/routes.py:786
+#: app/templates/user/connect_oauth.html:20 app/user/routes.py:789
 msgid "Connect OAuth"
 msgstr "OAuth-з'єднання"
 
@@ -10020,7 +10076,7 @@ msgstr "Сповіщення"
 #: app/templates/user/block_instance.html:16
 #: app/templates/user/block_user.html:16
 #: app/templates/user/edit_filters.html:16 app/templates/user/filters.html:16
-#: app/templates/user/filters.html:19 app/user/routes.py:1549
+#: app/templates/user/filters.html:19 app/user/routes.py:1566
 msgid "Filters"
 msgstr "Фільтри"
 
@@ -10216,7 +10272,7 @@ msgstr ""
 #: app/templates/user/edit_settings.html:17
 #: app/templates/user/edit_settings.html:20
 #: app/templates/user/import_export.html:17
-#: app/templates/user/import_export.html:20 app/user/routes.py:748
+#: app/templates/user/import_export.html:20 app/user/routes.py:751
 msgid "Change settings"
 msgstr "Змінити налаштування"
 
@@ -10260,13 +10316,13 @@ msgstr ""
 "більше немає. Але вони самі визначають, що робити з копіями ваших "
 "дописів. Не всі сайти працюють так, як наш."
 
-#: app/templates/user/edit_filters.html:18 app/user/routes.py:1613
+#: app/templates/user/edit_filters.html:18 app/user/routes.py:1630
 msgid "Edit filter"
 msgstr "Редагувати фільтр"
 
 #: app/templates/user/edit_filters.html:20
 #: app/templates/user/edit_filters.html:27 app/templates/user/filters.html:44
-#: app/user/routes.py:1576
+#: app/user/routes.py:1593
 msgid "Add filter"
 msgstr "Додати фільтр"
 
@@ -10460,10 +10516,10 @@ msgstr "Переспрямуємо вас на ваш сервер. Натисн
 #: app/templates/user/file_delete.html:15
 #: app/templates/user/file_upload.html:15 app/templates/user/files.html:17
 #: app/templates/user/files.html:21 app/templates/user/post_timing.html:94
-#: app/templates/user/show_profile.html:370
-#: app/templates/user/show_upvoted.html:115
-#: app/templates/user/voting_patterns.html:188
-#: app/templates/user/voting_patterns_down.html:105 app/user/routes.py:2337
+#: app/templates/user/show_profile.html:372
+#: app/templates/user/show_upvoted.html:117
+#: app/templates/user/voting_patterns.html:183
+#: app/templates/user/voting_patterns_down.html:107 app/user/routes.py:2353
 msgid "Files"
 msgstr "Файли"
 
@@ -10650,10 +10706,10 @@ msgstr "Сповіщень немає."
 
 #: app/templates/user/notifications.html:61
 #: app/templates/user/post_timing.html:83 app/templates/user/read_posts.html:49
-#: app/templates/user/show_profile.html:359
-#: app/templates/user/show_upvoted.html:104
-#: app/templates/user/voting_patterns.html:177
-#: app/templates/user/voting_patterns_down.html:94
+#: app/templates/user/show_profile.html:361
+#: app/templates/user/show_upvoted.html:106
+#: app/templates/user/voting_patterns.html:172
+#: app/templates/user/voting_patterns_down.html:96
 msgid "Manage"
 msgstr "Керувати"
 
@@ -10674,12 +10730,12 @@ msgstr ""
 "href=\"/alerts\">на які ви підписані</a>."
 
 #: app/templates/user/notifications.html:78
-#: app/templates/user/show_profile.html:456
+#: app/templates/user/show_profile.html:458
 msgid "Member of"
 msgstr "Бере участь"
 
 #: app/templates/user/notifications.html:88
-#: app/templates/user/show_profile.html:466
+#: app/templates/user/show_profile.html:468
 msgid "Moderates"
 msgstr "Модерує"
 
@@ -10709,7 +10765,7 @@ msgstr "Ключів доступу ще нема."
 
 #: app/templates/user/post_timing.html:29
 #: app/templates/user/post_timing.html:53
-#: app/templates/user/post_timing.html:64 app/user/routes.py:287
+#: app/templates/user/post_timing.html:64 app/user/routes.py:290
 #, python-format
 msgid "Post timings of %(user_name)s"
 msgstr "Час дописування %(user_name)s"
@@ -10719,12 +10775,12 @@ msgid "Posts created very quickly are a possible sign of bot activity."
 msgstr "Дописи, створені дуже швидко, вказують на ймовірну діяльність бота."
 
 #: app/templates/user/read_posts.html:17 app/templates/user/read_posts.html:20
-#: app/user/routes.py:2054
+#: app/user/routes.py:2071
 msgid "Read posts"
 msgstr "Прочитати дописи"
 
 #: app/templates/user/read_posts.html:29
-#: app/templates/user/show_profile.html:280
+#: app/templates/user/show_profile.html:282
 msgid "No posts yet."
 msgstr "Дописів ще нема."
 
@@ -10799,7 +10855,7 @@ msgid "Lemmyverse.link"
 msgstr "Lemmyverse.link"
 
 #: app/templates/user/show_profile.html:145
-#: app/templates/user/user_preview.html:69 app/user/routes.py:2104
+#: app/templates/user/user_preview.html:69 app/user/routes.py:2121
 msgid "Edit note"
 msgstr "Редагувати нотатку"
 
@@ -10833,80 +10889,80 @@ msgstr "IP-адреса останньої взаємодії."
 msgid "Donor"
 msgstr "Донор"
 
-#: app/templates/user/show_profile.html:193
+#: app/templates/user/show_profile.html:195
 msgid "Overview"
 msgstr "Огляд"
 
-#: app/templates/user/show_profile.html:208
-#: app/templates/user/show_profile.html:342
+#: app/templates/user/show_profile.html:210
+#: app/templates/user/show_profile.html:344
 msgid "Followers"
 msgstr "Підписники"
 
-#: app/templates/user/show_profile.html:220
+#: app/templates/user/show_profile.html:222
 #, python-format
 msgid "Posts and Comments by %(user_name)s"
 msgstr "Дописи й коментарі %(user_name)s"
 
-#: app/templates/user/show_profile.html:234
+#: app/templates/user/show_profile.html:236
 msgid "Overview pagination"
 msgstr "Поділ огляду на сторінки"
 
-#: app/templates/user/show_profile.html:249
+#: app/templates/user/show_profile.html:251
 msgid "No posts or comments yet."
 msgstr "Ще нема дописів чи коментарів."
 
-#: app/templates/user/show_profile.html:259 app/user/routes.py:170
+#: app/templates/user/show_profile.html:261 app/user/routes.py:170
 #, python-format
 msgid "Posts by %(user_name)s"
 msgstr "Дописи %(user_name)s"
 
-#: app/templates/user/show_profile.html:265
+#: app/templates/user/show_profile.html:267
 msgid "Post pagination"
 msgstr "Поділ дописів на сторінки"
 
-#: app/templates/user/show_profile.html:286
+#: app/templates/user/show_profile.html:288
 #, python-format
 msgid "Comments by %(user_name)s"
 msgstr "Коментарі %(user_name)s"
 
-#: app/templates/user/show_profile.html:314
+#: app/templates/user/show_profile.html:316
 msgid "Archived comments"
 msgstr "Архівні коментарі"
 
-#: app/templates/user/show_profile.html:379
+#: app/templates/user/show_profile.html:381
 msgid "Same IP address"
 msgstr "Та сама IP-адреса"
 
-#: app/templates/user/show_profile.html:393
+#: app/templates/user/show_profile.html:395
 msgid "Same user name"
 msgstr "Однакове користувацьке ім'я"
 
-#: app/templates/user/show_profile.html:409
+#: app/templates/user/show_profile.html:411
 #, python-format
 msgid "Search posts by %(name)s"
 msgstr "Шукати дописи %(name)s"
 
-#: app/templates/user/show_profile.html:417
+#: app/templates/user/show_profile.html:419
 msgid "Moderate user"
 msgstr "Модерувати користувача"
 
-#: app/templates/user/show_profile.html:433
+#: app/templates/user/show_profile.html:435
 msgid "Ask if reposter"
 msgstr "Запитати, чи репост-бот"
 
-#: app/templates/user/show_profile.html:438
+#: app/templates/user/show_profile.html:440
 msgid "Reposter challenge result pending"
 msgstr "Перевірка на репост-бота триває"
 
-#: app/templates/user/show_profile.html:440
+#: app/templates/user/show_profile.html:442
 msgid "Not a reposter"
 msgstr "Не репост-бот"
 
-#: app/templates/user/show_profile.html:481
+#: app/templates/user/show_profile.html:483
 msgid "Voting"
 msgstr "Голосування"
 
-#: app/templates/user/show_profile.html:484
+#: app/templates/user/show_profile.html:486
 #: app/templates/user/show_upvoted.html:31
 #: app/templates/user/show_upvoted.html:36
 #: app/templates/user/show_upvoted.html:48
@@ -10917,39 +10973,49 @@ msgstr "Голосування"
 msgid "Posts upvoted by %(user_name)s"
 msgstr "Дописи, схвалені %(user_name)s"
 
-#: app/templates/user/show_profile.html:486
+#: app/templates/user/show_profile.html:488
+#: app/templates/user/voting_patterns.html:116
 #: app/templates/user/voting_patterns.html:121
-#: app/templates/user/voting_patterns.html:126
-#: app/templates/user/voting_patterns.html:134
-#: app/templates/user/voting_patterns.html:151
-#: app/templates/user/voting_patterns.html:160
-#: app/templates/user/voting_patterns.html:163 app/user/routes.py:233
+#: app/templates/user/voting_patterns.html:129
+#: app/templates/user/voting_patterns.html:146
+#: app/templates/user/voting_patterns.html:155
+#: app/templates/user/voting_patterns.html:158 app/user/routes.py:233
 #, python-format
 msgid "Voting patterns of %(user_name)s"
 msgstr "Закономірності голосування %(user_name)s"
 
-#: app/templates/user/show_profile.html:487
+#: app/templates/user/show_profile.html:489
 #: app/templates/user/voting_patterns_down.html:29
 #: app/templates/user/voting_patterns_down.html:34
 #: app/templates/user/voting_patterns_down.html:42
 #: app/templates/user/voting_patterns_down.html:59
 #: app/templates/user/voting_patterns_down.html:68
-#: app/templates/user/voting_patterns_down.html:71 app/user/routes.py:261
+#: app/templates/user/voting_patterns_down.html:71 app/user/routes.py:264
 #, python-format
 msgid "Downvoting history of %(user_name)s"
 msgstr "Історія голосів проти від %(user_name)s"
 
-#: app/templates/user/show_profile.html:495
+#: app/templates/user/show_profile.html:497
 msgid "Posting pattern"
 msgstr "Закономірність дописування"
 
-#: app/templates/user/show_profile.html:550
+#: app/templates/user/show_profile.html:552
 msgid "Post timings"
 msgstr "Час дописування"
 
-#: app/templates/user/show_profile.html:557
+#: app/templates/user/show_profile.html:559
 msgid "Commenting pattern"
 msgstr "Закономірність коментування"
+
+#: app/templates/user/show_upvoted.html:89
+#, fuzzy
+msgid "Post created"
+msgstr "Автор допису"
+
+#: app/templates/user/show_upvoted.html:89
+#, fuzzy
+msgid "Upvoted at"
+msgstr "Схвалено"
 
 #: app/templates/user/stripe_redirect.html:10 app/user/subscription.py:87
 msgid "Please wait..."
@@ -10977,7 +11043,7 @@ msgstr "При сплаті щось пішло не так. Вашого обл
 msgid "Continue"
 msgstr "Продовжити"
 
-#: app/templates/user/user_ban.html:9 app/user/routes.py:880
+#: app/templates/user/user_ban.html:9 app/user/routes.py:883
 #, python-format
 msgid "Ban %(name)s"
 msgstr "Блокувати %(name)s"
@@ -11012,44 +11078,44 @@ msgstr "Поскаржитись на «%(user_name)s»"
 msgid "%(total)d votes"
 msgstr ""
 
-#: app/templates/user/voting_patterns.html:43
+#: app/templates/user/voting_patterns.html:38
 msgid "Up"
 msgstr "Схвалення"
 
-#: app/templates/user/voting_patterns.html:44
+#: app/templates/user/voting_patterns.html:39
 msgid "Down"
 msgstr "Засудження"
 
-#: app/templates/user/voting_patterns.html:54
+#: app/templates/user/voting_patterns.html:49
 #, fuzzy
 msgid "votes"
 msgstr "Голоси"
 
-#: app/templates/user/voting_patterns.html:76
+#: app/templates/user/voting_patterns.html:71
 msgid "Upvotes"
 msgstr "Схвалення"
 
-#: app/templates/user/voting_patterns.html:80
+#: app/templates/user/voting_patterns.html:75
 msgid "Downvotes"
 msgstr "Засудження"
 
-#: app/templates/user/voting_patterns.html:107
+#: app/templates/user/voting_patterns.html:102
 msgid "No votes in the last 60 days."
 msgstr "Нема голосів за 60 днів."
 
-#: app/templates/user/voting_patterns.html:167
+#: app/templates/user/voting_patterns.html:162
 msgid "Votes received"
 msgstr "Отримано голосів"
 
-#: app/templates/user/voting_patterns.html:167
+#: app/templates/user/voting_patterns.html:162
 msgid "Voter"
 msgstr "Голосує"
 
-#: app/templates/user/voting_patterns.html:169
+#: app/templates/user/voting_patterns.html:164
 msgid "Votes cast"
 msgstr "Надіслано голосів"
 
-#: app/templates/user/voting_patterns.html:169
+#: app/templates/user/voting_patterns.html:164
 msgid "Author voted on"
 msgstr "Автор голосує за"
 
@@ -11058,17 +11124,22 @@ msgid ""
 "As you scan the table, look for blocks where the same target or dates "
 "occur."
 msgstr ""
-"У таблиці варто звертати увагу на блокування з одною ціллю чи близькою датою."
+"У таблиці варто звертати увагу на блокування з одною ціллю чи близькою "
+"датою."
 
-#: app/templates/user/voting_patterns_down.html:78
+#: app/templates/user/voting_patterns_down.html:76
+msgid "Votes are sent in batches so the When column is not totally accurate."
+msgstr ""
+
+#: app/templates/user/voting_patterns_down.html:80
 msgid "Target"
 msgstr "Ціль"
 
-#: app/templates/user/voting_patterns_down.html:78
+#: app/templates/user/voting_patterns_down.html:80
 msgid "Post / comment"
 msgstr "Допис / коментар"
 
-#: app/templates/user/voting_patterns_down.html:82
+#: app/templates/user/voting_patterns_down.html:84
 #, fuzzy
 msgid "view"
 msgstr "Переглянути"
@@ -11275,12 +11346,12 @@ msgstr "Пропоновані спільноти"
 msgid "Comma seperated list of community suggestions"
 msgstr "Список пропонованих спільнот через кому"
 
-#: app/topic/routes.py:300
+#: app/topic/routes.py:303
 #, python-format
 msgid "New topic suggestion from %(site_name)s"
 msgstr "Нова пропозиція теми від %(site_name)s"
 
-#: app/topic/routes.py:305
+#: app/topic/routes.py:308
 msgid ""
 "Thank you for the topic suggestion, it has been sent to the site "
 "administrator(s)."
@@ -11704,7 +11775,7 @@ msgstr "як-от lemmy.example.co"
 msgid "This user has been deleted."
 msgstr "Користувача видалено."
 
-#: app/user/routes.py:316
+#: app/user/routes.py:319
 msgid ""
 "You have changed your email address so we need to verify it. Please check"
 " your email inbox for a verification link."
@@ -11712,85 +11783,85 @@ msgstr ""
 "Змінену електронну пошту треба підтвердити. Перевірте вхідні, туди має "
 "прийти посилання для підтвердження."
 
-#: app/user/routes.py:425
+#: app/user/routes.py:428
 msgid "Avatar removed!"
 msgstr "Аватар вилучено!"
 
-#: app/user/routes.py:602
+#: app/user/routes.py:605
 msgid "Auto-detect"
 msgstr "Автоматично"
 
-#: app/user/routes.py:603
+#: app/user/routes.py:606
 msgid "Basque"
 msgstr "Баскська"
 
-#: app/user/routes.py:604
+#: app/user/routes.py:607
 msgid "Catalan"
 msgstr "Каталонська"
 
-#: app/user/routes.py:605
+#: app/user/routes.py:608
 msgid "Cebuano"
 msgstr "Себуанська"
 
-#: app/user/routes.py:606
+#: app/user/routes.py:609
 msgid "Chinese"
 msgstr "Китайська"
 
-#: app/user/routes.py:607
+#: app/user/routes.py:610
 msgid "English"
 msgstr "Англійська"
 
-#: app/user/routes.py:608
+#: app/user/routes.py:611
 msgid "Filipino / Tagalog"
 msgstr "Філіпінська / тагальська"
 
-#: app/user/routes.py:609
+#: app/user/routes.py:612
 msgid "Finnish"
 msgstr "Фінська"
 
-#: app/user/routes.py:610
+#: app/user/routes.py:613
 msgid "French"
 msgstr "Французька"
 
-#: app/user/routes.py:611
+#: app/user/routes.py:614
 msgid "German"
 msgstr "Німецька"
 
-#: app/user/routes.py:612
+#: app/user/routes.py:615
 msgid "Hindi"
 msgstr "Гінді"
 
-#: app/user/routes.py:613
+#: app/user/routes.py:616
 msgid "Japanese"
 msgstr "Японська"
 
-#: app/user/routes.py:614
+#: app/user/routes.py:617
 msgid "Spanish"
 msgstr "Іспанська"
 
-#: app/user/routes.py:615
+#: app/user/routes.py:618
 msgid "Polish"
 msgstr "Польська"
 
-#: app/user/routes.py:616
+#: app/user/routes.py:619
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: app/user/routes.py:685
+#: app/user/routes.py:688
 #, python-format
 msgid "You cannot change the daily usage limit until %(date)s"
 msgstr "Обмеження щоденного використання стане можна змінити %(date)s"
 
-#: app/user/routes.py:783
+#: app/user/routes.py:786
 #, python-format
 msgid "Your %(provider)s account has been disconnected."
 msgstr "Обліковий запис %(provider)s від'єднано."
 
-#: app/user/routes.py:805
+#: app/user/routes.py:808
 msgid "Export Complete."
 msgstr "Експорт завершено."
 
-#: app/user/routes.py:828
+#: app/user/routes.py:831
 msgid ""
 "Your subscriptions and blocks are being imported. If you have many it "
 "could take a few minutes."
@@ -11798,30 +11869,30 @@ msgstr ""
 "Імпорт підписок і блокувань триває. Якщо їх багато, зачекайте кілька "
 "хвилин."
 
-#: app/user/routes.py:861
+#: app/user/routes.py:864
 msgid "You cannot ban yourself."
 msgstr "Блокувати себе неможливо."
 
-#: app/user/routes.py:899
+#: app/user/routes.py:902
 msgid "You cannot unban yourself."
 msgstr "Розблокувати себе неможливо."
 
-#: app/user/routes.py:902
+#: app/user/routes.py:905
 #, python-format
 msgid "%(actor)s has been unbanned."
 msgstr "%(actor)s більше не блокується."
 
-#: app/user/routes.py:937
+#: app/user/routes.py:940
 #, python-format
 msgid "%(actor)s has been blocked."
 msgstr "%(actor)s блокується."
 
-#: app/user/routes.py:1008
+#: app/user/routes.py:1011
 #, python-format
 msgid "%(actor)s has been unblocked."
 msgstr "%(actor)s більше не блокується."
 
-#: app/user/routes.py:1034
+#: app/user/routes.py:1037
 msgid ""
 "Moderators have already assessed reports regarding this person, no "
 "further reports are necessary."
@@ -11829,158 +11900,158 @@ msgstr ""
 "Модератори вже розглянули скарги на людину. Скаржитися додатково не "
 "потрібно."
 
-#: app/user/routes.py:1041
+#: app/user/routes.py:1044
 #, python-format
 msgid "%(user_name)s has already been reported, thank you!"
 msgstr "На %(user_name)s уже є скарга, дякуємо!"
 
-#: app/user/routes.py:1080
+#: app/user/routes.py:1088
 #, python-format
 msgid "%(user_name)s has been reported, thank you!"
 msgstr "Скаргу на %(user_name)s надіслано, дякуємо!"
 
-#: app/user/routes.py:1086
+#: app/user/routes.py:1094
 msgid "Report user"
 msgstr "Скарга на користувача"
 
-#: app/user/routes.py:1102
+#: app/user/routes.py:1110
 msgid "You cannot delete yourself."
 msgstr "Видалити себе неможливо."
 
-#: app/user/routes.py:1116
+#: app/user/routes.py:1124
 msgid "Deleted user was a remote instance admin."
 msgstr "Видалений користувач адміністрував віддалений сервер."
 
-#: app/user/routes.py:1118
+#: app/user/routes.py:1126
 msgid "Deleted user with role permissions."
 msgstr "Видалено користувача з дозволами ролі."
 
-#: app/user/routes.py:1119
+#: app/user/routes.py:1127
 #, python-format
 msgid "%(actor)s has been deleted."
 msgstr "%(actor)s видалено."
 
-#: app/user/routes.py:1136
+#: app/user/routes.py:1144
 #, python-format
 msgid "%(community_name)s has been unblocked."
 msgstr "%(community_name)s більше не блокується."
 
-#: app/user/routes.py:1161
+#: app/user/routes.py:1169
 #, python-format
 msgid "%(flair_name)s has been unblocked."
 msgstr "%(flair_name)s розблоковано."
 
-#: app/user/routes.py:1195
+#: app/user/routes.py:1203
 msgid "Account deletion in progress. Give it a few minutes."
 msgstr "Видалення облікового запису триває. Зачекайте кілька хвилин."
 
-#: app/user/routes.py:1202
+#: app/user/routes.py:1210
 msgid "Delete my account"
 msgstr "Видалити мій обліковий запис"
 
-#: app/user/routes.py:1357
+#: app/user/routes.py:1371
 msgid "All notifications marked as read."
 msgstr "Усі сповіщення позначено прочитаними."
 
-#: app/user/routes.py:1506
+#: app/user/routes.py:1523
 msgid "NSFW content will be hidden due to legal restrictions in your country."
 msgstr "NSFW-вміст буде сховано через правові обмеження вашої країни."
 
-#: app/user/routes.py:1629
+#: app/user/routes.py:1646
 msgid "Filter deleted."
 msgstr "Фільтр видалено."
 
-#: app/user/routes.py:1654
+#: app/user/routes.py:1671
 #, python-format
 msgid "User not found: %(username)s"
 msgstr "Користувача не знайдено: %(username)s"
 
-#: app/user/routes.py:1664 app/user/routes.py:1709 app/user/routes.py:1743
+#: app/user/routes.py:1681 app/user/routes.py:1726 app/user/routes.py:1760
 #, python-format
 msgid "%(name)s is already blocked."
 msgstr "%(name)s уже блокується."
 
-#: app/user/routes.py:1703
+#: app/user/routes.py:1720
 #, python-format
 msgid "Community not found: %(name)s"
 msgstr "Спільноти не знайдено: %(name)s"
 
-#: app/user/routes.py:1770
+#: app/user/routes.py:1787
 #, python-format
 msgid "Instance not found: %(domain)s"
 msgstr "Сервера не знайдено: %(domain)s"
 
-#: app/user/routes.py:1778
+#: app/user/routes.py:1795
 #, python-format
 msgid "Error blocking instance: %(error)s"
 msgstr "Помилка блокування сервера: %(error)s"
 
-#: app/user/routes.py:1848
+#: app/user/routes.py:1865
 msgid "Comment bookmarks"
 msgstr "Коментарі в закладках"
 
-#: app/user/routes.py:1876
+#: app/user/routes.py:1893
 msgid "Reply Alerts"
 msgstr "Сповіщення про відповіді"
 
-#: app/user/routes.py:1898
+#: app/user/routes.py:1915
 msgid "Community Alerts"
 msgstr "Сповіщення про спільноту"
 
-#: app/user/routes.py:1904
+#: app/user/routes.py:1921
 msgid "Topic Alerts"
 msgstr "Сповіщення на тему"
 
-#: app/user/routes.py:1910
+#: app/user/routes.py:1927
 msgid "Feed Alerts"
 msgstr "Сповіщення про стрічку"
 
-#: app/user/routes.py:1918
+#: app/user/routes.py:1935
 msgid "User Alerts"
 msgstr "Сповіщення про користувача"
 
-#: app/user/routes.py:1934
+#: app/user/routes.py:1951
 msgid "Post Alerts"
 msgstr "Сповіщення про дописи"
 
-#: app/user/routes.py:1989
+#: app/user/routes.py:2006
 msgid "Lemmy can't follow profiles, sorry"
 msgstr "На жаль, Lemmy не дає змоги стежити за профілями"
 
-#: app/user/routes.py:2064
+#: app/user/routes.py:2081
 msgid "Reading history has been deleted"
 msgstr "Історію читання видалено"
 
-#: app/user/routes.py:2134
+#: app/user/routes.py:2151
 msgid "Requested"
 msgstr "Запит надіслано"
 
-#: app/user/routes.py:2138
+#: app/user/routes.py:2155
 msgid "Follow request sent."
 msgstr "Запит на підписку надіслано."
 
-#: app/user/routes.py:2161
+#: app/user/routes.py:2178
 msgid "Unfollowed."
 msgstr "Ви відписались."
 
-#: app/user/routes.py:2181
+#: app/user/routes.py:2198
 msgid ""
 "A message was sent to them. If they do not respond within 48 hours their "
 "account will be flagged as a resposter."
 msgstr ""
-"Повідомлення надіслано. За відсутності відповіді протягом 48 годин обліковий "
-"запис буде позначено як репост-бота."
+"Повідомлення надіслано. За відсутності відповіді протягом 48 годин "
+"обліковий запис буде позначено як репост-бота."
 
-#: app/user/routes.py:2207
+#: app/user/routes.py:2224
 #, python-format
 msgid "That person could not be retrieved or is banned from %(site)s."
 msgstr "Помилка завантаження. Можливо, %(site)s блокує людину."
 
-#: app/user/routes.py:2217
+#: app/user/routes.py:2234
 msgid "Searching for remote people requires login"
 msgstr "Увійдіть, щоб шукати віддалених людей"
 
-#: app/user/routes.py:2404
+#: app/user/routes.py:2420
 msgid "You have exceeded your storage quota."
 msgstr "Ви перевищили квоту на пам'ять."
 
@@ -12150,3 +12221,21 @@ msgstr "Внесок скасовано."
 #~ "will review your post before allowing"
 #~ " it to be published. Please wait."
 #~ msgstr ""
+
+#~ msgid "Discussing %(title)s"
+#~ msgstr "Обговорення «%(title)s»"
+
+#~ msgid "Also check accounts that never vote, they tend to be bots."
+#~ msgstr ""
+#~ "Перевірте також облікові записи, які "
+#~ "ніколи не голосують. Зазвичай це боти."
+
+#~ msgid "Serial downvoters report."
+#~ msgstr "Скарга на масові голоси проти."
+
+#~ msgid "Does not vote"
+#~ msgstr "Не голосує"
+
+#~ msgid "Defederation"
+#~ msgstr "Блокування серверів"
+
