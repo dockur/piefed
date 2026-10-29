@@ -917,6 +917,8 @@ ul.form-multicheck-columns {
     min-width: min(100%, calc(var(--spacing-16) * 9.375)); /* 150px, or available width if <150 */
     max-width: 512px;
     max-width: min(100%, calc(var(--spacing-16) * 32)); /* 512px, or available width if <512 */
+    overflow: hidden; /* makes sure that blurred images don't overflow */
+    border-radius: var(--spacing-4);
   }
   img {
     max-width: 100%;
