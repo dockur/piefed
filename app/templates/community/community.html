@@ -8,6 +8,10 @@
 {% from "post/post_teaser/_macros.html" import render_article, render_link, render_poll, render_image, render_video -%}
 {% from "post/reply/_macros.html" import render_comment_voting_buttons, render_reply_notification_toggle, render_emoji_button -%}
 
+{% block end_scripts -%}
+    <script src="{{ url_for('static', filename='js/media_library.js', changed=getmtime('js/media_library.js')) }}" nonce={{ nonce }}></script>
+{% endblock -%}
+
 {% block app_content -%}
 <div class="row">
     <main class="col-12 {{ 'col-lg-10' if post_layout == 'masonry_wide' else 'col-lg-8' }} position-relative main_pane {{ 'border border-warning bg-body-secondary' if is_dead }}">
@@ -194,4 +198,5 @@
 
 
 </div>
+{% include "_insert_image_dialog.html" %}
 {% endblock -%}
