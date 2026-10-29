@@ -399,7 +399,7 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
 
     # Variant 1 - models/person/person.dart
     if variant == 1:
-        include = ['id', 'user_name', 'title', 'banned', 'deleted', 'bot']
+        include = ['id', 'user_name', 'title', 'banned', 'deleted', 'bot', 'matrix_user_id']
         v1 = {column.name: getattr(user, column.name) for column in user.__table__.columns if column.name in include}
         v1['bot'] = v1['bot'] or user.bot_override or False
         v1.update({'published': user.created.isoformat(timespec="microseconds") + 'Z',

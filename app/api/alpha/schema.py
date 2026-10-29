@@ -91,6 +91,7 @@ class Person(DefaultSchema):
     flair = fields.String()
     published = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     title = fields.String(allow_none=True)
+    matrix_user_id = fields.String()
 
 
 class PersonAggregates(DefaultSchema):
