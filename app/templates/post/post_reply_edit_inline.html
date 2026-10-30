@@ -1,0 +1,111 @@
+{% from 'bootstrap5/form.html' import render_field %}
+
+{% if editing %}
+    <div class="col-12 pr-0 mt-2 edit_reply">
+        <form role="form"
+                hx-post="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id, nonce=nonce) }}"
+                hx-target="closest .edit_reply"
+                hx-swap="outerHTML">
+            {{ form.csrf_token() }}
+            {{ render_field(form.body) }}
+            <fieldset id="post_reply_{{ post_reply.id }}_edit_options" class="mt-2 coolfieldset {{ 'collapsed' if request.cookies.get('fieldset_post_reply_more_options_state', 'collapsed') == 'collapsed' }}">
+                <legend>
+                    {{ _('More options') }}
+                </legend>
+                {{ render_field(form.notify_author) }}
+                {{ render_field(form.distinguished) }}
+                {{ render_field(form.language_id) }}
+            </fieldset>
+            <div class="container mt-2">
+                <div class="row">
+                    <div class="col-auto px-1">
+                        {{ render_field(form.submit) }}
+                    </div>
+                    <div class="col-auto px-1">
+                        <a href="#"
+                                id="comment_preview_{{ post_reply.id }}"
+                                class="btn btn-outline-secondary"
+                                hx-post="{{ url_for('post.preview', type="comment_edit", id=post_reply.id) }}"
+                                hx-target="#textarea_reply_edit_preview_{{ post_reply.id }}">
+                            {{ _('Preview') }}
+                        </a>
+                        <a href="#" id="insertImage_{{ post_reply.id }}" class="btn btn-outline-secondary {{ 'd-none' if markdown_editor }}">
+                            {{ _('Insert image') }}
+                        </a>
+                    </div>
+                    <div class="col-auto pe-1 ms-auto">
+                        <a href="#" class="btn btn-secondary">{{ "Cancel" }}</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col">
+                <div id="textarea_reply_edit_preview_{{ post_reply.id }}" class="reply_preview"></div>
+            </div>
+        </div>
+
+        {% if markdown_editor %}
+            <script nonce="{{ nonce }}">
+                (() => {
+                    var downarea = new DownArea({
+                        elem: document.querySelector('#reply_body_{{ post_reply.id }}'),
+                        resize: DownArea.RESIZE_VERTICAL,
+                        hide: ['heading', 'bold-italic'],
+                        value: document.getElementById("reply_body_{{ post_reply.id }}").value
+                    });
+                    setupAutoResize('reply_body_{{ post_reply.id }}');
+                })();
+            </script>
+        {% endif %}
+
+        <script nonce="{{ nonce }}">
+            (() => {
+                // Initialize Media Library for this reply form
+                const mediaLibrary_{{ post_reply.id }} = new MediaLibrary({
+                    dialogId: 'insertImageDialog',
+                    dialogCloseId: 'insert_image_dialog_close',
+                    triggerLinkId: 'insertImage_{{ post_reply.id }}',
+                    loadContainerId: 'loadImagesHere',
+                    targetTextareaId: 'reply_body_{{ post_reply.id }}',
+                    uploadInputId: 'imageUploadInput',
+                    uploadButtonId: 'imageUploadButton',
+                    uploadStatusId: 'uploadStatus',
+                    translations: {
+                        loading: "{{ _("Loading...") }}",
+                        noImages: "{{ _("No images found.") }}",
+                        errorLoading: "{{ _("Error loading images.") }}",
+                        insert: "{{ _("Insert") }}",
+                        more: "{{ _("More") }}",
+                        delete: "{{ _("Delete") }}",
+                        confirmDelete: "{{ _("Are you sure you want to delete this image?") }}",
+                        deleteError: "{{ _("Failed to delete image. Please try again.") }}",
+                        selectFile: "{{ _("Please select a file.") }}",
+                        selectImage: "{{ _("Please select an image file.") }}",
+                        uploading: "{{ _("Uploading...") }}",
+                        uploadSuccess: "{{ _("Upload successful!") }}",
+                        uploadError: "{{ _("Upload failed. Please try again.") }}",
+                        pasteUploadError: "{{ _("Failed to upload pasted image. Please try again.") }}"
+                    }
+                });
+
+                {% if markdown_editor %}
+                // Override DownArea image button to use media library
+                mediaLibrary_{{ post_reply.id }}.overrideDownAreaImageButton('#reply_body_{{ post_reply.id }}');
+                {% endif %}
+
+                // Initialize the coolfieldset with More Options
+                const moreOptions_{{ post_reply.id }} = document.getElementById('post_reply_{{ post_reply.id }}_edit_options');
+                coolfieldset('#post_reply_{{ post_reply.id }}_edit_options', {
+                    collapsed: moreOptions_{{ post_reply.id }}.classList.contains('collapsed'),
+                    animation: true
+                });
+            })();
+        </script>
+    </div>
+{% else %}
+    <div class="col-12 pr-0 mt-2" lang="{{ post_reply.language_code() }}">
+        {{ post_reply.body_html | community_links | feed_links | person_links | safe }}
+    </div>
+{% endif %}

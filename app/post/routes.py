@@ -1913,6 +1913,48 @@ def post_reply_source(post_id: int, comment_id: int, state: str):
                                comment_id=comment_id, post_id=post_id)
 
 
+@bp.route("/post/<int:post_id>/comment/<int:comment_id>/edit_inline", methods=["GET", "POST"])
+@login_required
+def post_reply_edit_inline(post_id: int, comment_id: int):
+    # This should be an htmx request, if not, redirect to the old form
+    if not request.headers.get('HX-Request'):
+        redirect(url_for('post.post_reply_edit', post_id=post_id, comment_id=comment_id))
+
+    # Fetch stuff
+    post = Post.query.get_or_404(post_id)
+    post_reply = PostReply.query.get_or_404(comment_id)
+    form = EditReplyForm()
+    form.language_id.choices = languages_for_form()
+    
+    # Ensure it is the author making the edit
+    if post_reply.user_id == current_user.id:
+        if form.validate_on_submit():
+            edit_reply(form, post_reply, post, SRC_WEB, in_line=True)
+            return render_template(
+                "post/post_reply_edit_inline.html",
+                form=form,
+                markdown_editor=current_user.markdown_editor,
+                post=post,
+                post_reply=post_reply,
+                editing=False)
+        else:
+            form.body.data = post_reply.body
+            form.body.render_kw = {"id": f"reply_body_{post_reply.id}"}
+            form.notify_author.data = post_reply.notify_author
+            form.language_id.data = post_reply.language_id
+            form.distinguished.data = post_reply.distinguished
+            if not post.community.is_moderator() and not post.community.is_owner() and not current_user.is_staff() and not current_user.is_admin():
+                form.distinguished.render_kw = {'disabled': True}
+            return render_template(
+                "post/post_reply_edit_inline.html",
+                form=form,
+                markdown_editor=current_user.markdown_editor,
+                post=post,
+                post_reply=post_reply,
+                editing=True)
+    else:
+        abort(401)
+
 
 @bp.route('/post/<int:post_id>/comment/<int:comment_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -2340,14 +2382,18 @@ def preview():
     if preview_top:
         oob_target = oob_target + "top_"
 
-    if preview_type == "comment":
+    if preview_type.startswith("comment"):
         oob_target = oob_target + "comment_preview_"
         if preview_top:
             target_id = "#textarea_comment_to_preview"
+        elif preview_type.endswith("_edit"):
+            target_id = "#textarea_reply_edit_preview_"
         else:
             target_id = "#textarea_in_reply_to_preview_"
-            if preview_id:
-                target_id += preview_id
+           
+        if preview_id and not preview_top:
+            target_id += preview_id
+    
     elif preview_type == "post" or preview_type == "wiki":
         oob_target = "post_preview_btn"
         target_id = "#preview"

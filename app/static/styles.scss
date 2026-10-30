@@ -713,6 +713,12 @@ ul.form-multicheck-columns {
 
 }
 
+.edit_reply {
+  .form-label {
+    display: none;
+  }
+}
+
 .sort_methods, .view_filter {
   text-wrap: none;
   text-wrap-mode: nowrap;

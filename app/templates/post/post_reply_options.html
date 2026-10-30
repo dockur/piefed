@@ -4,14 +4,22 @@
     {# Edit button - show if not deleted OR if deleted but user is author AND staff/admin #}
     {% if not post_reply.deleted and post_reply.user_id == current_user.id -%}
         <li>
-            <a href="{{ url_for('post.post_reply_edit', post_id=post.id, comment_id=post_reply.id) }}" class="dropdown-item no-underline" rel="nofollow">
+            <a class="dropdown-item no-underline" role="button"
+                    hx-get="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id) }}"
+                    hx-trigger="click throttle:1s"
+                    hx-target="previous .comment_body"
+                    hx-swap="innerHTML">
                 <span class="fe fe-edit"></span>
                 {{ _('Edit') }}
             </a>
         </li>
     {% elif post_reply.deleted and post_reply.user_id == current_user.id and (current_user.is_staff() or current_user.get_id() in admin_ids) -%}
         <li>
-            <a href="{{ url_for('post.post_reply_edit', post_id=post.id, comment_id=post_reply.id) }}" class="dropdown-item no-underline" rel="nofollow">
+            <a class="dropdown-item no-underline" role="button"
+                    hx-get="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id) }}"
+                    hx-trigger="click throttle:1s"
+                    hx-target="previous .comment_body"
+                    hx-swap="innerHTML">
                 <span class="fe fe-edit"></span>
                 {{ _('Edit') }}
             </a>
