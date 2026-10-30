@@ -1350,7 +1350,12 @@ def statistics(software=''):
     response = make_response(render_template('statistics.html', title=title, instances=instances,
                                              next_url=next_url, prev_url=prev_url, software=software))
     if not current_app.debug:
-        response.headers.add_header('Cache-Control', f'public, max-age=3600')
+        if current_user.is_anonymous:
+            response.headers.set('Vary', 'Accept, Accept-Language')
+            response.headers.set('Cache-Control', 'public, max-age=3600')
+        else:
+            response.headers.set('Vary', 'Accept, Cookie, Accept-Language')
+            response.headers.set('Cache-Control', 'private, max-age=15, must-revalidate')
     return response
 
 
