@@ -1144,6 +1144,7 @@ class UserSaveSettingsRequest(DefaultSchema):
     show_nsfl = fields.Boolean()
     show_read_posts = fields.Boolean()
     searchable = fields.Boolean(metadata={"description": "If profile shows up in the user list on the instance"})
+    matrix_user_id = fields.String(allow_none=True, metadata={"description": "Pass null to remove existing id"})
 
 
 class UserSaveSettingsResponse(DefaultSchema):

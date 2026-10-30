@@ -375,6 +375,19 @@ def put_user_save_user_settings(auth, data):
         cover = None
         remove_cover = False
 
+    if 'matrix_user_id' in data:
+        if not data['matrix_user_id']:
+            # null value passed, remove matrix id
+            matrix_user_id = None
+            remove_matrix = True
+        else:
+            # Set to new given value
+            matrix_user_id = data['matrix_user_id']
+            remove_matrix = False
+    else:
+        matrix_user_id = None
+        remove_matrix = False
+
     if nsfw_visibility:
         if nsfw_visibility == "Show":
             user.hide_nsfw = 0
@@ -493,6 +506,11 @@ def put_user_save_user_settings(auth, data):
             user.cover_id = None
         db.session.commit()
         cache.delete_memoized(User.cover_image, user)
+
+    if matrix_user_id:
+        user.matrix_user_id = matrix_user_id
+    elif remove_matrix:
+        user.matrix_user_id = ""
 
     if default_sort is not None:
         user.default_sort = default_sort.lower()

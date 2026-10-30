@@ -567,6 +567,7 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
                     "about": user.about,
                     "about_html": user.about_html,
                     "extra_fields": extra_fields,
+                    "matrix_user_id": user.matrix_user_id if user.matrix_user_id else ""
                 },
                 "counts": {
                     "person_id": user.id,
@@ -591,6 +592,8 @@ def user_view(user: User | int, variant, stub=False, user_id=None, flair_communi
             del v6["local_user_view"]["person"]["about_html"]
         if not v6["local_user_view"]["person"]["extra_fields"]:
             del v6["local_user_view"]["person"]["extra_fields"]
+        if not v6["local_user_view"]["person"]["matrix_user_id"]:
+            del v6["local_user_view"]["person"]["matrix_user_id"]
 
         return v6
 
