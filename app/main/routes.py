@@ -1428,9 +1428,7 @@ def anoobis():
     next = request.args.get('next')
     if next is None:
         return ''
-    # Only allow local paths (check_anoobis always passes request.path). Reject '//host' and '/\host' which browsers
-    # treat as another site, and anything that isn't a plain path, e.g. 'javascript:' or ' javascript:'.
-    if next.startswith('/') and not next.startswith('//') and not next.startswith('/\\'):
+    if next.startswith('/') and not next.startswith('//') and not next.startswith('/\\'):   # Only allow local paths
         return render_template('anoobis.html', next=next, diff_desktop=current_app.config['ANOOBIS_DIFFICULTY_DESKTOP'],
                                diff_mobile=current_app.config['ANOOBIS_DIFFICULTY_MOBILE'])
     else:
