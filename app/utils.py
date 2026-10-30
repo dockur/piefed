@@ -1815,7 +1815,7 @@ def check_anoobis(func):
     def decorated_view(*args, **kwargs):
         whitelist = ['Mastodon', 'Friendica', 'Synapse', 'PieFed', 'Bridgy', 'Lemmy', 'FlipboardProxy', 'Googlebot', 'GoogleOther', 'Kagibot', 'bingbot', 'Discordbot']
         if current_user.is_anonymous and current_app.config['ANOOBIS'] and \
-                request.cookies.get('anoobis') is None and \
+                request.cookies.get('anoobis3') is None and \
                 not any(item in request.user_agent.string for item in whitelist):
             return redirect(url_for('main.anoobis', next=request.path))
         return func(*args, **kwargs)
