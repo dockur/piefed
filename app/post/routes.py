@@ -1929,6 +1929,7 @@ def post_reply_edit_inline(post_id: int, comment_id: int):
     # Ensure it is the author making the edit
     if post_reply.user_id == current_user.id:
         if form.validate_on_submit():
+            # Edit was submitted
             edit_reply(form, post_reply, post, SRC_WEB, in_line=True)
             return render_template(
                 "post/post_reply_edit_inline.html",
@@ -1938,20 +1939,27 @@ def post_reply_edit_inline(post_id: int, comment_id: int):
                 post_reply=post_reply,
                 editing=False)
         else:
-            form.body.data = post_reply.body
-            form.body.render_kw = {"id": f"reply_body_{post_reply.id}"}
-            form.notify_author.data = post_reply.notify_author
-            form.language_id.data = post_reply.language_id
-            form.distinguished.data = post_reply.distinguished
-            if not post.community.is_moderator() and not post.community.is_owner() and not current_user.is_staff() and not current_user.is_admin():
-                form.distinguished.render_kw = {'disabled': True}
+            if request.args.get('cancelled', False):
+                # Edit was cancelled
+                editing = False
+            else:
+                # Edit is requested, get the form and populate it
+                editing = True
+                form.body.data = post_reply.body
+                form.body.render_kw = {"id": f"reply_body_{post_reply.id}"}
+                form.notify_author.data = post_reply.notify_author
+                form.language_id.data = post_reply.language_id
+                form.distinguished.data = post_reply.distinguished
+                if not post.community.is_moderator() and not post.community.is_owner() and not current_user.is_staff() and not current_user.is_admin():
+                    form.distinguished.render_kw = {'disabled': True}
+            
             return render_template(
                 "post/post_reply_edit_inline.html",
                 form=form,
                 markdown_editor=current_user.markdown_editor,
                 post=post,
                 post_reply=post_reply,
-                editing=True)
+                editing=editing)
     else:
         abort(401)
 

@@ -3,8 +3,9 @@
 {% if editing %}
     <div class="col-12 pr-0 mt-2 edit_reply">
         <form role="form"
-                hx-post="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id, nonce=nonce) }}"
+                hx-post="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id) }}"
                 hx-target="closest .edit_reply"
+                hx-trigger="submit"
                 hx-swap="outerHTML">
             {{ form.csrf_token() }}
             {{ render_field(form.body) }}
@@ -34,7 +35,14 @@
                         </a>
                     </div>
                     <div class="col-auto pe-1 ms-auto">
-                        <a href="#" class="btn btn-secondary">{{ "Cancel" }}</a>
+                        <a class="btn btn-outline-secondary"
+                                hx-get="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id, cancelled=True) }}"
+                                hx-target="closest .edit_reply"
+                                hx-trigger="click throttle:1s"
+                                hx-swap="outerHTML"
+                                >
+                            {{ "Cancel" }}
+                        </a>
                     </div>
                 </div>
             </div>
