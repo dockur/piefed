@@ -539,7 +539,7 @@
         if (options.captions && imageCaption) {
             var figcaption = create('figcaption');
             figcaption.id = 'baguetteBox-figcaption-' + index;
-            figcaption.innerHTML = imageCaption;
+            figcaption.textContent = imageCaption;
             figure.appendChild(figcaption);
         }
         imageContainer.appendChild(figure);

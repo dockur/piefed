@@ -137,11 +137,11 @@
                         const htmlSnippets = [
                             {% if sticky_posts -%}
                               {% for post in sticky_posts -%}
-                                  {% raw -%}`{% endraw -%}{% include 'post/_post_teaser_masonry.html' -%}{% raw -%}`{% endraw -%},
+                                  {% set snippet %}{% include 'post/_post_teaser_masonry.html' %}{% endset %}{{ snippet|tojson }},
                               {% endfor -%}
                             {% endif -%}
                             {% for post in posts.items -%}
-                                {% raw -%}`{% endraw -%}{% include 'post/_post_teaser_masonry.html' -%}{% raw -%}`{% endraw -%},
+                                {% set snippet %}{% include 'post/_post_teaser_masonry.html' %}{% endset %}{{ snippet|tojson }},
                             {% endfor -%}
                         ];
                         renderMasonry(masonry, htmlSnippets);

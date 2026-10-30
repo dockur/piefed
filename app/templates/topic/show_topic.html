@@ -49,7 +49,7 @@
                   const masonry = document.getElementById('masonry');
                   const htmlSnippets = [
                       {% for post in posts %}
-                        {% raw %}`{% endraw %}{% include 'post/_post_teaser_masonry.html' %}{% raw %}`{% endraw %},
+                        {% set snippet %}{% include 'post/_post_teaser_masonry.html' %}{% endset %}{{ snippet|tojson }},
                       {% endfor %}
                   ];
                   renderMasonry(masonry, htmlSnippets);

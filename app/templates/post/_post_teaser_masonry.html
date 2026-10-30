@@ -1,4 +1,3 @@
-{# do not use any back ticks in the HTML produced by this template - javascript needs to load it as a string. See community.html #}
 {% set content_blocked = post.blocked_by_content_filter(content_filters, current_user.get_id())
                          or (current_user.hide_nsfw == 3 and post.nsfw)
                          or (current_user.hide_nsfl == 3 and post.nsfl)
@@ -12,7 +11,7 @@
 {% if content_blocked and content_blocked == '-1' %}
     {# do nothing - blocked by keyword filter #}
 {% else %}
-    {% set post_title = post.title.replace('`', "'") %}
+    {% set post_title = post.title %}
     <div class="item{{ ' reported' if post.has_been_reported() }}{{ ' blocked' if content_blocked }}{{ ' blur' if blur_content }}"
         {% if content_blocked %} title="{{ _('Filtered: ') }}{{ content_blocked }}"{% endif %} id="post_{{ post.id }}">
         {% if post.image_id and not (post.url and (post.url.endswith('.mp4') or post.url.endswith('.webm'))) %}
@@ -24,7 +23,7 @@
                            loading="lazy" width="{{ post.image.width }}" height="{{ post.image.height }}" /></a>
                     {% elif post.image.source_url %}
                         <a href="{{ post.url }}" rel="nofollow ugc" target="_blank" aria-label="{{ _('View image') }}"><img src="{{ post.image.source_url }}"  class="{{ ' blur' if blur_content }}"
-                           alt="{{ post.title.replace('`', "'") }}" title="{{ post_title }}" loading="{{ 'lazy' if low_bandwidth else 'eager' }}" /></a>
+                           alt="{{ post_title }}" title="{{ post_title }}" loading="{{ 'lazy' if low_bandwidth else 'eager' }}" /></a>
                     {% else %}
                         <a href="{{ post.url }}" rel="nofollow ugc" target="_blank" aria-label="{{ _('View image') }}"><img src="{{ post.url }}"
                            alt="{{ post_title }}" title="{{ post_title }}" class="{{ 'blur' if blur_content }}"

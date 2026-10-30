@@ -117,7 +117,7 @@
             setTimeout(function () {
                 solveProofOfWork(difficulty);
                 setCookie('anoobis', 'ok', 1000);
-                location.href = '{{ next }}';
+                location.href = {{ next|tojson }};
             }, 50);
         });
     </script>

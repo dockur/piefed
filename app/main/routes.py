@@ -5,7 +5,6 @@ from datetime import timedelta, timezone
 from random import randint
 
 import flask
-from furl import furl
 from markupsafe import Markup
 from pyld import jsonld
 from sqlalchemy import or_, and_, func
@@ -1429,13 +1428,13 @@ def anoobis():
     next = request.args.get('next')
     if next is None:
         return ''
-    f = furl(next)
-    if next and (f.host is None or f.host == current_app.config['SERVER_NAME']) and (f.scheme is None or f.scheme.startswith('http')):
+    # Only allow local paths (check_anoobis always passes request.path). Reject '//host' and '/\host' which browsers
+    # treat as another site, and anything that isn't a plain path, e.g. 'javascript:' or ' javascript:'.
+    if next.startswith('/') and not next.startswith('//') and not next.startswith('/\\'):
         return render_template('anoobis.html', next=next, diff_desktop=current_app.config['ANOOBIS_DIFFICULTY_DESKTOP'],
                                diff_mobile=current_app.config['ANOOBIS_DIFFICULTY_MOBILE'])
     else:
-        raise Exception(f'Anoobis error: {f.host} != {current_app.config["SERVER_NAME"]}')
-        abort(403)
+        raise Exception(f'Anoobis error: invalid next {next!r}')
 
 
 @bp.route('/bot_challenge/<uuid>')
