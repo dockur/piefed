@@ -150,7 +150,7 @@ def remove_old_community_content():
                 ).filter(Post.posted_at < cut_off).all()]
 
                 for post_id in post_ids:
-                    delete_post(post_id, False, SRC_WEB, None)
+                    delete_post(post_id, community.is_local(), SRC_WEB, None)
 
         session.commit()
     except Exception:
