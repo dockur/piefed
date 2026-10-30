@@ -26,6 +26,7 @@
                 <tr>
                     <th>{{ _('Instance') }}</th>
                     <th>{{ _('Monthly active users') }}</th>
+                    <th>{{ _('Last seen') }}</th>
                     <th>{{ _('Software') }}</th>
                     <th>{{ _('Version') }}</th>
                 </tr>
@@ -33,10 +34,12 @@
             <tbody>
                 {% for instance in instances.items %}
                     <tr>
-                        <td>{{ instance.domain }}</td>
-                        <td>{{ instance.active_1mo }}</td>
-                        <td>{{ instance.software }}</td>
-                        <td>{{ instance.version }}</td>
+                        <td><a href="/instance/{{ instance.domain }}" rel="ugc noopener nofollow noindex noreferrer">{{ instance.domain }}</a>
+                        <a href="https://{{ instance.domain }}" rel="noopener nofollow noindex noreferrer"><span class="fe fe-external"></span></a></td>
+                        <td>{{ instance.active_1mo | numberformat }}</td>
+                        <td>{{ localize_datetime(instance.last_seen, locale) }}</td>
+                        <td>{{ instance.software | lower }}</td>
+                        <td>{{ instance.version | shorten(15) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

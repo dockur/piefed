@@ -145,7 +145,7 @@ def register(app):
                 Site(name="PieFed", description='Explore Anything, Discuss Everything.', public_key=public_key,
                      private_key=private_key, language_id=2))
             db.session.add(Instance(domain=app.config['SERVER_NAME'],
-                                    software='PieFed'))  # Instance 1 is always the local instance
+                                    software='piefed'))  # Instance 1 is always the local instance
             db.session.add(Settings(name='allow_nsfw', value=json.dumps(False)))
             db.session.add(Settings(name='allow_nsfl', value=json.dumps(False)))
             db.session.add(Settings(name='allow_dislike', value=json.dumps(True)))

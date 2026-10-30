@@ -19,7 +19,7 @@ from app.admin.util import topics_for_form
 from app.api.alpha.utils.misc import get_resolve_object
 from app.community.util import hashtags_recent
 from app.constants import SUBSCRIPTION_PENDING, SUBSCRIPTION_MEMBER, SUBSCRIPTION_OWNER, SUBSCRIPTION_MODERATOR, \
-    POST_STATUS_REVIEWING
+    POST_STATUS_REVIEWING, VERSION
 from app.email import send_email, send_registration_approved_email
 from app.inoculation import inoculation
 from app.main import bp
@@ -1325,13 +1325,17 @@ def statistics(software=''):
     else:
         title = _('Statistics for %(software)s', software=software)
 
+    local_instance = Instance.query.get(1)
+    if local_instance.active_1mo is None or local_instance.updated_at < utcnow() - timedelta(days=1):
+        local_instance.active_1mo = active_month()
+        local_instance.updated_at = utcnow()
+        local_instance.version = VERSION
+        db.session.commit()
+
     instances = Instance.query.filter(Instance.gone_forever == False, Instance.active_1mo != None)
     if software:
         software = software.strip().lower()
-        if ',' in software:
-            instances = instances.filter(Instance.software.in_(tuple(software.split(','))))
-        else:
-            instances = instances.filter(Instance.software == software)
+        instances = instances.filter(func.lower(Instance.software) == software)
 
     instances = instances.order_by(desc(Instance.active_1mo))
 
