@@ -1374,7 +1374,7 @@ def vote_for_poll(post_id, votes, src, auth=None):
 def build_gallery_thumbnail(files: List[str], return_file_id=True):
     pil_images = []
     for file in files:
-        if file.startswith('https://'):
+        if file.startswith('http'):
             source_image_response = get_request(file)
             if source_image_response and source_image_response.status_code == 200:
                 content_type = source_image_response.headers.get('content-type')
