@@ -5,6 +5,7 @@
     {% if not post_reply.deleted and post_reply.user_id == current_user.id -%}
         <li>
             <a class="dropdown-item no-underline" role="button"
+                    href="{{ url_for('post.post_reply_edit', post_id=post.id, comment_id=post_reply.id) }}"
                     hx-get="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id) }}"
                     hx-trigger="click throttle:1s"
                     hx-target="previous .comment_body"
@@ -16,6 +17,7 @@
     {% elif post_reply.deleted and post_reply.user_id == current_user.id and (current_user.is_staff() or current_user.get_id() in admin_ids) -%}
         <li>
             <a class="dropdown-item no-underline" role="button"
+                    href="{{ url_for('post.post_reply_edit', post_id=post.id, comment_id=post_reply.id) }}"
                     hx-get="{{ url_for('post.post_reply_edit_inline', post_id=post.id, comment_id=post_reply.id) }}"
                     hx-trigger="click throttle:1s"
                     hx-target="previous .comment_body"
