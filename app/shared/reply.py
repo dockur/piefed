@@ -199,7 +199,7 @@ def make_reply(input, post, parent_id, src, auth=None):
         return reply
 
 
-def edit_reply(input, reply, post, src, auth=None):
+def edit_reply(input, reply, post, src, auth=None, in_line=False):
     if src == SRC_API:
         user = authorise_api_user(auth, return_type='model', id_match=reply.user_id)
         content = input['body']
@@ -226,7 +226,7 @@ def edit_reply(input, reply, post, src, auth=None):
         reply.distinguished = distinguished
     db.session.commit()
 
-    if src == SRC_WEB:
+    if src == SRC_WEB and not in_line:
         flash(_('Your changes have been saved.'), 'success')
 
     task_selector('edit_reply', reply_id=reply.id, parent_id=reply.parent_id)

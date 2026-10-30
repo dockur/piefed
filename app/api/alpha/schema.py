@@ -91,6 +91,7 @@ class Person(DefaultSchema):
     flair = fields.String()
     published = fields.String(validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     title = fields.String(allow_none=True)
+    matrix_user_id = fields.String()
 
 
 class PersonAggregates(DefaultSchema):
@@ -1143,6 +1144,7 @@ class UserSaveSettingsRequest(DefaultSchema):
     show_nsfl = fields.Boolean()
     show_read_posts = fields.Boolean()
     searchable = fields.Boolean(metadata={"description": "If profile shows up in the user list on the instance"})
+    matrix_user_id = fields.String(allow_none=True, metadata={"description": "Pass null to remove existing id"})
 
 
 class UserSaveSettingsResponse(DefaultSchema):
