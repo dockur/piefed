@@ -1331,7 +1331,7 @@ def statistics(software=''):
         local_instance.version = VERSION
         db.session.commit()
 
-    instances = Instance.query.filter(Instance.gone_forever == False, Instance.active_1mo != None)
+    instances = Instance.query.filter(Instance.gone_forever == False, Instance.active_1mo != None, Instance.active_1mo > 0)
     if software:
         software = software.strip().lower()
         instances = instances.filter(func.lower(Instance.software) == software)
