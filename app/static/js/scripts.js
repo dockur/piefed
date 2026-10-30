@@ -1927,6 +1927,11 @@ function setupCommunityFilter() {
         if (communitiesMenu) {
             hookupCommunityFilter();
         }
+
+        // Make sure lightbox is re-initialized after an auto-reload
+        if (event.target.id === "auto-reload") {
+          setupLightboxTeaser();
+        }
     });
 
     document.addEventListener('htmx:afterSettle', function(event) {
