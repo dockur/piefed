@@ -1,0 +1,60 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+
+{% block app_content -%}
+    <h1>{{ title }}</h1>
+    <form method="get" class="mb-3 d-flex gap-3 align-items-center">
+        <select name="software" class="form-select submit_on_change">
+            <option value="">{{ _('All software') }}</option>
+            <option value="PieFed" {{ 'selected' if software == 'piefed' }}>PieFed</option>
+            <option value="Lemmy" {{ 'selected' if software == 'lemmy' }}>Lemmy</option>
+            <option value="Mbin" {{ 'selected' if software == 'mbin' }}>Mbin</option>
+            <option value="Mastodon" {{ 'selected' if software == 'mastodon' }}>Mastodon</option>
+            <option value="Pixelfed" {{ 'selected' if software == 'pixelfed' }}>Pixelfed</option>
+            <option value="Peertube" {{ 'selected' if software == 'peertube' }}>PeerTube</option>
+            <option value="NodeBB" {{ 'selected' if software == 'nodebb' }}>NodeBB</option>
+        </select>
+        <input type="submit" name="submit_form" value="{{ _('Search') }}" class="btn btn-primary"/>
+    </form>
+    <div class="table-responsive-md mt-4">
+        {% if instances.items %}
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th>{{ _('Instance') }}</th>
+                    <th>{{ _('Monthly active users') }}</th>
+                    <th>{{ _('Software') }}</th>
+                    <th>{{ _('Version') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for instance in instances.items %}
+                    <tr>
+                        <td>{{ instance.domain }}</td>
+                        <td>{{ instance.active_1mo }}</td>
+                        <td>{{ instance.software }}</td>
+                        <td>{{ instance.version }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else -%}
+            <p>{{ _('There are no instances to show.') }}</p>
+        {% endif -%}
+    </div>
+    <nav aria-label="{{ _('Pagination') }}" class="mt-4" role="navigation">
+            {% if prev_url -%}
+                <a href="{{ prev_url }}" class="btn btn-primary" rel='nofollow'>
+                    <span aria-hidden="true">&larr;</span> {{ _('Previous page') }}
+                </a>
+            {% endif -%}
+            {% if next_url -%}
+                <a href="{{ next_url }}" class="btn btn-primary" rel='nofollow'>
+                    {{ _('Next page') }} <span aria-hidden="true">&rarr;</span>
+                </a>
+            {% endif -%}
+    </nav>
+{% endblock -%}

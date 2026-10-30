@@ -1227,10 +1227,10 @@ def explore():
                            menu_subscribed_feeds=menu_subscribed_feeds(current_user.id) if current_user.is_authenticated else None,)
 
 
-# RSS feed of the community
+# RSS feed of the home page
 @bp.route('/index/feed', methods=['GET'])
 @bp.route('/index/feed/<feed_type>', methods=['GET'])
-#@cache.cached(timeout=600, query_string=True)
+@cache.cached(timeout=600, query_string=True)
 def index_rss(feed_type=None):
 
     # If nothing has changed since their last visit, return HTTP 304
@@ -1310,6 +1310,44 @@ def index_rss(feed_type=None):
     response.headers.set('Content-Type', 'application/rss+xml')
     response.headers.add_header('ETag', f"home_{hash(g.site.last_active)}")
     response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
+    return response
+
+
+@bp.route('/statistics')
+@bp.route('/statistics/<software>')
+@login_required_if_private_instance
+def statistics(software=''):
+    page = request.args.get('page', 1, type=int)
+    low_bandwidth = request.cookies.get('low_bandwidth', '0') == '1'
+    software = software or request.args.get('software', '')
+    if software == '':
+        title = _('Statistics')
+    else:
+        title = _('Statistics for %(software)s', software=software)
+
+    instances = Instance.query.filter(Instance.gone_forever == False, Instance.active_1mo != None)
+    if software:
+        software = software.strip().lower()
+        if ',' in software:
+            instances = instances.filter(Instance.software.in_(tuple(software.split(','))))
+        else:
+            instances = instances.filter(Instance.software == software)
+
+    instances = instances.order_by(desc(Instance.active_1mo))
+
+    # Pagination
+    arg_dict = {"low_bandwidth": low_bandwidth,
+                "software": software,
+                }
+
+    instances = instances.paginate(page=page, per_page=100 if not low_bandwidth else 50, error_out=False)
+    next_url = url_for('main.modlog', page=instances.next_num, **arg_dict) if instances.has_next else None
+    prev_url = url_for('main.modlog', page=instances.prev_num, **arg_dict) if instances.has_prev and page != 1 else None
+
+    response = make_response(render_template('statistics.html', title=title, instances=instances,
+                                             next_url=next_url, prev_url=prev_url, software=software))
+    if not current_app.debug:
+        response.headers.add_header('Cache-Control', f'public, max-age=3600')
     return response
 
 
