@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupTeaserClick,
 
         // lightboxes are too heavy for low bandwidth mode
-        ...(low_bandwidth ? [] : [setupLightboxTeaser, setupLightboxPostBody]),
+        ...(low_bandwidth ? [] : [setupLightboxTeaser, setupLightboxPostBody, setupLightboxListener]),
 
         setupTopicChooser,
         setupTimeTracking,
@@ -86,6 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupHandleUrlPaste,
         setupMarkdownKeyboardShortcuts,
         setupQuotingHighlightedText,
+        setupJoinListener,
 
         // must be last - see comment above
         setupDynamicContentObserver
@@ -1910,6 +1911,41 @@ function handleDynamicCtrlEnter(event) {
     }
 }
 
+// Make sure lightbox catches images that are dynamically loaded
+function setupLightboxListener() {
+    // HTMX event listener for dynamic content loading
+    document.addEventListener('htmx:afterSwap', function(event) {
+        // If it is an auto-reload, re-initialize the lightbox
+        if (event.target.id === "auto-reload") {
+            setupLightboxTeaser();
+        }
+    });
+}
+
+// Function to remove all the "Join" text on post teasers after an htmx is triggered to join that community
+function setupJoinListener() {
+    // HTMX event listener
+    document.addEventListener('htmx:beforeSwap', function(event) {
+        // First get info about the element triggering the request, return if something is wrong
+        const trigger = event.detail.requestConfig.elt;
+        if (!trigger || !trigger.classList) return;
+        
+        // Check if it has a class matching join_<community_id>
+        const joinClass = [...trigger.classList].find(className => /^join_\d+$/.test(className));
+
+        // If that class isn't present, send the htmx request like normal
+        if (!joinClass || event.detail.isError) return;
+
+        // If we make it this far, we will do the swap with JS, so disable htmx swapping
+        event.detail.shouldSwap = false;
+
+        // Remove all matching elements (presumably because we have joined now)
+        document.querySelectorAll(`.${joinClass}`).forEach(element => {
+            element.remove();
+        });
+    });
+}
+
 // Community filter (search box)
 function setupCommunityFilter() {
     // Try and hookup the filter first (in case HTMX already loaded)
@@ -1926,11 +1962,6 @@ function setupCommunityFilter() {
         const communitiesMenu = event.target.closest('.communities_menu');
         if (communitiesMenu) {
             hookupCommunityFilter();
-        }
-
-        // Make sure lightbox is re-initialized after an auto-reload
-        if (event.target.id === "auto-reload") {
-          setupLightboxTeaser();
         }
     });
 
