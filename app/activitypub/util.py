@@ -36,7 +36,8 @@ from app.utils import get_request, allowlist_html, get_setting, ap_datetime, mar
     moderating_communities, get_task_session, is_video_hosting_site, opengraph_parse, mastodon_extra_field_link, \
     blocked_users, piefed_markdown_to_lemmy_markdown, store_files_in_s3, guess_mime_type, get_recipient_language, \
     patch_db_session, to_srgb, communities_banned_from_all_users, blocked_communities, blocked_or_banned_instances, \
-    instance_community_ids, banned_instances, communities_run_by_inactive_mods, inspect_image_c2pa
+    instance_community_ids, banned_instances, communities_run_by_inactive_mods, inspect_image_c2pa, can_downvote, \
+    can_upvote
 
 
 def public_key():
@@ -3247,30 +3248,36 @@ def undo_vote(comment, post, target_ap_id, user):
         post = voted_on
         existing_vote = PostVote.query.filter_by(user_id=user.id, post_id=post.id).first()
         if existing_vote:
-            with db.session.begin_nested():
-                db.session.execute(text('UPDATE "user" SET reputation = reputation - :effect WHERE id = :user_id'),
-                                   {'effect': existing_vote.effect, 'user_id': post.user_id})
             if existing_vote.effect < 0:  # Lemmy sends 'like' for upvote and 'dislike' for down votes. Cool! When it undoes an upvote it sends an 'Undo Like'. Fine. When it undoes a downvote it sends an 'Undo Like' - not 'Undo Dislike'?!
+                if not can_downvote(user, post.community):
+                    return None
                 post.down_votes -= 1
             else:
+                if not can_upvote(user, post.community):
+                    return None
                 post.up_votes -= 1
             post.score -= existing_vote.effect
             db.session.delete(existing_vote)
+            db.session.execute(text('UPDATE "user" SET reputation = reputation - :effect WHERE id = :user_id'),
+                               {'effect': existing_vote.effect, 'user_id': post.user_id})
             db.session.commit()
         return post
     if isinstance(voted_on, PostReply):
         comment = voted_on
         existing_vote = PostReplyVote.query.filter_by(user_id=user.id, post_reply_id=comment.id).first()
         if existing_vote:
-            with db.session.begin_nested():
-                db.session.execute(text('UPDATE "user" SET reputation = reputation - :effect WHERE id = :user_id'),
-                                   {'effect': existing_vote.effect, 'user_id': comment.user_id})
             if existing_vote.effect < 0:  # Lemmy sends 'like' for upvote and 'dislike' for down votes. Cool! When it undoes an upvote it sends an 'Undo Like'. Fine. When it undoes a downvote it sends an 'Undo Like' - not 'Undo Dislike'?!
+                if not can_downvote(user, comment.community):
+                    return None
                 comment.down_votes -= 1
             else:
+                if not can_upvote(user, comment.community):
+                    return None
                 comment.up_votes -= 1
             comment.score -= existing_vote.effect
             db.session.delete(existing_vote)
+            db.session.execute(text('UPDATE "user" SET reputation = reputation - :effect WHERE id = :user_id'),
+                               {'effect': existing_vote.effect, 'user_id': comment.user_id})
             db.session.commit()
         return comment
 

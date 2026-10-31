@@ -1817,6 +1817,7 @@ def admin_user_edit(user_id):
         user.banned = form.banned.data
         user.ban_posts = form.ban_posts.data
         user.ban_comments = form.ban_comments.data
+        user.ban_votes = form.ban_votes.data
         user.hide_nsfw = form.hide_nsfw.data
         user.hide_nsfl = form.hide_nsfl.data
         user.can_send_pm = form.can_send_pm.data
@@ -1869,6 +1870,7 @@ def admin_user_edit(user_id):
         form.banned.data = user.banned
         form.ban_posts.data = user.ban_posts
         form.ban_comments.data = user.ban_comments
+        form.ban_votes.data = user.ban_votes
         form.hide_nsfw.data = user.hide_nsfw
         form.hide_nsfl.data = user.hide_nsfl
         form.can_send_pm.data = user.can_send_pm

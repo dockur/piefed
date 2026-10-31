@@ -1018,6 +1018,7 @@ class User(UserMixin, db.Model):
     banned_until = db.Column(db.DateTime)  # null == permanent ban
     ban_posts = db.Column(db.Boolean, default=False)
     ban_comments = db.Column(db.Boolean, default=False)
+    ban_votes = db.Column(db.Boolean, default=False)
     deleted = db.Column(db.Boolean, default=False)
     deleted_by = db.Column(db.Integer, index=True)
     about = db.Column(db.Text)  # markdown

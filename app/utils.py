@@ -2050,7 +2050,7 @@ def guess_mime_type(file_path: str) -> str:
 
 
 def can_downvote(user, community: Community, communities_banned_from_list=None) -> bool:
-    if user is None or community is None or user.banned or user.bot or user.bot_override:
+    if user is None or community is None or user.banned or user.bot or user.bot_override or user.ban_votes:
         return False
 
     try:
@@ -2094,7 +2094,7 @@ def can_downvote(user, community: Community, communities_banned_from_list=None) 
 
 
 def can_upvote(user, community: Community, communities_banned_from_list=None) -> bool:
-    if user is None or community is None or user.banned or user.bot or user.bot_override:
+    if user is None or community is None or user.banned or user.bot or user.bot_override or user.ban_votes:
         return False
 
     if communities_banned_from_list is not None:
