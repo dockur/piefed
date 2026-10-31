@@ -7,6 +7,7 @@ import time
 import httpx
 import boto3
 import orjson
+from botocore.exceptions import ClientError
 from flask import current_app
 from sqlalchemy import text, select, func
 
@@ -965,7 +966,10 @@ def archive_old_posts():
                     aws_secret_access_key=current_app.config['S3_ACCESS_SECRET'],
                 )
             for post_id in post_ids:
-                archive_post(post_id, s3)
+                try:
+                    archive_post(post_id, s3)
+                except ClientError:  # s3 randomly fails sometimes
+                    continue
 
             if s3:
                 s3.close()
