@@ -27,14 +27,14 @@ function handleTextareaInput(event) {
     const cursorPos = textarea.selectionStart;
     const textBeforeCursor = textarea.value.substring(0, cursorPos);
     
-    // Look for @ or ! symbol preceded by whitespace, start of string, or newline
+    // Look for @ or ! or ~ symbol preceded by whitespace, start of string, or newline
     // This avoids triggering in email addresses or other contexts
-    const mentionMatch = textBeforeCursor.match(/(?:^|\s|[\r\n])[@!]([a-zA-Z0-9_.-]*?)$/);
+    const mentionMatch = textBeforeCursor.match(/(?:^|\s|[\r\n])[@!~]([a-zA-Z0-9_.-]*?)$/);
     
     if (mentionMatch && mentionMatch[1] !== undefined) {
         const query = mentionMatch[1];
         const fullMatch = mentionMatch[0];
-        const trigger = fullMatch.charAt(fullMatch.length - 1 - query.length); // @ or !
+        const trigger = fullMatch.charAt(fullMatch.length - 1 - query.length); // @ or ! or ~
         
         if (query.length >= 2) {
             // Only show suggestions after typing 2+ letters
@@ -240,11 +240,11 @@ function selectSuggestion(suggestion) {
     const textBeforeCursor = textarea.value.substring(0, cursorPos);
     const textAfterCursor = textarea.value.substring(cursorPos);
     
-    // Find the @ or ! symbol and replace the partial mention with the full suggestion
-    const mentionMatch = textBeforeCursor.match(/(?:^|\s|[\r\n])[@!]([a-zA-Z0-9_.-]*?)$/);
+    // Find the @ or ! or ~ symbol and replace the partial mention with the full suggestion
+    const mentionMatch = textBeforeCursor.match(/(?:^|\s|[\r\n])[@!~]([a-zA-Z0-9_.-]*?)$/);
     if (mentionMatch) {
         const fullMatch = mentionMatch[0];
-        const trigger = fullMatch.match(/[@!]/)[0]; // Extract @ or !
+        const trigger = fullMatch.match(/[@!~]/)[0]; // Extract @ or ! or ~
         const beforeTrigger = textBeforeCursor.substring(0, mentionMatch.index + fullMatch.indexOf(trigger));
         const newValue = beforeTrigger + trigger + suggestion + ' ' + textAfterCursor;
         
