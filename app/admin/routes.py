@@ -10,6 +10,7 @@ import shutil
 from flask import request, flash, json, url_for, current_app, redirect, g, abort, send_file, make_response
 from flask_login import current_user, login_user
 from flask_babel import _, ngettext
+from markupsafe import Markup
 from slugify import slugify
 from sqlalchemy import text, desc, or_, and_, delete, update, select
 from sqlalchemy.exc import SQLAlchemyError
@@ -2020,6 +2021,19 @@ def admin_user_delete_task(user_id, current_user_id):
             raise
         finally:
             session.close()
+
+
+@bp.route('/user/<int:user_id>/reset_password', methods=['POST'])
+@permission_required('administer all users')
+@login_required
+def admin_user_reset_password(user_id):
+    user = User.query.get(user_id)
+    if user.is_local():
+        flash(Markup(_('Provide this link so they can reset their password, or log out and use it for them. It is valid for 20 minutes:<br>%(link)s',
+                link=url_for('auth.reset_password', token=user.get_reset_password_token(1200), _external=True))))
+    else:
+        flash('Can only reset passwords of local users.', 'error')
+    return redirect(url_for('admin.admin_user_edit', user_id=user.id))
 
 
 @bp.route('/reports', methods=['GET'])

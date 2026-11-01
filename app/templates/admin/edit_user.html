@@ -10,6 +10,9 @@
 <div class="row">
     <div class="col col-login mx-auto">
         <h1>{{ _('Edit %(user_name)s (%(display_name)s)', user_name=user.user_name, display_name=user.display_name()) }}</h1>
+        {% if user.is_local() %}
+            <a href="#" data-url="{{ url_for('admin.admin_user_reset_password', user_id=user.id) }}" class="btn btn-primary float-right send_post">{{ _('Reset password') }}</a>
+        {% endif %}
         <form method="post" enctype="multipart/form-data" id="add_local_user_form">
             {{ form.csrf_token() }}
             {{ user.about_html|safe if user.about_html }}
