@@ -1543,3 +1543,13 @@ def registration_view(registration) -> dict:
         v1["status"] = "awaiting review"
     
     return v1
+
+
+def captcha_view(captcha) -> dict:
+    v1 = dict()
+
+    v1["png"] = captcha["image"].split(",")[-1]
+    v1["wav"] = captcha["audio"].split(",")[-1]
+    v1["uuid"] = captcha["uuid"]
+
+    return v1

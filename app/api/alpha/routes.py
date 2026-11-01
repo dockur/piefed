@@ -1601,7 +1601,7 @@ def post_alpha_user_unban(data):
     return UserBanResponse().load(resp)
 
 
-@user_bp.route('/api/alpha/user/register', methods=['POST'])
+@user_bp.route('/user/register', methods=['POST'])
 @user_bp.doc(summary="Register a new user")
 @user_bp.arguments(UserRegistrationRequest)
 @user_bp.response(200, UserRegistrationResponse)
@@ -1613,7 +1613,7 @@ def post_alpha_user_register(data):
     return UserRegistrationRequest().load(resp)
 
 
-@user_bp.route('/api/alpha/user/get_captcha', methods=['GET'])
+@user_bp.route('/user/get_captcha', methods=['GET'])
 @user_bp.doc(summary="Fetch a Captcha")
 @user_bp.response(200, FetchCaptchaResponse)
 @user_bp.alt_response(400, schema=DefaultError)

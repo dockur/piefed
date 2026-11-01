@@ -2122,7 +2122,7 @@ class CaptchaFields(DefaultSchema):
 
 
 class FetchCaptchaResponse(DefaultSchema):
-    ok = fields.List(fields.Nested(CaptchaFields))
+    ok = fields.Nested(CaptchaFields)
 
 
 class UserFollowRequest(DefaultSchema):

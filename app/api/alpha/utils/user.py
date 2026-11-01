@@ -10,13 +10,14 @@ from app import db, cache
 from app.activitypub.util import make_image_sizes
 from app.api.alpha.utils.post import get_post_list
 from app.api.alpha.utils.reply import get_reply_list
-from app.api.alpha.views import user_view, reply_view, post_view, community_view
+from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view
 from app.constants import *
 from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community, File, UserFlair, \
     user_file, UserExtraField, UserNote, RevokedToken, utcnow
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user, follow_user, \
     unfollow_user
-from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes
+from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes, \
+    get_setting, create_captcha
 
 
 def get_user(auth, data):
@@ -1058,4 +1059,12 @@ def post_user_register(data):
 
 
 def get_user_captcha():
-    ...
+    """Fetches captcha info if the instance requires it."""
+    needs_captcha = get_setting("captcha_enabled", True)
+
+    if not needs_captcha:
+        raise Exception("Captcha disabled on this instance")
+
+    new_captcha = create_captcha()
+
+    return {"ok": captcha_view(new_captcha)}
