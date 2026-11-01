@@ -528,7 +528,8 @@ def community_profile(actor):
                           "lemmy:tagsForPosts": community.flair_for_ap(version=1),
                           "tag": community.flair_for_ap(version=2),
                           "postUrlType": community.post_url_type if community.post_url_type else "friendly",
-                          "defaultHashtag": community.default_hashtag
+                          "defaultHashtag": community.default_hashtag,
+                          "contentRetention": community.content_retention if community.is_local() else None
                           }
             if community.description_html:
                 actor_data["summary"] = community.description_html

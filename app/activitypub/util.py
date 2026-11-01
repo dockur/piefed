@@ -765,6 +765,8 @@ def refresh_community_profile_task(community_id, activity_json):
                         community.ap_followers_url = activity_json['followers']
                     if 'featured' in activity_json:
                         community.ap_featured_url = activity_json['featured']
+                    if 'contentRetention' in activity_json and activity_json['contentRetention']:
+                        community.content_retention = activity_json['contentRetention']
                     community.ap_fetched_at = utcnow()
                     community.public_key = activity_json['publicKey']['publicKeyPem']
 

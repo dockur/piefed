@@ -982,6 +982,32 @@ def delete_post(post_id: int, federate_deletion, src, auth):
         return
 
 
+def delete_rss_feed_post(post_id: int, user_id: int):
+
+    from app import redis_client
+    with redis_client.lock(f"lock:post:{post_id}", timeout=10, blocking_timeout=6):
+        post = db.session.query(Post).get(post_id)
+        if post.url:
+            post.calculate_cross_posts(delete_only=True)
+
+        post.deleted = True
+        post.deleted_by = user_id
+        post.author.post_count -= 1
+        db.session.commit()
+
+    if post.status == POST_STATUS_PUBLISHED:
+        task_selector('delete_post', user_id=user_id, post_id=post.id)
+
+    # remove any notifications about the post
+    notifs = db.session.query(Notification).filter(Notification.targets.op("->>")("post_id").cast(Integer) == post.id)
+    for notif in notifs:
+        # dont delete report notifs
+        if notif.notif_type == NOTIF_REPORT or notif.notif_type == NOTIF_REPORT_ESCALATION:
+            continue
+        db.session.delete(notif)
+    db.session.commit()
+
+
 def restore_post(post_id: int, src, auth):
     if src == SRC_API:
         post = db.session.query(Post).get(post_id)

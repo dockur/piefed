@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import timedelta, date
 import random
 import re
@@ -17,7 +18,7 @@ from app.constants import NOTIF_UNBAN, SRC_WEB
 from app.models import Notification, SendQueue, CommunityBan, CommunityMember, User, Community, Post, PostReply, \
     DefederationSubscription, Instance, ActivityPubLog, InstanceRole, utcnow, InstanceChooser, \
     InstanceBan, Emoji, RevokedToken, BotChallenge
-from app.shared.post import delete_post
+from app.shared.post import delete_post, delete_rss_feed_post
 from app.utils import get_task_session, download_defeds, instance_banned, get_request_instance, get_request, \
     shorten_string, patch_db_session, archive_post, get_setting, set_setting, communities_banned_from_all_users, \
     banned_instances, blocked_or_banned_instances, get_emoji_replacements, store_files_in_s3, ensure_directory_exists
@@ -140,19 +141,28 @@ def remove_old_community_content():
     session = get_task_session()
     try:
         communities = session.query(Community).filter(Community.content_retention > 0).all()
+        reduce_post_count = defaultdict(int)
 
         with patch_db_session(session):
+            feed_bot = session.query(User).filter_by(user_name='feed_bot', ap_id=None).first()
             for community in communities:
                 cut_off = utcnow() - timedelta(days=community.content_retention)
-                post_ids = [p[0] for p in session.query(Post.id).filter_by(
+                posts = session.query(Post.id, Post.user_id).filter_by(
                     deleted=False,
                     sticky=False,
                     community_id=community.id
-                ).filter(Post.posted_at < cut_off).all()]
+                ).filter(Post.posted_at < cut_off).all()
 
-                for post_id in post_ids:
-                    delete_post(post_id, community.is_local(), SRC_WEB, None)
+                for post_id, post_author_id in posts:
+                    if feed_bot and post_author_id == feed_bot.id:
+                        delete_rss_feed_post(post_id, post_author_id)     # rss feed posts are deleted by their author, to avoid polluting the modlog with irrellivent entries
+                        reduce_post_count[community.id] += 1
+                    else:
+                        delete_post(post_id, False, SRC_WEB, None)
 
+        for community_id, reduce_post_count_by in reduce_post_count.items():
+            session.execute(text('UPDATE "community" SET post_count = post_count - :reduce_post_count_by WHERE id = :community_id'),
+                            {'reduce_post_count_by': reduce_post_count_by, 'community_id': community_id})
         session.commit()
     except Exception:
         session.rollback()
