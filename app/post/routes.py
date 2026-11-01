@@ -663,6 +663,25 @@ def continue_discussion(post_id, comment_id):
                 else:
                     flash(_('This post has been deleted and is only visible to staff and admins.'), 'warning')
 
+    if current_user.is_anonymous:
+        if current_app.config['CONTENT_WARNING']:
+            if post.nsfl:
+                flash(_('This post is only visible to logged in users.'))
+                return redirect(url_for("auth.login", next=f"/post/{post_id}"))
+        else:
+            if post.nsfw or post.nsfl:
+                flash(_('This post is only visible to logged in users.'))
+                return redirect(url_for("auth.login", next=f"/post/{post_id}"))
+
+        if post.community.private:
+            abort(403)
+    else:
+        if (post.nsfw or post.nsfl) and user_in_restricted_country(current_user):
+            abort(403)
+
+        if post.community.private and post.community_id not in community_membership_private(current_user.id):
+            abort(403)
+
     mods = post.community.moderators()
     is_moderator = current_user.is_authenticated and any(mod.user_id == current_user.id for mod in mods)
     if post.community.private_mods:
