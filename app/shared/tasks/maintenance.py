@@ -653,7 +653,7 @@ def monitor_healthy_instances():
                 session.commit()
 
             # Handle admin roles for Lemmy/PieFed instances
-            if instance.online() and (instance.software == 'lemmy' or instance.software == 'piefed' or instance.software == 'pylova'):
+            if instance.online() and (instance.software == 'lemmy' or instance.software == 'piefed' or instance.software == 'pylova' or instance.software == 'catodon'):
                 try:
                     response = get_request(f'https://{instance.domain}/api/v3/site')
                     if response and response.status_code == 200:
