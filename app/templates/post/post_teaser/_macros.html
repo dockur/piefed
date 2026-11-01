@@ -184,7 +184,15 @@
     {% if not embed -%}
         <div class="post_options_link pull-right">
             {% if current_user.is_authenticated and joined_communities and post.community_id not in joined_communities and not post.is_microblog() %}
-                <a class="small" rel="nofollow" title="{{ _('Join this community') }}" aria-label="{{ _('Join this community') }}" href="#" hx-post="{{ '/c/' + post.community.link() + '/subscribe' }}" hx-swap="outerHTML" hx-target="this" >{{ _('Join') }}</a>
+                <a class="small join_{{ post.community.id }}" rel="nofollow"
+                        title="{{ _('Join this community') }}"
+                        aria-label="{{ _('Join this community') }}"
+                        href="{{ '/community/' + post.community.link() + '/subscribe' }}"
+                        hx-post="{{ '/community/' + post.community.link() + '/subscribe' }}"
+                        hx-swap="outerHTML"
+                        hx-target="this">
+                    {{ _('Join') }}
+                </a>
             {% endif -%}
             {% if current_user.is_authenticated and current_user.language_id and post.language_id and (current_user.language_id != post.language_id or post.community.always_translate) -%}
                 <div class="post_translate_icon">
