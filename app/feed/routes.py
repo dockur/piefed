@@ -339,68 +339,6 @@ def feed_notification(feed_id: int):
     return render_template('feed/_notification_toggle.html', feed=feed)
 
 
-@bp.route('/feed/add_community', methods=['GET'])
-@login_required
-def feed_add_community():
-    # this expects a user_id, a new_feed_id, a current_feed_id,
-    # and a community_id
-    # it will get those and then add a community to
-    # a feed using the FeedItem model
-    user_id = int(request.args.get('user_id'))
-    feed_id = int(request.args.get('new_feed_id'))
-    current_feed_id = int(request.args.get('current_feed_id'))
-    community_id = int(request.args.get('community_id'))
-
-    # make sure the user owns this feed
-    if Feed.query.get(feed_id).user_id != user_id:
-        abort(404)
-
-    _feed_add_community(community_id, current_feed_id, feed_id, user_id)
-
-    # send the user back to the page they came from or main
-    # Get the referrer from the request headers
-    referrer = request.referrer
-
-    # If the referrer exists and is not the same as the current request URL, redirect to the referrer
-    if referrer and referrer != request.url:
-        return redirect(referrer)
-
-    # If referrer is not available or is the same as the current request URL, redirect to the default URL
-    return redirect(url_for('main.index'))
-
-
-@bp.route('/feed/list', methods=['GET'])
-@login_required
-def feed_list():
-    # this takes a user id, community id, and current_feed id,
-    # and returns a set of html entries of the users feeds
-
-    # get the user id
-    user_id = int(request.args.get('user_id'))
-    # get the community id
-    community_id = int(request.args.get('community_id'))
-    # get the current_feed
-    current_feed_id = int(request.args.get('current_feed_id'))
-    # get the user's feeds
-    user_feeds = Feed.query.filter_by(user_id=user_id).all()
-
-    # setup html base to send back
-    options_html = ""
-
-    # add the none option if already in a feed
-    if current_feed_id != 0:
-        options_html = options_html + f'<li><a class="dropdown-item" href="/feed/remove_community?user_id={user_id}&new_feed_id=0&current_feed_id={current_feed_id}&community_id={community_id}">None</li>'
-
-    # for loop to add the rest of the options to the html
-    for feed in user_feeds:
-        # skip the current_feed if it has one
-        if feed.id == current_feed_id:
-            continue
-        options_html = options_html + f'<li><a class="dropdown-item" href="/feed/add_community?user_id={user_id}&new_feed_id={feed.id}&current_feed_id={current_feed_id}&community_id={community_id}">{feed.title}</li>'
-
-    return options_html
-
-
 # @bp.route('/f/<actor>', methods=['GET']) - defined in activitypub/routes.py, which calls this function for user requests. A bit weird.
 @login_required_if_private_instance
 @check_anoobis

@@ -971,10 +971,10 @@ def register(app):
                             if redis_client and current_app.config['REDIS_MEMORY_LIMIT'] != -1 and \
                                     redis_client.memory_stats()['total.allocated'] > current_app.config['REDIS_MEMORY_LIMIT']:
                                 print('Redis memory is quite full - stopping send queue to avoid making it worse.')
-                                redis_client.set("pause_federation", "1", ex=600)   # this also stops incoming federation
+                                redis_client.set(f'pause_federation_{current_app.config["SECRET_KEY"]}', "1", ex=600)   # this also stops incoming federation
                                 return
                             else:
-                                redis_client.set("pause_federation", "0", ex=600)
+                                redis_client.set(f'pause_federation_{current_app.config["SECRET_KEY"]}', "0", ex=600)
                         except:  # retrieving memory stats fails on recent versions of redis. Once the redis package is fixed this problem should go away.
                             ...
                         if not current_app.debug:
@@ -1024,7 +1024,7 @@ def register(app):
     @app.cli.command('reopen')
     def reopen():
         from app import redis_client
-        redis_client.set('pause_federation', '666', ex=1)
+        redis_client.set(f'pause_federation_{current_app.config["SECRET_KEY"]}', '666', ex=1)
         print('Done')
 
     @app.cli.command('publish-scheduled-posts')

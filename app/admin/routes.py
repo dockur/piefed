@@ -270,7 +270,7 @@ def admin_misc():
     form.language_id.choices = languages_for_form(all_languages=True)
     if close_form.submit.data and close_form.validate():
         from app import redis_client
-        redis_client.set('pause_federation', '666', ex=86400 * 365 * 10)
+        redis_client.set(f'pause_federation_{current_app.config["SECRET_KEY"]}', '666', ex=86400 * 365 * 10)
         site.registration_mode = 'Closed'
         if close_form.announcement.data:
             set_setting('announcement', close_form.announcement.data)

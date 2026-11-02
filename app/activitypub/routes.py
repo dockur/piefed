@@ -608,7 +608,7 @@ def shared_inbox():
         log_incoming_ap('', APLOG_NOTYPE, APLOG_FAILURE, None, 'Empty JSON body ' + str(request.user_agent))
         return "", 400
 
-    pause_federation = redis_client.get('pause_federation')
+    pause_federation = redis_client.get(f'pause_federation_{current_app.config["SECRET_KEY"]}')
     if pause_federation == '1': # temporary pause as this instance is overloaded
         return '', 429
     elif pause_federation == '666':
@@ -2537,6 +2537,9 @@ def process_chat(user, store_ap_json, core_activity, session):
             # Save ChatMessage to DB
             encrypted = core_activity['object']['encrypted'] if 'encrypted' in core_activity['object'] else None
             updated_message = session.query(ChatMessage).filter_by(ap_id=core_activity['object']['id']).first()
+            if updated_message and (updated_message.sender_id != sender.id or updated_message.recipient_id != recipient.id):
+                log_incoming_ap(id, APLOG_CHATMESSAGE, APLOG_FAILURE, saved_json, 'Message belongs to a different sender or recipient')
+                return True
             if not updated_message:
                 new_message = ChatMessage(sender_id=sender.id, recipient_id=recipient.id,
                                           conversation_id=existing_conversation.id,
@@ -2555,8 +2558,12 @@ def process_chat(user, store_ap_json, core_activity, session):
                 notification_text = 'New message from '
                 message_id = new_message.id
             else:
-                updated_message.body_html = core_activity['object']['content']
-                updated_message.body = html_to_text(core_activity['object']['content'])
+                if 'source' in core_activity['object'] and core_activity['object']['source']['content']:
+                    updated_message.body = core_activity['object']['source']['content']
+                    updated_message.body_html = markdown_to_html(core_activity['object']['source']['content'], allow_img=False)
+                else:
+                    updated_message.body_html = allowlist_html(core_activity['object']['content'])
+                    updated_message.body = html_to_text(core_activity['object']['content'])
                 updated_message.read = False
                 existing_conversation.updated_at = utcnow()
                 session.commit()
