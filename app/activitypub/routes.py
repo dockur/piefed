@@ -37,7 +37,7 @@ from app.utils import gibberish, get_setting, community_membership, ap_datetime,
     feed_membership, get_task_session, patch_db_session, \
     blocked_phrases, orjson_response, moderating_communities, joined_communities, moderating_communities_ids, \
     moderating_communities_ids_all_users, publish_sse_event, blocked_users, block_honey_pot, instance_allowed, \
-    requestor_domain
+    requestor_domain, markdown_to_html, allowlist_html
 
 
 @bp.route('/testredis')
@@ -2540,10 +2540,14 @@ def process_chat(user, store_ap_json, core_activity, session):
             if not updated_message:
                 new_message = ChatMessage(sender_id=sender.id, recipient_id=recipient.id,
                                           conversation_id=existing_conversation.id,
-                                          body_html=core_activity['object']['content'],
-                                          body=html_to_text(core_activity['object']['content']),
                                           encrypted=encrypted,
                                           ap_id=core_activity['object']['id'])
+                if 'source' in core_activity['object'] and core_activity['object']['source']['content']:
+                    new_message.body = core_activity['object']['source']['content']
+                    new_message.body_html = markdown_to_html(core_activity['object']['source']['content'], allow_img=False)
+                else:
+                    new_message.body_html = allowlist_html(core_activity['object']['content'])
+                    new_message.body = html_to_text(core_activity['object']['content'])
                 session.add(new_message)
                 existing_conversation.updated_at = utcnow()
                 session.commit()

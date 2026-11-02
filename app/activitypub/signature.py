@@ -545,6 +545,10 @@ class LDSignature:
             raise VerificationFormatError("Invalid signature section")
         if signature["type"].lower() != "rsasignature2017":
             raise VerificationFormatError("Unknown signature type")
+        contexts = document.get("@context", [])
+        for context in contexts if isinstance(contexts, list) else [contexts]:
+            if isinstance(context, str) and is_invalid_get_request_uri(context):
+                raise VerificationFormatError("Invalid @context URL")
         # Get the normalised hash of each document
         final_hash = cls.normalized_hash(options) + cls.normalized_hash(document)
         # Verify the signature
