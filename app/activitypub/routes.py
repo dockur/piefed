@@ -2007,7 +2007,7 @@ def community_featured(actor):
     if community is not None:
         if community.local_only or community.private:
             abort(403)
-        posts = Post.query.filter_by(community_id=community.id, sticky=True, deleted=False).all()
+        posts = Post.query.filter_by(community_id=community.id, sticky=True, deleted=False, status=POST_STATUS_PUBLISHED).all()
 
         community_data = {
             "@context": default_context(),
