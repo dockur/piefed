@@ -15,5 +15,5 @@
       <li><label><input type="checkbox" name="ai_generated" value="1" {{ 'checked' if post.ai_generated else '' }}> {{ _('AI generated') }}</label></li>
   </ul>
   <button type="submit" class="btn btn-primary" hx-post="{{ url_for("post.post_set_flair", post_id=post_id) }}" hx-trigger="click throttle:1s"
-    {% if post_preview %}hx-target="#post_{{ post_id }}" {% endif %}hx-swap="outerHTML">{{ _('Submit') }}</button>
+    {% if post_preview %}hx-target="#post_{{ post_id }}" {% endif %}hx-swap="outerHTML">{{ _('Save') }}</button>
 </form>
