@@ -108,7 +108,7 @@
         <link rel="preconnect" href='{{ preconnect }}'>
       {% endif -%}
       {% if config["S3_PUBLIC_URL"] and not low_bandwidth -%}
-        <link rel="preconnect" href="{{ config['S3_PUBLIC_URL'] }}">
+        <link rel="preconnect" href="https://{{ config['S3_PUBLIC_URL'] }}">
       {% endif -%}
       {% if g.site.additional_css -%}
       <style>
