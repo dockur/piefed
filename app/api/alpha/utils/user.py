@@ -10,14 +10,15 @@ from app import db, cache
 from app.activitypub.util import make_image_sizes
 from app.api.alpha.utils.post import get_post_list
 from app.api.alpha.utils.reply import get_reply_list
-from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view
+from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view, topic_view, feed_view
 from app.constants import *
 from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community, File, UserFlair, \
-    user_file, UserExtraField, UserNote, RevokedToken, utcnow
+    user_file, UserExtraField, UserNote, RevokedToken, utcnow, NotificationSubscription, Topic, Feed, CommunityMember
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user, follow_user, \
     unfollow_user
 from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes, \
-    get_setting, create_captcha
+    get_setting, create_captcha, moderating_communities_ids, communities_banned_from, joined_or_modding_communities, \
+    blocked_communities, blocked_or_banned_instances, subscribed_feeds
 
 
 def get_user(auth, data):
@@ -1068,3 +1069,157 @@ def get_user_captcha():
     new_captcha = create_captcha()
 
     return {"ok": captcha_view(new_captcha)}
+
+
+def get_user_activity_alerts(auth, data):
+    type_ = data["type_"] if "type_" in data else "Posts"
+    filter = data["filter"] if "filter" in data else "All"
+    sort = data["sort"] if "sort" in data else "New"
+    page = data["page"] if "page" in data else 1
+    limit = data["limit"] if "limit" in data else 20
+
+    user_id = authorise_api_user(auth)
+
+    if type_ == "Posts":
+        if filter == 'Mine':
+            entities = Post.query.filter_by(deleted=False, user_id=user_id). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == Post.id). \
+                filter_by(type=NOTIF_POST, user_id=user_id)
+        
+        elif filter == 'Others':
+            entities = Post.query.filter(Post.deleted == False, Post.status > POST_STATUS_REVIEWING,
+                                         Post.user_id != user_id). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == Post.id). \
+                filter_by(type=NOTIF_POST, user_id=user_id)
+        
+        else:  # default to 'All' filter
+            entities = Post.query.filter_by(deleted=False). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == Post.id). \
+                filter_by(type=NOTIF_POST, user_id=user_id)
+    
+    elif type_ == "Users":
+        entities = User.query.filter_by(deleted=False). \
+            join(NotificationSubscription, NotificationSubscription.entity_id == User.id). \
+            filter_by(type=NOTIF_USER, user_id=user_id)
+
+    elif type_ == "Topics":
+        entities = Topic.query.join(NotificationSubscription, NotificationSubscription.entity_id == Topic.id). \
+            filter_by(type=NOTIF_TOPIC, user_id=user_id)
+
+    elif type_ == "Feeds":
+        entities = Feed.query.join(NotificationSubscription, NotificationSubscription.entity_id == Feed.id). \
+            filter_by(type=NOTIF_FEED, user_id=user_id)
+
+    elif type_ == "Communities":
+        if filter == 'Mine':
+            entities = Community.query. \
+                join(CommunityMember, CommunityMember.community_id == Community.id). \
+                filter_by(user_id=user_id, is_moderator=True). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == CommunityMember.community_id). \
+                filter_by(type=NOTIF_COMMUNITY, user_id=user_id)
+        
+        elif filter == 'Others':
+            entities = Community.query. \
+                join(CommunityMember, CommunityMember.community_id == Community.id). \
+                filter_by(user_id=user_id, is_moderator=False). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == CommunityMember.community_id). \
+                filter_by(type=NOTIF_COMMUNITY, user_id=user_id)
+        
+        else:  # default to 'all' filter
+            entities = Community.query. \
+                join(NotificationSubscription, NotificationSubscription.entity_id == Community.id). \
+                filter_by(type=NOTIF_COMMUNITY, user_id=user_id)
+
+    elif type_ == "Comments":
+        if filter == 'Mine':
+            entities = PostReply.query.filter_by(deleted=False, user_id=user_id). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == PostReply.id). \
+                filter_by(type=NOTIF_REPLY, user_id=user_id)
+        
+        elif filter == 'Others':
+            entities = PostReply.query.filter(PostReply.deleted == False, PostReply.user_id != user_id). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == PostReply.id). \
+                filter_by(type=NOTIF_REPLY, user_id=user_id)
+        
+        else:  # default to 'all' filter
+            entities = PostReply.query.filter_by(deleted=False). \
+                join(NotificationSubscription, NotificationSubscription.entity_id == PostReply.id). \
+                filter_by(type=NOTIF_REPLY, user_id=user_id)
+
+    if sort == "Old":
+        entities = entities.order_by(asc(NotificationSubscription.created_at))
+    else:
+        entities = entities.order_by(desc(NotificationSubscription.created_at))
+
+    entities = entities.paginate(page=page, per_page=limit, error_out=False)
+
+    v1 = dict()
+    v1["next_page"] = str(entities.next_num) if entities.next_num else None
+
+    if type_ == "Posts":
+        v1["posts"] = []
+        for post in entities:
+            v1["posts"].append(post_view(post=post, variant=2, stub=False, user_id=user_id))
+    elif type_ == "Users":
+        v1["users"] = []
+        for user in entities:
+            v1["users"].append(user_view(user=user, user_id=user_id, variant=2, stub=True))
+    elif type_ == "Topics":
+        # Need to do some extra work for topics
+        banned_from = communities_banned_from(user_id)
+        communities_moderating = moderating_communities_ids(user_id)
+        communities_joined = joined_or_modding_communities(user_id)
+        blocked_community_ids = blocked_communities(user_id)
+        blocked_instance_ids = blocked_or_banned_instances(user_id)
+        
+        v1["topics"] = []
+        for topic in entities:
+            topic_dict = topic_view(
+                topic=topic,
+                variant=1,
+                banned_from=banned_from,
+                communities_joined=communities_joined,
+                communities_moderating=communities_moderating,
+                blocked_community_ids=blocked_community_ids,
+                blocked_instance_ids=blocked_instance_ids,
+                include_communities=False,
+                )
+            topic_dict["children"] = []  # Do not include children here
+
+            v1["topics"].append(topic_dict)
+
+    elif type_ == "Feeds":
+        # Need to do some extra work for feeds
+        blocked_community_ids = blocked_communities(user_id)
+        blocked_instance_ids = blocked_or_banned_instances(user_id)
+        subscribed = subscribed_feeds(user_id)
+        banned_from = communities_banned_from(user_id)
+        communities_moderating = moderating_communities_ids(user_id)
+        communities_joined = joined_or_modding_communities(user_id)
+
+        v1["feeds"] = []
+        for feed in entities:
+            v1["feeds"].append(feed_view(
+                feed=feed,
+                variant=2,
+                user_id=user_id,
+                subscribed=subscribed,
+                include_communities=False,
+                communities_moderating=communities_moderating,
+                banned_from=banned_from,
+                communities_joined=communities_joined,
+                blocked_community_ids=blocked_community_ids,
+                blocked_instance_ids=blocked_instance_ids,
+            )["feed"])
+
+    elif type_ == "Communities":
+        v1["communities"] = []
+        for community in entities:
+            v1["communities"].append(community_view(community=community, variant=2, stub=False, user_id=user_id))
+
+    elif type_ == "Comments":
+        v1["comments"] = []
+        for comment in entities:
+            v1["comments"].append(reply_view(reply=comment, variant=3, user_id=user_id))
+
+    return v1

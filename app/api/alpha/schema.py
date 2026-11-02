@@ -29,6 +29,8 @@ ai_visibility_list = ["Show", "Hide", "Label", "Transparent"]
 private_message_list = ["None", "Local", "Trusted", "All"]
 search_nsfw = ['Exclude', 'Include', 'Only']
 modlog_type_list = ["All", "ModRemovePost", "ModLockPost", "ModFeaturePost", "ModRemoveComment", "ModRemoveCommunity", "ModBanFromCommunity", "ModAddCommunity", "ModTransferCommunity", "ModAdd", "ModBan", "ModHideCommunity", "AdminPurgePerson", "AdminPurgeCommunity", "AdminPurgePost", "AdminPurgeComment"]
+activity_alert_type_list = ["Posts", "Comments", "Communities", "Topics", "Feeds", "Users"]
+activity_alert_filter_list = ["All", "Mine", "Others"]
 
 
 def validate_datetime_string(text):
@@ -2139,3 +2141,22 @@ class UserUnfollowRequest(DefaultSchema):
 
 class UserUnfollowResponse(DefaultSchema):
     ok = fields.String()
+
+
+class FetchActivityAlertsRequest(DefaultSchema):
+    type_ = fields.String(validate=validate.OneOf(activity_alert_type_list), metadata={"default": "Posts"})
+    filter = fields.String(validate=validate.OneOf(activity_alert_filter_list), metadata={"default": "All", "description": "Ignored with `type_` = `Users`, `Feeds`, `Topics`"})
+    sort = fields.String(validate=validate.OneOf(["New", "Old"]), metadata={"default": "New", "description": "Sorted by date of activity alert creation"})
+    page = fields.Integer(metadata={"default": 1})
+    limit = fields.Integer(metadata={"default": 20})
+
+
+class FetchActivityAlertsResponse(DefaultSchema):
+    next_page = fields.String(allow_none=True)
+    communities = fields.List(fields.Nested(CommunityView))
+    posts = fields.List(fields.Nested(PostView))
+    users = fields.List(fields.Nested(PersonView))
+    comments = fields.List(fields.Nested(CommentView))
+    topics = fields.List(fields.Nested(TopicView), metadata={"description": "Does not include children topics or constituent communities."})
+    feeds = fields.List(fields.Nested(FeedView), metadata={"description": "Does not include children feeds or constituent communities."})
+    
