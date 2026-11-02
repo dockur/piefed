@@ -13,13 +13,13 @@ from app.activitypub.signature import send_post_request, default_context, RsaKey
 from app.activitypub.util import find_actor_or_create, make_image_sizes
 from app.constants import *
 from app.models import User, Feed, FeedMember, FeedItem, Community, FeedJoinRequest, CommunityMember, \
-    CommunityJoinRequest, Instance, File
+    CommunityJoinRequest, Instance, File, NotificationSubscription
 from app.shared.tasks import task_selector
 from app.shared.community import leave_community
 from app.shared.upload import process_upload
 from app.utils import authorise_api_user, feed_membership, get_request, menu_subscribed_feeds, joined_communities, \
     community_membership, gibberish, get_task_session, instance_banned, menu_instance_feeds, \
-    piefed_markdown_to_lemmy_markdown, markdown_to_html, is_image_url
+    piefed_markdown_to_lemmy_markdown, markdown_to_html, is_image_url, render_template
 
 
 def join_feed(actor, user_id, src=SRC_WEB):
@@ -618,6 +618,7 @@ def existing_communities(feed_id: int) -> List:
     return db.session.execute(text('SELECT community_id FROM feed_item WHERE feed_id = :feed_id'),
                               {'feed_id': feed_id}).scalars()
 
+
 def form_communities_to_ids(form_communities: str) -> set:
     from app.community.util import search_for_community
     result = set()
@@ -631,3 +632,44 @@ def form_communities_to_ids(form_communities: str) -> set:
         if community:
             result.add(community.id)
     return result
+
+
+def subscribe_feed(feed_id: int, subscribe, src, auth=None):
+    user_id = authorise_api_user(auth) if src == SRC_API else current_user.id
+    feed = Feed.query.get(feed_id)
+
+    if src == SRC_WEB:
+        subscribe = False if feed.notify_new_posts(user_id) else True
+
+    existing_notification = NotificationSubscription.query.filter(NotificationSubscription.entity_id == feed.id,
+                                                                    NotificationSubscription.user_id == user_id,
+                                                                    NotificationSubscription.type == NOTIF_FEED).first()
+
+    if subscribe == False:
+        if existing_notification:
+            db.session.delete(existing_notification)
+            db.session.commit()
+        else:
+            msg = 'A subscription for this feed did not exist.'
+            if src == SRC_API:
+                raise Exception(msg)
+            else:
+                flash(_(msg))
+
+    else:
+        if existing_notification:
+            msg = 'A subscription for this feed already existed.'
+            if src == SRC_API:
+                raise Exception(msg)
+            else:
+                flash(_(msg))
+        else:
+            new_notification = NotificationSubscription(name=feed.name, user_id=user_id, entity_id=feed.id,
+                                                        type=NOTIF_FEED)
+            db.session.add(new_notification)
+            db.session.commit()
+
+    if src == SRC_API:
+        return user_id
+    else:
+        return render_template("feed/_notification_toggle.html", feed=feed)

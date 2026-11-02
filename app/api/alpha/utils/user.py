@@ -16,6 +16,10 @@ from app.models import Conversation, ChatMessage, Notification, PostReply, User,
     user_file, UserExtraField, UserNote, RevokedToken, utcnow, NotificationSubscription, Topic, Feed, CommunityMember
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user, follow_user, \
     unfollow_user
+from app.shared.post import subscribe_post
+from app.shared.reply import subscribe_reply
+from app.shared.feed import subscribe_feed
+from app.shared.community import subscribe_community
 from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes, \
     get_setting, create_captcha, moderating_communities_ids, communities_banned_from, joined_or_modding_communities, \
     blocked_communities, blocked_or_banned_instances, subscribed_feeds
@@ -1223,3 +1227,102 @@ def get_user_activity_alerts(auth, data):
             v1["comments"].append(reply_view(reply=comment, variant=3, user_id=user_id))
 
     return v1
+
+
+def post_user_activity_alert(auth, data, subscribe = True):
+    post_id = data["post_id"] if "post_id" in data else None
+    comment_id = data["comment_id"] if "comment_id" in data else None
+    person_id = data["person_id"] if "person_id" in data else None
+    topic_id = data["topic_id"] if "topic_id" in data else None
+    feed_id = data["feed_id"] if "feed_id" in data else None
+    community_id = data["community_id"] if "community_id" in data else None
+
+    user_id = authorise_api_user(auth)
+    v1 = dict()
+
+    if post_id:
+        _ = subscribe_post(post_id, subscribe, SRC_API, auth)
+        v1["post"] = post_view(post=post_id, variant=2, stub=False, user_id=user_id)
+
+    if comment_id:
+        _ = subscribe_reply(comment_id, subscribe, SRC_API, auth)
+        v1["comment"] = reply_view(reply=comment_id, variant=3, user_id=user_id)
+
+    if person_id:
+        _ = subscribe_user(person_id, subscribe, SRC_API, auth)
+        v1["user"] = user_view(user=person_id, user_id=user_id, variant=2, stub=True)
+
+    if topic_id:
+        # No shared function for topics, do it manually
+        topic = Topic.query.get(topic_id)
+        existing_notification = NotificationSubscription.query.filter(NotificationSubscription.entity_id == topic.id,
+                                                                      NotificationSubscription.user_id == user_id,
+                                                                      NotificationSubscription.type == NOTIF_TOPIC).first()
+
+        if existing_notification and subscribe:
+            raise Exception("A subscription for this topic already exists")
+        elif not existing_notification and not subscribe:
+            raise Exception("A subscription for this topic does not exist")
+
+        if subscribe:
+            new_notification = NotificationSubscription(name=topic.name, user_id=user_id, entity_id=topic.id,
+                                                        type=NOTIF_TOPIC)
+            db.session.add(new_notification)
+            db.session.commit()
+        else:
+            db.session.delete(existing_notification)
+            db.session.commit()
+
+        # Need to do some extra work for topics
+        banned_from = communities_banned_from(user_id)
+        communities_moderating = moderating_communities_ids(user_id)
+        communities_joined = joined_or_modding_communities(user_id)
+        blocked_community_ids = blocked_communities(user_id)
+        blocked_instance_ids = blocked_or_banned_instances(user_id)
+
+        topic_dict = topic_view(
+            topic=topic,
+            variant=1,
+            banned_from=banned_from,
+            communities_joined=communities_joined,
+            communities_moderating=communities_moderating,
+            blocked_community_ids=blocked_community_ids,
+            blocked_instance_ids=blocked_instance_ids,
+            include_communities=False,
+            )
+        topic_dict["children"] = []  # Do not include children here
+
+        v1["topic"] = topic_dict
+
+    if feed_id:
+        _ = subscribe_feed(feed_id, subscribe, SRC_API, auth)
+
+        # Need to do some extra work for feeds
+        blocked_community_ids = blocked_communities(user_id)
+        blocked_instance_ids = blocked_or_banned_instances(user_id)
+        subscribed = subscribed_feeds(user_id)
+        banned_from = communities_banned_from(user_id)
+        communities_moderating = moderating_communities_ids(user_id)
+        communities_joined = joined_or_modding_communities(user_id)
+
+        v1["feed"] = feed_view(
+            feed=feed_id,
+            variant=2,
+            user_id=user_id,
+            subscribed=subscribed,
+            include_communities=False,
+            communities_moderating=communities_moderating,
+            banned_from=banned_from,
+            communities_joined=communities_joined,
+            blocked_community_ids=blocked_community_ids,
+            blocked_instance_ids=blocked_instance_ids,
+        )["feed"]
+
+    if community_id:
+        _ = subscribe_community(community_id, subscribe, SRC_API, auth)
+        v1["community"] = community_view(community=community_id, variant=2, stub=False, user_id=user_id)
+
+    return v1
+
+def post_user_activity_alert_delete(auth, data):
+    return post_user_activity_alert(auth, data, subscribe=False)
