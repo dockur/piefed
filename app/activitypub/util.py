@@ -2028,7 +2028,7 @@ def delete_post_or_comment(deletor, to_delete, store_ap_json, request_json, reas
                 to_delete.author.post_reply_count -= 1
                 db.session.commit()
                 if not to_delete.author.bot:
-                    with redis_client.lock(f"lock:post:{to_delete.id}", timeout=10, blocking_timeout=6):
+                    with redis_client.lock(f"lock:post:{to_delete.post_id}", timeout=10, blocking_timeout=6):
                         to_delete.post.reply_count -= 1
                         if to_delete.post.reply_count_cross_posted:
                             to_delete.post.reply_count_cross_posted -= 1
@@ -2043,11 +2043,14 @@ def delete_post_or_comment(deletor, to_delete, store_ap_json, request_json, reas
                               link_text=f'comment on {shorten_string(to_delete.post.title)}',
                               link=f'post/{to_delete.post.id}#comment_{to_delete.id}')
         log_incoming_ap(id, APLOG_DELETE, APLOG_SUCCESS, saved_json)
+        return True
     else:
         log_incoming_ap(id, APLOG_DELETE, APLOG_FAILURE, saved_json, 'Deletor did not have permisson')
+        return False
 
 
 def restore_post_or_comment(restorer, to_restore, store_ap_json, request_json, reason):
+    from app import redis_client
     saved_json = request_json if store_ap_json else None
     id = request_json['id']
     community = to_restore.community
@@ -2056,36 +2059,53 @@ def restore_post_or_comment(restorer, to_restore, store_ap_json, request_json, r
             community.is_moderator(restorer) or
             community.is_instance_admin(restorer)):
         if isinstance(to_restore, Post):
-            to_restore.deleted = False
-            to_restore.deleted_by = None
-            community.post_count += 1
-            to_restore.author.post_count += 1
-            if to_restore.url:
-                to_restore.calculate_cross_posts()
-            db.session.commit()
+            with redis_client.lock(f"lock:post:{to_restore.id}", timeout=20, blocking_timeout=20):
+                to_restore.deleted = False
+                to_restore.deleted_by = None
+                db.session.commit()
+                if to_restore.url:
+                    to_restore.calculate_cross_posts()
+            with redis_client.lock(f"lock:community:{community.id}", timeout=10, blocking_timeout=6):
+                community.post_count += 1
+            with redis_client.lock(f"lock:user:{to_restore.user_id}", timeout=10, blocking_timeout=6):
+                to_restore.author.post_count += 1
+                db.session.commit()
             if to_restore.author.id != restorer.id:
                 add_to_modlog('restore_post', actor=restorer, target_user=to_restore.author, reason=reason,
                               community=community, post=to_restore,
                               link_text=shorten_string(to_restore.title), link=f'post/{to_restore.id}')
 
         elif isinstance(to_restore, PostReply):
-            to_restore.deleted = False
-            to_restore.deleted_by = None
-            if not to_restore.author.bot:
-                to_restore.post.reply_count += 1
-            to_restore.author.post_reply_count += 1
-            if to_restore.path:
-                db.session.execute(text('update post_reply set child_count = child_count + 1 where id in :parents'),
-                                   {'parents': tuple(to_restore.path[:-1])})
-            db.session.commit()
+            with redis_client.lock(f"lock:post_reply:{to_restore.id}", timeout=10, blocking_timeout=6):
+                to_restore.deleted = False
+                to_restore.deleted_by = None
+                if to_restore.path:
+                    db.session.execute(text('update post_reply set child_count = child_count + 1 where id in :parents'),
+                                       {'parents': tuple(to_restore.path[:-1])})
+                db.session.commit()
+            with redis_client.lock(f"lock:user:{to_restore.user_id}", timeout=10, blocking_timeout=6):
+                to_restore.author.post_reply_count += 1
+                db.session.commit()
+                if not to_restore.author.bot:
+                    with redis_client.lock(f"lock:post:{to_restore.post_id}", timeout=10, blocking_timeout=6):
+                        to_restore.post.reply_count += 1
+                        if to_restore.post.reply_count_cross_posted is not None:
+                            to_restore.post.reply_count_cross_posted += 1
+                        db.session.commit()
+            with redis_client.lock(f"lock:community:{community.id}", timeout=10, blocking_timeout=6):
+                community.post_reply_count += 1
+                db.session.commit()
+
             if to_restore.author.id != restorer.id:
                 add_to_modlog('restore_post_reply', actor=restorer, target_user=to_restore.author, reason=reason,
                               community=community, post=to_restore.post, reply=to_restore,
                               link_text=f'comment on {shorten_string(to_restore.post.title)}',
                               link=f'post/{to_restore.post_id}#comment_{to_restore.id}')
         log_incoming_ap(id, APLOG_UNDO_DELETE, APLOG_SUCCESS, saved_json)
+        return True
     else:
         log_incoming_ap(id, APLOG_UNDO_DELETE, APLOG_FAILURE, saved_json, 'Restorer did not have permisson')
+        return False
 
 
 def site_ban_remove_data(blocker_id, blocked):
