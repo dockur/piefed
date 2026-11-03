@@ -1243,19 +1243,42 @@ def post_user_activity_alert(auth, data, subscribe = True):
     v1 = dict()
 
     if post_id:
-        _ = subscribe_post(post_id, subscribe, SRC_API, auth)
+        try:
+            subscribe_post(post_id, subscribe, SRC_API, auth)
+        except Exception as e:
+            # Ignore exceptions of adding existing or deleting non-existing subs
+            if "A subscription for this post" not in str(e):
+                raise
+        
         v1["post"] = post_view(post=post_id, variant=2, stub=False, user_id=user_id)
 
     if comment_id:
-        _ = subscribe_reply(comment_id, subscribe, SRC_API, auth)
+        try:
+            subscribe_reply(comment_id, subscribe, SRC_API, auth)
+        except Exception as e:
+            # Ignore exceptions of adding existing or deleting non-existing subs
+            if "A subscription for this comment" not in str(e):
+                raise
+
         v1["comment"] = reply_view(reply=comment_id, variant=3, user_id=user_id)
 
     if person_id:
-        _ = subscribe_user(person_id, subscribe, SRC_API, auth)
+        try:
+            subscribe_user(person_id, subscribe, SRC_API, auth)
+        except Exception as e:
+            # Ignore exceptions of adding existing or deleting non-existing subs
+            if "A subscription for this user" not in str(e):
+                raise
+
         v1["user"] = user_view(user=person_id, user_id=user_id, variant=2, stub=True)
 
     if topic_id:
-        _ = subscribe_topic(topic_id, subscribe, SRC_API, auth)
+        try:
+            subscribe_topic(topic_id, subscribe, SRC_API, auth)
+        except Exception as e:
+            # Ignore exceptions of adding existing or deleting non-existing subs
+            if "A subscription for this topic" not in str(e):
+                raise
 
         # Need to do some extra work for topics
         banned_from = communities_banned_from(user_id)
@@ -1280,7 +1303,12 @@ def post_user_activity_alert(auth, data, subscribe = True):
         v1["topic"] = topic_dict
 
     if feed_id:
-        _ = subscribe_feed(feed_id, subscribe, SRC_API, auth)
+        try:
+            subscribe_feed(feed_id, subscribe, SRC_API, auth)
+        except Exception as e:
+            # Ignore exceptions of adding existing or deleting non-existing subs
+            if "A subscription for this feed" not in str(e):
+                raise
 
         # Need to do some extra work for feeds
         blocked_community_ids = blocked_communities(user_id)
@@ -1304,7 +1332,13 @@ def post_user_activity_alert(auth, data, subscribe = True):
         )["feed"]
 
     if community_id:
-        _ = subscribe_community(community_id, subscribe, SRC_API, auth)
+        try:
+            subscribe_community(community_id, subscribe, SRC_API, auth)
+        except Exception as e:
+            # Ignore exceptions of adding existing or deleting non-existing subs
+            if "A subscription for this community" not in str(e):
+                raise
+
         v1["community"] = community_view(community=community_id, variant=2, stub=False, user_id=user_id)
 
     return v1
