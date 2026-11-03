@@ -622,6 +622,7 @@ class CommentView(DefaultSchema):
 
 class FeedView(DefaultSchema):
     actor_id = fields.Url(required=True)
+    activity_alert = fields.Boolean(required=True)
     ap_domain = fields.String(required=True)
     children = fields.List(fields.Nested(lambda: FeedView()), required=True,
                            metadata={"description": "Always empty list for resolve_object endpoint"})
@@ -2189,3 +2190,8 @@ class ActivityAlertResponse(DefaultSchema):
     comment = fields.Nested(CommentView)
     topic = fields.Nested(TopicView, metadata={"description": "Does not include children topics or constituent communities."})
     feed = fields.Nested(FeedView, metadata={"description": "Does not include children feeds or constituent communities."})
+
+
+class FeedSubscribeRequest(DefaultSchema):
+    feed_id = fields.Integer(required=True)
+    subscribe = fields.Boolean(required=True)

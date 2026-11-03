@@ -12,7 +12,8 @@ from app.api.alpha.utils.community import get_community, get_community_list, pos
     post_community_moderate_post_nsfw, post_community_mod, post_community_flair_create, put_community_flair_edit, \
     post_community_flair_delete, post_community_leave_all
 from app.api.alpha.utils.domain import post_domain_block
-from app.api.alpha.utils.feed import get_feed_list, get_feed, post_feed_follow, post_feed, put_feed, post_feed_delete
+from app.api.alpha.utils.feed import get_feed_list, get_feed, post_feed_follow, post_feed, put_feed, post_feed_delete, \
+    put_feed_subscribe
 from app.api.alpha.utils.misc import get_search, get_resolve_object, get_suggestion, get_modlog
 from app.api.alpha.utils.post import get_post_list, get_post, post_post_like, put_post_save, put_post_subscribe, \
     post_post, put_post, post_post_delete, post_post_report, post_post_lock, post_post_feature, post_post_remove, \
@@ -526,6 +527,20 @@ def post_alpha_feed_delete(data):
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
     resp = post_feed_delete(auth, data)
+    return FeedView().load(resp)
+
+
+@feed_bp.route("feed/subscribe", methods=["PUT"])
+@feed_bp.doc(summary="Get notifications for new posts in a feed.")
+@feed_bp.arguments(FeedSubscribeRequest)
+@feed_bp.response(200, FeedView)
+@feed_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def put_alpha_feed_subscribe(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_feed_subscribe(auth, data)
     return FeedView().load(resp)
 
 
@@ -1732,11 +1747,12 @@ def get_alpha_user_get_captcha():
     return FetchCaptchaResponse().load(resp)
 
 
-@user_bp.route("/user/activity_alerts", methods=["GET"])
+@user_bp.route("/user/activity_alert/list", methods=["GET"])
 @user_bp.doc(summary="Fetch the activity alerts for a user.")
 @user_bp.arguments(FetchActivityAlertsRequest, location="query")
 @user_bp.response(200, FetchActivityAlertsResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_activity_alerts(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1750,6 +1766,7 @@ def get_alpha_user_activity_alerts(data):
 @user_bp.arguments(ActivityAlertRequest)
 @user_bp.response(200, ActivityAlertResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_activity_alert(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1762,6 +1779,7 @@ def post_alpha_user_activity_alert(data):
 @user_bp.arguments(ActivityAlertRequest)
 @user_bp.response(200, ActivityAlertResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_activity_alert_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
