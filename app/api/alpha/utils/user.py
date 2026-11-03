@@ -20,6 +20,7 @@ from app.shared.post import subscribe_post
 from app.shared.reply import subscribe_reply
 from app.shared.feed import subscribe_feed
 from app.shared.community import subscribe_community
+from app.shared.topic import subscribe_topic
 from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes, \
     get_setting, create_captcha, moderating_communities_ids, communities_banned_from, joined_or_modding_communities, \
     blocked_communities, blocked_or_banned_instances, subscribed_feeds
@@ -1187,6 +1188,7 @@ def get_user_activity_alerts(auth, data):
                 blocked_community_ids=blocked_community_ids,
                 blocked_instance_ids=blocked_instance_ids,
                 include_communities=False,
+                user_id=user_id,
                 )
             topic_dict["children"] = []  # Do not include children here
 
@@ -1253,25 +1255,7 @@ def post_user_activity_alert(auth, data, subscribe = True):
         v1["user"] = user_view(user=person_id, user_id=user_id, variant=2, stub=True)
 
     if topic_id:
-        # No shared function for topics, do it manually
-        topic = Topic.query.get(topic_id)
-        existing_notification = NotificationSubscription.query.filter(NotificationSubscription.entity_id == topic.id,
-                                                                      NotificationSubscription.user_id == user_id,
-                                                                      NotificationSubscription.type == NOTIF_TOPIC).first()
-
-        if existing_notification and subscribe:
-            raise Exception("A subscription for this topic already exists")
-        elif not existing_notification and not subscribe:
-            raise Exception("A subscription for this topic does not exist")
-
-        if subscribe:
-            new_notification = NotificationSubscription(name=topic.name, user_id=user_id, entity_id=topic.id,
-                                                        type=NOTIF_TOPIC)
-            db.session.add(new_notification)
-            db.session.commit()
-        else:
-            db.session.delete(existing_notification)
-            db.session.commit()
+        _ = subscribe_topic(topic_id, subscribe, SRC_API, auth)
 
         # Need to do some extra work for topics
         banned_from = communities_banned_from(user_id)
@@ -1281,7 +1265,7 @@ def post_user_activity_alert(auth, data, subscribe = True):
         blocked_instance_ids = blocked_or_banned_instances(user_id)
 
         topic_dict = topic_view(
-            topic=topic,
+            topic=topic_id,
             variant=1,
             banned_from=banned_from,
             communities_joined=communities_joined,
@@ -1289,6 +1273,7 @@ def post_user_activity_alert(auth, data, subscribe = True):
             blocked_community_ids=blocked_community_ids,
             blocked_instance_ids=blocked_instance_ids,
             include_communities=False,
+            user_id=user_id
             )
         topic_dict["children"] = []  # Do not include children here
 

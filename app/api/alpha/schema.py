@@ -900,6 +900,7 @@ class FollowFeedRequest(DefaultSchema):
 
 
 class TopicView(DefaultSchema):
+    activity_alert = fields.Boolean(required=True)
     children = fields.List(fields.Nested(lambda: TopicView()), required=True)
     communities = fields.List(fields.Nested(Community), required=True)
     communities_count = fields.Integer(required=True)
@@ -2194,4 +2195,9 @@ class ActivityAlertResponse(DefaultSchema):
 
 class FeedSubscribeRequest(DefaultSchema):
     feed_id = fields.Integer(required=True)
+    subscribe = fields.Boolean(required=True)
+
+
+class TopicSubscribeRequest(DefaultSchema):
+    topic_id = fields.Integer(required=True)
     subscribe = fields.Boolean(required=True)

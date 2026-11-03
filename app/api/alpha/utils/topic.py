@@ -7,6 +7,7 @@ from app import db
 from app.api.alpha.views import feed_view, topic_view
 from app.constants import *
 from app.models import User
+from app.shared.topic import subscribe_topic
 from app.utils import authorise_api_user, blocked_communities, blocked_or_banned_instances, filtered_out_communities, \
     communities_banned_from, moderating_communities_ids, joined_or_modding_communities, feed_tree_public, feed_tree, \
     subscribed_feeds, topic_tree
@@ -37,6 +38,7 @@ def get_topic_list(auth, data, user_id=None) -> dict:
         communities_moderating = moderating_communities_ids(user_id)
         communities_joined = joined_or_modding_communities(user_id)
     else:
+        user_id = None
         banned_from = []
         communities_moderating = []
         communities_joined = []
@@ -51,7 +53,7 @@ def get_topic_list(auth, data, user_id=None) -> dict:
                              banned_from=banned_from, communities_joined=communities_joined,
                              blocked_community_ids=blocked_community_ids,
                              blocked_instance_ids=blocked_instance_ids,
-                             include_communities=include_communities)
+                             include_communities=include_communities, user_id=user_id)
 
             # Process nested children
             if item['children']:
@@ -70,3 +72,29 @@ def get_topic_list(auth, data, user_id=None) -> dict:
     }
 
     return list_json
+
+
+def put_topic_subscribe(auth, data):
+    topic_id = data["topic_id"]
+    subscribe = data["subscribe"]
+
+    # Auth is done in subscribe_topic
+    user_id = subscribe_topic(topic_id, subscribe, SRC_API, auth)
+
+    banned_from = communities_banned_from(user_id)
+    communities_moderating = moderating_communities_ids(user_id)
+    communities_joined = joined_or_modding_communities(user_id)
+    blocked_community_ids = blocked_communities(user_id)
+    blocked_instance_ids = blocked_or_banned_instances(user_id)
+
+    return topic_view(
+        topic=topic_id,
+        variant=1,
+        banned_from=banned_from,
+        communities_joined=communities_joined,
+        communities_moderating=communities_moderating,
+        blocked_community_ids=blocked_community_ids,
+        blocked_instance_ids=blocked_instance_ids,
+        include_communities=True,
+        user_id=user_id,
+    )

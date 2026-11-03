@@ -30,7 +30,7 @@ from app.api.alpha.utils.reply import get_reply_list, post_reply_like, put_reply
     put_reply_report_resolve
 from app.api.alpha.utils.site import get_site, post_site_block, get_federated_instances, get_site_instance_chooser, \
     get_site_instance_chooser_search, get_site_version, get_site_metadata
-from app.api.alpha.utils.topic import get_topic_list
+from app.api.alpha.utils.topic import get_topic_list, put_topic_subscribe
 from app.api.alpha.utils.upload import post_upload_image, post_upload_community_image, post_upload_user_image, \
     post_image_delete
 from app.api.alpha.utils.user import get_user, post_user_block, get_user_unread_count, get_user_replies, \
@@ -1387,6 +1387,20 @@ def get_alpha_topic_list(data):
     resp = get_topic_list(auth, data)
     validated = TopicListResponse().load(resp)
     return orjson_response(validated)
+
+@topic_bp.route('/topic/subscribe', methods=["PUT"])
+@topic_bp.doc(summary="Get notifications for new posts in a topic.")
+@topic_bp.arguments(TopicSubscribeRequest)
+@topic_bp.response(200, TopicView(exclude=("children",)), 
+                   description="Does not include children in response.")
+@topic_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def put_alpha_topic_subscribe(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_topic_subscribe(auth, data)
+    return TopicView(exclude=("children",)).load(resp)
 
 
 # Domain

@@ -1271,7 +1271,7 @@ def conversation_report_view(report: int | Report, variant=1) -> dict:
 
 def topic_view(topic: Topic | int, variant: int, communities_moderating, banned_from,
                communities_joined, blocked_community_ids, blocked_instance_ids,
-               include_communities) -> dict:
+               include_communities, user_id: int | None = None) -> dict:
     if isinstance(topic, int):
         topic = Topic.query.get(topic)
 
@@ -1294,6 +1294,16 @@ def topic_view(topic: Topic | int, variant: int, communities_moderating, banned_
                         community.instance_id not in blocked_instance_ids and \
                         community.id not in banned_from:
                     v1['communities'].append(community_view(community, variant=1, stub=True))
+
+        if user_id:
+            existing_notification = NotificationSubscription.query.filter(NotificationSubscription.entity_id == topic.id,
+                                                                          NotificationSubscription.user_id == user_id,
+                                                                          NotificationSubscription.type == NOTIF_TOPIC).first()
+
+            v1["activity_alert"] = bool(existing_notification)
+
+        else:
+            v1["activity_alert"] = False
 
         return v1
 
