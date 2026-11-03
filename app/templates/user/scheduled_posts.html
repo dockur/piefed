@@ -23,6 +23,7 @@
                 {% if entities %}
                     <tr>
                        <th>{{ _('Title') }}</th>
+                       <th>{{ _('Community') }}</th>
                        <th>{{ _('Scheduled for') }}</th>
 		       <th>{{ _('Timezone') }}</th>
                        <th>{{ _('Frequency') }}</th>
@@ -31,6 +32,7 @@
                     {% for post in entities %}
                         <tr>
                             <td><span title="{{ post.title }}">{{ post.title }}</span></td>
+                            <td><span title="{{ post.community.title }}">{{ post.community.title }}</span></td>
                             <td><span title="{{ _('Scheduled for') }}">{{ post.scheduled_for }}</span></td>
 			    <td><span title="{{ _('Timezone') }}">{{ post.timezone }}</span></td>
                             <td><span title="{{ _('Frequency') }}">
