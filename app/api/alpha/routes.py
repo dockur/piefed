@@ -40,7 +40,7 @@ from app.api.alpha.utils.user import get_user, post_user_block, get_user_unread_
     post_user_logout, post_user_follow, post_user_unfollow
 from app.api.alpha.utils.admin import get_registration_list, put_registration_approve
 from app.constants import *
-from app.utils import orjson_response, get_setting
+from app.utils import orjson_response, get_setting, auth_required_if_private
 from app.api.alpha.schema import *
 
 
@@ -91,6 +91,7 @@ def get_alpha_site_version():
 @site_bp.arguments(BlockInstanceRequest)
 @site_bp.response(200, BlockInstanceResponse)
 @site_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_site_block(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -134,6 +135,7 @@ def get_alpha_site_instance_chooser_search(data):
 @misc_bp.arguments(SearchRequest, location="query")
 @misc_bp.response(200, SearchResponse)
 @misc_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_search(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -147,6 +149,7 @@ def get_alpha_search(data):
 @misc_bp.arguments(ResolveObjectRequest, location="query")
 @misc_bp.response(200, ResolveObjectResponse)
 @misc_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_resolve_object(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -185,6 +188,7 @@ def get_alpha_suggest_completion(data):
 @misc_bp.response(200, GetModLogResponse)
 @misc_bp.alt_response(400, schema=DefaultError)
 @misc_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def alpha_miscellaneous_modlog(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -199,6 +203,7 @@ def alpha_miscellaneous_modlog(data):
 @comm_bp.arguments(GetCommunityRequest, location="query")
 @comm_bp.response(200, GetCommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_community(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -212,6 +217,7 @@ def get_alpha_community(data):
 @comm_bp.arguments(ListCommunitiesRequest, location="query")
 @comm_bp.response(200, ListCommunitiesResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_community_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -225,6 +231,7 @@ def get_alpha_community_list(data):
 @comm_bp.arguments(FollowCommunityRequest)
 @comm_bp.response(200, CommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_follow(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -237,6 +244,7 @@ def post_alpha_community_follow(data):
 @comm_bp.doc(summary="Leave all communities and feeds for which the user is not a moderator or owner.")
 @comm_bp.response(200, UserMeResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_leave_all():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -250,6 +258,7 @@ def post_alpha_leave_all():
 @comm_bp.arguments(BlockCommunityRequest)
 @comm_bp.response(200, BlockCommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_block(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -264,6 +273,7 @@ def post_alpha_community_block(data):
 @comm_bp.response(200, CommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
 @comm_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -278,6 +288,7 @@ def post_alpha_community(data):
 @comm_bp.arguments(EditCommunityRequest)
 @comm_bp.response(200, CommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_community(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -291,6 +302,7 @@ def put_alpha_community(data):
 @comm_bp.arguments(SubscribeCommunityRequest)
 @comm_bp.response(200, CommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_community_subscribe(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -304,6 +316,7 @@ def put_alpha_community_subscribe(data):
 @comm_bp.arguments(DeleteCommunityRequest)
 @comm_bp.response(200, CommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -317,6 +330,7 @@ def post_alpha_community_delete(data):
 @comm_bp.arguments(ModCommunityRequest)
 @comm_bp.response(200, ModCommunityResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_mod(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -330,6 +344,7 @@ def post_alpha_community_mod(data):
 @comm_bp.arguments(CommunityModerationBansListRequest, location="query")
 @comm_bp.response(200, CommunityModerationBansListResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_community_moderate_bans(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -343,6 +358,7 @@ def get_alpha_community_moderate_bans(data):
 @comm_bp.arguments(CommunityModerationUnbanRequest)
 @comm_bp.response(200, CommunityModerationBanItem)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_community_moderate_unban(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -356,6 +372,7 @@ def put_alpha_community_moderate_unban(data):
 @comm_bp.arguments(CommunityModerationBanRequest)
 @comm_bp.response(200, CommunityModerationBanItem)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_moderate_ban(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -369,6 +386,7 @@ def post_alpha_community_moderate_ban(data):
 @comm_bp.arguments(CommunityModerationNsfwRequest)
 @comm_bp.response(200, PostView)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_moderate_post_nsfw(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -382,6 +400,7 @@ def post_alpha_community_moderate_post_nsfw(data):
 @comm_bp.arguments(CommunityFlairCreateRequest)
 @comm_bp.response(200, CommunityFlairCreateResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_flair(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -395,6 +414,7 @@ def post_alpha_community_flair(data):
 @comm_bp.arguments(CommunityFlairEditRequest)
 @comm_bp.response(200, CommunityFlairEditResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_community_flair(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -408,6 +428,7 @@ def put_alpha_community_flair(data):
 @comm_bp.arguments(CommunityFlairDeleteRequest)
 @comm_bp.response(200, CommunityFlairDeleteResponse)
 @comm_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_community_flair_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -422,6 +443,7 @@ def post_alpha_community_flair_delete(data):
 @feed_bp.arguments(GetFeedRequest, location="query")
 @feed_bp.response(200, FeedView)
 @feed_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_feed(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -436,6 +458,7 @@ def get_alpha_feed(data):
 @feed_bp.arguments(FeedListRequest, location="query")
 @feed_bp.response(200, FeedListResponse)
 @feed_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_feed_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -450,6 +473,7 @@ def get_alpha_feed_list(data):
 @feed_bp.arguments(FollowFeedRequest)
 @feed_bp.response(200, FeedView)
 @feed_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_feed_follow(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -466,6 +490,7 @@ def post_alpha_feed_follow(data):
 @feed_bp.response(200, FeedView)
 @feed_bp.alt_response(400, schema=DefaultError)
 @feed_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_feed(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -480,6 +505,7 @@ def post_alpha_feed(data):
 @feed_bp.arguments(EditFeedRequest)
 @feed_bp.response(200, FeedView)
 @feed_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_feed(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -493,6 +519,7 @@ def put_alpha_feed(data):
 @feed_bp.arguments(DeleteFeedRequest)
 @feed_bp.response(200, FeedView)
 @feed_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_feed_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -510,6 +537,7 @@ list_posts_response = ListPostsResponse()
 @post_bp.arguments(ListPostsRequest, location="query", unknown=INCLUDE)
 @post_bp.response(200, ListPostsResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_post_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -527,6 +555,7 @@ def get_alpha_post_list(data):
 @post_bp.arguments(ListPostsRequest2, location="query", unknown=INCLUDE)
 @post_bp.response(200, ListPostsResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_post_list2(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -544,6 +573,7 @@ def get_alpha_post_list2(data):
 @post_bp.arguments(ScheduledPostListRequest, location="query", unknown=INCLUDE)
 @post_bp.response(200, ScheduledPostListResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_scheduled_post_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -557,6 +587,7 @@ def get_alpha_scheduled_post_list(data):
 @post_bp.arguments(GetPostRequest, location="query")
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -570,6 +601,7 @@ def get_alpha_post(data):
 @post_bp.arguments(GetScheduledPostRequest, location="query")
 @post_bp.response(200, GetScheduledPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_scheduled_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -586,6 +618,7 @@ get_post_replies_response = GetPostRepliesResponse()
 @post_bp.arguments(GetPostRepliesRequest, location="query")
 @post_bp.response(200, GetPostRepliesResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_post_replies(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -600,6 +633,7 @@ def get_alpha_post_replies(data):
 @post_bp.arguments(GetSiteMetadataRequest, location="query")
 @post_bp.response(200, GetSiteMetadataResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_metadata(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -613,6 +647,7 @@ def post_alpha_post_metadata(data):
 @post_bp.arguments(LikePostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_like(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -625,6 +660,7 @@ def post_alpha_post_like(data):
 @post_bp.arguments(SavePostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_post_save(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -638,6 +674,7 @@ def put_alpha_post_save(data):
 @post_bp.arguments(SubscribePostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_post_subscribe(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -652,6 +689,7 @@ def put_alpha_post_subscribe(data):
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
 @post_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -667,6 +705,7 @@ def post_alpha_post(data):
 @post_bp.response(200, GetScheduledPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
 @post_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_scheduled_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -681,6 +720,7 @@ def post_alpha_scheduled_post(data):
 @post_bp.arguments(EditPostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -694,6 +734,7 @@ def put_alpha_post(data):
 @post_bp.arguments(EditScheduledPostRequest)
 @post_bp.response(200, GetScheduledPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_scheduled_post(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -707,6 +748,7 @@ def put_alpha_scheduled_post(data):
 @post_bp.arguments(DeletePostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -720,6 +762,7 @@ def post_alpha_post_delete(data):
 @post_bp.arguments(DeleteScheduledPostRequest)
 @post_bp.response(200, GetScheduledPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_scheduled_post_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -733,6 +776,7 @@ def post_alpha_scheduled_post_delete(data):
 @post_bp.arguments(ReportPostRequest)
 @post_bp.response(200, PostReportResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_report(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -746,6 +790,7 @@ def post_alpha_post_report(data):
 @post_bp.arguments(GetPostReportListRequest, location="query")
 @post_bp.response(200, GetPostReportListResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_post_report_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -759,6 +804,7 @@ def get_alpha_post_report_list(data):
 @post_bp.arguments(PutPostReportResolveRequest)
 @post_bp.response(200, PostReportResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_post_report_resolve(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -772,6 +818,7 @@ def put_alpha_post_report_resolve(data):
 @post_bp.arguments(LockPostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_lock(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -785,6 +832,7 @@ def post_alpha_post_lock(data):
 @post_bp.arguments(HidePostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_hide(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -798,6 +846,7 @@ def post_alpha_post_hide(data):
 @post_bp.arguments(FeaturePostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_feature(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -811,6 +860,7 @@ def post_alpha_post_feature(data):
 @post_bp.arguments(RemovePostRequest)
 @post_bp.response(200, GetPostResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_remove(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -824,6 +874,7 @@ def post_alpha_post_remove(data):
 @post_bp.arguments(MarkPostAsReadRequest)
 @post_bp.response(200, SuccessResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_mark_as_read(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -837,6 +888,7 @@ def post_alpha_post_mark_as_read(data):
 @post_bp.arguments(ListPostLikesRequest, location="query")
 @post_bp.response(200, ListPostLikesResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_post_like_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -851,6 +903,7 @@ def get_alpha_post_like_list(data):
 @post_bp.arguments(PostSetFlairRequest)
 @post_bp.response(200, PostSetFlairResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_set_flair(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -864,6 +917,7 @@ def post_alpha_post_set_flair(data):
 @post_bp.arguments(PollVoteRequest)
 @post_bp.response(200, PollVoteResponse)
 @post_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_post_poll_vote(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -881,6 +935,7 @@ list_comments_response = ListCommentsResponse()
 @reply_bp.arguments(ListCommentsRequest, location="query")
 @reply_bp.response(200, ListCommentsResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_comment_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -898,6 +953,7 @@ def get_alpha_comment_list(data):
 @reply_bp.arguments(LikeCommentRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_like(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -911,6 +967,7 @@ def post_alpha_comment_like(data):
 @reply_bp.arguments(SaveCommentRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_comment_save(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -924,6 +981,7 @@ def put_alpha_comment_save(data):
 @reply_bp.arguments(SubscribeCommentRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_comment_subscribe(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -938,6 +996,7 @@ def put_alpha_comment_subscribe(data):
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
 @reply_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -952,6 +1011,7 @@ def post_alpha_comment(data):
 @reply_bp.arguments(EditCommentRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_comment(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -965,6 +1025,7 @@ def put_alpha_comment(data):
 @reply_bp.arguments(DeleteCommentRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -978,6 +1039,7 @@ def post_alpha_comment_delete(data):
 @reply_bp.arguments(ReportCommentRequest)
 @reply_bp.response(200, GetCommentReportResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_report(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -991,6 +1053,7 @@ def post_alpha_comment_report(data):
 @reply_bp.arguments(GetCommentReportListRequest, location="query")
 @reply_bp.response(200, GetCommentReportListResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_comment_report_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1004,6 +1067,7 @@ def get_alpha_comment_report_list(data):
 @reply_bp.arguments(PutCommentReportResolveRequest)
 @reply_bp.response(200, GetCommentReportResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_comment_report_resolve(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1017,6 +1081,7 @@ def put_alpha_comment_report_resolve(data):
 @reply_bp.arguments(RemoveCommentRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_remove(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1030,6 +1095,7 @@ def post_alpha_comment_remove(data):
 @reply_bp.arguments(MarkCommentAsReadRequest)
 @reply_bp.response(200, GetCommentReplyResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_mark_as_read(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1043,6 +1109,7 @@ def post_alpha_comment_mark_as_read(data):
 @reply_bp.arguments(MarkCommentAsAnswerRequest)
 @reply_bp.response(200, GetCommentReplyResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_mark_as_answer(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1056,6 +1123,7 @@ def post_alpha_comment_mark_as_answer(data):
 @reply_bp.arguments(MarkCommentAsDistinguishedRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_distinguish(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1069,6 +1137,7 @@ def post_alpha_comment_distinguish(data):
 @reply_bp.arguments(GetCommentRequest, location="query")
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_comment(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1082,6 +1151,7 @@ def get_alpha_comment(data):
 @reply_bp.arguments(LockCommentRequest)
 @reply_bp.response(200, GetCommentResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_comment_lock(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1095,6 +1165,7 @@ def post_alpha_comment_lock(data):
 @reply_bp.arguments(ListCommentLikesRequest, location="query")
 @reply_bp.response(200, ListCommentLikesResponse)
 @reply_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_comment_like_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1110,6 +1181,7 @@ def get_alpha_comment_like_list(data):
 @private_message_bp.arguments(ListPrivateMessagesRequest, location="query")
 @private_message_bp.response(200, ListPrivateMessagesResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_private_message_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1123,6 +1195,7 @@ def get_alpha_private_message_list(data):
 @private_message_bp.arguments(GetPrivateMessageConversationRequest, location="query")
 @private_message_bp.response(200, GetPrivateMessageConversationResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_private_message_conversation(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1136,6 +1209,7 @@ def get_alpha_private_message_conversation(data):
 @private_message_bp.arguments(LeaveConversationRequest)
 @private_message_bp.response(200)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_conversation_leave(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1149,6 +1223,7 @@ def post_alpha_conversation_leave(data):
 @private_message_bp.response(200, PrivateMessageResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
 @private_message_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_private_message(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1163,6 +1238,7 @@ def post_alpha_private_message(data):
 @private_message_bp.arguments(EditPrivateMessageRequest)
 @private_message_bp.response(200, PrivateMessageResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_private_message(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1176,6 +1252,7 @@ def put_alpha_private_message(data):
 @private_message_bp.arguments(MarkPrivateMessageAsReadRequest)
 @private_message_bp.response(200, PrivateMessageResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_private_message_mark_as_read(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1189,6 +1266,7 @@ def post_alpha_private_message_mark_as_read(data):
 @private_message_bp.arguments(DeletePrivateMessageRequest)
 @private_message_bp.response(200, PrivateMessageResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_private_message_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1202,6 +1280,7 @@ def post_alpha_private_message_delete(data):
 @private_message_bp.arguments(ReportPrivateMessageRequest)
 @private_message_bp.response(200, PrivateMessageReportResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_private_message_report(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1215,6 +1294,7 @@ def post_alpha_private_message_report(data):
 @private_message_bp.arguments(ReportConversationRequest)
 @private_message_bp.response(200)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_private_message_conversation_report(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1227,6 +1307,7 @@ def post_alpha_private_message_conversation_report(data):
 @private_message_bp.arguments(GetPrivateMessageReportListRequest, location="query")
 @private_message_bp.response(200, GetPrivateMessageReportListResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_private_message_report_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1240,6 +1321,7 @@ def get_alpha_private_message_report_list(data):
 @private_message_bp.arguments(GetConversationReportListRequest, location="query")
 @private_message_bp.response(200, GetConversationReportListResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_private_message_conversation_report_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1253,6 +1335,7 @@ def get_alpha_private_message_conversation_report_list(data):
 @private_message_bp.arguments(PutPrivateMessageReportResolveRequest)
 @private_message_bp.response(200, PrivateMessageReportResponse)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_private_message_report_resolve(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1266,6 +1349,7 @@ def put_alpha_private_message_report_resolve(data):
 @private_message_bp.arguments(PutConversationReportResolveRequest)
 @private_message_bp.response(200)
 @private_message_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_private_message_conversation_report_resolve(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1279,6 +1363,7 @@ def put_alpha_private_message_conversation_report_resolve(data):
 @topic_bp.arguments(TopicListRequest, location="query")
 @topic_bp.response(200, TopicListResponse)
 @topic_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_topic_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1294,6 +1379,7 @@ def get_alpha_topic_list(data):
 @user_bp.arguments(DomainBlockRequest)
 @user_bp.response(200, DomainBlockResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_domain_block(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1308,6 +1394,7 @@ def post_alpha_domain_block(data):
 @user_bp.arguments(GetUserRequest, location="query")
 @user_bp.response(200, GetUserResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1321,6 +1408,7 @@ def get_alpha_user(data):
 @user_bp.doc(summary="Get the details for the current user")
 @user_bp.response(200, UserMeResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_details():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1349,6 +1437,7 @@ def post_alpha_user_login(data):
 @user_bp.doc(summary="Logout / Revoke JWT token")
 @user_bp.response(200, LogoutResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_logout():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1362,6 +1451,7 @@ def post_alpha_user_logout():
 @user_bp.doc(summary="Get your unread counts")
 @user_bp.response(200, UserUnreadCountsResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_unread_count():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1375,6 +1465,7 @@ def get_alpha_user_unread_count():
 @user_bp.arguments(UserRepliesRequest, location="query")
 @user_bp.response(200, UserRepliesResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_replies(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1388,6 +1479,7 @@ def get_alpha_user_replies(data):
 @user_bp.arguments(UserMentionsRequest, location="query")
 @user_bp.response(200, UserMentionsResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_mentions(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1401,6 +1493,7 @@ def get_alpha_user_mentions(data):
 @user_bp.arguments(UserMediaRequest, location="query")
 @user_bp.response(200, UserMediaResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_media(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1414,6 +1507,7 @@ def get_alpha_user_media(data):
 @user_bp.arguments(UserBlockRequest)
 @user_bp.response(200, UserBlockResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_block(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1426,6 +1520,7 @@ def post_alpha_user_block(data):
 @user_bp.doc(summary="Mark all notifications and messages as read")
 @user_bp.response(200, UserMarkAllReadResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_mark_all_as_read():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1439,6 +1534,7 @@ def post_alpha_user_mark_all_as_read():
 @user_bp.arguments(UserSubscribeRequest)
 @user_bp.response(200, UserSubscribeResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_user_subscribe(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1453,6 +1549,7 @@ def put_alpha_user_subscribe(data):
 @user_bp.arguments(UserSaveSettingsRequest)
 @user_bp.response(200, UserSaveSettingsResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_user_save_user_settings(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1466,6 +1563,7 @@ def put_alpha_user_save_user_settings(data):
 @user_bp.arguments(UserNotificationsRequest, location="query")
 @user_bp.response(200, UserNotificationsResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_notifications(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1479,6 +1577,7 @@ def get_alpha_user_notifications(data):
 @user_bp.arguments(UserNotificationStateRequest)
 @user_bp.response(200, UserNotificationItemView)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_user_notification_state(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1491,6 +1590,7 @@ def put_alpha_user_notification_state(data):
 @user_bp.doc(summary="Get user unread notifications count")
 @user_bp.response(200, UserNotificationsCountResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_user_notifications_count():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1503,6 +1603,7 @@ def get_alpha_user_notifications_count():
 @user_bp.doc(summary="Mark all notifications as read")
 @user_bp.response(200, UserMarkAllNotifsReadResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_user_notifications_read():
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1528,6 +1629,7 @@ def post_alpha_user_verify_credentials(data):
 @user_bp.arguments(UserSetFlairRequest)
 @user_bp.response(200, UserSetFlairResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_set_flair(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1541,6 +1643,7 @@ def post_alpha_user_set_flair(data):
 @user_bp.arguments(UserFollowRequest)
 @user_bp.response(200, UserFollowResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_follow(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1554,6 +1657,7 @@ def post_alpha_user_follow(data):
 @user_bp.arguments(UserUnfollowRequest)
 @user_bp.response(200, UserUnfollowResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_unfollow(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1567,6 +1671,7 @@ def post_alpha_user_unfollow(data):
 @user_bp.arguments(UserSetNoteRequest)
 @user_bp.response(200, UserSetNoteResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_note(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1580,6 +1685,7 @@ def post_alpha_user_note(data):
 @user_bp.arguments(UserBanRequest)
 @user_bp.response(200, UserBanResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_ban(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1593,6 +1699,7 @@ def post_alpha_user_ban(data):
 @user_bp.arguments(UserUnbanRequest)
 @user_bp.response(200, UserBanResponse)
 @user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_unban(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1631,6 +1738,7 @@ def get_alpha_user_get_captcha():
 @upload_bp.response(200, ImageUploadResponse)
 @upload_bp.alt_response(400, schema=DefaultError)
 @upload_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_upload_image(files_data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1647,6 +1755,7 @@ def post_alpha_upload_image(files_data):
 @upload_bp.response(200, ImageUploadResponse)
 @upload_bp.alt_response(400, schema=DefaultError)
 @upload_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_upload_community_image(files_data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1663,6 +1772,7 @@ def post_alpha_upload_community_image(files_data):
 @upload_bp.response(200, ImageUploadResponse)
 @upload_bp.alt_response(400, schema=DefaultError)
 @upload_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_upload_user_image(files_data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1679,6 +1789,7 @@ def post_alpha_upload_user_image(files_data):
 @upload_bp.response(200, ImageDeleteResponse)
 @upload_bp.alt_response(400, schema=DefaultError)
 @upload_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
 def post_alpha_user_image_delete(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1694,6 +1805,7 @@ def post_alpha_user_image_delete(data):
 @admin_bp.arguments(GetRegistrationList, location="query")
 @admin_bp.response(200, GetRegistrationListResponse)
 @admin_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def get_alpha_admin_registration_list(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")
@@ -1707,6 +1819,7 @@ def get_alpha_admin_registration_list(data):
 @admin_bp.arguments(RegistrationApproveRequest)
 @admin_bp.response(200)
 @admin_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
 def put_alpha_admin_registration_approve(data):
     if not enable_api():
         return abort(400, message="alpha api is not enabled")

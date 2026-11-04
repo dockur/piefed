@@ -1810,6 +1810,25 @@ def login_required_if_private_instance(func):
     return decorated_view
 
 
+def auth_required_if_private(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not g.site.private_instance:
+            return func(*args, **kwargs)
+
+        # Make sure header is present
+        auth = request.headers.get('Authorization')
+        if not auth:
+            raise Exception("instance_is_private")
+
+        # Make sure credentials valid - raises an exeption if it doesn't validate
+        _ = authorise_api_user(auth)
+        
+        return func(*args, **kwargs)
+
+    return decorated_view
+
+
 def check_anoobis(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
