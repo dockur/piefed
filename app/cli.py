@@ -424,7 +424,7 @@ def register(app):
                 
                 for row in result:
                     # Use admin (user 1) as placeholder creator for all communities
-                    # since we can't easily determine the actual creator from Lemmy schema
+                    # since we can't easily determine the creator from Lemmy schema
                     creator_id = 1
 
                     existing_community = Community.query.get(row.id)
@@ -2272,8 +2272,31 @@ def register(app):
                   help="Also show groups with no clear beneficiary - usually friends who "
                        "read the same communities. Off by default because they outnumber "
                        "the real findings by roughly twenty to one.")
+    @click.option("--min-vote-only-containment", default=0.5,
+                  help="Report a group whose members have never posted or commented when their "
+                       "overlap is at least this share of the smallest account's voting. Such "
+                       "accounts have no content to vote on each other with, so the inward "
+                       "test can never flag them.")
+    @click.option("--sync-minutes", default=15,
+                  help="Describe a group as voting together in real time when the median gap "
+                       "between members' votes on the same item is under this. Affects wording "
+                       "only.")
+    @click.option("--burst-hours", default=48,
+                  help="Burst search: only compare accounts from the same instance first seen "
+                       "within this many hours of each other.")
+    @click.option("--min-vote-only", default=3,
+                  help="Smallest group of vote-only accounts to report, from either route. "
+                       "Can be below --min-clique: a tight core inside a larger clique counts.")
+    @click.option("--burst-min-shared", default=5,
+                  help="Burst search: ignore pairs sharing fewer items than this.")
+    @click.option("--burst-min-logp", default=10.0,
+                  help="Burst search: edge strength, as -log10 of the chance overlap. Lower than "
+                       "--min-logp because throwaway accounts cast few votes.")
+    @click.option("--no-bursts", is_flag=True, help="Skip the burst search (it takes about a minute).")
     def voting_clusters(days, cap, min_shared, min_communities, min_logp, min_clique, top,
-                        min_inward, min_promoted, min_hub_share, overlap, show_all):
+                        min_inward, min_promoted, min_hub_share, overlap, show_all,
+                        min_vote_only_containment, sync_minutes, burst_hours, min_vote_only,
+                        burst_min_shared, burst_min_logp, no_bursts):
         """Find groups of accounts that vote on the same content far more than chance allows.
 
         The admin dashboard only catches manipulation that is blatant on its own terms - one
@@ -2300,6 +2323,29 @@ def register(app):
         does not drag it down). Above --min-inward the group is reported; below it they are
         people who happen to read the same things, hidden unless you pass --all.
 
+        The inward test has a blind spot: accounts that never post or comment have nothing
+        to vote on each other with, so their inward share is always 0. So within every
+        non-ring clique, the members with no content whose pairwise overlap clears
+        --min-vote-only-containment are reported as a vote-only group (--min-vote-only or
+        more), described by whose content they push up and down. The core is judged on its
+        own because one loosely attached member would otherwise drag the clique's weakest
+        link below the bar. The kid_gojira accounts - namesakes on several servers, no
+        content, voting on the same comments minutes apart - were a clique this test used
+        to hide.
+
+        Every group also gets a timing figure: the median gap between members' votes on the
+        same item. Real coordination tends to be minutes; people reading the same thread
+        are usually hours apart.
+
+        SECOND WAY IN, BURSTS. Throwaway farms never reach Stage 2: each account casts ~20
+        votes, mostly on popular items, so --cap, --min-shared and --min-communities filter
+        out every pair. A separate search picks candidates by who they are rather than what
+        they voted on - accounts from the same instance, first seen within --burst-hours of
+        each other, that have never posted or commented - then compares them on all items,
+        popular ones included, against the same popularity-weighted null. Connected groups
+        of --min-vote-only or more are reported as vote-only groups. This is what catches a
+        lemmy.cafe-style farm: 55 random-name accounts created in batches.
+
         Stage 4, MERGE AND DESCRIBE. One dense blob yields dozens of near-identical cliques,
         so everything pointing at the same beneficiary is merged into a single finding and
         re-described from the union. Each group is then reported as one of two shapes, which
@@ -2322,35 +2368,32 @@ def register(app):
         rows = db.session.execute(text(sql), {'days': days, 'cap': cap,
                                               'min_shared': min_shared,
                                               'min_communities': min_communities}).all()
-        if not rows:
-            print("no candidate pairs")
-            return
-        universe = rows[0].universe
-        print(f"{len(rows):,} candidate pairs over {universe:,} votes on low-traffic items")
-
         edges = {}
         adj = defaultdict(set)
-        for r in rows:
-            # Expected overlap if each account picked items in proportion to their
-            # popularity. Symmetrised over the two directions.
-            mu = (r.n2 * float(r.s1) + r.n1 * float(r.s2)) / (2.0 * universe)
-            strength = poisson_tail_log10(r.shared, mu)
-            if strength < min_logp:
-                continue
-            # Containment: the overlap as a share of the SMALLER account's own
-            # activity. Without this the ranking fills up with the instance's
-            # heaviest voters, who overlap in absolute terms simply because they
-            # all read /new, and real farms sink hundreds of places.
-            containment = r.shared / max(1, min(r.n1, r.n2))
-            edges[(r.u1, r.u2)] = {'shared': r.shared, 'communities': r.communities,
-                                   'strength': strength, 'containment': containment}
-            adj[r.u1].add(r.u2)
-            adj[r.u2].add(r.u1)
-        print(f"{len(edges):,} edges at -log10(p) >= {min_logp}")
-        if not edges:
-            return
+        if rows:
+            universe = rows[0].universe
+            print(f"{len(rows):,} candidate pairs over {universe:,} votes on low-traffic items")
+            for r in rows:
+                # Expected overlap if each account picked items in proportion to their
+                # popularity. Symmetrised over the two directions.
+                mu = (r.n2 * float(r.s1) + r.n1 * float(r.s2)) / (2.0 * universe)
+                strength = poisson_tail_log10(r.shared, mu)
+                if strength < min_logp:
+                    continue
+                # Containment: the overlap as a share of the SMALLER account's own
+                # activity. Without this the ranking fills up with the instance's
+                # heaviest voters, who overlap in absolute terms simply because they
+                # all read /new, and real farms sink hundreds of places.
+                containment = r.shared / max(1, min(r.n1, r.n2))
+                edges[(r.u1, r.u2)] = {'shared': r.shared, 'communities': r.communities,
+                                       'strength': strength, 'containment': containment}
+                adj[r.u1].add(r.u2)
+                adj[r.u2].add(r.u1)
+            print(f"{len(edges):,} edges at -log10(p) >= {min_logp}")
+        else:
+            print("no candidate pairs")
 
-        cliques = maximal_cliques(adj, min_clique)
+        cliques = maximal_cliques(adj, min_clique) if edges else []
         print(f"{len(cliques):,} groups of >= {min_clique} accounts")
 
         def edge(u, v):
@@ -2362,12 +2405,55 @@ def register(app):
                          if (u, v) in edges or (v, u) in edges]
             groups.append({
                 'members': members,
+                'source': 'clique',
                 'containment': min(d['containment'] for d in pair_data),
                 'strength': min(d['strength'] for d in pair_data),
                 'communities': min(d['communities'] for d in pair_data),
                 'shared': max(d['shared'] for d in pair_data),
             })
-        ids = sorted({u for g in groups for u in g['members']})
+
+        # SECOND WAY IN. Throwaway accounts never survive the pair query above, so look
+        # for them by who they are - new, silent, from the same instance at the same time -
+        # and only then by what they voted on.
+        burst_groups = []
+        if not no_bursts:
+            print(f"looking for bursts of new accounts that never post or comment (same instance, "
+                  f"first seen within {burst_hours}h of each other) ...", flush=True)
+            burst_rows = db.session.execute(text(sql_file('account_bursts')),
+                                            {'days': days, 'burst_hours': burst_hours,
+                                             'burst_min_shared': burst_min_shared}).all()
+            burst_edges = {}
+            burst_adj = defaultdict(set)
+            for r in burst_rows:
+                mu = (r.n2 * float(r.s1) + r.n1 * float(r.s2)) / (2.0 * r.universe)
+                strength = poisson_tail_log10(r.shared, mu)
+                containment = r.shared / max(1, min(r.n1, r.n2))
+                if strength < burst_min_logp or containment < min_vote_only_containment:
+                    continue
+                burst_edges[(r.u1, r.u2)] = {'shared': r.shared, 'strength': strength,
+                                             'containment': containment}
+                burst_adj[r.u1].add(r.u2)
+                burst_adj[r.u2].add(r.u1)
+            # Connected components rather than cliques: a throwaway that cast six votes
+            # cannot overlap strongly with every sibling, but it is still part of the batch.
+            # The same-instance, same-time restriction keeps components from percolating.
+            for members in connected_components(burst_adj):
+                if len(members) < min_vote_only:
+                    continue
+                pair_data = [d for (u, v), d in burst_edges.items() if u in members]
+                burst_groups.append({
+                    'members': sorted(members),
+                    'source': 'burst',
+                    'containment': median(d['containment'] for d in pair_data),
+                    'strength': min(d['strength'] for d in pair_data),
+                    'communities': None,
+                    'shared': max(d['shared'] for d in pair_data),
+                })
+            print(f"{len(burst_groups):,} bursts of >= {min_vote_only} silent accounts voting together")
+
+        if not groups and not burst_groups:
+            return
+        ids = sorted({u for g in groups + burst_groups for u in g['members']})
 
         # The clique statistics say a group is coordinated but not what it is
         # DOING, which is the tell. To find out, pull every
@@ -2375,17 +2461,27 @@ def register(app):
         # who they boost, and whether they boost each other.
         votes_by_member = defaultdict(list)
         for row in db.session.execute(text("""
-                SELECT user_id, post_id * 2 AS item, author_id, effect
+                SELECT user_id, post_id * 2 AS item, author_id, effect, created_at
                 FROM post_vote
                 WHERE created_at >= NOW() - make_interval(days => :days)
                   AND effect <> 0 AND author_id IS NOT NULL AND user_id = ANY(:ids)
                 UNION ALL
-                SELECT user_id, post_reply_id * 2 + 1, author_id, effect
+                SELECT user_id, post_reply_id * 2 + 1, author_id, effect, created_at
                 FROM post_reply_vote
                 WHERE created_at >= NOW() - make_interval(days => :days)
                   AND effect <> 0 AND author_id IS NOT NULL AND user_id = ANY(:ids)
                 """), {'days': days, 'ids': ids}).all():
-            votes_by_member[row.user_id].append((row.item, row.author_id, row.effect))
+            votes_by_member[row.user_id].append((row.item, row.author_id, row.effect,
+                                                 row.created_at))
+
+        # Posts + comments ever made, so groups of vote-only accounts can be recognised.
+        content = defaultdict(int)
+        for row in db.session.execute(text("""
+                SELECT user_id, COUNT(*) AS n FROM post WHERE user_id = ANY(:ids) GROUP BY user_id
+                UNION ALL
+                SELECT user_id, COUNT(*) FROM post_reply WHERE user_id = ANY(:ids) GROUP BY user_id
+                """), {'ids': ids}).all():
+            content[row.user_id] += row.n
 
         def describe(members):
             """Who does this set of accounts vote for, and how inward-facing is it?"""
@@ -2394,7 +2490,7 @@ def register(app):
             upvoters_of_item = defaultdict(set)             # item -> members who upvoted it
             item_author = {}
             for u in members:
-                for item, author, effect in votes_by_member.get(u, ()):
+                for item, author, effect, _voted_at in votes_by_member.get(u, ()):
                     if author in members and author != u:
                         internal[(u, author)][0 if effect > 0 else 1] += 1
                     if effect > 0:
@@ -2428,6 +2524,7 @@ def register(app):
                 'internal_total': sum(sum(v) for v in internal.values()),
                 'co_authors': co_authors,
                 'total_co': sum(co_authors.values()),
+                'contentless': all(content.get(u, 0) == 0 for u in members),
                 'inward': median(shares) if shares else 0.0,
                 'beneficiary': top_recv,
                 'ben_votes': received_inside[top_recv] if top_recv else 0,
@@ -2438,13 +2535,82 @@ def register(app):
                               if top_recv else 0.0),
             }
 
-        for g in groups:
+        def vote_pattern(members):
+            """Downvote targets and timing. Only needed for groups that get printed, and
+            costly to build for thousands of cliques, so kept out of describe()."""
+            members = set(members)
+            downvoters_of_item = defaultdict(set)           # item -> members who downvoted it
+            vote_times = defaultdict(list)                  # (item, up?) -> when members voted
+            item_author = {}
+            for u in members:
+                for item, author, effect, voted_at in votes_by_member.get(u, ()):
+                    vote_times[(item, effect > 0)].append(voted_at)
+                    if effect < 0:
+                        downvoters_of_item[item].add(u)
+                        item_author[item] = author
+            down_authors = Counter(item_author[i] for i, us in downvoters_of_item.items()
+                                   if len(us) >= 2)
+            # How far apart in time do members vote the same way on the same item? An operator
+            # cycling through logins, or a script, lands minutes apart; people who merely read
+            # the same thread are typically hours apart.
+            spreads = [(max(ts) - min(ts)).total_seconds() / 60
+                       for ts in vote_times.values() if len(ts) >= 2]
+            return {
+                'down_authors': down_authors,
+                'total_down': sum(down_authors.values()),
+                'sync_minutes': median(spreads) if spreads else None,
+                'sync_items': len(spreads),
+            }
+
+        for g in groups + burst_groups:
             g.update(describe(g['members']))
             g['is_ring'] = g['inward'] >= min_inward and g['ben_votes'] >= min_promoted
+            g['is_voteonly'] = False
 
-        rings = [g for g in groups if g['is_ring']]
-        print(f"{len(rings):,} of them concentrate on one account; "
-              f"the rest look like people who read the same things")
+        # Accounts with no content can't vote on each other, so the inward test is blind
+        # to them. Strong overlap among silent accounts is a finding in its own right.
+        # Judge it on the core, not the whole clique: one loosely attached heavy voter in a
+        # clique drags its weakest-link containment down and would hide a tight farm (the
+        # kid_gojira accounts overlap 64-83%, but share a clique with a lurker at 10%).
+        voteonly = []
+        for g in groups:
+            if g['is_ring']:
+                continue
+            silent = [u for u in g['members'] if content.get(u, 0) == 0]
+            strong = defaultdict(set)
+            for i, u in enumerate(silent):
+                for v in silent[i + 1:]:
+                    d = edges.get((u, v)) or edges.get((v, u))
+                    if d and d['containment'] >= min_vote_only_containment:
+                        strong[u].add(v)
+                        strong[v].add(u)
+            for core in connected_components(strong):
+                if len(core) < min_vote_only:
+                    continue
+                pair_data = [edge(u, v) for u in core for v in strong[u] if u < v]
+                entry = describe(core)
+                entry.update({
+                    'members': sorted(core),
+                    'source': 'clique',
+                    'is_ring': False,
+                    'is_voteonly': True,
+                    'containment': min(d['containment'] for d in pair_data),
+                    'strength': min(d['strength'] for d in pair_data),
+                    'communities': min(d['communities'] for d in pair_data),
+                    'shared': max(d['shared'] for d in pair_data),
+                })
+                voteonly.append(entry)
+                g['has_voteonly_core'] = True
+        # Burst groups are silent by construction and their edges already passed the
+        # containment bar; anything that somehow became a ring is handled with the rings.
+        for g in burst_groups:
+            g['is_voteonly'] = not g['is_ring'] and g['contentless']
+            if g['is_voteonly']:
+                voteonly.append(g)
+
+        rings = [g for g in groups + burst_groups if g['is_ring']]
+        print(f"{len(rings):,} of them concentrate on one account and {len(voteonly):,} are "
+              f"vote-only accounts; the rest look like people who read the same things")
 
         # Clique enumeration emits many overlapping cliques out of one dense
         # blob, so the same ring otherwise gets reported again and again under
@@ -2483,11 +2649,52 @@ def register(app):
         # where members boost each other reciprocally, follow.
         merged.sort(key=lambda g: (-g['hub_share'], -g['inward'], -g['ben_votes']))
 
+        # Vote-only groups have no beneficiary to merge on, so merge any that share a member -
+        # overlapping cliques from one farm, or a clique and a burst describing the same
+        # accounts - and re-describe the union.
+        voteonly_merged = []
+        pending = list(voteonly)
+        while pending:
+            cluster = [pending.pop(0)]
+            ms = set(cluster[0]['members'])
+            grew = True
+            while grew:
+                grew = False
+                for g in list(pending):
+                    # At least half of the group must already be in the cluster. Merging on
+                    # any shared member lets one well-connected account chain unrelated
+                    # groups into a blob.
+                    if len(ms & set(g['members'])) * 2 >= len(g['members']):
+                        cluster.append(g)
+                        ms |= set(g['members'])
+                        pending.remove(g)
+                        grew = True
+            entry = describe(ms)
+            communities = [g['communities'] for g in cluster if g['communities'] is not None]
+            entry.update({
+                'is_ring': False,
+                'is_voteonly': True,
+                'merged_from': len(cluster),
+                'source': ('burst' if all(g['source'] == 'burst' for g in cluster) else
+                           'mixed' if any(g['source'] == 'burst' for g in cluster) else
+                           'clique'),
+                'containment': max(g['containment'] for g in cluster),
+                'strength': max(g['strength'] for g in cluster),
+                'communities': max(communities) if communities else None,
+                'shared': max(g['shared'] for g in cluster),
+            })
+            voteonly_merged.append(entry)
+        # Biggest first; among equals, the most tightly overlapping.
+        voteonly_merged.sort(key=lambda g: (-len(g['members']), -g['containment']))
+
         kept = merged[:top]
+        kept += voteonly_merged[:max(0, top - len(kept))]
         if show_all:
             # Non-rings stay as individual cliques; suppress near-duplicates so a
             # single blob does not fill the page.
-            others = sorted([g for g in groups if not g['is_ring']] + demoted,
+            others = sorted([g for g in groups
+                             if not g['is_ring'] and not g.get('has_voteonly_core')]
+                            + demoted,
                             key=lambda g: (-g['containment'], -len(g['members'])))
             shown_sets = [set(g['members']) for g in kept]
             for g in others:
@@ -2499,12 +2706,15 @@ def register(app):
                 g.setdefault('merged_from', 1)
                 kept.append(g)
                 shown_sets.append(ms)
+        for g in kept:
+            g.update(vote_pattern(g['members']))
         reports = [(g, g['internal'], g['co_authors']) for g in kept]
 
         # one label lookup covering members and the authors they promote
         label_ids = set(ids)
-        for _g, _internal, co_authors in reports:
+        for g, _internal, co_authors in reports:
             label_ids.update(a for a, _ in co_authors.most_common(4))
+            label_ids.update(a for a, _ in g['down_authors'].most_common(4))
         info = {}
         for row in db.session.execute(text(
                 'SELECT id, COALESCE(ap_id, user_name) AS label, ap_id IS NULL AS is_local, '
@@ -2527,7 +2737,13 @@ def register(app):
             print(f"\n=== group {i}: {len(members)} accounts{merged_note} ===")
 
             total_co = g['total_co']
-            if g['ben_votes'] < min_promoted:
+            if g.get('is_voteonly'):
+                # Checked first: these accounts never vote on each other, so the
+                # "too few internal votes" branch below would otherwise swallow them.
+                print("    Looks like vote-only accounts working together - none of them has "
+                      "ever posted or commented, but they keep voting the same way on the same "
+                      "content. Judge them by whose content they push up and down (below).")
+            elif g['ben_votes'] < min_promoted:
                 # A "60% of their votes go to X" verdict off five items is noise
                 # dressed as a finding. Say nothing rather than overclaim.
                 print(f"    They only cast {g['ben_votes']} votes on each other - too little "
@@ -2551,10 +2767,29 @@ def register(app):
                 print(f"    Probably not a ring - the typical member aims only "
                       f"{g['inward'] * 100:.0f}% of its voting at the group, so they look like "
                       f"people who read the same things.")
-            print(f"    Overlap is {g['containment'] * 100:.0f}% of the smallest account's "
-                  f"voting, up to {g['shared']} shared items, spread over at least "
-                  f"{g['communities']} communities (weakest link -log10(p)={g['strength']:.0f}).")
-            if len(instances) == 1:
+            if g['communities'] is not None:
+                print(f"    Overlap is {g['containment'] * 100:.0f}% of the smallest account's "
+                      f"voting, up to {g['shared']} shared items, spread over at least "
+                      f"{g['communities']} communities "
+                      f"(weakest link -log10(p)={g['strength']:.0f}).")
+            else:
+                print(f"    Overlap is {g['containment'] * 100:.0f}% of the typical pair's "
+                      f"smaller account's voting, up to {g['shared']} shared items, popular "
+                      f"items included (weakest link -log10(p)={g['strength']:.0f}).")
+            if g['sync_minutes'] is not None:
+                sync = g['sync_minutes']
+                gap = (f"{sync * 60:.0f} seconds" if sync < 1 else
+                       f"{sync:.0f} minutes" if sync < 120 else f"{sync / 60:.0f} hours")
+                tempo = (" - voting together in real time" if sync <= sync_minutes else "")
+                print(f"    When two or more of them voted the same way on an item, the votes "
+                      f"landed a median of {gap} apart{tempo} ({g['sync_items']} items).")
+            if g.get('source') == 'burst':
+                print(f"    Found by the burst search: all on {', '.join(sorted(instances))}, "
+                      f"each first seen within {burst_hours}h of another member.")
+            elif g.get('source') == 'mixed':
+                print("    Some of these accounts were found by the burst search (new, silent, "
+                      "first seen together on one instance).")
+            elif len(instances) == 1:
                 print("    NOTE: all on one server - could just be that server's regulars.")
 
             print("    Accounts:")
@@ -2579,6 +2814,15 @@ def register(app):
                 if rest > 0:
                     print(f"      {'everyone else combined':46} {rest} items")
 
+            down_authors = g['down_authors']
+            if down_authors:
+                print("    Whose content two or more of them downvoted:")
+                for author, n in down_authors.most_common(4):
+                    print(f"      {label(author):46} {n} items")
+                rest = g['total_down'] - sum(n for _, n in down_authors.most_common(4))
+                if rest > 0:
+                    print(f"      {'everyone else combined':46} {rest} items")
+
 
 def poisson_tail_log10(k, mu):
     """-log10 of the chance that Poisson(mu) reaches k or more."""
@@ -2592,6 +2836,24 @@ def poisson_tail_log10(k, mu):
         if term < 1e-12 * total:
             break
     return -(log_first + math.log(total)) / math.log(10)
+
+
+def connected_components(adj):
+    """Connected components of an undirected graph given as {node: set(neighbours)}."""
+    seen, components = set(), []
+    for start in adj:
+        if start in seen:
+            continue
+        component, stack = set(), [start]
+        while stack:
+            node = stack.pop()
+            if node in component:
+                continue
+            component.add(node)
+            stack.extend(adj[node] - component)
+        seen |= component
+        components.append(component)
+    return components
 
 
 def maximal_cliques(adj, min_size):
