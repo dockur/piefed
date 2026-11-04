@@ -1391,7 +1391,7 @@ def get_alpha_topic_list(data):
 @topic_bp.route('/topic/subscribe', methods=["PUT"])
 @topic_bp.doc(summary="Get notifications for new posts in a topic.")
 @topic_bp.arguments(TopicSubscribeRequest)
-@topic_bp.response(200, TopicView(exclude=("children",)), 
+@topic_bp.response(200, TopicSubscribeResponse,
                    description="Does not include children in response.")
 @topic_bp.alt_response(400, schema=DefaultError)
 @auth_required_if_private
@@ -1400,7 +1400,7 @@ def put_alpha_topic_subscribe(data):
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
     resp = put_topic_subscribe(auth, data)
-    return TopicView(exclude=("children",)).load(resp)
+    return TopicSubscribeResponse().load(resp)
 
 
 # Domain

@@ -911,6 +911,11 @@ class TopicView(DefaultSchema):
     parent_topic_id = fields.Integer(allow_none=True)
 
 
+class TopicSubscribeResponse(TopicView):
+    class Meta(DefaultSchema.Meta):
+        exclude = ("children",)
+
+
 class TopicListRequest(DefaultSchema):
     include_communities = fields.Boolean(metadata={"description": "include list of communities in each topic with result", "default": True})
 
