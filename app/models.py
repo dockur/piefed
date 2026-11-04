@@ -2549,12 +2549,14 @@ class Post(db.Model):
         if self.user_id == user_id:
             return False
 
+        title_lower = self.title.lower()
+
         # tokenize title into words (lowercase)
-        tokens = re.findall(r"\w+", self.title.lower())
+        tokens = re.findall(r"\w+", title_lower)
 
         for name, keywords in (content_filters or {}).items():
             for keyword in keywords:
-                if keyword.lower() in tokens:
+                if keyword.lower() in tokens or keyword.lower() in title_lower:
                     return name
         return False
 
