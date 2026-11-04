@@ -13,7 +13,7 @@ from app.activitypub.util import active_month
 from app.constants import *
 from app.models import ChatMessage, Community, Language, Instance, Post, PostReply, User, \
     AllowedInstances, BannedInstances, utcnow, Site, Feed, FeedItem, Topic, CommunityFlair, \
-    UserNote, Poll, Event, PollChoice, Conversation, Report
+    UserNote, Poll, Event, PollChoice, Conversation, Report, NotificationSubscription
 from app.post.util import tags_to_string, flair_to_string
 from app.utils import blocked_communities, blocked_or_banned_instances, blocked_users, communities_banned_from, \
     get_setting, \
@@ -1100,6 +1100,17 @@ def feed_view(feed: Feed | int, variant: int, user_id, subscribed, include_commu
         v1['owner'] = user_id == feed.user_id
         v1['local'] = feed.is_local()
 
+        if user_id:
+            existing_notification = NotificationSubscription.query.filter(
+                NotificationSubscription.entity_id == feed.id,
+                NotificationSubscription.user_id == user_id,
+                NotificationSubscription.type == NOTIF_FEED).first()
+
+            v1["activity_alert"] = bool(existing_notification)
+
+        else:
+            v1["activity_alert"] = False
+
         v1['communities'] = []
         if include_communities:
             for community in Community.query.filter(Community.banned == False, Community.private == False).\
@@ -1260,7 +1271,7 @@ def conversation_report_view(report: int | Report, variant=1) -> dict:
 
 def topic_view(topic: Topic | int, variant: int, communities_moderating, banned_from,
                communities_joined, blocked_community_ids, blocked_instance_ids,
-               include_communities) -> dict:
+               include_communities, user_id: int | None = None) -> dict:
     if isinstance(topic, int):
         topic = Topic.query.get(topic)
 
@@ -1283,6 +1294,16 @@ def topic_view(topic: Topic | int, variant: int, communities_moderating, banned_
                         community.instance_id not in blocked_instance_ids and \
                         community.id not in banned_from:
                     v1['communities'].append(community_view(community, variant=1, stub=True))
+
+        if user_id:
+            existing_notification = NotificationSubscription.query.filter(NotificationSubscription.entity_id == topic.id,
+                                                                          NotificationSubscription.user_id == user_id,
+                                                                          NotificationSubscription.type == NOTIF_TOPIC).first()
+
+            v1["activity_alert"] = bool(existing_notification)
+
+        else:
+            v1["activity_alert"] = False
 
         return v1
 

@@ -4,7 +4,7 @@ from app import db
 from app.api.alpha.views import feed_view
 from app.constants import *
 from app.models import User, Feed, FeedItem, Community
-from app.shared.feed import leave_feed, join_feed, make_feed, edit_feed, delete_feed
+from app.shared.feed import leave_feed, join_feed, make_feed, edit_feed, delete_feed, subscribe_feed
 from app.utils import authorise_api_user, blocked_communities, blocked_or_banned_instances, filtered_out_communities, \
     communities_banned_from, moderating_communities_ids, joined_or_modding_communities, feed_tree_public, feed_tree, \
     subscribed_feeds
@@ -219,3 +219,13 @@ def post_feed_delete(auth, data):
         delete_feed(feed_id, SRC_API, auth)
 
     return feed_json
+
+
+def put_feed_subscribe(auth, data):
+    feed_id = data["feed_id"]
+    subscribe = data["subscribe"]
+
+    # Auth is done in subscribe_feed and get_feed
+    _ = subscribe_feed(feed_id, subscribe, SRC_API, auth)
+
+    return get_feed(auth, {'id': feed_id})

@@ -29,6 +29,8 @@ ai_visibility_list = ["Show", "Hide", "Label", "Transparent"]
 private_message_list = ["None", "Local", "Trusted", "All"]
 search_nsfw = ['Exclude', 'Include', 'Only']
 modlog_type_list = ["All", "ModRemovePost", "ModLockPost", "ModFeaturePost", "ModRemoveComment", "ModRemoveCommunity", "ModBanFromCommunity", "ModAddCommunity", "ModTransferCommunity", "ModAdd", "ModBan", "ModHideCommunity", "AdminPurgePerson", "AdminPurgeCommunity", "AdminPurgePost", "AdminPurgeComment"]
+activity_alert_type_list = ["Posts", "Comments", "Communities", "Topics", "Feeds", "Users"]
+activity_alert_filter_list = ["All", "Mine", "Others"]
 
 
 def validate_datetime_string(text):
@@ -620,6 +622,7 @@ class CommentView(DefaultSchema):
 
 class FeedView(DefaultSchema):
     actor_id = fields.Url(required=True)
+    activity_alert = fields.Boolean(required=True)
     ap_domain = fields.String(required=True)
     children = fields.List(fields.Nested(lambda: FeedView()), required=True,
                            metadata={"description": "Always empty list for resolve_object endpoint"})
@@ -897,6 +900,7 @@ class FollowFeedRequest(DefaultSchema):
 
 
 class TopicView(DefaultSchema):
+    activity_alert = fields.Boolean(required=True)
     children = fields.List(fields.Nested(lambda: TopicView()), required=True)
     communities = fields.List(fields.Nested(Community), required=True)
     communities_count = fields.Integer(required=True)
@@ -2139,3 +2143,61 @@ class UserUnfollowRequest(DefaultSchema):
 
 class UserUnfollowResponse(DefaultSchema):
     ok = fields.String()
+
+
+class FetchActivityAlertsRequest(DefaultSchema):
+    type_ = fields.String(validate=validate.OneOf(activity_alert_type_list), metadata={"default": "Posts", "description": "Only this type of item will be returned."})
+    filter = fields.String(validate=validate.OneOf(activity_alert_filter_list), metadata={"default": "All", "description": "Ignored with `type_` = `Users`, `Feeds`, `Topics`"})
+    sort = fields.String(validate=validate.OneOf(["New", "Old"]), metadata={"default": "New", "description": "Sorted by date of activity alert creation"})
+    page = fields.Integer(metadata={"default": 1})
+    limit = fields.Integer(metadata={"default": 20})
+
+
+class FetchActivityAlertsResponse(DefaultSchema):
+    next_page = fields.String(allow_none=True)
+    communities = fields.List(fields.Nested(CommunityView))
+    posts = fields.List(fields.Nested(PostView))
+    users = fields.List(fields.Nested(PersonView))
+    comments = fields.List(fields.Nested(CommentView))
+    topics = fields.List(fields.Nested(TopicView), metadata={"description": "Does not include children topics or constituent communities."})
+    feeds = fields.List(fields.Nested(FeedView), metadata={"description": "Does not include children feeds or constituent communities."})
+
+
+class ActivityAlertRequest(DefaultSchema):
+    class Meta(DefaultSchema.Meta):
+        description = "At least one field is required, and only one item per field."
+
+    post_id = fields.Integer()
+    comment_id = fields.Integer()
+    person_id = fields.Integer()
+    topic_id = fields.Integer()
+    feed_id = fields.Integer()
+    community_id = fields.Integer()
+
+    @validates_schema
+    def validate_input(self, data, **kwargs):
+        fields_to_check = ("post_id", "comment_id", "person_id", "topic_id", "feed_id", "community_id")
+        if not any(field in data for field in fields_to_check):
+            raise ValidationError("At least one field must be specified")
+
+
+class ActivityAlertResponse(DefaultSchema):
+    class Meta(DefaultSchema.Meta):
+        description = "Only fields with modified activity alerts are returned."
+
+    community = fields.Nested(CommunityView)
+    post = fields.Nested(PostView)
+    user = fields.Nested(PersonView)
+    comment = fields.Nested(CommentView)
+    topic = fields.Nested(TopicView, metadata={"description": "Does not include children topics or constituent communities."})
+    feed = fields.Nested(FeedView, metadata={"description": "Does not include children feeds or constituent communities."})
+
+
+class FeedSubscribeRequest(DefaultSchema):
+    feed_id = fields.Integer(required=True)
+    subscribe = fields.Boolean(required=True)
+
+
+class TopicSubscribeRequest(DefaultSchema):
+    topic_id = fields.Integer(required=True)
+    subscribe = fields.Boolean(required=True)

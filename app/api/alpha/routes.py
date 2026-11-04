@@ -12,7 +12,8 @@ from app.api.alpha.utils.community import get_community, get_community_list, pos
     post_community_moderate_post_nsfw, post_community_mod, post_community_flair_create, put_community_flair_edit, \
     post_community_flair_delete, post_community_leave_all
 from app.api.alpha.utils.domain import post_domain_block
-from app.api.alpha.utils.feed import get_feed_list, get_feed, post_feed_follow, post_feed, put_feed, post_feed_delete
+from app.api.alpha.utils.feed import get_feed_list, get_feed, post_feed_follow, post_feed, put_feed, post_feed_delete, \
+    put_feed_subscribe
 from app.api.alpha.utils.misc import get_search, get_resolve_object, get_suggestion, get_modlog
 from app.api.alpha.utils.post import get_post_list, get_post, post_post_like, put_post_save, put_post_subscribe, \
     post_post, put_post, post_post_delete, post_post_report, post_post_lock, post_post_feature, post_post_remove, \
@@ -29,7 +30,7 @@ from app.api.alpha.utils.reply import get_reply_list, post_reply_like, put_reply
     put_reply_report_resolve
 from app.api.alpha.utils.site import get_site, post_site_block, get_federated_instances, get_site_instance_chooser, \
     get_site_instance_chooser_search, get_site_version, get_site_metadata
-from app.api.alpha.utils.topic import get_topic_list
+from app.api.alpha.utils.topic import get_topic_list, put_topic_subscribe
 from app.api.alpha.utils.upload import post_upload_image, post_upload_community_image, post_upload_user_image, \
     post_image_delete
 from app.api.alpha.utils.user import get_user, post_user_block, get_user_unread_count, get_user_replies, \
@@ -37,7 +38,8 @@ from app.api.alpha.utils.user import get_user, post_user_block, get_user_unread_
     get_user_notifications, put_user_notification_state, get_user_notifications_count, \
     put_user_mark_all_notifications_read, post_user_verify_credentials, post_user_set_flair, get_user_details, \
     get_user_media, post_user_set_note, post_user_ban, post_user_unban, post_user_register, get_user_captcha, \
-    post_user_logout, post_user_follow, post_user_unfollow
+    post_user_logout, post_user_follow, post_user_unfollow, get_user_activity_alerts, post_user_activity_alert, \
+    post_user_activity_alert_delete
 from app.api.alpha.utils.admin import get_registration_list, put_registration_approve
 from app.constants import *
 from app.utils import orjson_response, get_setting, auth_required_if_private
@@ -525,6 +527,20 @@ def post_alpha_feed_delete(data):
         return abort(400, message="alpha api is not enabled")
     auth = request.headers.get('Authorization')
     resp = post_feed_delete(auth, data)
+    return FeedView().load(resp)
+
+
+@feed_bp.route("feed/subscribe", methods=["PUT"])
+@feed_bp.doc(summary="Get notifications for new posts in a feed.")
+@feed_bp.arguments(FeedSubscribeRequest)
+@feed_bp.response(200, FeedView)
+@feed_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def put_alpha_feed_subscribe(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_feed_subscribe(auth, data)
     return FeedView().load(resp)
 
 
@@ -1372,6 +1388,20 @@ def get_alpha_topic_list(data):
     validated = TopicListResponse().load(resp)
     return orjson_response(validated)
 
+@topic_bp.route('/topic/subscribe', methods=["PUT"])
+@topic_bp.doc(summary="Get notifications for new posts in a topic.")
+@topic_bp.arguments(TopicSubscribeRequest)
+@topic_bp.response(200, TopicView(exclude=("children",)), 
+                   description="Does not include children in response.")
+@topic_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def put_alpha_topic_subscribe(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_topic_subscribe(auth, data)
+    return TopicView(exclude=("children",)).load(resp)
+
 
 # Domain
 @user_bp.route('/domain/block', methods=['POST'])
@@ -1729,6 +1759,47 @@ def get_alpha_user_get_captcha():
         return abort(400, message="alpha api is not enabled")
     resp = get_user_captcha()
     return FetchCaptchaResponse().load(resp)
+
+
+@user_bp.route("/user/activity_alert/list", methods=["GET"])
+@user_bp.doc(summary="Fetch the activity alerts for a user.")
+@user_bp.arguments(FetchActivityAlertsRequest, location="query")
+@user_bp.response(200, FetchActivityAlertsResponse)
+@user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def get_alpha_user_activity_alerts(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_user_activity_alerts(auth, data)
+    return FetchActivityAlertsResponse().load(resp)
+
+
+@user_bp.route("/user/activity_alert", methods=["POST"])
+@user_bp.doc(summary="Create an activity alert.")
+@user_bp.arguments(ActivityAlertRequest)
+@user_bp.response(200, ActivityAlertResponse)
+@user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def post_alpha_user_activity_alert(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = post_user_activity_alert(auth, data)
+    return ActivityAlertResponse().load(resp)
+
+@user_bp.route("/user/activity_alert/delete", methods=["POST"])
+@user_bp.doc(summary="Create an activity alert.")
+@user_bp.arguments(ActivityAlertRequest)
+@user_bp.response(200, ActivityAlertResponse)
+@user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def post_alpha_user_activity_alert_delete(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get("Authorization")
+    resp = post_user_activity_alert_delete(auth, data)
+    return ActivityAlertResponse().load(resp)
 
 
 # Upload
