@@ -393,7 +393,7 @@
             <!-- -->
         {% endif -%}
         <script src="{{ url_for('static', filename='js/lightbox/baguetteBox.js') }}" nonce="{{ nonce }}"></script>
-        {% if current_user.is_authenticated -%}
+        {% if current_user.is_authenticated and current_user.markdown_editor -%}
             <script type="text/javascript" src="{{ url_for('static', filename='js/markdown/downarea.js', changed=getmtime('js/markdown/downarea.js')) }}" nonce="{{ nonce }}"></script>
         {% endif -%}
         {% if notif_server and current_user.is_authenticated -%}

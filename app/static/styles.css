@@ -1609,6 +1609,12 @@ ul.form-multicheck-columns li {
   border-bottom: solid var(--border-2) var(--light-grey);
   padding-top: var(--spacing-8);
   padding-bottom: var(--spacing-8);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 150px;
+  /* content-visibility implies paint containment, which clips the absolutely-positioned options dropdown and user preview popup. Turn it off while those could be showing. */
+}
+.post_list .post_teaser:hover, .post_list .post_teaser:focus-within, .post_list .post_teaser:has(.dropdown-menu.show) {
+  content-visibility: visible;
 }
 .post_list .post_teaser:hover {
   cursor: pointer;
