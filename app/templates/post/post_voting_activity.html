@@ -16,7 +16,9 @@
                 <summary>{{ _('Upvoters') }}</summary>
                 <table cellpadding="2">
                     {% for user, vote in upvoters %}
-                    <tr><td>{% if user.post_count == 0 and user.post_reply_count == 0 %}<span class="fe fe-bot-account text-muted" title="{{ _('This account has never written anything.') }}"></span>{% endif %}{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}</td>
+                    <tr><td>{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
+                                {% if user.post_count == 0 and user.post_reply_count == 0 %}<span class="fe fe-bot-account text-muted" title="{{ _('This account has never written anything.') }}"></span>{% endif %}
+                        </td>
                             <td>{{ localize_datetime(vote.created_at, locale=locale) }}</td>
                             <td>{{ vote.created_at }}</td>
                             {%- if current_user.is_admin_or_staff() %}<td><a href="/u/{{ user.link() }}/voting_patterns">{{ _('Voting patterns') }}</a></td>{% endif -%}
@@ -29,7 +31,9 @@
                 <summary>{{ _('Downvoters') }}</summary>
                 <table cellpadding="2">
                     {% for user, vote in downvoters -%}
-                        <tr><td>{% if user.post_count == 0 and user.post_reply_count == 0 %}<span class="fe fe-bot-account text-muted" title="{{ _('This account has never written anything.') }}"></span>{% endif %}{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}</td>
+                        <tr><td>{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
+                                {% if user.post_count == 0 and user.post_reply_count == 0 %}<span class="fe fe-bot-account text-muted" title="{{ _('This account has never written anything.') }}"></span>{% endif %}
+                            </td>
                              <td>{{ localize_datetime(vote.created_at, locale=locale) }}</td>
                              <td>{{ vote.created_at }}</td>
                              {%- if current_user.is_admin_or_staff() %}<td><a href="/u/{{ user.link() }}/voting_patterns">{{ _('Voting patterns') }}</a></td>{% endif -%}
