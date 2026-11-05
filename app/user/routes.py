@@ -225,9 +225,9 @@ def user_voting_patterns(actor):
 
         votes_cast_sql = sql_file('user_votes_cast')
 
-        votes_received = db.session.execute(text(votes_received_sql), {'user_id': user.id, 'top_n': 8, 'days': 60}).all()
+        votes_received = db.session.execute(text(votes_received_sql), {'user_id': user.id, 'top_n': 12, 'days': 60}).all()
 
-        votes_cast = db.session.execute(text(votes_cast_sql), {'user_id': user.id, 'top_n': 8, 'days': 60}).all()
+        votes_cast = db.session.execute(text(votes_cast_sql), {'user_id': user.id, 'top_n': 12, 'days': 60}).all()
 
         return render_template('user/voting_patterns.html', user=user,
                                title=_('Voting patterns of %(user_name)s', user_name=user.user_name),

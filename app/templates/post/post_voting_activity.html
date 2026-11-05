@@ -11,11 +11,12 @@
         <h3>{{ _('Voting Activity for "%(post_title)s"', post_title=post_title) }}</h3>
         <p>{{ _('This is sensitive information and should only be used for detecting vote manipulation, brigading and support for harmful content.') }}</p>
         <p>{{ _('Do not share screenshots of this information publicly or use it for personal vendettas.') }}</p>
+        <p><span class="fe fe-bot-account text-muted"></span> {{ _('This icon designates accounts that have never written anything and only vote - they might be bots.') }}</p>
             <p><details open>
                 <summary>{{ _('Upvoters') }}</summary>
                 <table cellpadding="2">
                     {% for user, vote in upvoters %}
-                        <tr><td>{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}</td>
+                    <tr><td>{% if user.post_count == 0 and user.post_reply_count == 0 %}<span class="fe fe-bot-account text-muted" title="{{ _('This account has never written anything.') }}"></span>{% endif %}{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}</td>
                             <td>{{ localize_datetime(vote.created_at, locale=locale) }}</td>
                             <td>{{ vote.created_at }}</td>
                             {%- if current_user.is_admin_or_staff() %}<td><a href="/u/{{ user.link() }}/voting_patterns">{{ _('Voting patterns') }}</a></td>{% endif -%}
@@ -28,7 +29,7 @@
                 <summary>{{ _('Downvoters') }}</summary>
                 <table cellpadding="2">
                     {% for user, vote in downvoters -%}
-                        <tr><td>{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}</td>
+                        <tr><td>{% if user.post_count == 0 and user.post_reply_count == 0 %}<span class="fe fe-bot-account text-muted" title="{{ _('This account has never written anything.') }}"></span>{% endif %}{{ render_username(user, current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}</td>
                              <td>{{ localize_datetime(vote.created_at, locale=locale) }}</td>
                              <td>{{ vote.created_at }}</td>
                              {%- if current_user.is_admin_or_staff() %}<td><a href="/u/{{ user.link() }}/voting_patterns">{{ _('Voting patterns') }}</a></td>{% endif -%}

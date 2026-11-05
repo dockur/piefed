@@ -24,14 +24,15 @@ ranked AS (
 SELECT 0 AS sort_order, r.other_id AS user_id,
        COALESCE(u.ap_id, u.user_name) AS label,
        r.votes, r.ups, r.downs,
-       ROUND(100.0 * r.votes / r.grand_total, 2) AS pct
+       ROUND(100.0 * r.votes / r.grand_total, 2) AS pct,
+       u.post_count, u.post_reply_count
 FROM ranked r JOIN "user" u ON u.id = r.other_id
 WHERE r.rn <= :top_n
 UNION ALL
 SELECT 1, NULL,
        'Others (' || COUNT(*) || ' accounts)',
        CAST(SUM(votes) AS bigint), CAST(SUM(ups) AS bigint), CAST(SUM(downs) AS bigint),
-       ROUND(100.0 * SUM(votes) / MAX(grand_total), 2)
+       ROUND(100.0 * SUM(votes) / MAX(grand_total), 2), 1, 1
 FROM ranked WHERE rn > :top_n
 HAVING COUNT(*) > 0
 ORDER BY sort_order, votes DESC;

@@ -45,7 +45,7 @@
                     <tr>
                         <td>
                             {% if row.user_id %}
-                                <a href="/u/{{ row.label }}">{{ row.label }}</a>
+                                <a href="/u/{{ row.label }}">{{ row.label }}</a> {% if row.post_count == 0 and row.post_reply_count == 0 %}<span class="fe fe-bot-account text-muted" title="{{ _('This account has never written anything.') }}"></span>{% endif %}
                                 <small><a href="/u/{{ row.label }}/voting_patterns">{{ _('votes') }}</a></small>
                             {% else %}
                                 <em>{{ row.label }}</em>
@@ -84,12 +84,12 @@
                             x: {
                                 stacked: true,
                                 beginAtZero: true,
-                                ticks: { font: { size: 11 } },
+                                ticks: { font: { size: 12 } },
                                 grid: { display: false }
                             },
                             y: {
                                 stacked: true,
-                                ticks: { font: { size: 11 } },
+                                ticks: { font: { size: 12 } },
                                 grid: { display: false }
                             }
                         }
