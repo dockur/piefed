@@ -23,6 +23,8 @@ WHERE voter.post_count = 0
   AND voter.post_reply_count = 0
   AND voter.deleted = false
   AND voter.bot = false
+  AND voter.banned = false
+  AND voter.ban_votes = false
   AND (voter.bot_override = false OR voter.bot_override IS NULL)
 GROUP BY v.user_id, voter.user_name, voter.ap_domain, voter.ap_id
 HAVING count(*) >= 20
