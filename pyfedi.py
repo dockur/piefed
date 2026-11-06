@@ -94,7 +94,7 @@ def before_request():
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept, User-Agent'
         #response.headers['Vary'] = 'Origin'
         return response
-    
+
     # Store nonce in g (g is per-request, unlike session)
     g.nonce = gibberish()
     g.locale = str(get_locale())
@@ -113,6 +113,9 @@ def before_request():
                         ORDER BY id"""),
                 {'role_admin': ROLE_ADMIN}).scalars())
             set_setting('admin_ids', g.admin_ids)
+
+    if request.path.startswith('/api/') or request.path.startswith('/static/'):
+        return # the api does not use any of the below
 
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()

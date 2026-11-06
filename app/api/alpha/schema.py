@@ -490,6 +490,29 @@ class ScheduledPostView(PostView):
     scheduled_post = fields.Nested(ScheduledPost, required=True)
 
 
+class PostView2(DefaultSchema):
+    """Leaner post view with creator_id/community_id references instead of full nested objects."""
+    banned_from_community = fields.Boolean(required=True)
+    community_id = fields.Integer(required=True)
+    counts = fields.Nested(PostAggregates, required=True)
+    creator_id = fields.Integer(required=True)
+    creator_banned_from_community = fields.Boolean(required=True)
+    creator_is_admin = fields.Boolean(required=True)
+    creator_is_moderator = fields.Boolean(required=True)
+    hidden = fields.Boolean(required=True)
+    post = fields.Nested(Post, required=True)
+    read = fields.Boolean(required=True)
+    saved = fields.Boolean(required=True)
+    subscribed = fields.String(required=True, validate=validate.OneOf(subscribed_type_list))
+    unread_comments = fields.Integer(required=True)
+    activity_alert = fields.Boolean()
+    my_vote = fields.Integer()
+    blurred = fields.Boolean()
+    filtered = fields.Boolean()
+    flair_list = fields.List(fields.Nested(CommunityFlair))
+    can_auth_user_moderate = fields.Boolean()
+
+
 class CommunityAggregates(DefaultSchema):
     id = fields.Integer(required=True)
     post_count = fields.Integer(required=True)
@@ -1791,6 +1814,11 @@ class ImageDeleteResponse(DefaultSchema):
 
 class ListPostsResponse(Schema):
     posts = fields.List(fields.Nested(PostView), required=True)
+    next_page = fields.String(allow_none=True)
+
+
+class ListPostsResponse2(Schema):
+    posts = fields.List(fields.Nested(PostView2), required=True)
     next_page = fields.String(allow_none=True)
 
 

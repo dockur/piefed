@@ -569,7 +569,7 @@ def get_alpha_post_list(data):
 @post_bp.route('/post/list2', methods=['GET'])
 @post_bp.doc(summary="List posts. For testing only, do not use.")
 @post_bp.arguments(ListPostsRequest2, location="query", unknown=INCLUDE)
-@post_bp.response(200, ListPostsResponse)
+@post_bp.response(200, ListPostsResponse2)
 @post_bp.alt_response(400, schema=DefaultError)
 @auth_required_if_private
 def get_alpha_post_list2(data):
@@ -578,7 +578,7 @@ def get_alpha_post_list2(data):
     auth = request.headers.get('Authorization')
     resp = get_post_list2(auth, data)
     if data.get('debug') or current_app.debug:
-        validated = ListPostsResponse().load(resp)
+        validated = ListPostsResponse2().load(resp)
         return orjson_response(validated)
     else:
         return orjson_response(resp)

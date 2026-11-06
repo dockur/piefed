@@ -1821,7 +1821,7 @@ def auth_required_if_private(func):
         if not auth:
             raise Exception("instance_is_private")
 
-        # Make sure credentials valid - raises an exeption if it doesn't validate
+        # Make sure credentials valid - raises an exception if it doesn't validate
         _ = authorise_api_user(auth)
         
         return func(*args, **kwargs)

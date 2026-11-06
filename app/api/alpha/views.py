@@ -222,10 +222,7 @@ def post_view(post: Post | int, variant, stub=False, user_id=None, my_vote=0, co
         creator = user_view(user=post.author, variant=1, stub=True, flair_community_id=post.community_id, user_id=user_id, usernotes=usernotes)
         community = community_view(community=post.community, variant=1, stub=True)
         if user_id:
-            if hasattr(g, 'user'):
-                user = g.user
-            else:
-                user = User.query.get(user_id)
+            user = User.query.get(user_id)
             can_auth_user_moderate = post.community.is_moderator(user)
             v2.update({'can_auth_user_moderate': can_auth_user_moderate})
 
@@ -1309,39 +1306,40 @@ def topic_view(topic: Topic | int, variant: int, communities_moderating, banned_
 
 
 def site_view(user) -> dict:
-    logo = g.site.logo if g.site.logo else '/static/images/piefed_logo_icon_t_75.png'
+    site: Site = Site.query.get(1)
+    logo = site.logo if site.logo else '/static/images/piefed_logo_icon_t_75.png'
 
-    site = {
-        "enable_downvotes": g.site.enable_downvotes,
+    site_response = {
+        "enable_downvotes": site.enable_downvotes,
         "icon": f"{current_app.config['SERVER_URL']}{logo}",
-        "registration_mode": g.site.registration_mode,
-        "name": g.site.name,
+        "registration_mode": site.registration_mode,
+        "name": site.name,
         "actor_id": f"{current_app.config['SERVER_URL']}/",
         "user_count": users_total(),
         "all_languages": []
     }
 
-    if g.site.sidebar and g.site.sidebar_html:
-        if g.site.sidebar == g.site.sidebar_html:
-            site['sidebar'] = g.site.sidebar_html
+    if site.sidebar and site.sidebar_html:
+        if site.sidebar == site.sidebar_html:
+            site_response['sidebar'] = site.sidebar_html
         else:
-            site['sidebar_md'] = g.site.sidebar
-            site['sidebar'] = g.site.sidebar_html
-    elif g.site.sidebar:
-        site['sidebar'] = g.site.sidebar
+            site_response['sidebar_md'] = site.sidebar
+            site_response['sidebar'] = site.sidebar_html
+    elif site.sidebar:
+        site_response['sidebar'] = site.sidebar
     
     announcement = get_setting('announcement')
     if announcement:
-        site['announcement_md'] = announcement
+        site_response['announcement_md'] = announcement
     
     announcement_html = get_setting('announcement_html')
     if announcement_html:
-        site['announcement'] = announcement_html
+        site_response['announcement'] = announcement_html
     
-    if g.site.description:
-        site['description'] = g.site.description
+    if site.description:
+        site_response['description'] = site.description
     for language in Language.query.all():
-        site["all_languages"].append({
+        site_response["all_languages"].append({
             "id": language.id,
             "code": language.code,
             "name": language.name
@@ -1350,7 +1348,7 @@ def site_view(user) -> dict:
     v1 = {
         "version": current_app.config['VERSION'],
         "admins": [],
-        "site": site
+        "site": site_response
     }
     for admin in Site.admins():
         v1['admins'].append(user_view(user=admin, variant=2))
@@ -1361,8 +1359,9 @@ def site_view(user) -> dict:
 
 
 def site_instance_chooser_view():
-    logo = g.site.logo if g.site.logo else '/static/images/piefed_logo_icon_t_75.png'
-    language = Language.query.get(g.site.language_id)
+    site: Site = Site.query.get(1)
+    logo = site.logo if site.logo else '/static/images/piefed_logo_icon_t_75.png'
+    language = Language.query.get(site.language_id)
     defed_list = BannedInstances.query.filter(or_(BannedInstances.domain == 'hexbear.net',
                                                   BannedInstances.domain == 'lemmygrad.ml',
                                                   BannedInstances.domain == 'hilariouschaos.com',
@@ -1392,23 +1391,23 @@ def site_instance_chooser_view():
             "code": language.code,
             "name": language.name
         },
-        'nsfw': g.site.enable_nsfw,
+        'nsfw': site.enable_nsfw,
         'newbie_friendly': num_topics() >= 3,
-        'name': g.site.name,
+        'name': site.name,
         'elevator_pitch': get_setting('elevator_pitch', ''),
-        'description': g.site.description or '',
-        'about': g.site.about_html or '',
-        'sidebar': g.site.sidebar_html or '',
+        'description': site.description or '',
+        'about': site.about_html or '',
+        'sidebar': site.sidebar_html or '',
         'logo_url': f"{current_app.config['SERVER_URL']}{logo}",
         'maturity': maturity,
         'mau': active_month(),
-        'can_make_communities': not g.site.community_creation_admin_only,
+        'can_make_communities': not site.community_creation_admin_only,
         'defederation': list(set([instance.domain for instance in defed_list])),
         'trusts': list(set([instance.domain for instance in trusted_list])),
-        'tos_url': g.site.tos_url or '',
-        'registration_mode': g.site.registration_mode,
+        'tos_url': site.tos_url or '',
+        'registration_mode': site.registration_mode,
         'software': 'piefed',
-        'monthsmonitored': months_since(g.site.created_at)
+        'monthsmonitored': months_since(site.created_at)
     }
     return result
 
