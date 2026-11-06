@@ -2779,6 +2779,16 @@ def admin_votes_serial_downvoters():
                            roles_with=roles_with('administer all communities'))
 
 
+@bp.route('/votes_without_posting', methods=['GET'])
+@permission_required('administer all communities')
+@login_required
+def admin_votes_without_posting():
+    rows = db.session.execute(text(sql_file('votes_without_posting'))).all()
+    return render_template('admin/votes_without_posting.html',
+                           rows=rows,
+                           roles_with=roles_with('administer all communities'))
+
+
 @bp.route('/high_posts_per_day', methods=['GET'])
 @permission_required('administer all communities')
 @login_required

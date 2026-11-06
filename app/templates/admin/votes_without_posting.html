@@ -1,0 +1,57 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% set active_child = 'admin_votes' %}
+
+{% block app_content %}
+{% include 'admin/_tabbed_nav.html' %}
+<br>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>{{ _('Votes without posting') }}</h2>
+        </div>
+
+        <p>{{ _('These accounts have cast at least 20 votes in the last 2 months, but have never posted or replied themselves (post_count = 0 and post_reply_count = 0). That is quite common but also can be a sign of being a bot.') }}</p>
+        {% if rows %}
+            <table class="table table-striped">
+                <tr>
+                    <th>{{ _('Voter') }}</th>
+                    <th>{{ _('Last voted') }}</th>
+                    <th>{{ _('Number of votes') }}</th>
+                    <th>{{ _('Upvotes') }}</th>
+                    <th>{{ _('Downvotes') }}</th>
+                    <th> </th>
+                </tr>
+                {% for row in rows %}
+                    {% set link = row.voter_ap_id if row.voter_ap_id else row.voter -%}
+                    <tr>
+                        <td><a href="/u/{{ link }}">{{ link }}</a></td>
+                        <td>{{ localize_datetime(row.last_vote, locale=locale) }}</td>
+                        <td>{{ row.votes }}</td>
+                        <td>{{ row.upvotes }}</td>
+                        <td>{{ row.downvotes }}</td>
+                        <td>
+                            <a class="small" href="/u/{{ link }}/voting_patterns">{{ _('voting') }}</a> |
+                            <a class="small" href="/u/{{ link }}/voting_patterns_down">{{ _('downvotes') }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="mb-4"><em>{{ _('Nothing found.') }}</em></p>
+        {% endif %}
+
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        {% include 'admin/_nav.html' %}
+    </div>
+</div>
+<hr />
+{% endblock %}
