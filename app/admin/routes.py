@@ -2754,8 +2754,11 @@ def admin_votes():
     if request.args.get('refresh'):
         cache.delete_memoized(vote_manipulation_findings)
         return redirect(url_for('admin.admin_votes'))
+    findings = vote_manipulation_findings()
+    if findings['targeting_failed'] or findings['namesake_failed']:
+        cache.delete_memoized(vote_manipulation_findings)
     return render_template('admin/votes.html',
-                           findings=vote_manipulation_findings(),
+                           findings=findings,
                            roles_with=roles_with('administer all communities'))
 
 
