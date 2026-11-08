@@ -1,4 +1,4 @@
-from flask import request, redirect, url_for, flash, abort
+from flask import request, redirect, url_for, flash, abort, session, current_app
 from flask_babel import _
 from flask_login import current_user
 from sqlalchemy import desc
@@ -10,7 +10,7 @@ from app.blocklist.forms import AddCopyBlocklistForm, SearchRemoteBlocklist, Edi
 from app.blocklist.util import search_for_blocklist, blocklist_members_for_edit, actor_to_blocklist
 from app.constants import SUBSCRIPTION_OWNER, SUBSCRIPTION_MEMBER, SUBSCRIPTION_NONMEMBER, SUBSCRIPTION_PENDING, \
     SRC_WEB
-from app.models import User, Blocklist, BlocklistItem, BlocklistMember
+from app.models import User, Blocklist, BlocklistItem, BlocklistMember, BlocklistJoinRequest
 from app.shared.blocklist import join_blocklist, leave_blocklist, make_blocklist, edit_blocklist, delete_blocklist
 from app.utils import show_ban_message, render_template, login_required, validation_required, approval_required, \
     blocklist_membership
@@ -20,6 +20,13 @@ def _flash_unresolved(unresolved):
     if unresolved:
         flash(_('These accounts could not be found and were not added: %(accounts)s',
                 accounts=', '.join(unresolved)), 'warning')
+
+
+def _back_to_referrer(blocklist: Blocklist):
+    referrer = request.headers.get('Referer', None)
+    if referrer is not None and current_app.config['SERVER_NAME'] in referrer:
+        return redirect(referrer)
+    return redirect(url_for('activitypub.blocklist_profile', actor=blocklist.link()))
 
 
 def _owned_blocklist_or_404(blocklist_id: int) -> Blocklist:
@@ -35,7 +42,12 @@ def _owned_blocklist_or_404(blocklist_id: int) -> Blocklist:
 def blocklists():
     my_blocklists = []
     subscribed_blocklists = []
+    subscribed_ids = set()  # blocklists the user can unsubscribe from - member (but not owner) or pending
     if current_user.is_authenticated:
+        subscribed_ids = {bm.blocklist_id for bm in db.session.query(BlocklistMember).
+                          filter_by(user_id=current_user.id, is_owner=False)}
+        subscribed_ids |= {jr.blocklist_id for jr in db.session.query(BlocklistJoinRequest).
+                           filter_by(user_id=current_user.id)}
         my_blocklists = db.session.query(Blocklist).filter(Blocklist.user_id == current_user.id).\
             order_by(Blocklist.title).all()
         subscribed_blocklists = db.session.query(Blocklist).join(BlocklistMember, BlocklistMember.blocklist_id == Blocklist.id).\
@@ -50,7 +62,7 @@ def blocklists():
 
     return render_template('blocklist/blocklists.html', title=_('Blocklists'), my_blocklists=my_blocklists,
                            subscribed_blocklists=subscribed_blocklists, other_blocklists=other_blocklists,
-                           search=search)
+                           subscribed_ids=subscribed_ids, search=search)
 
 
 # @bp.route('/b/<actor>', methods=['GET']) - defined in activitypub/routes.py, which calls this function for browser requests
@@ -190,7 +202,10 @@ def blocklist_subscribe(actor):
     if blocklist is None:
         abort(404)
     join_blocklist(blocklist, SRC_WEB)
-    return redirect(url_for('activitypub.blocklist_profile', actor=blocklist.link()))
+    if request.headers.get('HX-Request'):
+        session.pop('_flashes', None)   # the button changing is confirmation enough, don't show it on the next page too
+        return render_template('blocklist/_unsubscribe_button.html', blocklist=blocklist)
+    return _back_to_referrer(blocklist)
 
 
 @bp.route('/blocklist/<actor>/unsubscribe', methods=['POST'])
@@ -200,4 +215,9 @@ def blocklist_unsubscribe(actor):
     if blocklist is None:
         abort(404)
     leave_blocklist(blocklist, SRC_WEB)
-    return redirect(url_for('activitypub.blocklist_profile', actor=blocklist.link()))
+    if request.headers.get('HX-Request'):
+        session.pop('_flashes', None)
+        if blocklist.subscribed(current_user.id) == SUBSCRIPTION_OWNER:
+            return ''   # owners can't unsubscribe. Shouldn't happen as there's no button for them.
+        return render_template('blocklist/_subscribe_button.html', blocklist=blocklist)
+    return _back_to_referrer(blocklist)
