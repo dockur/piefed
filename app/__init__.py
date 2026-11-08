@@ -254,6 +254,9 @@ def create_app(config_class=Config):
     from app.feed import bp as feed_bp
     app.register_blueprint(feed_bp)
 
+    from app.blocklist import bp as blocklist_bp
+    app.register_blueprint(blocklist_bp)
+
     from app.instance import bp as instance_bp
     app.register_blueprint(instance_bp)
 

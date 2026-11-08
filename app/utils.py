@@ -66,7 +66,7 @@ from app.models import CronJobLog, Settings, Domain, Instance, BannedInstances, 
     Site, Post, utcnow, Filter, CommunityMember, InstanceBlock, CommunityBan, Topic, UserBlock, Language, \
     File, ModLog, CommunityBlock, Feed, FeedMember, CommunityFlair, CommunityJoinRequest, Notification, UserNote, \
     PostReply, PostReplyBookmark, AllowedInstances, InstanceBan, Tag, Emoji, UserExtraField, ArchivedPostReply, \
-    RevokedToken, CommunityFavorite, UserFollower, CommunityFlairBlock, Role, RolePermission
+    RevokedToken, CommunityFavorite, UserFollower, CommunityFlairBlock, Role, RolePermission, Blocklist
 
 logger = logging.getLogger(__name__)
 
@@ -1574,6 +1574,13 @@ def feed_membership(user: User, feed: Feed) -> int:
     if feed is None:
         return False
     return feed.subscribed(user.id)
+
+
+@cache.memoize(timeout=10)
+def blocklist_membership(user: User, blocklist: Blocklist) -> int:
+    if blocklist is None:
+        return False
+    return blocklist.subscribed(user.id)
 
 
 @cache.memoize(timeout=86400)

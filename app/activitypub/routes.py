@@ -27,7 +27,7 @@ from app.feed.routes import show_feed
 from app.models import User, Community, CommunityJoinRequest, CommunityMember, CommunityBan, ActivityPubLog, Post, \
     PostReply, Instance, AllowedInstances, BannedInstances, utcnow, Site, Notification, \
     ChatMessage, Conversation, UserFollower, UserBlock, Poll, PollChoice, Feed, FeedItem, FeedMember, FeedJoinRequest, \
-    IpBan, ActivityBatch, InstanceBan, UserFollowRequest, votes_cast_today
+    IpBan, ActivityBatch, InstanceBan, UserFollowRequest, votes_cast_today, Blocklist, BlocklistItem, BlocklistMember
 from app.post.routes import continue_discussion, show_post
 from app.shared.tasks import task_selector
 from app.user.routes import show_profile
@@ -2772,7 +2772,7 @@ def feed_moderators_route(actor):
     else:
         feed: Feed = db.session.query(Feed).filter_by(name=actor.lower(), ap_id=None).first()
     if feed is not None:
-        # currently feeds only have the one owner, but lets make this a list in case we want to 
+        # currently feeds only have the one owner, but lets make this a list in case we want to
         # expand that in the future
         moderators = [db.session.query(User).get(feed.user_id)]
         moderators_data = {
@@ -2806,6 +2806,186 @@ def feed_followers(actor):
                 "id": f'{current_app.config["SERVER_URL"]}/f/{actor}/followers',
                 "type": "Collection",
                 "totalItems": db.session.query(FeedMember).filter_by(feed_id=feed.id).count(),
+                "items": []
+            }
+            resp = jsonify(result)
+            resp.content_type = 'application/activity+json'
+            resp.headers.set('Cache-Control', 'public, max-age=15')
+            return resp
+        else:
+            abort(404)
+
+# blocklists
+@bp.route('/b/<actor>')
+@bp.route('/b/<actor>/<blocklist_owner>', methods=['GET'])
+def blocklist_profile(actor, blocklist_owner=None):
+    """ Requests to this endpoint can be for a JSON representation of the feed, or an HTML rendering of it.
+        The two types of requests are differentiated by the header """
+    actor = actor.strip()
+    if blocklist_owner is not None:
+        feed_owner = blocklist_owner.strip()
+        actor = actor + '/' + feed_owner
+    if '@' in actor:
+        # don't provide activitypub info for remote communities
+        if 'application/ld+json' in request.headers.get('Accept',
+                                                        '') or 'application/activity+json' in request.headers.get(
+                'Accept', ''):
+            abort(400)
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(ap_id=actor.lower()).first()
+    else:
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
+    if blocklist is not None:
+        if is_activitypub_request():
+            # check if feed is public, if not abort
+            # with 403 (forbidden)
+            if not blocklist.public:
+                abort(403)
+            server = current_app.config['SERVER_NAME']
+            actor_data = {"@context": default_context(),
+                          "type": "Blocklist",
+                          "id": f"https://{server}/f/{actor}",
+                          "name": blocklist.title,
+                          "preferredUsername": actor,
+                          "inbox": f"https://{server}/f/{actor}/inbox",
+                          "outbox": f"https://{server}/f/{actor}/outbox",
+                          "followers": f"https://{server}/f/{actor}/followers",
+                          "following": f"https://{server}/f/{actor}/following",
+                          "moderators": f"https://{server}/f/{actor}/moderators",
+                          "attributedTo": f"https://{server}/f/{actor}/moderators",
+                          "url": f"https://{server}/f/{actor}",
+                          "publicKey": {
+                              "id": f"https://{server}/f/{actor}#main-key",
+                              "owner": f"https://{server}/f/{actor}",
+                              "publicKeyPem": blocklist.public_key
+                          },
+                          "endpoints": {
+                              "sharedInbox": f"{current_app.config['SERVER_URL']}/inbox"
+                          },
+                          "published": ap_datetime(blocklist.created_at),
+                          "updated": ap_datetime(blocklist.last_edit),
+                          }
+            if blocklist.description_html:
+                actor_data["summary"] = blocklist.description_html
+                actor_data['source'] = {'content': blocklist.description, 'mediaType': 'text/markdown'}
+            resp = jsonify(actor_data)
+            resp.content_type = 'application/activity+json'
+            resp.headers.set('Cache-Control', 'public, max-age=5')
+            resp.headers.set('Link',
+                             f'<https://{current_app.config["SERVER_NAME"]}/b/{actor}>; rel="alternate"; type="text/html"')
+            return resp
+        else:  # browser request - return html
+            return show_feed(blocklist)
+    else:
+        abort(404)
+
+
+@bp.route('/b/<actor>/inbox', methods=['POST'])
+def blocklist_inbox(actor):
+    return shared_inbox()
+
+
+@bp.route('/b/<actor>/outbox', methods=['GET'])
+def blocklist_outbox(actor):
+    # every AP actor has to have an /outbox
+    actor = actor.strip()
+    if '@' in actor:
+        # don't provide activitypub info for remote feeds
+        abort(400)
+    else:
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
+
+
+    # get the blocklist items
+    blocklist_items = db.session.query(BlocklistItem).join(Blocklist, BlocklistItem.blocklist_id == blocklist.id).order_by(desc(BlocklistItem.id)).all()
+    # make the ap data json
+    items = []
+    for fi in blocklist_items:
+        u = User.query.get(fi.user_id)
+        items.append(u.public_url())
+    result = {
+        "@context": default_context(),
+        "id": blocklist.ap_outbox_url,
+        "type": "Collection",
+        "totalItems": len(items),
+        "items": items
+    }
+    resp = jsonify(result)
+    resp.content_type = 'application/activity+json'
+    resp.headers.set('Cache-Control', 'public, max-age=5')
+    return resp
+
+
+@bp.route('/b/<actor>/following', methods=['GET'])
+def blocklist_following(actor):
+    actor = actor.strip()
+    if '@' in actor:
+        # don't provide activitypub info for remote feeds
+        abort(400)
+    else:
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
+
+    blocklist_items = db.session.query(BlocklistItem).join(Blocklist, BlocklistItem.feed_id == blocklist.id).order_by(desc(BlocklistItem.id)).all()
+    # make the ap data json
+    items = []
+    for fi in blocklist_items:
+        u = User.query.get(fi.user_id)
+        items.append(u.public_url())
+    result = {
+        "@context": default_context(),
+        "id": blocklist.ap_following_url,
+        "type": "Collection",
+        "totalItems": len(items),
+        "items": items
+    }
+    resp = jsonify(result)
+    resp.content_type = 'application/activity+json'
+    resp.headers.set('Cache-Control', 'public, max-age=10')
+    return resp
+
+
+@bp.route('/b/<actor>/moderators', methods=['GET'])
+def blocklist_moderators_route(actor):
+    actor = actor.strip()
+    if '@' in actor:
+        # don't provide activitypub info for remote blocklists
+        abort(400)
+    else:
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
+    if blocklist is not None:
+        # currently feeds only have the one owner, but lets make this a list in case we want to
+        # expand that in the future
+        moderators = [db.session.query(User).get(blocklist.user_id)]
+        moderators_data = {
+            "@context": default_context(),
+            "type": "OrderedCollection",
+            "id": f"{current_app.config['SERVER_URL']}/f/{actor}/moderators",
+            "totalItems": len(moderators),
+            "orderedItems": []
+        }
+
+        for moderator in moderators:
+            moderators_data['orderedItems'].append(moderator.public_url())
+
+        resp = jsonify(moderators_data)
+        resp.content_type = 'application/activity+json'
+        resp.headers.set('Cache-Control', 'public, max-age=10')
+        return resp
+
+
+@bp.route('/b/<actor>/followers', methods=['GET'])
+def blocklist_followers(actor):
+    actor = actor.strip()
+    if '@' in actor:
+        # don't provide activitypub info for remote blocklists
+        abort(400)
+    else:
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
+        if blocklist is not None:
+            result = {
+                "@context": default_context(),
+                "id": f'{current_app.config["SERVER_URL"]}/f/{actor}/followers',
+                "type": "Collection",
+                "totalItems": db.session.query(BlocklistMember).filter_by(blocklist_id=blocklist.id).count(),
                 "items": []
             }
             resp = jsonify(result)

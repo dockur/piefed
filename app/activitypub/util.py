@@ -28,7 +28,8 @@ from app.constants import *
 from app.models import User, Post, Community, File, PostReply, Instance, utcnow, \
     PostVote, PostReplyVote, ActivityPubLog, Notification, Site, CommunityMember, InstanceRole, Report, Conversation, \
     Language, Tag, Poll, PollChoice, CommunityBan, CommunityJoinRequest, NotificationSubscription, \
-    Licence, UserExtraField, Feed, FeedMember, FeedItem, CommunityFlair, UserFlair, Topic, Event, InstanceBan, Emoji
+    Licence, UserExtraField, Feed, FeedMember, FeedItem, CommunityFlair, UserFlair, Topic, Event, InstanceBan, Emoji, \
+    Blocklist, BlocklistMember, BlocklistItem
 from app.utils import get_request, allowlist_html, get_setting, ap_datetime, markdown_to_html, \
     is_image_url, domain_from_url, gibberish, ensure_directory_exists, shorten_string, fixup_url, \
     microblog_content_to_title, is_video_url, \
@@ -1463,6 +1464,100 @@ def actor_json_to_model(activity_json, address, server):
             for child_feed in activity_json['childFeeds']:
                 populate_child_feed(feed.id, child_feed)
         return feed
+    elif activity_json['type'] == 'Blocklist':
+        blocklist = db.session.query(Blocklist).filter(Blocklist.ap_profile_id == activity_json['id'].lower()).first()
+        if blocklist:
+            return blocklist
+        if 'attributedTo' in activity_json and isinstance(activity_json['attributedTo'], str):  # lemmy, mbin, feeds and blocklists
+            owners_url = activity_json['attributedTo']
+        elif 'moderators' in activity_json:  # kbin, and our feeds
+            owners_url = activity_json['moderators']
+        else:
+            owners_url = None
+
+        # get the owners list
+        # these users will be added to feedmember db entries at the bottom of this function
+        owner_users = []
+        owners_data = get_request(owners_url, headers={'Accept': 'application/activity+json'})
+        if owners_data.status_code == 200:
+            owners_json = owners_data.json()
+            for owner in owners_json['orderedItems']:
+                owner_user = find_actor_or_create(owner)
+                owner_users.append(owner_user)
+
+        # also get the users in the remote blocklist's /following list
+        blocklist_members = []
+        following_data = get_request(activity_json['following'], headers={'Accept': 'application/activity+json'})
+        if following_data.status_code == 200:
+            following_json = following_data.json()
+            for c_ap_id in following_json['items']:
+                community = find_actor_or_create(c_ap_id)
+                blocklist_members.append(community)
+
+        blocklist = Blocklist(name=activity_json['preferredUsername'].strip(),
+                    user_id=owner_users[0].id,
+                    title=activity_json['name'].strip(),
+                    machine_name=activity_json['preferredUsername'],
+                    description_html=activity_json['summary'] if 'summary' in activity_json else '',
+                    description=piefed_markdown_to_lemmy_markdown(activity_json['source']['content']) if 'source' in activity_json else '',
+                    created_at=activity_json['published'] if 'published' in activity_json else utcnow(),
+                    last_edit=activity_json['updated'] if 'updated' in activity_json else utcnow(),
+                    num_blocked=0,
+                    ap_id=f"{address[1:].lower()}@{server.lower()}" if address.startswith('~') else f"{address.lower()}@{server.lower()}",
+                    ap_public_url=activity_json['id'],
+                    ap_profile_id=activity_json['id'].lower(),
+                    ap_followers_url=activity_json['followers'] if 'followers' in activity_json else None,
+                    ap_following_url=activity_json['following'] if 'following' in activity_json else None,
+                    ap_inbox_url=activity_json['endpoints']['sharedInbox'] if 'endpoints' in activity_json else activity_json['inbox'],
+                    ap_outbox_url=activity_json['outbox'],
+                    ap_moderators_url=owners_url,
+                    ap_fetched_at=utcnow(),
+                    ap_domain=server.lower(),
+                    public_key=activity_json['publicKey']['publicKeyPem'],
+                    instance_id=find_instance_id(server)
+                    )
+
+        description_html = ''
+        if 'summary' in activity_json:
+            description_html = activity_json['summary']
+        elif 'content' in activity_json:
+            description_html = activity_json['content']
+        else:
+            description_html = ''
+
+        if description_html is not None and description_html != '':
+            if not description_html.startswith('<'):  # PeerTube
+                description_html = '<p>' + description_html + '</p>'
+            blocklist.description_html = allowlist_html(description_html)
+            if 'source' in activity_json and activity_json['source'].get('mediaType') == 'text/markdown':
+                blocklist.description = activity_json['source']['content']
+                blocklist.description_html = markdown_to_html(blocklist.description)  # prefer Markdown if provided, overwrite version obtained from HTML
+            else:
+                blocklist.description = html_to_text(blocklist.description_html)
+
+        try:
+            db.session.add(blocklist)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return db.session.query(Blocklist).filter_by(ap_profile_id=activity_json['id'].lower()).one()
+
+        # add the owners as blocklistmembers
+        for ou in owner_users:
+            fm = BlocklistMember(blocklist_id=blocklist.id, user_id=ou.id, is_owner=True)
+            db.session.add(fm)
+            db.session.commit()
+
+        # add the blocked accounts from the remote /following list as blocklistitems
+        blocklist = db.session.query(Blocklist).filter_by(ap_profile_id=activity_json['id'].lower()).first()
+        if blocklist:
+            for u in blocklist_members:
+                fi = BlocklistItem(blocklist_id=blocklist.id, user_id=u.id)
+                blocklist.num_blocked += 1
+                db.session.add(fi)
+                db.session.commit()
+
+        return blocklist
 
 
 # Save two different versions of a File, after downloading it from file.source_url. Set a width parameter to None to avoid generating one of that size
