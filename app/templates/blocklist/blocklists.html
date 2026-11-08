@@ -1,0 +1,65 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+
+{% macro blocklist_table(lists) -%}
+<div class="table-responsive-md">
+    <table class="communities_table table table-striped mt-1">
+        <thead>
+        <tr>
+            <th>{{ _('Name') }}</th>
+            <th>{{ _('# Blocked') }}</th>
+            <th>{{ _('Subscribers') }}</th>
+            <th>{{ _('Creator') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for blocklist in lists -%}
+            <tr>
+                <th scope="row" class="pl-1"><a href="{{ url_for('activitypub.blocklist_profile', actor=blocklist.link()) }}">{{ blocklist.display_name() }}</a></th>
+                <td>{{ blocklist.num_blocked or 0 }}</td>
+                <td>{{ blocklist.subscriptions_count or 0 }}</td>
+                <td>{{ blocklist.creator() }}</td>
+            </tr>
+        {% endfor -%}
+        </tbody>
+    </table>
+</div>
+{%- endmacro %}
+
+{% block app_content %}
+<h1>{{ _('Blocklists') }}</h1>
+<p>{{ _('A blocklist is a list of accounts maintained by someone. Subscribe to a blocklist to block everyone on it, including people added to it later.') }}</p>
+{% if current_user.is_authenticated %}
+    <div class="mb-3">
+        <a class="btn btn-primary" href="{{ url_for('blocklist.blocklist_new') }}">{{ _('New blocklist') }}</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('blocklist.blocklist_add_remote') }}">{{ _('Find a remote blocklist') }}</a>
+    </div>
+
+    <h2>{{ _('My blocklists') }}</h2>
+    {% if my_blocklists %}
+        {{ blocklist_table(my_blocklists) }}
+    {% else %}
+        <p>{{ _('You have not made any blocklists.') }}</p>
+    {% endif %}
+
+    <h2>{{ _('Subscribed') }}</h2>
+    {% if subscribed_blocklists %}
+        {{ blocklist_table(subscribed_blocklists) }}
+    {% else %}
+        <p>{{ _('You are not subscribed to any blocklists.') }}</p>
+    {% endif %}
+{% endif %}
+
+<h2>{{ _('All known blocklists') }}</h2>
+<form method="get" class="mb-2">
+    <input type="search" name="search" value="{{ search }}" class="form-control d-inline-block w-auto" placeholder="{{ _('Search') }}">
+</form>
+{% if other_blocklists %}
+    {{ blocklist_table(other_blocklists) }}
+{% else %}
+    <p>{{ _('No blocklists found.') }}</p>
+{% endif %}
+{% endblock %}

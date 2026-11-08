@@ -37,6 +37,13 @@ feed_bp = ApiBlueprint(
     description="",
 )
 
+blocklist_bp = ApiBlueprint(
+    "Blocklist",
+    __name__,
+    url_prefix="/api/alpha",
+    description="Shared lists of accounts. Subscribing to a blocklist blocks everyone on it, including accounts added later.",
+)
+
 topic_bp = ApiBlueprint(
     "Topic",
     __name__,
@@ -135,6 +142,7 @@ blueprints = [
     misc_bp,
     comm_bp,
     feed_bp,
+    blocklist_bp,
     topic_bp,
     user_bp,
     reply_bp,

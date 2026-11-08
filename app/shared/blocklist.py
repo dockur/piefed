@@ -2,503 +2,477 @@ from __future__ import annotations
 
 from typing import List
 
-from flask import flash, current_app, abort, g
+from flask import flash, current_app
 from flask_babel import _
 from flask_login import current_user
-from slugify import slugify
 from sqlalchemy import text
 
 from app import db, cache, celery
 from app.activitypub.signature import send_post_request, default_context, RsaKeys
-from app.activitypub.util import find_actor_or_create, make_image_sizes
 from app.constants import *
-from app.models import User, Feed, FeedMember, BlocklistItem, Community, FeedJoinRequest, BlocklistMember, \
-    BlocklistJoinRequest, Instance, File, NotificationSubscription, Blocklist, BlocklistMember, BlocklistItem, UserBlock
-from app.shared.tasks import task_selector
-from app.shared.community import leave_community
-from app.shared.upload import process_upload
-from app.utils import authorise_api_user, feed_membership, get_request, menu_subscribed_feeds, blocked_users, \
-    community_membership, gibberish, get_task_session, instance_banned, menu_instance_feeds, \
-    piefed_markdown_to_lemmy_markdown, markdown_to_html, is_image_url, render_template, blocklist_membership
+from app.models import User, Blocklist, BlocklistMember, BlocklistItem, BlocklistJoinRequest, utcnow
+from app.utils import authorise_api_user, get_request, blocked_users, gibberish, get_task_session, instance_banned, \
+    piefed_markdown_to_lemmy_markdown, markdown_to_html, blocklist_membership, patch_db_session
 
 
-def join_blocklist(actor, user_id, src=SRC_WEB):
+# How blocklists work
+# -------------------
+# Blocklist         - a list of accounts, owned by one user. Federated as an actor of type 'Blocklist' at /b/<machine_name>
+# BlocklistItem     - one account that is on the list. The /b/<machine_name>/following collection lists these.
+# BlocklistMember   - someone subscribed to the list. The owner is always a member (is_owner=True).
+# UserBlock         - for every *local* member, each account on the list gets a UserBlock with blocked_via_blocklist=True.
+#                     Blocks the user made by hand have blocked_via_blocklist=False and are never removed by blocklist code.
+#
+# Remote instances subscribe to a list by sending a Follow from one of their users to the Blocklist actor. Changes to the
+# list are sent to those instances as Announce(Add) / Announce(Remove) from the Blocklist actor, and each instance applies
+# the change to its own local subscribers. Blocks themselves are never federated (same as normal user blocks).
+
+
+# ----- Applying / removing UserBlocks -----
+
+def _block_params(**kwargs):
+    params = {'admin': ROLE_ADMIN, 'staff': ROLE_STAFF, 'notif_user': NOTIF_USER, 'now': utcnow()}
+    params.update(kwargs)
+    return params
+
+
+def apply_blocklist_to_user(blocklist_id: int, user_id: int):
+    """Block every account in the blocklist, on behalf of a local user. Safe to call repeatedly."""
+    params = _block_params(blocklist_id=blocklist_id, user_id=user_id)
+    db.session.execute(text('''
+        INSERT INTO "user_block" (blocker_id, blocked_id, created_at, blocked_via_blocklist)
+        SELECT DISTINCT :user_id, bi.user_id, :now, true
+        FROM "blocklist_item" bi
+        WHERE bi.blocklist_id = :blocklist_id AND bi.user_id != :user_id
+          AND NOT EXISTS (SELECT 1 FROM "user_block" ub WHERE ub.blocker_id = :user_id AND ub.blocked_id = bi.user_id)
+          AND NOT EXISTS (SELECT 1 FROM "user_role" ur WHERE ur.user_id = bi.user_id AND ur.role_id IN (:admin, :staff))
+    '''), params)
+    db.session.execute(text('''
+        DELETE FROM "notification_subscription"
+        WHERE type = :notif_user AND entity_id = :user_id
+          AND user_id IN (SELECT user_id FROM "blocklist_item" WHERE blocklist_id = :blocklist_id)
+    '''), params)
+    db.session.commit()
+    cache.delete_memoized(blocked_users, user_id)
+
+
+def unapply_blocklist_from_user(blocklist_id: int, user_id: int):
+    """Remove the blocks that a local user got from this blocklist, unless another blocklist they are subscribed to
+    also blocks the same account. Blocks made by hand are left alone."""
+    db.session.execute(text('''
+        DELETE FROM "user_block" ub
+        WHERE ub.blocker_id = :user_id AND ub.blocked_via_blocklist = true
+          AND ub.blocked_id IN (SELECT user_id FROM "blocklist_item" WHERE blocklist_id = :blocklist_id)
+          AND NOT EXISTS (SELECT 1 FROM "blocklist_item" bi
+                          JOIN "blocklist_member" bm ON bm.blocklist_id = bi.blocklist_id
+                          WHERE bm.user_id = :user_id AND bi.blocklist_id != :blocklist_id AND bi.user_id = ub.blocked_id)
+    '''), {'blocklist_id': blocklist_id, 'user_id': user_id})
+    db.session.commit()
+    cache.delete_memoized(blocked_users, user_id)
+
+
+def _local_subscriber_ids(blocklist_id: int) -> List[int]:
+    return list(db.session.execute(text('''
+        SELECT bm.user_id FROM "blocklist_member" bm JOIN "user" u ON u.id = bm.user_id
+        WHERE bm.blocklist_id = :blocklist_id AND u.ap_id is null
+    '''), {'blocklist_id': blocklist_id}).scalars())
+
+
+def _apply_item_to_subscribers(blocklist_id: int, blocked_id: int):
+    """A new account was added to the blocklist - block it on behalf of every local subscriber."""
+    role = db.session.execute(text('SELECT role_id FROM "user_role" WHERE user_id = :user_id AND role_id IN (:admin, :staff)'),
+                              _block_params(user_id=blocked_id)).scalar()
+    if role:
+        return  # admin and staff cannot be blocked
+    params = _block_params(blocklist_id=blocklist_id, blocked_id=blocked_id)
+    db.session.execute(text('''
+        INSERT INTO "user_block" (blocker_id, blocked_id, created_at, blocked_via_blocklist)
+        SELECT DISTINCT bm.user_id, :blocked_id, :now, true
+        FROM "blocklist_member" bm JOIN "user" u ON u.id = bm.user_id
+        WHERE bm.blocklist_id = :blocklist_id AND u.ap_id is null AND bm.user_id != :blocked_id
+          AND NOT EXISTS (SELECT 1 FROM "user_block" ub WHERE ub.blocker_id = bm.user_id AND ub.blocked_id = :blocked_id)
+    '''), params)
+    db.session.execute(text('''
+        DELETE FROM "notification_subscription"
+        WHERE type = :notif_user AND user_id = :blocked_id
+          AND entity_id IN (SELECT user_id FROM "blocklist_member" WHERE blocklist_id = :blocklist_id)
+    '''), params)
+    db.session.commit()
+    for subscriber_id in _local_subscriber_ids(blocklist_id):
+        cache.delete_memoized(blocked_users, subscriber_id)
+
+
+def _remove_item_from_subscribers(blocklist_id: int, blocked_id: int):
+    """An account was removed from the blocklist - unblock it for every local subscriber, unless they also block it
+    by hand or through another blocklist."""
+    db.session.execute(text('''
+        DELETE FROM "user_block" ub USING "blocklist_member" bm
+        WHERE bm.blocklist_id = :blocklist_id AND ub.blocker_id = bm.user_id AND ub.blocked_id = :blocked_id
+          AND ub.blocked_via_blocklist = true
+          AND NOT EXISTS (SELECT 1 FROM "blocklist_item" bi
+                          JOIN "blocklist_member" bm2 ON bm2.blocklist_id = bi.blocklist_id
+                          WHERE bm2.user_id = bm.user_id AND bi.blocklist_id != :blocklist_id AND bi.user_id = :blocked_id)
+    '''), {'blocklist_id': blocklist_id, 'blocked_id': blocked_id})
+    db.session.commit()
+    for subscriber_id in _local_subscriber_ids(blocklist_id):
+        cache.delete_memoized(blocked_users, subscriber_id)
+
+
+# ----- Changing the contents of a blocklist -----
+
+def add_to_blocklist(blocklist: Blocklist, blocked_user_id: int, federate=True) -> bool:
+    if blocked_user_id == blocklist.user_id:
+        return False
+    existing = db.session.query(BlocklistItem).filter_by(blocklist_id=blocklist.id, user_id=blocked_user_id).first()
+    if existing:
+        return False
+    db.session.add(BlocklistItem(blocklist_id=blocklist.id, user_id=blocked_user_id))
+    blocklist.num_blocked = (blocklist.num_blocked or 0) + 1
+    blocklist.last_edit = utcnow()
+    db.session.commit()
+
+    _apply_item_to_subscribers(blocklist.id, blocked_user_id)
+
+    if federate and blocklist.is_local():
+        announce_blocklist_add_remove(blocklist, 'Add', blocked_user_id)
+    return True
+
+
+def remove_from_blocklist(blocklist: Blocklist, blocked_user_id: int, federate=True) -> bool:
+    existing = db.session.query(BlocklistItem).filter_by(blocklist_id=blocklist.id, user_id=blocked_user_id).first()
+    if not existing:
+        return False
+
+    _remove_item_from_subscribers(blocklist.id, blocked_user_id)
+
+    db.session.query(BlocklistItem).filter_by(blocklist_id=blocklist.id, user_id=blocked_user_id).delete()
+    blocklist.num_blocked = max((blocklist.num_blocked or 1) - 1, 0)
+    blocklist.last_edit = utcnow()
+    db.session.commit()
+
+    if federate and blocklist.is_local():
+        announce_blocklist_add_remove(blocklist, 'Remove', blocked_user_id)
+    return True
+
+
+def sync_remote_blocklist_items(blocklist: Blocklist):
+    """Fetch the /following collection of a remote blocklist and make our copy match it."""
+    from app.activitypub.util import find_actor_or_create
+    if blocklist.is_local() or not blocklist.ap_following_url:
+        return
     try:
-        remote = False
-        actor = actor.strip()
-        user = User.query.get(user_id)
-        if '@' in actor:
-            blocklist = Blocklist.query.filter_by(ap_id=actor).first()
-            remote = True
-        else:
-            blocklist = Blocklist.query.filter_by(name=actor, ap_id=None).first()
-
-        if blocklist is not None:
-            if blocklist_membership(user, blocklist) == SUBSCRIPTION_NONMEMBER:
-                from app.blocklist.routes import do_block
-                success = True
-
-                # for local feeds, joining is instant
-                member = BlocklistMember(user_id=user.id, blocklist_id=blocklist.id)
-                db.session.add(member)
-                blocklist.subscriptions_count += 1
-                db.session.commit()
-
-                # also subscribe the user to the BlocklistItem communities
-                feed_items = BlocklistItem.query.filter_by(blocklist_id=blocklist.id).all()
-                for fi in feed_items:
-                    to_block = User.query.get(fi.user_id)
-                    actor = to_block.ap_id if to_block.ap_id else to_block.name
-                    if current_app.debug:
-                        do_block(actor, user.id, joined_via_blocklist=True)
-                    else:
-                        do_block.delay(actor, user.id, joined_via_blocklist=True)
-
-                # feed is remote
-                if remote:
-                    # send ActivityPub message to remote feed, asking to follow. Accept message will be sent to our shared inbox
-                    join_request = FeedJoinRequest(user_id=user.id, blocklist_id=blocklist.id)
-                    db.session.add(join_request)
-                    db.session.commit()
-                    if blocklist.instance.online():
-                        follow = {
-                            "actor": user.public_url(),
-                            "to": [blocklist.public_url()],
-                            "object": blocklist.public_url(),
-                            "type": "Follow",
-                            "id": f"{current_app.config['SERVER_URL']}/activities/follow/{join_request.uuid}"
-                        }
-                        send_post_request(blocklist.ap_inbox_url, follow, user.private_key, user.public_url() + '#main-key',
-                                          timeout=10)
-
-                        # reach out and get the BlocklistItems from the remote /following collection
-                        res = get_request(blocklist.ap_following_url)
-                        following_collection = res.json()
-
-                        # for each of those add the communities
-                        # subscribe the user if they have feed_auto_follow turned on
-                        for fci in following_collection['items']:
-                            community_ap_id = fci
-                            to_block = find_actor_or_create(community_ap_id, community_only=True)
-                            if to_block and isinstance(to_block, Community):
-                                actor = to_block.ap_id if to_block.ap_id else to_block.name
-                                do_block(actor, user.id, joined_via_blocklist=True)
-                                # also make a BlocklistItem in the local db
-                                feed_item = BlocklistItem(blocklist_id=blocklist.id, user_id=to_block.id)
-                                db.session.add(feed_item)
-                                db.session.commit()
-
-                if success is True and src == SRC_WEB:
-                    flash(_('You subscribed to %(feed_title)s', feed_title=blocklist.title))
-            else:
-                msg_to_user = "Already subscribed, or subscription pending"
-                if src == SRC_WEB:
-                    flash(_(msg_to_user))
-
-            cache.delete_memoized(feed_membership, user, blocklist)
-            cache.delete_memoized(blocked_users, user.id)
-        else:
-            abort(404)
+        res = get_request(blocklist.ap_following_url, headers={'Accept': 'application/activity+json'})
+        if res.status_code != 200:
+            return
+        collection = res.json()
+        res.close()
     except Exception:
-        db.session.rollback()
+        return
+
+    items = collection.get('items') or collection.get('orderedItems') or []
+    remote_ids = set()
+    for actor_url in items:
+        if isinstance(actor_url, dict):
+            actor_url = actor_url.get('id')
+        if not actor_url:
+            continue
+        blocked = find_actor_or_create(actor_url)
+        if blocked and isinstance(blocked, User):
+            remote_ids.add(blocked.id)
+
+    existing_ids = set(existing_blocklist_item_ids(blocklist.id))
+    for added_id in remote_ids - existing_ids:
+        add_to_blocklist(blocklist, added_id, federate=False)
+    for removed_id in existing_ids - remote_ids:
+        remove_from_blocklist(blocklist, removed_id, federate=False)
+
+    blocklist.ap_fetched_at = utcnow()
+    db.session.commit()
+
+
+@celery.task
+def sync_remote_blocklist_task(blocklist_id: int, then_apply_to_user_id: int | None = None):
+    session = get_task_session()
+    try:
+        with patch_db_session(session):
+            blocklist = session.query(Blocklist).get(blocklist_id)
+            if blocklist:
+                sync_remote_blocklist_items(blocklist)
+                if then_apply_to_user_id:
+                    apply_blocklist_to_user(blocklist.id, then_apply_to_user_id)
+    except Exception:
+        session.rollback()
         raise
     finally:
-        db.session.remove()
+        session.close()
 
 
-def leave_blocklist(blocklist: int | Blocklist, src, auth=None, bulk_leave=False):
-    if isinstance(blocklist, Blocklist):
-        blocklist_id = blocklist.id
-    elif isinstance(blocklist, int):
-        blocklist_id = blocklist
-        blocklist = db.session.query(Blocklist).get(blocklist_id)
-    
-    user_id = authorise_api_user(auth) if src == SRC_API else current_user.id
-
-    fm = db.session.query(BlocklistMember).filter_by(user_id=user_id, blocklist_id=blocklist_id).one()
-
-    if not fm.is_owner:
-        task_selector('leave_blocklist', user_id=user_id, blocklist_id=blocklist_id)
-        
-        db.session.query(BlocklistMember).filter_by(user_id=user_id, blocklist_id=blocklist_id).delete()
-        blocklist.subscriptions_count -= 1
-        db.session.commit()
-
-        if not bulk_leave:
-            # Need to unsub from every community in the feed if the user has that option set
-            # During bulk_leave, community memberships handled separately
-            user = db.session.query(User).get(user_id)
-            feed_items = db.session.query(BlocklistItem).filter_by(blocklist_id=blocklist_id).all()
-            for feed_item in feed_items:
-                # Send the community unsub requests to celery - it will handle all the db commits and cache busting
-                do_unblock(user_id=feed_item.user_id, src=src, auth=auth, bulk_leave=bulk_leave)
-
-        if src == SRC_WEB and not bulk_leave:
-            flash(_('You have unsubscribed from the %(blocklist_name)s blocklist, '
-                    'please allow a couple minutes for it to fully process', blocklist_name = blocklist.title))
+def sync_remote_blocklist(blocklist_id: int, then_apply_to_user_id: int | None = None):
+    if current_app.debug:
+        sync_remote_blocklist_task(blocklist_id, then_apply_to_user_id)
     else:
+        sync_remote_blocklist_task.delay(blocklist_id, then_apply_to_user_id)
+
+
+# ----- Subscribing / unsubscribing -----
+
+def join_blocklist(blocklist: Blocklist, src, auth=None):
+    user_id = authorise_api_user(auth) if src == SRC_API else current_user.id
+    user = db.session.query(User).get(user_id)
+
+    if blocklist.subscribed(user.id) != SUBSCRIPTION_NONMEMBER:
         if src == SRC_API:
-            raise Exception("You cannot leave your own blocklist")
-        else:
-            flash(_('You cannot leave your own blocklist'), 'warning')
-            return
+            raise Exception('already_subscribed')
+        flash(_('Already subscribed, or subscription pending'))
+        return
+
+    # Membership is created straight away (also for remote blocklists) so that the blocks take effect immediately.
+    # For remote blocklists a Follow is sent too, so the remote instance will tell us about future changes to the list.
+    db.session.add(BlocklistMember(user_id=user.id, blocklist_id=blocklist.id))
+    blocklist.subscriptions_count = (blocklist.subscriptions_count or 0) + 1
+    db.session.commit()
+
+    apply_blocklist_to_user(blocklist.id, user.id)
+
+    if not blocklist.is_local():
+        join_request = BlocklistJoinRequest(user_id=user.id, blocklist_id=blocklist.id)
+        db.session.add(join_request)
+        db.session.commit()
+        if blocklist.instance and blocklist.instance.online():
+            follow = {
+                "actor": user.public_url(),
+                "to": [blocklist.public_url()],
+                "object": blocklist.public_url(),
+                "type": "Follow",
+                "id": f"{current_app.config['SERVER_URL']}/activities/follow/{join_request.uuid}"
+            }
+            send_post_request(blocklist.ap_inbox_url, follow, user.private_key, user.public_url() + '#main-key',
+                              timeout=10)
+        # our copy of the list might be out of date, refresh it (in the background, it could be large)
+        sync_remote_blocklist(blocklist.id, then_apply_to_user_id=user.id)
+
+    cache.delete_memoized(blocklist_membership, user, blocklist)
+
+    if src == SRC_WEB:
+        flash(_('You subscribed to %(blocklist_title)s', blocklist_title=blocklist.title))
 
 
-def make_blocklist(input, src, auth=None):
+def leave_blocklist(blocklist: Blocklist, src, auth=None):
+    user_id = authorise_api_user(auth) if src == SRC_API else current_user.id
+    user = db.session.query(User).get(user_id)
+
+    membership = db.session.query(BlocklistMember).filter_by(user_id=user.id, blocklist_id=blocklist.id).first()
+    join_request = db.session.query(BlocklistJoinRequest).filter_by(user_id=user.id, blocklist_id=blocklist.id).first()
+    if membership is None and join_request is None:
+        if src == SRC_API:
+            raise Exception('not_subscribed')
+        return
+    if membership and membership.is_owner:
+        if src == SRC_API:
+            raise Exception('cannot_leave_own_blocklist')
+        flash(_('You cannot unsubscribe from your own blocklist. Delete it instead.'), 'warning')
+        return
+
+    # Undo the Follow
+    if not blocklist.is_local() and blocklist.instance and not blocklist.instance.gone_forever:
+        follow_id = f"{current_app.config['SERVER_URL']}/activities/follow/{join_request.uuid}" if join_request \
+            else f"{current_app.config['SERVER_URL']}/activities/follow/{gibberish(15)}"
+        follow = {
+            "actor": user.public_url(),
+            "to": [blocklist.public_url()],
+            "object": blocklist.public_url(),
+            "type": "Follow",
+            "id": follow_id
+        }
+        undo = {
+            'actor': user.public_url(),
+            'to': [blocklist.public_url()],
+            'type': 'Undo',
+            'id': f"{current_app.config['SERVER_URL']}/activities/undo/" + gibberish(15),
+            'object': follow
+        }
+        send_post_request(blocklist.ap_inbox_url, undo, user.private_key, user.public_url() + '#main-key', timeout=10)
+
+    db.session.query(BlocklistMember).filter_by(user_id=user.id, blocklist_id=blocklist.id).delete()
+    db.session.query(BlocklistJoinRequest).filter_by(user_id=user.id, blocklist_id=blocklist.id).delete()
+    if membership:
+        blocklist.subscriptions_count = max((blocklist.subscriptions_count or 1) - 1, 0)
+    db.session.commit()
+
+    unapply_blocklist_from_user(blocklist.id, user.id)
+    cache.delete_memoized(blocklist_membership, user, blocklist)
+
+    if src == SRC_WEB:
+        flash(_('You have unsubscribed from %(blocklist_title)s', blocklist_title=blocklist.title))
+
+
+# ----- Creating / editing / deleting -----
+
+def make_blocklist(input, src, auth=None) -> tuple[Blocklist, List[str]]:
+    """Returns the new blocklist and a list of the lines in 'members' that could not be resolved to an account"""
     if src == SRC_API:
-        url = input['url']
+        machine_name = input['url']
         title = input['title']
-        public = input['public']
-        description = input['description']
-        members = input['members']
+        description = input.get('description') or ''
+        members = input.get('members') or ''
         user = authorise_api_user(auth, return_type='model')
     else:
-        url = input.url.data
+        machine_name = input.url.data
         title = input.title.data
-        description = piefed_markdown_to_lemmy_markdown(input.description.data)
-        members = input.members.data
+        description = input.description.data or ''
+        members = input.members.data or ''
         user = current_user
 
+    machine_name = machine_name.strip().lower()
+    server_url = current_app.config['SERVER_URL']
     private_key, public_key = RsaKeys.generate_keypair()
-    blocklist = Blocklist(user_id=user.id, title=title, name=url, machine_name=url,
-                description=piefed_markdown_to_lemmy_markdown(description),
-                description_html=markdown_to_html(description),
-                private_key=private_key,
-                public_key=public_key,
-                ap_profile_id='https://' + current_app.config['SERVER_NAME'] + '/f/' + url.lower(),
-                ap_public_url='https://' + current_app.config['SERVER_NAME'] + '/f/' + url,
-                ap_followers_url='https://' + current_app.config['SERVER_NAME'] + '/f/' + url + '/followers',
-                ap_following_url='https://' + current_app.config['SERVER_NAME'] + '/f/' + url + '/following',
-                ap_outbox_url='https://' + current_app.config['SERVER_NAME'] + '/f/' + url + '/outbox',
-                ap_domain=current_app.config['SERVER_NAME'],
-                subscriptions_count=1, instance_id=1)
-
+    blocklist = Blocklist(user_id=user.id, title=title, machine_name=machine_name,
+                          description=piefed_markdown_to_lemmy_markdown(description),
+                          description_html=markdown_to_html(description),
+                          private_key=private_key, public_key=public_key,
+                          ap_profile_id=f'{server_url}/b/{machine_name}',
+                          ap_public_url=f'{server_url}/b/{machine_name}',
+                          ap_followers_url=f'{server_url}/b/{machine_name}/followers',
+                          ap_following_url=f'{server_url}/b/{machine_name}/following',
+                          ap_outbox_url=f'{server_url}/b/{machine_name}/outbox',
+                          ap_inbox_url=f'{server_url}/b/{machine_name}/inbox',
+                          ap_moderators_url=f'{server_url}/b/{machine_name}/moderators',
+                          ap_domain=current_app.config['SERVER_NAME'],
+                          subscriptions_count=1, num_blocked=0, instance_id=1)
     db.session.add(blocklist)
     db.session.commit()
 
-    membership = BlocklistMember(user_id=user.id, blocklist_id=blocklist.id, is_owner=True)
-    db.session.add(membership)
+    db.session.add(BlocklistMember(user_id=user.id, blocklist_id=blocklist.id, is_owner=True))
     db.session.commit()
 
-    new_members = form_communities_to_ids(members)  # the communities that are in the feed now
+    from app.blocklist.util import form_members_to_ids
+    new_member_ids, unresolved = form_members_to_ids(members)
+    for member_id in new_member_ids:
+        add_to_blocklist(blocklist, member_id, federate=False)  # nobody remote is subscribed yet
 
-    for added_community in new_members:
-        _blocklist_add_member(added_community, 0, blocklist.id, user.id)
+    cache.delete_memoized(blocklist_membership, user, blocklist)
+    return blocklist, unresolved
 
 
-def edit_blocklist(input, blocklist, src, auth=None, from_scratch=False):
+def edit_blocklist(input, blocklist: Blocklist, src, auth=None) -> List[str]:
+    """Returns a list of the lines in 'members' that could not be resolved to an account"""
     if src == SRC_API:
-        url = input['url']
         title = input['title']
-        public = input['public']
-        description = input['description']
-        members = input['members']
+        description = input.get('description') or ''
+        members = input.get('members')
         user = authorise_api_user(auth, return_type='model')
     else:
-        url = input.url.data
         title = input.title.data
-        public = input.public.data
-        description = piefed_markdown_to_lemmy_markdown(input.description.data)
+        description = input.description.data or ''
         members = input.members.data
         user = current_user
 
-    if url:
-        url = slugify(url.strip().split('/')[0], separator='_').lower()
-        url = slugify(url.strip(), separator='_').lower() + '/' + user.user_name.lower()
-        blocklist.name = url
-        blocklist.machine_name = url
+    if not (blocklist.user_id == user.id or user.is_admin()):
+        raise Exception('incorrect_login')
+
     blocklist.title = title
     blocklist.description = piefed_markdown_to_lemmy_markdown(description)
     blocklist.description_html = markdown_to_html(description)
-
-    if not from_scratch:
-        if not (blocklist.user_id == user.id or user.is_admin()):
-            raise Exception('incorrect_login')
-
-    db.session.add(blocklist)
+    blocklist.last_edit = utcnow()
     db.session.commit()
 
-    # Update BlocklistItems based on whatever has changed in the form.members field
-    old_communities = set(existing_users(blocklist.id))  # the accounts that were in the blocklist before the edit was made
-    new_communities = form_communities_to_ids(members)  # the members that are in the blocklist now
-    added_communities = new_communities - old_communities
-    removed_communities = old_communities - new_communities
+    unresolved = []
+    if members is not None:
+        from app.blocklist.util import form_members_to_ids
+        old_ids = set(existing_blocklist_item_ids(blocklist.id))
+        new_ids, unresolved = form_members_to_ids(members)
+        for added_id in new_ids - old_ids:
+            add_to_blocklist(blocklist, added_id)
+        for removed_id in old_ids - new_ids:
+            remove_from_blocklist(blocklist, removed_id)
+    return unresolved
 
-    for added_community in added_communities:
-        _blocklist_add_member(added_community, 0, blocklist.id, user.id)
 
-    for removed_community in removed_communities:
-        _blocklist_remove_member(removed_community, blocklist.id)
-        
-
-def delete_blocklist(blocklist_id: int, src, auth=None):
+def delete_blocklist(blocklist: Blocklist, src, auth=None):
     if src == SRC_API:
-        user_id = authorise_api_user(auth)
+        user = authorise_api_user(auth, return_type='model')
     else:
-        user_id = current_user.id
+        user = current_user
 
-    blocklist = db.session.query(Blocklist).get(blocklist_id)
+    if not (blocklist.user_id == user.id or user.is_admin()):
+        raise Exception('incorrect_login')
 
-    # does the user own the feed
-    if blocklist.user_id != user_id:
-        abort(404)
+    # tell remote subscribers. Done before BlocklistMembers are deleted as we need them to know where to send it.
+    if blocklist.is_local():
+        owner = db.session.query(User).get(blocklist.user_id)
+        delete_json = {
+            "@context": default_context(),
+            "type": "Delete",
+            "actor": owner.public_url(),
+            "id": f"{current_app.config['SERVER_URL']}/activities/delete/{gibberish(15)}",
+            "object": {
+                "type": "Blocklist",
+                "id": blocklist.public_url()
+            }
+        }
+        for inbox in _remote_subscriber_inboxes(blocklist):
+            send_post_request(inbox, delete_json, owner.private_key, owner.public_url() + '#main-key', timeout=10)
 
-    # announce the change to any potential subscribers
-    # have to do it here before the blocklist members are cleared out
-    if current_app.debug:
-        announce_blocklist_delete_to_subscribers(user_id, blocklist.id)
-    else:
-        announce_blocklist_delete_to_subscribers.delay(user_id, blocklist.id)
+    remove_blocklist_locally(blocklist)
 
-    # strip out any feedmembers before deleting
+
+def remove_blocklist_locally(blocklist: Blocklist):
+    """Delete a blocklist from the db, after taking away the blocks it gave to local subscribers.
+    Used when a local user deletes their blocklist, or a remote instance tells us one of its blocklists was deleted."""
+    for subscriber_id in _local_subscriber_ids(blocklist.id):
+        unapply_blocklist_from_user(blocklist.id, subscriber_id)
+        cache.delete_memoized(blocklist_membership, db.session.query(User).get(subscriber_id), blocklist)
     db.session.query(BlocklistMember).filter(BlocklistMember.blocklist_id == blocklist.id).delete()
-
-    # delete the feed
-    if blocklist.num_blocked > 0:
-        db.session.query(BlocklistItem).filter(BlocklistItem.blocklist_id == blocklist.id).delete()
+    db.session.query(BlocklistJoinRequest).filter(BlocklistJoinRequest.blocklist_id == blocklist.id).delete()
+    db.session.query(BlocklistItem).filter(BlocklistItem.blocklist_id == blocklist.id).delete()
     db.session.delete(blocklist)
     db.session.commit()
 
 
-def _blocklist_add_member(member_id: int, current_blocklist_id: int, blocklist_id: int, user_id: int):
-    # if current_feed_id is not 0 then we are moving a blocked user from
-    # one blocklist to another
-    if current_blocklist_id != 0:
-        current_feed_item = BlocklistItem.query.filter_by(blocklist_id=current_blocklist_id).filter_by(
-            user_id=member_id).first()
-        db.session.delete(current_feed_item)
-        db.session.commit()
+# ----- Federation -----
 
-        # also update the num_communities for the old feed
-        blocklist = Blocklist.query.get(current_blocklist_id)
-        blocklist.num_blocked = blocklist.num_blocked - 1
-        db.session.add(blocklist)
-        db.session.commit()
-
-        # announce the change to any potential subscribers
-        user = User.query.get(member_id)
-        if current_app.debug:
-            announce_blocklist_add_remove_to_subscribers("Remove", blocklist.id, user.id)
-        else:
-            announce_blocklist_add_remove_to_subscribers.delay("Remove", blocklist.id, user.id)
-
-    # make the new BlocklistItem and commit it
-    blocklist_item = BlocklistItem(blocklist_id=blocklist_id, user_id=member_id)
-    db.session.add(blocklist_item)
-    db.session.commit()
-
-    # also update the num_communities for the new feed
-    blocklist = Blocklist.query.get(blocklist_id)
-    blocklist.num_blocked = blocklist.num_blocked + 1
-    db.session.add(blocklist)
-    db.session.commit()
-
-    # announce the change to any potential subscribers
-    u = User.query.get(member_id)
-    if current_app.debug:
-        announce_blocklist_add_remove_to_subscribers("Add", blocklist.id, u.id)
-    else:
-        announce_blocklist_add_remove_to_subscribers.delay("Add", blocklist.id, u.id)
-
-    # subscribe the user to the community if they are not already subscribed
-    current_membership = BlocklistMember.query.filter_by(user_id=user_id, blocklist_id=blocklist_id).first()
-    if current_membership is None:
-        # import do_subscribe here, otherwise we get import errors from circular import problems
-        from app.blocklist.routes import do_subscribe
-        u = User.query.get(member_id)
-        actor = u.ap_id if u.ap_id else u.name
-        do_subscribe(actor, user_id, joined_via_blocklist=True)
+def _remote_subscriber_inboxes(blocklist: Blocklist) -> List[str]:
+    inboxes = []
+    for instance in blocklist.following_instances():
+        if instance.inbox and instance.online() and not instance_banned(instance.domain):
+            inboxes.append(instance.inbox)
+    return inboxes
 
 
-def _blocklist_remove_member(user_id: int, current_blocklist_id: int):
-    current_feed_item = db.session.query(BlocklistItem).filter_by(blocklist_id=current_blocklist_id).filter_by(user_id=user_id).first()
-    db.session.delete(current_feed_item)
-    db.session.commit()
-
-    # also update the num_communities for the old feed
-    blocklist = db.session.query(Blocklist).get(current_blocklist_id)
-    blocklist.num_blocks = blocklist.num_blocks - 1
-    db.session.add(blocklist)
-    db.session.commit()
-
-    user = db.session.query(User).get(user_id)
-    community_members = db.session.query(UserBlock).filter_by(user_id=user.id).all()
-    # make all local users un-block the previously blocked account - if the user blocked the other user
-    # as a result of adding it to a blocklist
-    for cm in community_members:
-        user = db.session.query(User).get(cm.user_id)
-        if user.is_local() and cm.blocked_via_blocklist is not None and cm.blocked_via_blocklist:
-            subscription = blocklist_membership(user, blocklist)
-            if subscription != SUBSCRIPTION_OWNER:
-                proceed = True
-                # Undo the Follow
-                if not user.is_local():  # this is a remote community, so activitypub is needed
-                    if not user.instance.gone_forever:
-                        follow_id = f"{current_app.config['SERVER_URL']}/activities/follow/{gibberish(15)}"
-                        if user.instance.domain == 'ovo.st':
-                            join_request = db.session.query(BlocklistJoinRequest).filter_by(user_id=user.id,
-                                                                                            user_id=user.id).first()
-                            if join_request:
-                                follow_id = f"{current_app.config['SERVER_URL']}/activities/follow/{join_request.uuid}"
-                        undo_id = f"{current_app.config['SERVER_URL']}/activities/undo/" + gibberish(15)
-                        follow = {
-                            "actor": user.public_url(),
-                            "to": [user.public_url()],
-                            "object": user.public_url(),
-                            "type": "Follow",
-                            "id": follow_id
-                        }
-                        undo = {
-                            'actor': user.public_url(),
-                            'to': [user.public_url()],
-                            'type': 'Undo',
-                            'id': undo_id,
-                            'object': follow
-                        }
-                        send_post_request(user.ap_inbox_url, undo, user.private_key,
-                                          user.public_url() + '#main-key', timeout=10)
-
-                if proceed:
-                    db.session.query(BlocklistMember).filter_by(user_id=user.id, user_id=user.id).delete()
-                    db.session.query(BlocklistJoinRequest).filter_by(user_id=user.id, user_id=user.id).delete()
-                    db.session.commit()
-
-                cache.delete_memoized(blocklist_membership, user, user)
-                cache.delete_memoized(blocked_users, user.id)
-
-    # announce the change to any potential subscribers
-    if blocklist.public:
-        if current_app.debug:
-            announce_blocklist_add_remove_to_subscribers("Remove", blocklist.id, user.id)
-        else:
-            announce_blocklist_add_remove_to_subscribers.delay("Remove", blocklist.id, user.id)
-
-
-@celery.task
-def announce_blocklist_add_remove_to_subscribers(action: str, feed_id: int, community_id: int):
-    # find the feed
-    feed = Feed.query.get(feed_id)
-    # find the community
-    community = Community.query.get(community_id)
-    # build the Announce json
+def announce_blocklist_add_remove(blocklist: Blocklist, action: str, blocked_user_id: int):
+    """Tell instances that have users subscribed to this (local) blocklist that an account was added or removed."""
+    inboxes = _remote_subscriber_inboxes(blocklist)
+    if not inboxes:
+        return
+    blocked_user = db.session.query(User).get(blocked_user_id)
+    if blocked_user is None:
+        return
+    server_url = current_app.config['SERVER_URL']
     activity_json = {
         "@context": default_context(),
         "type": "Announce",
-        "actor": feed.ap_public_url,
-        "id": f"{current_app.config['SERVER_URL']}/activities/announce/{gibberish(15)}",
-    }
-
-    # build the object json
-    object_json = {
-        "@context": "https://www.w3.org/ns/activitystreams",
-        "type": action,
-        "actor": feed.ap_public_url,
-        "id": f"{current_app.config['SERVER_URL']}/activities/feedadd/{gibberish(15)}",
+        "actor": blocklist.public_url(),
+        "to": ["https://www.w3.org/ns/activitystreams#Public"],
+        "cc": [blocklist.ap_followers_url],
+        "id": f"{server_url}/activities/announce/{gibberish(15)}",
         "object": {
-            "type": "Group",
-            "id": community.ap_public_url
-        },
-        "target": {
-            "type": "Collection",
-            "id": feed.ap_following_url
+            "type": action,
+            "actor": blocklist.public_url(),
+            "id": f"{server_url}/activities/{action.lower()}/{gibberish(15)}",
+            "object": {
+                "type": "Person",
+                "id": blocked_user.public_url()
+            },
+            "target": {
+                "type": "Collection",
+                "id": blocklist.ap_following_url
+            }
         }
     }
-
-    # embed the object json in the Announce json
-    activity_json['object'] = object_json
-
-    # look up the feedmembers
-    feed_members = FeedMember.query.filter_by(blocklist_id=feed.id).all()
-
-    # for each member
-    #  - if its the owner, skip
-    #  - if its a local server user, skip
-    #  - if its a remote user
-    # setup a db session for this task
-    session = get_task_session()
-    try:
-        for fm in feed_members:
-            fm_user = User.query.get(fm.user_id)
-            if fm_user.id == feed.user_id:
-                continue
-            if fm_user.is_local():
-                # user is local so lets auto-subscribe them to the community
-                from app.community.routes import do_subscribe
-                actor = community.ap_id if community.ap_id else community.name
-                do_subscribe(actor, fm_user.id, joined_via_feed=True)
-                continue
-
-            # if we get here the feedmember is a remote user
-            instance: Instance = session.query(Instance).get(fm_user.instance.id)
-            if instance.inbox and instance.online() and not instance_banned(instance.domain):
-                send_post_request(instance.inbox, activity_json, feed.private_key, feed.ap_profile_id + '#main-key', timeout=10)
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
+    for inbox in inboxes:
+        send_post_request(inbox, activity_json, blocklist.private_key, blocklist.public_url() + '#main-key', timeout=10)
 
 
-@celery.task
-def announce_blocklist_delete_to_subscribers(user_id, blocklist_id):
-    # get the user
-    user = User.query.get(user_id)
-    # get the feed
-    feed = Feed.query.get(blocklist_id)
-    # create the delete json
-    delete_json = {
-        "@context": default_context(),
-        "type": "Delete",
-        "actor": user.ap_public_url,
-        "id": f"{current_app.config['SERVER_URL']}/delete/{gibberish(15)}",
-        "object": {
-            "type": "Blocklist",
-            "id": feed.ap_public_url
-        }
-    }
-
-    # find the feed members
-    feed_members = FeedMember.query.filter_by(blocklist_id=feed.id).all()
-
-    # for each member
-    #  - if its the owner, skip
-    #  - if its a local server user, skip
-    #  - if its a remote user
-    session = get_task_session()
-    try:
-        for fm in feed_members:
-            fm_user = session.query(User).get(fm.user_id)
-            if fm_user.id == feed.user_id:
-                continue
-            if fm_user.is_local():
-                continue
-            # if we get here the feedmember is a remote user
-            instance: Instance = session.query(Instance).get(fm_user.instance.id)
-            if instance.inbox and instance.online() and not instance_banned(instance.domain):
-                send_post_request(instance.inbox, delete_json, user.private_key, user.ap_profile_id + '#main-key', timeout=10)
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
-
-
-def existing_communities(feed_id: int) -> List:
-    return db.session.execute(text('SELECT community_id FROM feed_item WHERE feed_id = :feed_id'),
-                              {'feed_id': feed_id}).scalars()
-
-
-def form_communities_to_ids(form_communities: str) -> set:
-    from app.community.util import search_for_community
-    result = set()
-    parts = form_communities.strip().split('\n')
-    for community_ap_id in parts:
-        if not community_ap_id.startswith('!'):
-            community_ap_id = '!' + community_ap_id
-        if not '@' in community_ap_id:
-            community_ap_id = community_ap_id + '@' + current_app.config['SERVER_NAME']
-        community = search_for_community(community_ap_id.strip())
-        if community:
-            result.add(community.id)
-    return result
-
+def existing_blocklist_item_ids(blocklist_id: int) -> List[int]:
+    return list(db.session.execute(text('SELECT user_id FROM "blocklist_item" WHERE blocklist_id = :blocklist_id'),
+                                   {'blocklist_id': blocklist_id}).scalars())

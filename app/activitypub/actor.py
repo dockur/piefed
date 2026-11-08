@@ -11,7 +11,7 @@ from sqlalchemy import or_, func
 from app import cache, db
 from app.activitypub.util import get_request, signed_get_request, actor_json_to_model, refresh_user_profile, \
     refresh_community_profile, refresh_feed_profile, extract_domain_and_actor, normalise_actor_string
-from app.models import User, Community, Feed, Site
+from app.models import User, Community, Feed, Site, Blocklist
 from app.utils import utcnow, get_setting, actor_contains_blocked_words, actor_profile_contains_blocked_words, \
     instance_banned, low_value_reposters, instance_allowed
 
@@ -24,6 +24,11 @@ def find_local_community(actor_url: str) -> Community:
 def find_local_feed(actor_url: str) -> Feed:
     """Find a local feed by URL."""
     return db.session.query(Feed).filter(Feed.ap_profile_id == actor_url).first()
+
+
+def find_local_blocklist(actor_url: str) -> Blocklist:
+    """Find a local blocklist by URL."""
+    return db.session.query(Blocklist).filter(Blocklist.ap_profile_id == actor_url, Blocklist.ap_id == None).first()
 
 
 def find_local_user(actor_url: str, allow_banned: bool = False) -> User:
@@ -56,7 +61,7 @@ def validate_remote_actor(actor_url, actor=None, allow_banned=False):
 
     # If we have the actor object, check more conditions
     if actor:
-        if actor.banned and not allow_banned:
+        if getattr(actor, 'banned', False) and not allow_banned:  # Blocklists have no 'banned' attribute
             return False
         if isinstance(actor, User):
             if actor.deleted or actor_profile_contains_blocked_words(actor):
@@ -91,6 +96,11 @@ def find_remote_actor(actor_url):
         actor = db.session.query(Feed).filter(Feed.ap_profile_id == actor_url).first()
         if actor:
             return actor
+    elif '/b/' in actor_url:
+        # URL contains /b/ - likely a blocklist
+        actor = db.session.query(Blocklist).filter(Blocklist.ap_profile_id == actor_url).first()
+        if actor:
+            return actor
     
     # Fallback to trying everything
     actor = db.session.query(User).filter(User.ap_profile_id == actor_url).first()
@@ -110,6 +120,9 @@ def find_remote_actor(actor_url):
     if actor is None:
         actor = db.session.query(Feed).filter(Feed.ap_profile_id == actor_url).first()
 
+    if actor is None:
+        actor = db.session.query(Blocklist).filter(Blocklist.ap_profile_id == actor_url).first()
+
     return actor
 
 
@@ -127,6 +140,9 @@ def schedule_actor_refresh(actor, override=False):
                 refresh_community_profile(actor.id)
             elif isinstance(actor, Feed):
                 refresh_feed_profile(actor.id)
+            elif isinstance(actor, Blocklist):
+                from app.shared.blocklist import sync_remote_blocklist
+                sync_remote_blocklist(actor.id)
 
 
 def fetch_remote_actor_data(url: str, retry_count=1):
@@ -278,6 +294,12 @@ def find_actor_by_url(actor_url, community_only=False, feed_only=False, allow_ba
         if actor and feed_only:
             return actor
         elif actor and not feed_only:
+            return actor
+        return None
+
+    if f"{server_name}/b/" in actor_url:
+        actor = find_local_blocklist(actor_url)
+        if actor and not community_only and not feed_only:
             return actor
         return None
 

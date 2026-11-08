@@ -1,0 +1,24 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block app_content %}
+    <div class="row">
+        <div class="col mx-auto">
+            <div class="card mt-5">
+                <div class="card-body p-6">
+                    <h1 class="card-title">{{ _('Find a blocklist on another instance') }}</h1>
+                    <p>{{ _('Accepted address formats') }}: </p>
+                    <ul>
+                        <li>%blocklistname@server.name</li>
+                        <li>https://server.name/b/blocklistname</li>
+                    </ul>
+                    {{ render_form(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

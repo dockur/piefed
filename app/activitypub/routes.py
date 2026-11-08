@@ -19,7 +19,9 @@ from app.activitypub.util import users_total, active_half_year, active_month, lo
     comment_model_to_json, restore_post_or_comment, ban_user, unban_user, \
     log_incoming_ap, find_community, site_ban_remove_data, community_ban_remove_data, verify_object_from_source, \
     post_replies_for_ap, is_vote, find_instance_id, resolve_remote_post_from_search, proactively_delete_content, \
-    process_quote_boost, object_has_missing_fields, find_microblogging_community, process_microblog_announce
+    process_quote_boost, object_has_missing_fields, find_microblogging_community, process_microblog_announce, \
+    _activitypub_response, _local_blocklist_or_404
+from app.blocklist.routes import show_blocklist
 from app.community.routes import show_community
 from app.community.util import send_to_remote_instance, send_to_remote_instance_fast
 from app.constants import *
@@ -27,7 +29,7 @@ from app.feed.routes import show_feed
 from app.models import User, Community, CommunityJoinRequest, CommunityMember, CommunityBan, ActivityPubLog, Post, \
     PostReply, Instance, AllowedInstances, BannedInstances, utcnow, Site, Notification, \
     ChatMessage, Conversation, UserFollower, UserBlock, Poll, PollChoice, Feed, FeedItem, FeedMember, FeedJoinRequest, \
-    IpBan, ActivityBatch, InstanceBan, UserFollowRequest, votes_cast_today, Blocklist, BlocklistItem, BlocklistMember
+    IpBan, ActivityBatch, InstanceBan, UserFollowRequest, votes_cast_today, Blocklist, BlocklistItem, BlocklistMember, BlocklistJoinRequest
 from app.post.routes import continue_discussion, show_post
 from app.shared.tasks import task_selector
 from app.user.routes import show_profile
@@ -37,7 +39,7 @@ from app.utils import gibberish, get_setting, community_membership, ap_datetime,
     feed_membership, get_task_session, patch_db_session, \
     blocked_phrases, orjson_response, moderating_communities, joined_communities, moderating_communities_ids, \
     moderating_communities_ids_all_users, publish_sse_event, blocked_users, block_honey_pot, instance_allowed, \
-    requestor_domain, markdown_to_html, allowlist_html
+    requestor_domain, markdown_to_html, allowlist_html, blocklist_membership
 
 
 @bp.route('/testredis')
@@ -73,11 +75,15 @@ def webfinger():
 def process_webfinger_request(resource):
 
     feed = False
+    blocklist = False
     query = resource  # acct:alice@tada.club
     if 'acct:' in query:
         actor = query.split(':')[1].split('@')[0]  # alice
         if actor.startswith('~'):
             feed = True
+            actor = actor[1:]
+        elif actor.startswith('%'):
+            blocklist = True
             actor = actor[1:]
     elif 'https:' in query or 'http:' in query:
         actor = query.split('/')[-1]
@@ -109,7 +115,10 @@ def process_webfinger_request(resource):
         return resp
 
     object = None
-    if not feed:
+    if blocklist:
+        object = Blocklist.query.filter_by(machine_name=actor.strip().lower(), ap_id=None).first()
+        type = 'Blocklist'
+    elif not feed:
         # look for the User first, then the Community, then the Feed that matches
         type = 'Person'
         object = User.query.filter(
@@ -815,7 +824,7 @@ def process_inbox_request(request_json, store_ap_json):
                 actor_id = request_json['actor']
                 if isinstance(actor_id, dict):  # Discourse does this
                     actor_id = actor_id['id']
-                feed = community = user = None
+                feed = community = user = blocklist = None
                 if actor_id and actor_id.startswith('https://s.rimu.geek.nz'):
                     pass    # just here to set breakpoints on, during testing. remove before commit
                 if request_json['type'] == 'Announce' or request_json['type'] == 'Accept' or request_json['type'] == 'Reject':
@@ -823,8 +832,10 @@ def process_inbox_request(request_json, store_ap_json):
                     if not community:
                         feed = find_actor_or_create_cached(actor_id, feed_only=True, create_if_not_found=False)
                         if not feed:
-                            user = find_actor_or_create_cached(actor_id, create_if_not_found=False)
-                    if not community and not feed and not user:
+                            blocklist = session.query(Blocklist).filter_by(ap_profile_id=actor_id.lower()).first()
+                            if not blocklist:
+                                user = find_actor_or_create_cached(actor_id, create_if_not_found=False)
+                    if not community and not feed and not user and not blocklist:
                         log_incoming_ap(id, APLOG_ANNOUNCE, APLOG_FAILURE, saved_json, 'Actor was not a user, feed or a community')
                         return
                 else:
@@ -878,6 +889,35 @@ def process_inbox_request(request_json, store_ap_json):
                             fake_activity = request_json.copy()
                             fake_activity['object'] = obj
                             process_inbox_request(fake_activity, store_ap_json)  # Process the Announce (with single object) as normal
+                        return
+                    if blocklist:
+                        # Announce(Add) or Announce(Remove) from a remote blocklist that some of our users subscribe to.
+                        # The outer Announce was signed by the blocklist so the inner activity can be trusted, as long
+                        # as it only changes that blocklist.
+                        inner = request_json['object']
+                        if inner['type'] not in ('Add', 'Remove'):
+                            log_incoming_ap(id, APLOG_ANNOUNCE, APLOG_IGNORED, saved_json, f"Unexpected {inner['type']} from blocklist")
+                            return
+                        log_type = APLOG_ADD if inner['type'] == 'Add' else APLOG_REMOVE
+                        target = inner.get('target')
+                        target_id = target.get('id') if isinstance(target, dict) else target
+                        if not target_id or not blocklist.ap_following_url or target_id.lower() != blocklist.ap_following_url.lower():
+                            log_incoming_ap(id, log_type, APLOG_FAILURE, saved_json, 'Blocklist Add/Remove has wrong target')
+                            return
+                        object_id = inner['object'].get('id') if isinstance(inner['object'], dict) else inner['object']
+                        if inner['type'] == 'Add':
+                            blocked_user = find_actor_or_create_cached(object_id)
+                        else:
+                            blocked_user = find_actor_or_create_cached(object_id, create_if_not_found=False)
+                        if not blocked_user or not isinstance(blocked_user, User):
+                            log_incoming_ap(id, log_type, APLOG_FAILURE, saved_json, f'Could not find account {object_id}')
+                            return
+                        from app.shared.blocklist import add_to_blocklist, remove_from_blocklist
+                        if inner['type'] == 'Add':
+                            add_to_blocklist(blocklist, blocked_user.id, federate=False)
+                        else:
+                            remove_from_blocklist(blocklist, blocked_user.id, federate=False)
+                        log_incoming_ap(id, log_type, APLOG_SUCCESS, saved_json)
                         return
                     if not feed:
                         user = find_actor_or_create_cached(request_json['object']['actor'])
@@ -982,6 +1022,27 @@ def process_inbox_request(request_json, store_ap_json):
                                 send_post_request(user.ap_inbox_url, accept, feed.private_key,
                                                   f"{feed.public_url()}#main-key")
                                 log_incoming_ap(id, APLOG_FOLLOW, APLOG_SUCCESS, saved_json)
+                        return
+                    elif isinstance(target, Blocklist):
+                        blocklist = target
+                        if not blocklist.is_local():
+                            log_incoming_ap(id, APLOG_FOLLOW, APLOG_FAILURE, saved_json, 'Follow request for remote blocklist received')
+                            return
+                        existing_member = session.query(BlocklistMember).filter_by(user_id=user.id, blocklist_id=blocklist.id).first()
+                        if not existing_member:
+                            session.add(BlocklistMember(user_id=user.id, blocklist_id=blocklist.id))
+                            blocklist.subscriptions_count = (blocklist.subscriptions_count or 0) + 1
+                            session.commit()
+                            cache.delete_memoized(blocklist_membership, user, blocklist)
+                        # send accept message to acknowledge the follow (also if they were already a member - maybe our previous Accept got lost)
+                        accept = {"@context": default_context(), "actor": blocklist.public_url(),
+                                  "to": [user.public_url()],
+                                  "object": {"actor": user.public_url(), "to": None, "object": blocklist.public_url(),
+                                             "type": "Follow", "id": follow_id},
+                                  "type": "Accept",
+                                  "id": f"{current_app.config['SERVER_URL']}/activities/accept/" + gibberish(32)}
+                        send_post_request(user.ap_inbox_url, accept, blocklist.private_key, f"{blocklist.public_url()}#main-key")
+                        log_incoming_ap(id, APLOG_FOLLOW, APLOG_SUCCESS, saved_json)
                         return
                     elif isinstance(target, User):
                         local_user = target
@@ -1095,6 +1156,12 @@ def process_inbox_request(request_json, store_ap_json):
                                 session.commit()
                                 cache.delete_memoized(feed_membership, requestor_user, feed)
                             log_incoming_ap(id, APLOG_ACCEPT, APLOG_SUCCESS, saved_json)
+                    elif blocklist:
+                        # BlocklistMember was already created when the user subscribed, so the join request can be dropped
+                        session.query(BlocklistJoinRequest).filter_by(user_id=requestor_user.id, blocklist_id=blocklist.id).delete()
+                        session.commit()
+                        cache.delete_memoized(blocklist_membership, requestor_user, blocklist)
+                        log_incoming_ap(id, APLOG_ACCEPT, APLOG_SUCCESS, saved_json)
                     elif user:
                         join_request = session.query(UserFollowRequest).filter_by(user_id=requestor_user.id,
                                                                                   follow_id=user.id).first()
@@ -1143,6 +1210,17 @@ def process_inbox_request(request_json, store_ap_json):
                                 session.delete(existing_membership)
                                 cache.delete_memoized(feed_membership, requestor_user, feed)
                             session.commit()
+                            log_incoming_ap(id, APLOG_ACCEPT, APLOG_SUCCESS, saved_json)
+                        elif blocklist:
+                            session.query(BlocklistJoinRequest).filter_by(user_id=requestor_user.id, blocklist_id=blocklist.id).delete()
+                            existing_membership = session.query(BlocklistMember).filter_by(user_id=requestor_user.id, blocklist_id=blocklist.id).first()
+                            if existing_membership:
+                                session.delete(existing_membership)
+                                blocklist.subscriptions_count = max((blocklist.subscriptions_count or 1) - 1, 0)
+                            session.commit()
+                            from app.shared.blocklist import unapply_blocklist_from_user
+                            unapply_blocklist_from_user(blocklist.id, requestor_user.id)
+                            cache.delete_memoized(blocklist_membership, requestor_user, blocklist)
                             log_incoming_ap(id, APLOG_ACCEPT, APLOG_SUCCESS, saved_json)
                         elif user:
                             join_request = session.query(UserFollowRequest).filter_by(user_id=requestor_user.id,
@@ -1265,6 +1343,18 @@ def process_inbox_request(request_json, store_ap_json):
                         else:
                             log_incoming_ap(id, APLOG_DELETE, APLOG_FAILURE, saved_json, f"Delete: cannot find {core_activity['object']['id']}")
                             return
+                    elif isinstance(core_activity['object'], dict) and core_activity['object']['type'] == 'Blocklist':
+                        blocklist = session.query(Blocklist).filter_by(ap_profile_id=core_activity['object']['id'].lower()).first()
+                        if blocklist is None:
+                            log_incoming_ap(id, APLOG_DELETE, APLOG_IGNORED, saved_json, f"Delete: cannot find {core_activity['object']['id']}")
+                            return
+                        if blocklist.is_local() or user is None or user.id != blocklist.user_id:
+                            log_incoming_ap(id, APLOG_DELETE, APLOG_FAILURE, saved_json, 'Delete rejected, request came from non-owner.')
+                            return
+                        from app.shared.blocklist import remove_blocklist_locally
+                        remove_blocklist_locally(blocklist)
+                        log_incoming_ap(id, APLOG_DELETE, APLOG_SUCCESS, saved_json, f"Delete: Blocklist {core_activity['object']['id']} deleted")
+                        return
                     elif isinstance(core_activity['object'], str):
                         ap_id = core_activity['object']  # lemmy
                     else:
@@ -1687,6 +1777,16 @@ def process_inbox_request(request_json, store_ap_json):
                                 session.delete(join_request)
                             session.commit()
                             cache.delete_memoized(feed_membership, user, feed)
+                            log_incoming_ap(id, APLOG_UNDO_FOLLOW, APLOG_SUCCESS, saved_json)
+                            return
+                        if isinstance(target, Blocklist):
+                            blocklist = target
+                            member = session.query(BlocklistMember).filter_by(user_id=user.id, blocklist_id=blocklist.id).first()
+                            if member and not member.is_owner:
+                                session.delete(member)
+                                blocklist.subscriptions_count = max((blocklist.subscriptions_count or 1) - 1, 0)
+                                session.commit()
+                                cache.delete_memoized(blocklist_membership, user, blocklist)
                             log_incoming_ap(id, APLOG_UNDO_FOLLOW, APLOG_SUCCESS, saved_json)
                             return
                         if isinstance(target, User):
@@ -2815,68 +2915,56 @@ def feed_followers(actor):
         else:
             abort(404)
 
+
 # blocklists
-@bp.route('/b/<actor>')
-@bp.route('/b/<actor>/<blocklist_owner>', methods=['GET'])
-def blocklist_profile(actor, blocklist_owner=None):
-    """ Requests to this endpoint can be for a JSON representation of the feed, or an HTML rendering of it.
+@bp.route('/b/<actor>', methods=['GET'])
+def blocklist_profile(actor):
+    """ Requests to this endpoint can be for a JSON representation of the blocklist, or an HTML rendering of it.
         The two types of requests are differentiated by the header """
-    actor = actor.strip()
-    if blocklist_owner is not None:
-        feed_owner = blocklist_owner.strip()
-        actor = actor + '/' + feed_owner
+    actor = actor.strip().lower()
     if '@' in actor:
-        # don't provide activitypub info for remote communities
-        if 'application/ld+json' in request.headers.get('Accept',
-                                                        '') or 'application/activity+json' in request.headers.get(
-                'Accept', ''):
-            abort(400)
-        blocklist: Blocklist = db.session.query(Blocklist).filter_by(ap_id=actor.lower()).first()
-    else:
-        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
-    if blocklist is not None:
         if is_activitypub_request():
-            # check if feed is public, if not abort
-            # with 403 (forbidden)
-            if not blocklist.public:
-                abort(403)
-            server = current_app.config['SERVER_NAME']
-            actor_data = {"@context": default_context(),
-                          "type": "Blocklist",
-                          "id": f"https://{server}/f/{actor}",
-                          "name": blocklist.title,
-                          "preferredUsername": actor,
-                          "inbox": f"https://{server}/f/{actor}/inbox",
-                          "outbox": f"https://{server}/f/{actor}/outbox",
-                          "followers": f"https://{server}/f/{actor}/followers",
-                          "following": f"https://{server}/f/{actor}/following",
-                          "moderators": f"https://{server}/f/{actor}/moderators",
-                          "attributedTo": f"https://{server}/f/{actor}/moderators",
-                          "url": f"https://{server}/f/{actor}",
-                          "publicKey": {
-                              "id": f"https://{server}/f/{actor}#main-key",
-                              "owner": f"https://{server}/f/{actor}",
-                              "publicKeyPem": blocklist.public_key
-                          },
-                          "endpoints": {
-                              "sharedInbox": f"{current_app.config['SERVER_URL']}/inbox"
-                          },
-                          "published": ap_datetime(blocklist.created_at),
-                          "updated": ap_datetime(blocklist.last_edit),
-                          }
-            if blocklist.description_html:
-                actor_data["summary"] = blocklist.description_html
-                actor_data['source'] = {'content': blocklist.description, 'mediaType': 'text/markdown'}
-            resp = jsonify(actor_data)
-            resp.content_type = 'application/activity+json'
-            resp.headers.set('Cache-Control', 'public, max-age=5')
-            resp.headers.set('Link',
-                             f'<https://{current_app.config["SERVER_NAME"]}/b/{actor}>; rel="alternate"; type="text/html"')
-            return resp
-        else:  # browser request - return html
-            return show_feed(blocklist)
+            abort(400)  # don't provide activitypub info for remote blocklists
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(ap_id=actor).first()
     else:
+        blocklist: Blocklist = db.session.query(Blocklist).filter_by(machine_name=actor, ap_id=None).first()
+    if blocklist is None:
         abort(404)
+
+    if is_activitypub_request():
+        actor_url = blocklist.public_url()
+        owner = db.session.query(User).get(blocklist.user_id)
+        actor_data = {"@context": default_context(),
+                      "type": "Blocklist",
+                      "id": actor_url,
+                      "name": blocklist.title,
+                      "preferredUsername": blocklist.machine_name,
+                      "inbox": f"{actor_url}/inbox",
+                      "outbox": f"{actor_url}/outbox",
+                      "followers": f"{actor_url}/followers",
+                      "following": f"{actor_url}/following",
+                      "moderators": f"{actor_url}/moderators",
+                      "attributedTo": owner.public_url(),
+                      "url": actor_url,
+                      "publicKey": {
+                          "id": f"{actor_url}#main-key",
+                          "owner": actor_url,
+                          "publicKeyPem": blocklist.public_key
+                      },
+                      "endpoints": {
+                          "sharedInbox": f"{current_app.config['SERVER_URL']}/inbox"
+                      },
+                      "published": ap_datetime(blocklist.created_at),
+                      "updated": ap_datetime(blocklist.last_edit),
+                      }
+        if blocklist.description_html:
+            actor_data["summary"] = blocklist.description_html
+            actor_data['source'] = {'content': blocklist.description, 'mediaType': 'text/markdown'}
+        resp = _activitypub_response(actor_data, max_age=5)
+        resp.headers.set('Link', f'<{actor_url}>; rel="alternate"; type="text/html"')
+        return resp
+    else:  # browser request - return html
+        return show_blocklist(blocklist)
 
 
 @bp.route('/b/<actor>/inbox', methods=['POST'])
@@ -2886,114 +2974,57 @@ def blocklist_inbox(actor):
 
 @bp.route('/b/<actor>/outbox', methods=['GET'])
 def blocklist_outbox(actor):
-    # every AP actor has to have an /outbox
-    actor = actor.strip()
-    if '@' in actor:
-        # don't provide activitypub info for remote feeds
-        abort(400)
-    else:
-        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
-
-
-    # get the blocklist items
-    blocklist_items = db.session.query(BlocklistItem).join(Blocklist, BlocklistItem.blocklist_id == blocklist.id).order_by(desc(BlocklistItem.id)).all()
-    # make the ap data json
-    items = []
-    for fi in blocklist_items:
-        u = User.query.get(fi.user_id)
-        items.append(u.public_url())
-    result = {
+    # every AP actor has to have an /outbox. Changes to the list are only sent to subscribers so this is always empty.
+    blocklist = _local_blocklist_or_404(actor)
+    return _activitypub_response({
         "@context": default_context(),
-        "id": blocklist.ap_outbox_url,
-        "type": "Collection",
-        "totalItems": len(items),
-        "items": items
-    }
-    resp = jsonify(result)
-    resp.content_type = 'application/activity+json'
-    resp.headers.set('Cache-Control', 'public, max-age=5')
-    return resp
+        "id": f"{blocklist.public_url()}/outbox",
+        "type": "OrderedCollection",
+        "totalItems": 0,
+        "orderedItems": []
+    })
 
 
 @bp.route('/b/<actor>/following', methods=['GET'])
 def blocklist_following(actor):
-    actor = actor.strip()
-    if '@' in actor:
-        # don't provide activitypub info for remote feeds
-        abort(400)
-    else:
-        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
-
-    blocklist_items = db.session.query(BlocklistItem).join(Blocklist, BlocklistItem.feed_id == blocklist.id).order_by(desc(BlocklistItem.id)).all()
-    # make the ap data json
-    items = []
-    for fi in blocklist_items:
-        u = User.query.get(fi.user_id)
-        items.append(u.public_url())
-    result = {
+    # The accounts that are on the blocklist
+    blocklist = _local_blocklist_or_404(actor)
+    blocked_users = db.session.query(User).join(BlocklistItem, BlocklistItem.user_id == User.id).\
+        filter(BlocklistItem.blocklist_id == blocklist.id).order_by(desc(BlocklistItem.id)).all()
+    items = [u.public_url() for u in blocked_users]
+    return _activitypub_response({
         "@context": default_context(),
         "id": blocklist.ap_following_url,
         "type": "Collection",
         "totalItems": len(items),
         "items": items
-    }
-    resp = jsonify(result)
-    resp.content_type = 'application/activity+json'
-    resp.headers.set('Cache-Control', 'public, max-age=10')
-    return resp
+    })
 
 
 @bp.route('/b/<actor>/moderators', methods=['GET'])
 def blocklist_moderators_route(actor):
-    actor = actor.strip()
-    if '@' in actor:
-        # don't provide activitypub info for remote blocklists
-        abort(400)
-    else:
-        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
-    if blocklist is not None:
-        # currently feeds only have the one owner, but lets make this a list in case we want to
-        # expand that in the future
-        moderators = [db.session.query(User).get(blocklist.user_id)]
-        moderators_data = {
-            "@context": default_context(),
-            "type": "OrderedCollection",
-            "id": f"{current_app.config['SERVER_URL']}/f/{actor}/moderators",
-            "totalItems": len(moderators),
-            "orderedItems": []
-        }
-
-        for moderator in moderators:
-            moderators_data['orderedItems'].append(moderator.public_url())
-
-        resp = jsonify(moderators_data)
-        resp.content_type = 'application/activity+json'
-        resp.headers.set('Cache-Control', 'public, max-age=10')
-        return resp
+    blocklist = _local_blocklist_or_404(actor)
+    # currently blocklists only have the one owner, but lets make this a list in case we want to expand that in the future
+    moderators = [db.session.query(User).get(blocklist.user_id)]
+    return _activitypub_response({
+        "@context": default_context(),
+        "type": "OrderedCollection",
+        "id": f"{blocklist.public_url()}/moderators",
+        "totalItems": len(moderators),
+        "orderedItems": [moderator.public_url() for moderator in moderators]
+    })
 
 
 @bp.route('/b/<actor>/followers', methods=['GET'])
 def blocklist_followers(actor):
-    actor = actor.strip()
-    if '@' in actor:
-        # don't provide activitypub info for remote blocklists
-        abort(400)
-    else:
-        blocklist: Blocklist = db.session.query(Blocklist).filter_by(name=actor.lower(), ap_id=None).first()
-        if blocklist is not None:
-            result = {
-                "@context": default_context(),
-                "id": f'{current_app.config["SERVER_URL"]}/f/{actor}/followers',
-                "type": "Collection",
-                "totalItems": db.session.query(BlocklistMember).filter_by(blocklist_id=blocklist.id).count(),
-                "items": []
-            }
-            resp = jsonify(result)
-            resp.content_type = 'application/activity+json'
-            resp.headers.set('Cache-Control', 'public, max-age=15')
-            return resp
-        else:
-            abort(404)
+    blocklist = _local_blocklist_or_404(actor)
+    return _activitypub_response({
+        "@context": default_context(),
+        "id": f'{blocklist.public_url()}/followers',
+        "type": "Collection",
+        "totalItems": db.session.query(BlocklistMember).filter_by(blocklist_id=blocklist.id).count(),
+        "items": []
+    }, max_age=15)
 
 
 @bp.route('/activitypub/externalInteraction', methods=['GET'])
