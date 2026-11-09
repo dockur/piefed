@@ -1422,11 +1422,11 @@ def unsubscribe_everyone_then_delete_task(community_id):
         session = get_task_session()
         try:
             with patch_db_session(session):
-                community = session.query(Community).get(community_id)
+                community = db.session.query(Community).get(community_id)
                 if not community.is_local():
-                    members = session.query(CommunityMember).filter_by(community_id=community_id).all()
+                    members = db.session.query(CommunityMember).filter_by(community_id=community_id).all()
                     for member in members:
-                        user = session.query(User).get(member.user_id)
+                        user = db.session.query(User).get(member.user_id)
                         unsubscribe_from_community(community, user)
                     sleep(5)
                 else:
@@ -1434,9 +1434,10 @@ def unsubscribe_everyone_then_delete_task(community_id):
                     ...
 
                 community.delete_dependencies()
-                session.delete(community)  # todo: when a remote community is deleted it will be able to be re-created by using the 'Add remote' function. Not ideal. Consider soft-delete.
-                session.commit()
+                db.session.delete(community)  # todo: when a remote community is deleted it will be able to be re-created by using the 'Add remote' function. Not ideal. Consider soft-delete.
+                db.session.commit()
         except Exception:
+            db.session.rollback()
             session.rollback()
             raise
         finally:
