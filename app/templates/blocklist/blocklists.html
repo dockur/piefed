@@ -44,36 +44,62 @@
 {%- endmacro %}
 
 {% block app_content %}
-<h1>{{ _('Blocklists') }}</h1>
-<p>{{ _('A blocklist is a list of accounts maintained by someone. Subscribe to a blocklist to block everyone on it, including people added to it later.') }}</p>
-{% if current_user.is_authenticated %}
-    <div class="mb-3">
-        <a class="btn btn-primary" href="{{ url_for('blocklist.blocklist_new') }}">{{ _('New blocklist') }}</a>
-        <a class="btn btn-outline-secondary" href="{{ url_for('blocklist.blocklist_add_remote') }}">{{ _('Find a remote blocklist') }}</a>
-    </div>
+<div class="row">
+    <main class="col-12 col-lg-8 position-relative main_pane">
+        <nav class="mb-2"  id="breadcrumb_nav" title="{{ _('Navigation') }}">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Blocklists') }}</li>
+          </ol>
+        </nav>
 
-    <h2>{{ _('My blocklists') }}</h2>
-    {% if my_blocklists %}
-        {{ blocklist_table(my_blocklists) }}
-    {% else %}
-        <p>{{ _('You have not made any blocklists.') }}</p>
-    {% endif %}
+        <div class="row">
+            <div class="col">
+                <h1>{{ _('Blocklists') }}</h1>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group">
+                    <a class="btn btn-primary" href="{{ url_for('blocklist.blocklist_new') }}">{{ _('New blocklist') }}</a>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('blocklist.blocklist_add_remote') }}">{{ _('Find a remote blocklist') }}</a>
+                </div>
+            </div>
+        </div>
 
-    <h2>{{ _('Subscribed') }}</h2>
-    {% if subscribed_blocklists %}
-        {{ blocklist_table(subscribed_blocklists) }}
-    {% else %}
-        <p>{{ _('You are not subscribed to any blocklists.') }}</p>
-    {% endif %}
-{% endif %}
+        <p>{{ _('A blocklist is a list of accounts maintained by someone. Subscribe to a blocklist to block everyone on it, including people added to it later.') }}</p>
+        {% if current_user.is_authenticated %}
+            <div class="mb-3">
 
-<h2>{{ _('All known blocklists') }}</h2>
-<form method="get" class="mb-2">
-    <input type="search" name="search" value="{{ search }}" class="form-control d-inline-block w-auto" placeholder="{{ _('Search') }}">
-</form>
-{% if other_blocklists %}
-    {{ blocklist_table(other_blocklists) }}
-{% else %}
-    <p>{{ _('No blocklists found.') }}</p>
-{% endif %}
+            </div>
+
+            <h2>{{ _('My blocklists') }}</h2>
+            {% if my_blocklists %}
+                {{ blocklist_table(my_blocklists) }}
+            {% else %}
+                <p>{{ _('You have not made any blocklists.') }}</p>
+            {% endif %}
+
+            <h2>{{ _('Subscribed') }}</h2>
+            {% if subscribed_blocklists %}
+                {{ blocklist_table(subscribed_blocklists) }}
+            {% else %}
+                <p>{{ _('You are not subscribed to any blocklists.') }}</p>
+            {% endif %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col">
+                <h2>{{ _('All known blocklists') }}</h2>
+            </div>
+            <div class="col-auto">
+                <form method="get" class="mb-2">
+                    <input type="search" name="search" value="{{ search }}" class="form-control d-inline-block w-auto" placeholder="{{ _('Search') }}">
+                </form>
+            </div>
+        </div>
+        {% if other_blocklists %}
+            {{ blocklist_table(other_blocklists) }}
+        {% else %}
+            <p>{{ _('No blocklists found.') }}</p>
+        {% endif %}
+    </main>
 {% endblock %}

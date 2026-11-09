@@ -62,7 +62,7 @@
                             </form>
                             <p class="mt-2"><small>{{ _('Subscribing will block everyone on this list, including people added to it later.') }}</small></p>
                         {% endif %}
-                        <a class="btn btn-outline-secondary mt-2" href="{{ url_for('blocklist.blocklist_copy', blocklist_id=blocklist.id) }}">{{ _('Copy') }}</a>
+                        <a class="btn btn-outline-secondary" href="{{ url_for('blocklist.blocklist_copy', blocklist_id=blocklist.id) }}">{{ _('Copy') }}</a>
                     {% endif %}
                 </div>
             </div>

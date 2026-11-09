@@ -13,7 +13,7 @@ from app.constants import SUBSCRIPTION_OWNER, SUBSCRIPTION_MEMBER, SUBSCRIPTION_
 from app.models import User, Blocklist, BlocklistItem, BlocklistMember, BlocklistJoinRequest
 from app.shared.blocklist import join_blocklist, leave_blocklist, make_blocklist, edit_blocklist, delete_blocklist
 from app.utils import show_ban_message, render_template, login_required, validation_required, approval_required, \
-    blocklist_membership
+    blocklist_membership, referrer
 
 
 def _flash_unresolved(unresolved):
@@ -67,6 +67,8 @@ def blocklists():
 
 # @bp.route('/b/<actor>', methods=['GET']) - defined in activitypub/routes.py, which calls this function for browser requests
 def show_blocklist(blocklist: Blocklist):
+    if current_user.is_anonymous:
+        return redirect(url_for('auth.login', next='/blocklists'))
     page = request.args.get('page', 1, type=int)
     blocked_accounts = User.query.join(BlocklistItem, BlocklistItem.user_id == User.id).\
         filter(BlocklistItem.blocklist_id == blocklist.id).order_by(User.user_name).\
@@ -87,6 +89,8 @@ def show_blocklist(blocklist: Blocklist):
 
 @bp.route('/blocklist/new', methods=['GET', 'POST'])
 @login_required
+@validation_required
+@approval_required
 def blocklist_new():
     if current_user.banned:
         return show_ban_message()
@@ -103,6 +107,8 @@ def blocklist_new():
 
 @bp.route('/blocklist/<int:blocklist_id>/copy', methods=['GET', 'POST'])
 @login_required
+@validation_required
+@approval_required
 def blocklist_copy(blocklist_id: int):
     if current_user.banned:
         return show_ban_message()
@@ -161,6 +167,8 @@ def blocklist_delete(blocklist_id: int):
 
 @bp.route('/blocklist/add_remote', methods=['GET', 'POST'])
 @login_required
+@validation_required
+@approval_required
 def blocklist_add_remote():
     if current_user.banned:
         return show_ban_message()
