@@ -390,7 +390,7 @@ def flairs_from_string(flairs: str, community_id: int) -> List[Tag]:
 
 
 @celery.task
-def delete_community_task(community_id):
+def delete_community_task(community_id, user_id):
     with current_app.app_context():
         session = get_task_session()
         try:
@@ -401,8 +401,9 @@ def delete_community_task(community_id):
                     # todo: federate deletion out to all instances. At end of federation process, delete_dependencies() and delete community
 
                 # record for modlog
-                reason = f"Community {community.name} deleted by {current_user.user_name}"
-                add_to_modlog('delete_community', actor=current_user, reason=reason, community=community)
+                user = session.query(User).get(user_id)
+                reason = f"Community {community.name} deleted by {user.user_name}"
+                add_to_modlog('delete_community', actor=user, reason=reason, community=community)
 
                 # actually delete the community
                 community.delete_dependencies()

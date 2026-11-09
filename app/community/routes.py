@@ -1450,9 +1450,9 @@ def community_delete(community_id: int):
         form = DeleteCommunityForm()
         if form.validate_on_submit():
             if current_app.debug:
-                delete_community_task(community_id)
+                delete_community_task(community_id, current_user.id)
             else:
-                delete_community_task.delay(community_id)
+                delete_community_task.delay(community_id, current_user.id)
 
             flash(_('Community deleted'))
             return redirect('/communities')
