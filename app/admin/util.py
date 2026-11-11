@@ -419,3 +419,18 @@ def process_topic_communities(topic_data, topic_id):
             raise
         finally:
             session.close()
+
+
+def get_mass_ban_ids(to_ban):
+    if not to_ban:
+        return ''
+    to_ban = to_ban.strip()
+
+    results = []
+    results.append(to_ban.split('\n'))
+    results.append(to_ban.split(','))
+    results.append(to_ban.split(' '))
+
+    results = [[item.strip() for item in lst if item and item.strip()] for lst in results]  # remove empty elements from all lists
+
+    return max(results, key=len)    # return longest list

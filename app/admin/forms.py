@@ -417,3 +417,12 @@ class EmojiFilterForm(FlaskForm):
 class TopicImportForm(FlaskForm):
     import_file = FileField(_l('Json file that was exported from another instance'), validators=[DataRequired()])
     import_submit = SubmitField(_l('Import'))
+
+
+class MassBanForm(FlaskForm):
+    users_to_ban = TextAreaField(_l('Users'), validators=[DataRequired()],
+                                 render_kw={'placeholder': _l('Actor IDs, one per line or separated by a comma or space.'),
+                                            'rows': 10})
+    reason = StringField(_l('Reason'))
+    purge = BooleanField(_l('Delete all content by these accounts'))
+    submit = SubmitField(_l('Mass ban'))

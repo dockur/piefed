@@ -12,8 +12,19 @@
 <br>
 <div class="row">
     <div class="col">
-        <h1>{{ _('Users') }}</h1>
-        <a class="btn btn-primary" href="{{ url_for('admin.admin_users_add') }}" style="float: right;">{{ _('Add local user') }}</a>
+
+        <div class="row">
+            <div class="col">
+                <h1>{{ _('Users') }}</h1>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group">
+                    <a class="btn btn-primary" href="{{ url_for('admin.admin_users_add') }}" style="float: right;">{{ _('Add local user') }}</a>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('admin.admin_users_mass_ban') }}" style="float: right;">{{ _('Mass ban') }}</a>
+                </div>
+            </div>
+        </div>
+
         <form id="searchUsers" method="get">
             <div>
                 <input type="search" name="search" placeholder="{{ _('Search') }}" value="{{ search }}">

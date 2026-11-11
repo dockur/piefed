@@ -1,0 +1,25 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_field, render_form %}
+{% set active_child = 'admin_users' %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col col-login mx-auto">
+        <h1>{{ _('Mass ban') }}</h1>
+        <form method="post" enctype="multipart/form-data" id="add_local_user_form">
+            {{ render_form(form) }}
+        </form>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        {% include 'admin/_nav.html' %}
+    </div>
+</div>
+<hr />
+{% endblock %}

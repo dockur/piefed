@@ -1,6 +1,7 @@
 import datetime
 import os
 import re
+from types import SimpleNamespace
 from datetime import timedelta
 from time import sleep
 from io import BytesIO
@@ -22,22 +23,22 @@ from wtforms import Label
 from app import db, celery, cache
 from app.activitypub.routes import process_inbox_request, process_delete_request, replay_inbox_request
 from app.activitypub.signature import post_request, default_context, RsaKeys
-from app.activitypub.util import extract_domain_and_actor
+from app.activitypub.util import extract_domain_and_actor, find_actor_or_create
 from app.admin.constants import ReportTypes
 from app.admin.forms import FederationForm, SiteMiscForm, SiteProfileForm, EditCommunityForm, EditUserForm, \
     EditTopicForm, SendNewsletterForm, AddUserForm, PreLoadCommunitiesForm, ImportExportBannedListsForm, \
     EditInstanceForm, RemoteInstanceScanForm, MoveCommunityForm, EditBlockedImageForm, AddBlockedImageForm, \
     CmsPageForm, CreateOfflineInstanceForm, InstanceChooserForm, CloseInstanceForm, EmojiForm, TopicImportForm, \
-    EmojiFilterForm, ContactInstanceForm
+    EmojiFilterForm, ContactInstanceForm, MassBanForm
 from flask_wtf import FlaskForm
 from app.admin.util import unsubscribe_from_everything_then_delete, unsubscribe_from_community, send_newsletter, \
     topics_for_form, move_community_images_to_here, switch_to_unsilenced, switch_to_silenced, serialize_topic_tree, \
-    create_topic_and_children
+    create_topic_and_children, get_mass_ban_ids
 from app.auth.util import send_email_verification, random_token
 from app.chat.util import send_message
 from app.community.util import save_icon_file, save_banner_file, search_for_community, is_bad_name
 from app.community.routes import do_subscribe
-from app.constants import REPORT_STATE_NEW, REPORT_STATE_ESCALATED, POST_STATUS_REVIEWING, ROLE_ADMIN
+from app.constants import REPORT_STATE_NEW, REPORT_STATE_ESCALATED, POST_STATUS_REVIEWING, ROLE_ADMIN, SRC_WEB
 from app.email import send_registration_approved_email
 from app.models import AllowedInstances, BannedInstances, ActivityPubLog, CronJobLog, utcnow, Site, Community, \
     CommunityMember, \
@@ -45,6 +46,7 @@ from app.models import AllowedInstances, BannedInstances, ActivityPubLog, CronJo
     Tag, DefederationSubscription, BlockedImage, CmsPage, Notification, Emoji, user_file, InstanceRole, Conversation
 from app.shared.tasks import task_selector
 from app.shared.upload import process_file_delete
+from app.shared.user import ban_user
 from app.translation import LibreTranslateAPI
 from app.utils import render_template, permission_required, set_setting, get_setting, gibberish, markdown_to_html, \
     moderating_communities, joined_communities, finalize_user_setup, theme_list, blocked_phrases, blocked_referrers, \
@@ -2811,3 +2813,33 @@ def admin_no_link_diversity():
     return render_template('admin/no_link_diversity.html',
                            rows=rows,
                            roles_with=roles_with('administer all communities'))
+
+
+@bp.route('/users/mass_ban', methods=['GET', 'POST'])
+@permission_required('administer all users')
+@login_required
+def admin_users_mass_ban():
+    form = MassBanForm()
+    if form.validate_on_submit():
+        count = 0
+        if ap_ids_to_ban := get_mass_ban_ids(form.users_to_ban.data):
+            for ap_id in ap_ids_to_ban:
+                user_to_ban = find_actor_or_create(ap_id, create_if_not_found=False)
+                if user_to_ban is None:
+                    continue
+                # construct form object that ban_user expects
+                ban_form = SimpleNamespace(
+                    person_id=user_to_ban.id,
+                    purge=SimpleNamespace(data=form.purge.data),
+                    ip_address=SimpleNamespace(data=False),
+                    reason=SimpleNamespace(data=form.reason.data),
+                    flush=SimpleNamespace(data=False),
+                )
+                ban_user(ban_form, SRC_WEB, None)
+                count += 1
+
+        flash(_('Banned %(count)d users.', count=count))
+
+    return render_template('admin/users_mass_ban.html',
+                           form=form,
+                           roles_with=roles_with('administer all users'))
