@@ -580,6 +580,12 @@ And if you want to add your score to the database to help your fellow Bookworms 
         target_html = '<p>note<sup class="footnote-ref" id="fnref-1-fn-test"><a href="#fn-1-fn-test">1</a></sup></p>\n<pre><code>code\n</code></pre>\n<div class="footnotes">\n<hr/>\n<ol>\n<li id="fn-1-fn-test">\n<p>more</p>\n<p><code>footnote</code>\xa0<a class="footnoteBackLink" href="#fnref-1-fn-test">↩</a></p>\n</li>\n</ol>\n</div>\n'
         self.assertEqual(target_html, result)
 
+        # Nested list should not be converted to code block
+        markdown = "1. First level\n    2. Second level"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        target_html = "<ol>\n<li>First level\n<ol>\n<li>Second level</li>\n</ol></li>\n</ol>\n"
+        self.assertEqual(target_html, result)
+
 
 if __name__ == '__main__':
     unittest.main()
