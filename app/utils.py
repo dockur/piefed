@@ -942,6 +942,10 @@ def handle_indented_codeblocks(text: str) -> str:
     code_placeholder = gibberish(10)
     code_snippets, text = stash_code_md(text, code_placeholder, ignore_indented=True)
 
+    # Stash lists since nested lists can interfere with indented code blocks
+    list_placeholder = gibberish(10)
+    list_snippets, text = stash_lists(text, list_placeholder)
+
     # Regex to capture groups of lines starting with at least four spaces or a tab (ignoring lines with only a \n)
     block_regex = re.compile(r'(^(?: {4,}|\t)[^\r\n]*(?:\r?\n|$))+', re.M)
 
@@ -988,6 +992,9 @@ def handle_indented_codeblocks(text: str) -> str:
 
     # Do the regex work
     text = re.sub(block_regex, wrap_indented_block, text)
+
+    # Return the lists
+    text = pop_lists(list_snippets, text, list_placeholder)
 
     # Return the footnotes
     text = pop_footnotes(footnote_snippets, text, placeholder)
@@ -1454,6 +1461,59 @@ def stash_footnotes(text: str, placeholder: str) -> tuple[list, str]:
 def pop_footnotes(footnote_snippets: list, text:str, placeholder: str) -> str:
     for i, footnote in enumerate(footnote_snippets):
         text = text.replace(f"{placeholder}{i}$", footnote)
+
+    return text
+
+
+def stash_lists(text: str, placeholder: str) -> tuple[list, str]:
+    """
+    Stash numbered or bulleted lists so they don't interfere with indented code blocks.
+    """
+
+    lines = text.splitlines(keepends=True)
+
+    # Regex to catch the beginning of a list
+    any_level_list = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
+    first_level_list = re.compile(r"^(?:[-*+]|\d+[.)])\s+")
+
+    # Initialize some stuff
+    list_snippets = []
+    output_lines = []
+    line_index = 0
+
+    # Loop through lines
+    while line_index < len(lines):
+        if not first_level_list.match(lines[line_index]):
+            # This is a line that does not match the beginning of a list, don't need a placeholder for it
+            output_lines.append(lines[line_index])
+
+            # Iterate the counter and proceed to the next loop
+            line_index += 1
+            continue
+
+        # Getting here means that this line is the start of a new list
+        list_start = line_index
+
+        # Start looking at the following lines to see if they continue the list or not
+        line_index += 1
+        while line_index < len(lines) and any_level_list.match(lines[line_index]):
+            # This line is continuing the list...keep iterating
+            line_index += 1
+
+        # Getting here means that the list has ended, stash it
+        list_snippets.append("".join(lines[list_start:line_index]))
+
+        # Insert the placeholder text to the output text
+        output_lines.append(f"{placeholder}{len(list_snippets) - 1}$\n")
+
+    text = "".join(output_lines)
+
+    return (list_snippets, text)
+
+
+def pop_lists(list_snippets: list, text: str, placeholder: str) -> str:
+    for i, list_snippet in enumerate(list_snippets):
+        text = text.replace(f"{placeholder}{i}$", list_snippet)
 
     return text
 
