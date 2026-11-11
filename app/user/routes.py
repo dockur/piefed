@@ -172,12 +172,13 @@ def show_profile(user):
                     count(v.id) as vote_count
                 from generate_series(0, 23) as h(hour_of_day)
                 left join (
-                    select id, user_id, created_at from post_vote
+                    select id, user_id, author_id, created_at from post_vote
                     union all
-                    select id, user_id, created_at from post_reply_vote
+                    select id, user_id, author_id, created_at from post_reply_vote
                 ) v
                     on extract(hour from v.created_at) = h.hour_of_day
                     and v.created_at >= now() - interval '30 days'
+                    and v.author_id != v.user_id
                     and v.user_id in (
                         select id
                         from "user"
