@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block end_scripts -%}
-    {% if current_user.is_authenticated and current_user.is_admin() and user.post_count and posting_pattern_labels %}
+    {% if current_user.is_authenticated and current_user.is_admin() %}
         <script src="{{ url_for('static', filename='js/chart.js', changed=getmtime('js/chart.js')) }}" nonce={{ nonce }}></script>
     {% endif %}
     <script src="{{ url_for('static', filename='js/media_library.js', changed=getmtime('js/media_library.js')) }}" nonce={{ nonce }}></script>
