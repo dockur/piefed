@@ -124,6 +124,8 @@ def show_profile(user):
     posting_pattern_values = []
     comment_pattern_labels = []
     comment_pattern_values = []
+    voting_pattern_labels = []
+    voting_pattern_values = []
     if current_user.is_authenticated:
         vote_quota_used = votes_cast_today(user.id) / current_app.config['VOTE_QUOTA']
 
@@ -163,6 +165,29 @@ def show_profile(user):
         comment_pattern = db.session.execute(text(sql), {'user_name': user.user_name}).all()
         comment_pattern_labels = [x for x, y in comment_pattern]
         comment_pattern_values = [y for x, y in comment_pattern]
+
+        # Generate graph of which hours of the day the user votes at. Bots tend to have a distinctive look.
+        sql = """select
+                    h.hour_of_day,
+                    count(v.id) as vote_count
+                from generate_series(0, 23) as h(hour_of_day)
+                left join (
+                    select id, user_id, created_at from post_vote
+                    union all
+                    select id, user_id, created_at from post_reply_vote
+                ) v
+                    on extract(hour from v.created_at) = h.hour_of_day
+                    and v.created_at >= now() - interval '30 days'
+                    and v.user_id in (
+                        select id
+                        from "user"
+                        where user_name = :user_name
+                    )
+                group by h.hour_of_day
+                order by h.hour_of_day;"""
+        voting_pattern = db.session.execute(text(sql), {'user_name': user.user_name}).all()
+        voting_pattern_labels = [x for x, y in voting_pattern]
+        voting_pattern_values = [y for x, y in voting_pattern]
     else:
         vote_quota_used = 0
 
@@ -172,7 +197,8 @@ def show_profile(user):
                            description=description, subscribed=subscribed, disable_voting=True,
                            user_notes=user_notes(current_user.get_id()), posting_pattern_labels=posting_pattern_labels,
                            posting_pattern_values=posting_pattern_values, comment_pattern_labels=comment_pattern_labels,
-                           comment_pattern_values=comment_pattern_values, show_posts_tab=request.args.get('show_posts_tab'),
+                           comment_pattern_values=comment_pattern_values, voting_pattern_labels=voting_pattern_labels,
+                           voting_pattern_values=voting_pattern_values, show_posts_tab=request.args.get('show_posts_tab'),
                            post_next_url=post_next_url, post_prev_url=post_prev_url,
                            replies_next_url=replies_next_url, replies_prev_url=replies_prev_url,
                            noindex=not user.indexable, show_post_community=True, hide_vote_buttons=True,
