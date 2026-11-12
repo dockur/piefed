@@ -235,6 +235,12 @@ class TestAllowlistHtml(unittest.TestCase):
         self.assertIn('loading="lazy"', result)
         self.assertIn('width="200px"', result)
 
+    def test_ordered_list_start_attribute(self):
+        """Test that the start attribute is preserved in ordered lists if present."""
+        html = '<ol start="2"><li>first item</li><li>second item</li></ol>'
+        result = allowlist_html(html, test_env={"fn_string": "fn-test"})
+        self.assertIn('start="2"', result)
+
 
 if __name__ == '__main__':
     unittest.main()

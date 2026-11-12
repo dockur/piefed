@@ -472,6 +472,9 @@ def allowlist_html(html: str, a_target='_blank', test_env=False) -> str:
             if tag.name == 'source':
                 allowed_attrs.extend(['type'])
 
+            if tag.name == 'ol':
+                allowed_attrs.extend(['start'])
+
             for attr in list(tag.attrs):
                 if attr not in allowed_attrs:
                     del tag[attr]
@@ -1077,6 +1080,8 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
         raw_html = make_quotes_straight(raw_html)
         raw_html = links_with_parens(raw_html)
         raw_html = fix_www_links(raw_html)
+
+        print(raw_html)
 
         return allowlist_html(raw_html, a_target=a_target if anchors_new_tab else '', test_env=test_env)
     else:

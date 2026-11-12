@@ -581,7 +581,7 @@ And if you want to add your score to the database to help your fellow Bookworms 
         self.assertEqual(target_html, result)
 
         # Nested list should not be converted to code block
-        markdown = "1. First level\n    2. Second level"
+        markdown = "1. First level\n    1. Second level"
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
         target_html = "<ol>\n<li>First level\n<ol>\n<li>Second level</li>\n</ol></li>\n</ol>\n"
         self.assertEqual(target_html, result)
