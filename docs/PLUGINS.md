@@ -22,6 +22,8 @@ Plugins can have their code executed by adding a @hook decorator to a function. 
 
   - `cron_daily` - is run once a day in the daily_maintenance_task.
 
+  - `new_modlog_item` - is run whenever an item is added to the modlog (even if the modlog is not public). The newly created `Modlog` object is passed as an argument. Note that this is fired *after* the mod action has occurred.
+
   - `new_user` - is run when a new user is verified; meaning that they have completed any required email verification and their application has been accepted (if applicable). The newly created `User` object is passed to this hook as an argument.
 
   - `new_registration_for_approval` - is run when a user has submitted an application and (if applicable) verified their email, but the application is awaiting admin approval. The `UserRegistration` object is passed to this plugin as an argument.
