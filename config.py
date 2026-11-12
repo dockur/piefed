@@ -117,6 +117,9 @@ class Config(object):
     SERVE_API_DOCS = os.environ.get('SERVE_API_DOCS') or False
     RATELIMIT_ENABLED = os.environ.get('RATELIMIT_ENABLED', 'True') in ('True', 'true', '1')
 
+    # Plugins
+    ENABLE_WEBHOOK_ROUTE = os.environ.get('ENABLE_WEBHOOK_ROUTE', False) in ("True", "true", "1")
+
     IMAGE_HASHING_ENDPOINT = os.environ.get('IMAGE_HASHING_ENDPOINT') or ''
 
     FLAG_THROWAWAY_EMAILS = os.environ.get('FLAG_THROWAWAY_EMAILS') or False

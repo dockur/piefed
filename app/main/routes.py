@@ -1467,6 +1467,9 @@ def my_year_in_review(year):
 @bp.route('/webhook', methods=['POST'])
 @limiter.limit("60 per 1 minutes", methods=['POST'])
 def receive_webhook():
+    if not current_app.config["ENABLE_WEBHOOK_ROUTE"]:
+        abort(404)
+
     payload = request.get_json()
 
     if not payload:

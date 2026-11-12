@@ -30,6 +30,6 @@ Plugins can have their code executed by adding a @hook decorator to a function. 
 
   - `new_remote_community` - is run whenever a new remote community is federated to the instance and the `Community` object is passed as a parameter
 
-  - `webhook` - is run whenever a `POST` is received at the `/webhook` route. The payload from the webhook is passed to the plugin. Validation and authentication of the payload needs to be done by the plugin as flask just passes along the payload directly. Plugins making use of this hook should return the payload unchanged so as not to interfere with other plugins that might make use of this hook.
+  - `webhook` - is run whenever a `POST` is received at the `/webhook` route. This route is disabled by default. However, by setting the environment variable `ENABLE_WEBHOOK_ROUTE="True"`, you can enable the route for plugins to use. The payload from the webhook is passed to the plugin. Validation and authentication of the payload needs to be done by the plugin as flask just passes along the payload directly. Plugins making use of this hook should return the payload unchanged so as not to interfere with other plugins that might make use of this hook.
 
 More hooks will be added over time, presently the plugin engine is still experimental and undergoing heavy development.
