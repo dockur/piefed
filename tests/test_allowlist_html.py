@@ -241,6 +241,12 @@ class TestAllowlistHtml(unittest.TestCase):
         result = allowlist_html(html, test_env={"fn_string": "fn-test"})
         self.assertIn('start="2"', result)
 
+    def test_table_align_attributes(self):
+        """Test that style attributes are preserved in tables to allow for alignment."""
+        html = '<table><thead><tr><th style="text-align:center;">Heading</th><th style="text-align:center;">Heading</th></tr></thead><tbody><tr><td style="text-align:center;">1</td><td style="text-align:center;">2</td></tr></tbody></table>'
+        result = allowlist_html(html, test_env={"fn_string": "fn-test"})
+        self.assertIn('style="text-align:center;"', result)
+
 
 if __name__ == '__main__':
     unittest.main()
