@@ -248,6 +248,9 @@
                                     <li>
                                         <a class="dropdown-item{% if active_child == 'hidden_posts' %} active{% endif %}" href="/hidden_posts">{{ _('Hidden posts') }}</a>
                                     </li>
+                                    <li>
+                                        <a class="dropdown-item{% if active_child == 'blocklists' %} active{% endif %}" href="/blocklists">{{ _('Blocklists') }}</a>
+                                    </li>
                                     {% if current_user.is_authenticated -%}
                                         {% if current_user.stripe_subscription_id -%}
                                             <li>

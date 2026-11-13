@@ -254,6 +254,9 @@ def create_app(config_class=Config):
     from app.feed import bp as feed_bp
     app.register_blueprint(feed_bp)
 
+    from app.blocklist import bp as blocklist_bp
+    app.register_blueprint(blocklist_bp)
+
     from app.instance import bp as instance_bp
     app.register_blueprint(instance_bp)
 
@@ -277,11 +280,12 @@ def create_app(config_class=Config):
 
     # API Namespaces
     from app.api.alpha import site_bp, misc_bp, comm_bp, feed_bp, topic_bp, user_bp, \
-                              reply_bp, post_bp, upload_bp, private_message_bp, admin_bp
+                              reply_bp, post_bp, upload_bp, private_message_bp, admin_bp, blocklist_bp
     rest_api.register_blueprint(site_bp)
     rest_api.register_blueprint(misc_bp)
     rest_api.register_blueprint(comm_bp)
     rest_api.register_blueprint(feed_bp)
+    rest_api.register_blueprint(blocklist_bp)
     rest_api.register_blueprint(topic_bp)
     rest_api.register_blueprint(user_bp)
     rest_api.register_blueprint(reply_bp)

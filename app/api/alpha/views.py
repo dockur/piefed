@@ -13,7 +13,7 @@ from app.activitypub.util import active_month
 from app.constants import *
 from app.models import ChatMessage, Community, Language, Instance, Post, PostReply, User, \
     AllowedInstances, BannedInstances, utcnow, Site, Feed, FeedItem, Topic, CommunityFlair, \
-    UserNote, Poll, Event, PollChoice, Conversation, Report, NotificationSubscription
+    UserNote, Poll, Event, PollChoice, Conversation, Report, NotificationSubscription, Blocklist, BlocklistItem
 from app.post.util import tags_to_string, flair_to_string
 from app.utils import blocked_communities, blocked_or_banned_instances, blocked_users, communities_banned_from, \
     get_setting, \
@@ -1132,6 +1132,37 @@ def feed_view(feed: Feed | int, variant: int, user_id, subscribed, include_commu
         
         v2["feed"]["children"] = []
         return v2
+
+
+def blocklist_view(blocklist: Blocklist | int, user_id, subscribed: list, include_blocked: bool) -> dict:
+    if isinstance(blocklist, int):
+        blocklist = Blocklist.query.get(blocklist)
+        if blocklist is None:
+            raise Exception('blocklist_not_found')
+
+    v1 = {
+        'id': blocklist.id,
+        'actor_id': blocklist.public_url(),
+        'ap_domain': blocklist.ap_domain,
+        'name': blocklist.machine_name,
+        'title': blocklist.title,
+        'description': blocklist.description,
+        'description_html': blocklist.description_html,
+        'user_id': blocklist.user_id,
+        'owner': user_id is not None and user_id == blocklist.user_id,
+        'subscribed': blocklist.id in subscribed,
+        'local': blocklist.is_local(),
+        'subscriptions_count': blocklist.subscriptions_count or 0,
+        'blocked_count': blocklist.num_blocked or 0,
+        'published': blocklist.created_at.isoformat(timespec="microseconds") + 'Z',
+        'updated': blocklist.last_edit.isoformat(timespec="microseconds") + 'Z',
+        'blocked': []
+    }
+    if include_blocked:
+        for user in User.query.join(BlocklistItem, BlocklistItem.user_id == User.id).\
+                filter(BlocklistItem.blocklist_id == blocklist.id).order_by(User.user_name):
+            v1['blocked'].append(user_view(user, variant=1, stub=True))
+    return v1
 
 
 def private_message_view(cm: ChatMessage, variant, report=None) -> dict:

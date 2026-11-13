@@ -2231,6 +2231,70 @@ class FeedSubscribeRequest(DefaultSchema):
     subscribe = fields.Boolean(required=True)
 
 
+class BlocklistView(DefaultSchema):
+    id = fields.Integer(required=True)
+    actor_id = fields.Url(required=True)
+    ap_domain = fields.String(required=True)
+    name = fields.String(required=True, metadata={"description": "URL-safe name of the blocklist, as in /b/name"})
+    title = fields.String(required=True)
+    description = fields.String(allow_none=True, metadata={"format": "markdown"})
+    description_html = fields.String(allow_none=True, metadata={"format": "html"})
+    user_id = fields.Integer(required=True, metadata={"description": "user_id of the blocklist creator/owner"})
+    owner = fields.Boolean(required=True, metadata={"description": "Is the authorized user the creator of the blocklist?"})
+    subscribed = fields.Boolean(required=True, metadata={"description": "Is the authorized user subscribed to the blocklist? Always true for the owner."})
+    local = fields.Boolean(required=True)
+    subscriptions_count = fields.Integer(required=True)
+    blocked_count = fields.Integer(required=True)
+    published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    updated = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
+    blocked = fields.List(fields.Nested(Person), required=True,
+                          metadata={"description": "Accounts on the blocklist. Empty list when include_blocked is false."})
+    unresolved_members = fields.List(fields.String(),
+                                     metadata={"description": "Only after create/edit: lines of 'members' that could not be found and were not added"})
+
+
+class GetBlocklistRequest(DefaultSchema):
+    id = fields.Integer()
+    name = fields.String(metadata={"description": "name@instance.tld, e.g. spammers@piefed.social"})
+
+
+class BlocklistListRequest(DefaultSchema):
+    mine_only = fields.Boolean(metadata={"description": "only return blocklists created by the authorized user", "default": False})
+    subscribed_only = fields.Boolean(metadata={"description": "only return blocklists the authorized user is subscribed to (including their own)", "default": False})
+    include_blocked = fields.Boolean(metadata={"description": "include the accounts on each blocklist. Can be large.", "default": False})
+    page = fields.Integer(metadata={"default": 1})
+    limit = fields.Integer(metadata={"default": 50})
+
+
+class BlocklistListResponse(DefaultSchema):
+    blocklists = fields.List(fields.Nested(BlocklistView), required=True)
+    next_page = fields.String(allow_none=True)
+
+
+class FollowBlocklistRequest(DefaultSchema):
+    blocklist_id = fields.Integer(required=True)
+    follow = fields.Boolean(required=True)
+
+
+class CreateBlocklistRequest(DefaultSchema):
+    name = fields.String(required=True, metadata={"description": "URL-safe name/slug for the blocklist. Cannot be changed later."})
+    title = fields.String(required=True)
+    description = fields.String(metadata={"format": "markdown"})
+    members = fields.String(metadata={"description": "Newline-separated list of accounts to block, e.g. someone@lemmy.world"})
+
+
+class EditBlocklistRequest(DefaultSchema):
+    blocklist_id = fields.Integer(required=True)
+    title = fields.String()
+    description = fields.String(metadata={"format": "markdown"})
+    members = fields.String(metadata={"description": "Newline-separated list of accounts to block; omit to keep the existing list"})
+
+
+class DeleteBlocklistRequest(DefaultSchema):
+    blocklist_id = fields.Integer(required=True)
+    deleted = fields.Boolean(required=True)
+
+
 class TopicSubscribeRequest(DefaultSchema):
     topic_id = fields.Integer(required=True)
     subscribe = fields.Boolean(required=True)

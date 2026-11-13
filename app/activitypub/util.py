@@ -15,7 +15,7 @@ import boto3
 import httpx
 import pillow_jxl
 from PIL import Image, ImageOps
-from flask import current_app, request, g, url_for, json
+from flask import current_app, request, g, url_for, json, abort, jsonify
 from flask_babel import _, force_locale, gettext
 from furl import furl
 from redis.exceptions import LockNotOwnedError
@@ -28,7 +28,8 @@ from app.constants import *
 from app.models import User, Post, Community, File, PostReply, Instance, utcnow, \
     PostVote, PostReplyVote, ActivityPubLog, Notification, Site, CommunityMember, InstanceRole, Report, Conversation, \
     Language, Tag, Poll, PollChoice, CommunityBan, CommunityJoinRequest, NotificationSubscription, \
-    Licence, UserExtraField, Feed, FeedMember, FeedItem, CommunityFlair, UserFlair, Topic, Event, InstanceBan, Emoji
+    Licence, UserExtraField, Feed, FeedMember, FeedItem, CommunityFlair, UserFlair, Topic, Event, InstanceBan, Emoji, \
+    Blocklist
 from app.utils import get_request, allowlist_html, get_setting, ap_datetime, markdown_to_html, \
     is_image_url, domain_from_url, gibberish, ensure_directory_exists, shorten_string, fixup_url, \
     microblog_content_to_title, is_video_url, \
@@ -365,6 +366,8 @@ def find_actor_or_create_cached(actor: str, create_if_not_found=True, community_
             actor_obj = db.session.get(Community, actor_id)
         elif actor_type == 'Feed':
             actor_obj = db.session.get(Feed, actor_id)
+        elif actor_type == 'Blocklist':
+            actor_obj = db.session.get(Blocklist, actor_id)
 
         if actor_obj:
             # Schedule a refresh if needed
@@ -1463,6 +1466,72 @@ def actor_json_to_model(activity_json, address, server):
             for child_feed in activity_json['childFeeds']:
                 populate_child_feed(feed.id, child_feed)
         return feed
+    elif activity_json['type'] == 'Blocklist':
+        blocklist = db.session.query(Blocklist).filter(Blocklist.ap_profile_id == activity_json['id'].lower()).first()
+        if blocklist:
+            return blocklist
+
+        # find the owner. attributedTo is the owner's actor url, 'moderators' is a collection of them.
+        owner = None
+        if isinstance(activity_json.get('attributedTo'), str):
+            owner = find_actor_or_create(activity_json['attributedTo'])
+        elif activity_json.get('moderators'):
+            try:
+                owners_data = get_request(activity_json['moderators'], headers={'Accept': 'application/activity+json'})
+                if owners_data.status_code == 200:
+                    owners_json = owners_data.json()
+                    if owners_json.get('orderedItems'):
+                        owner = find_actor_or_create(owners_json['orderedItems'][0])
+                owners_data.close()
+            except Exception:
+                owner = None
+        if owner is None or not isinstance(owner, User):
+            return None
+
+        blocklist = Blocklist(user_id=owner.id,
+                              title=activity_json.get('name', activity_json['preferredUsername']).strip(),
+                              machine_name=activity_json['preferredUsername'].strip().lower(),
+                              created_at=activity_json['published'] if 'published' in activity_json else utcnow(),
+                              last_edit=activity_json['updated'] if 'updated' in activity_json else utcnow(),
+                              num_blocked=0,
+                              subscriptions_count=0,
+                              ap_id=f"{address[1:].lower()}@{server.lower()}" if address.startswith('%') else f"{address.lower()}@{server.lower()}",
+                              ap_public_url=activity_json['id'],
+                              ap_profile_id=activity_json['id'].lower(),
+                              ap_preferred_username=activity_json['preferredUsername'],
+                              ap_followers_url=activity_json.get('followers'),
+                              ap_following_url=activity_json.get('following'),
+                              ap_inbox_url=activity_json['endpoints']['sharedInbox'] if 'endpoints' in activity_json else activity_json['inbox'],
+                              ap_outbox_url=activity_json.get('outbox'),
+                              ap_moderators_url=activity_json.get('moderators'),
+                              ap_fetched_at=utcnow(),
+                              ap_domain=server.lower(),
+                              public_key=activity_json['publicKey']['publicKeyPem'],
+                              instance_id=find_instance_id(server)
+                              )
+
+        description_html = activity_json.get('summary') or ''
+        if description_html:
+            blocklist.description_html = allowlist_html(description_html)
+            if 'source' in activity_json and activity_json['source'].get('mediaType') == 'text/markdown':
+                blocklist.description = activity_json['source']['content']
+                blocklist.description_html = markdown_to_html(blocklist.description)  # prefer Markdown if provided, overwrite version obtained from HTML
+            else:
+                blocklist.description = html_to_text(blocklist.description_html)
+
+        try:
+            db.session.add(blocklist)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return db.session.query(Blocklist).filter_by(ap_profile_id=activity_json['id'].lower()).one()
+
+        # get the accounts on the list, from the remote blocklist's /following collection. Nobody here is subscribed
+        # yet so this won't create any UserBlocks.
+        from app.shared.blocklist import sync_remote_blocklist_items
+        sync_remote_blocklist_items(blocklist)
+
+        return blocklist
 
 
 # Save two different versions of a File, after downloading it from file.source_url. Set a width parameter to None to avoid generating one of that size
@@ -4231,3 +4300,20 @@ def object_has_missing_fields(object):
     if 'type' in object and object['type'] == 'OrderedCollection':
         return False
     return not 'id' in object or not 'type' in object or not 'actor' in object or not 'object' in object
+
+
+def _local_blocklist_or_404(actor: str) -> Blocklist:
+    actor = actor.strip().lower()
+    if '@' in actor:
+        abort(400)  # don't provide activitypub info for remote blocklists
+    blocklist = db.session.query(Blocklist).filter_by(machine_name=actor, ap_id=None).first()
+    if blocklist is None:
+        abort(404)
+    return blocklist
+
+
+def _activitypub_response(data, max_age=10):
+    resp = jsonify(data)
+    resp.content_type = 'application/activity+json'
+    resp.headers.set('Cache-Control', f'public, max-age={max_age}')
+    return resp

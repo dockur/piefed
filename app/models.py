@@ -1548,6 +1548,22 @@ class User(UserMixin, db.Model):
         db.session.query(CommunityBlock).filter(CommunityBlock.user_id == self.id).delete()
         db.session.query(CommunityFlairBlock).filter(CommunityFlairBlock.user_id == self.id).delete()
         db.session.query(CommunityBan).filter(CommunityBan.user_id == self.id).delete()
+        # blocklists owned by this user - take away the blocks they gave subscribers, then delete them
+        owned_blocklists = db.session.query(Blocklist).filter(Blocklist.user_id == self.id).all()
+        if owned_blocklists:
+            from app.shared.blocklist import remove_blocklist_locally
+            for owned_blocklist in owned_blocklists:
+                remove_blocklist_locally(owned_blocklist)
+        # this user being on, or subscribed to, other people's blocklists
+        db.session.execute(text('UPDATE "blocklist" SET num_blocked = GREATEST(num_blocked - 1, 0) '
+                                'WHERE id IN (SELECT blocklist_id FROM "blocklist_item" WHERE user_id = :user_id)'),
+                           {'user_id': self.id})
+        db.session.execute(text('UPDATE "blocklist" SET subscriptions_count = GREATEST(subscriptions_count - 1, 0) '
+                                'WHERE id IN (SELECT blocklist_id FROM "blocklist_member" WHERE user_id = :user_id)'),
+                           {'user_id': self.id})
+        db.session.query(BlocklistJoinRequest).filter(BlocklistJoinRequest.user_id == self.id).delete()
+        db.session.query(BlocklistMember).filter(BlocklistMember.user_id == self.id).delete()
+        db.session.query(BlocklistItem).filter(BlocklistItem.user_id == self.id).delete()
         db.session.query(BotChallenge).filter(BotChallenge.user_id == self.id).delete()
         db.session.query(BotChallenge).filter(BotChallenge.sent_by == self.id).delete()
         db.session.query(CommunityJoinRequest).filter(CommunityJoinRequest.user_id == self.id).delete()
@@ -3540,6 +3556,7 @@ class UserBlock(db.Model):
     blocker_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     blocked_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     created_at = db.Column(db.DateTime, default=utcnow)
+    blocked_via_blocklist = db.Column(db.Boolean, default=False)
 
 
 class Settings(db.Model):
@@ -3995,8 +4012,129 @@ def load_user(id):
     return db.session.query(User).get(int(id))
 
 
-# --- Feeds Models ---
+# --- Blocklist Models ---
+class BlocklistItem(db.Model):      # people who are blocked by the blocklist
+    id = db.Column(db.Integer, primary_key=True)
+    blocklist_id = db.Column(db.Integer, db.ForeignKey('blocklist.id'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
 
+
+class BlocklistMember(db.Model):    # subscribers to the blocklist
+    id = db.Column(db.Integer, primary_key=True)
+    blocklist_id = db.Column(db.Integer, db.ForeignKey('blocklist.id'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    is_owner = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=utcnow)
+
+
+class Blocklist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)   # owner
+    title = db.Column(db.String(256))  # Human name
+    machine_name = db.Column(db.String(50), index=True)  # url
+    description = db.Column(db.Text)  # markdown
+    description_html = db.Column(db.Text)  # html equivalent of above markdown
+    public_key = db.Column(db.Text)
+    private_key = db.Column(db.Text)
+    subscriptions_count = db.Column(db.Integer, default=0)
+    instance_id = db.Column(db.Integer, db.ForeignKey('instance.id'), index=True)
+    instance = db.relationship('Instance', lazy='joined', foreign_keys=[instance_id])
+
+    num_blocked = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=utcnow)
+    last_edit = db.Column(db.DateTime, default=utcnow)
+
+    ap_id = db.Column(db.String(255), index=True)
+    ap_profile_id = db.Column(db.String(255), index=True, unique=True)
+    ap_public_url = db.Column(db.String(255))
+    ap_followers_url = db.Column(db.String(255))
+    ap_following_url = db.Column(db.String(255))
+    ap_domain = db.Column(db.String(255))
+    ap_preferred_username = db.Column(db.String(255))
+    ap_fetched_at = db.Column(db.DateTime)
+    ap_deleted_at = db.Column(db.DateTime)
+    ap_inbox_url = db.Column(db.String(255))
+    ap_outbox_url = db.Column(db.String(255))
+    ap_moderators_url = db.Column(db.String(255))
+
+    items = db.relationship('BlocklistItem', lazy='dynamic', cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return '<Blocklist {}_{}>'.format(self.machine_name, self.id)
+
+    def display_name(self) -> str:
+        if self.ap_id is None:
+            return self.title
+        else:
+            return f"{self.title}@{self.ap_domain}"
+
+    def link(self) -> str:
+        if self.ap_id is None:
+            return self.machine_name
+        else:
+            return self.ap_id.lower()
+
+    def lemmy_link(self) -> str:
+        if self.ap_id is None:
+            return f"%{self.machine_name}@{current_app.config['SERVER_NAME']}"
+        else:
+            return f"%{self.ap_id.lower()}"
+
+    def creator(self):
+        owner = db.session.query(User).get(self.user_id)
+        return owner.ap_id if owner.ap_id else owner.user_name
+
+    def subscribed(self, user_id: int) -> int:
+        if user_id is None:
+            return SUBSCRIPTION_NONMEMBER
+        subscription = db.session.query(BlocklistMember).filter_by(user_id=user_id, blocklist_id=self.id).first()
+        if subscription:
+            if subscription.is_owner:
+                return SUBSCRIPTION_OWNER
+            return SUBSCRIPTION_MEMBER
+        else:
+            join_request = db.session.query(BlocklistJoinRequest).filter_by(user_id=user_id, blocklist_id=self.id).first()
+            if join_request:
+                return SUBSCRIPTION_PENDING
+            else:
+                return SUBSCRIPTION_NONMEMBER
+
+    def profile_id(self):
+        retval = self.ap_profile_id if self.ap_profile_id else f"{current_app.config['SERVER_URL']}/b/{self.machine_name}"
+        return retval.lower()
+
+    def public_url(self):
+        result = self.ap_public_url if self.ap_public_url else f"{current_app.config['SERVER_URL']}/b/{self.machine_name}"
+        return result
+
+    def is_local(self):
+        return self.ap_id is None or self.profile_id().startswith(current_app.config['SERVER_URL'])
+
+    def local_url(self):
+        if self.is_local():
+            return self.ap_profile_id
+        else:
+            return f"{current_app.config['SERVER_URL']}/b/{self.ap_id}"
+
+    # instances that have users which are subscribed to this blocklist. (excluding the current instance)
+    def following_instances(self, include_dormant=False) -> List[Instance]:
+        instances = db.session.query(Instance).join(User, User.instance_id == Instance.id).\
+            join(BlocklistMember, BlocklistMember.user_id == User.id)
+        instances = instances.filter(BlocklistMember.blocklist_id == self.id)
+        if not include_dormant:
+            instances = instances.filter(Instance.dormant == False)
+        instances = instances.filter(Instance.id != 1, Instance.gone_forever == False)
+        return instances.distinct().all()
+
+
+class BlocklistJoinRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    blocklist_id = db.Column(db.Integer, db.ForeignKey('blocklist.id'), index=True)
+
+
+# --- Feeds Models ---
 class FeedItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     feed_id = db.Column(db.Integer, db.ForeignKey('feed.id'), index=True)

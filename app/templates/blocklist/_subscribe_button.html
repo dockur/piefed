@@ -1,0 +1,5 @@
+<form method="post" action="{{ url_for('blocklist.blocklist_subscribe', actor=blocklist.link()) }}" class="d-inline"
+      hx-post="{{ url_for('blocklist.blocklist_subscribe', actor=blocklist.link()) }}" hx-trigger="submit throttle:1s" hx-swap="outerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-primary btn-sm" aria-label="{{ _('Subscribe to %(name)s', name=blocklist.display_name()) }}">{{ _('Subscribe') }}</button>
+</form>

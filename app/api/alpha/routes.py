@@ -5,7 +5,9 @@ from flask_smorest import abort
 
 from app import limiter
 from app.api.alpha import bp, site_bp, misc_bp, comm_bp, feed_bp, topic_bp, user_bp, \
-    reply_bp, post_bp, private_message_bp, upload_bp, admin_bp
+    reply_bp, post_bp, private_message_bp, upload_bp, admin_bp, blocklist_bp
+from app.api.alpha.utils.blocklist import get_blocklist, get_blocklist_list, post_blocklist_follow, post_blocklist, \
+    put_blocklist, post_blocklist_delete
 from app.api.alpha.utils.community import get_community, get_community_list, post_community_follow, \
     post_community_block, post_community, put_community, put_community_subscribe, post_community_delete, \
     get_community_moderate_bans, put_community_moderate_unban, post_community_moderate_ban, \
@@ -542,6 +544,97 @@ def put_alpha_feed_subscribe(data):
     auth = request.headers.get('Authorization')
     resp = put_feed_subscribe(auth, data)
     return FeedView().load(resp)
+
+
+# Blocklist
+@blocklist_bp.route('/blocklist', methods=["GET"])
+@blocklist_bp.doc(summary="Get a blocklist, including the accounts on it")
+@blocklist_bp.arguments(GetBlocklistRequest, location="query")
+@blocklist_bp.response(200, BlocklistView)
+@blocklist_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def get_alpha_blocklist(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_blocklist(auth, data)
+    validated = BlocklistView().load(resp)
+    return orjson_response(validated)
+
+
+@blocklist_bp.route('/blocklist/list', methods=["GET"])
+@blocklist_bp.doc(summary="Get list of blocklists")
+@blocklist_bp.arguments(BlocklistListRequest, location="query")
+@blocklist_bp.response(200, BlocklistListResponse)
+@blocklist_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def get_alpha_blocklist_list(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = get_blocklist_list(auth, data)
+    validated = BlocklistListResponse().load(resp)
+    return orjson_response(validated)
+
+
+@blocklist_bp.route("/blocklist/follow", methods=["POST"])
+@blocklist_bp.doc(summary="Subscribe / unsubscribe to a blocklist. Subscribing blocks everyone on it.")
+@blocklist_bp.arguments(FollowBlocklistRequest)
+@blocklist_bp.response(200, BlocklistView)
+@blocklist_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def post_alpha_blocklist_follow(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    blocklist = post_blocklist_follow(auth, data)
+    resp = get_blocklist(auth, {'id': blocklist.id})
+    validated = BlocklistView().load(resp)
+    return orjson_response(validated)
+
+
+@blocklist_bp.route("/blocklist", methods=["POST"])
+@blocklist_bp.doc(summary="Create a new blocklist.")
+@blocklist_bp.arguments(CreateBlocklistRequest)
+@blocklist_bp.response(200, BlocklistView)
+@blocklist_bp.alt_response(400, schema=DefaultError)
+@blocklist_bp.alt_response(429, schema=DefaultError)
+@auth_required_if_private
+def post_alpha_blocklist(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    with limiter.limit('10/day', exempt_when=is_trusted_request):
+        auth = request.headers.get('Authorization')
+        resp = post_blocklist(auth, data)
+        return BlocklistView().load(resp)
+
+
+@blocklist_bp.route("/blocklist", methods=["PUT"])
+@blocklist_bp.doc(summary="Edit blocklist.")
+@blocklist_bp.arguments(EditBlocklistRequest)
+@blocklist_bp.response(200, BlocklistView)
+@blocklist_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def put_alpha_blocklist(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = put_blocklist(auth, data)
+    return BlocklistView().load(resp)
+
+
+@blocklist_bp.route("/blocklist/delete", methods=["POST"])
+@blocklist_bp.doc(summary="Delete a blocklist.")
+@blocklist_bp.arguments(DeleteBlocklistRequest)
+@blocklist_bp.response(200, BlocklistView)
+@blocklist_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def post_alpha_blocklist_delete(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get('Authorization')
+    resp = post_blocklist_delete(auth, data)
+    return BlocklistView().load(resp)
 
 
 list_posts_response = ListPostsResponse()
