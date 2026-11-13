@@ -434,3 +434,8 @@ def get_mass_ban_ids(to_ban):
     results = [[item.strip() for item in lst if item and item.strip()] for lst in results]  # remove empty elements from all lists
 
     return max(results, key=len)    # return longest list
+
+
+def get_auto_ban_instance_ids(domains):
+    domains = get_mass_ban_ids(domains)     # this function is not really intended for this but what the hell
+    return [instance.id for instance in Instance.query.filter(Instance.domain.in_(domains))]

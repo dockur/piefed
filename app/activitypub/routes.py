@@ -1611,10 +1611,27 @@ def process_inbox_request(request_json, store_ap_json):
                                 log_incoming_ap(id, APLOG_USERBAN, APLOG_MONITOR, request_json,
                                                 'Remote Admin in banning one of our users from their site')
                                 return
+                            auto_ban = False
                             if blocked.instance_id != blocker.instance_id:
+                                reason = shorten_string(core_activity['summary'], 255) if 'summary' in core_activity else ''
+                                add_to_modlog('ban_user', actor=blocker, target_user=blocked, reason=reason,
+                                              link_text=blocked.display_name(), link=f'u/{blocked.link()}')
                                 log_incoming_ap(id, APLOG_USERBAN, APLOG_MONITOR, request_json,
                                                 'Remote Admin is banning a user of a different instance from their site')
-                                return
+
+                                # Auto ban - see /admin/user/auto_ban
+                                accept_ban = False
+                                if blocker.instance_id in get_setting('auto_ban_instances', []):
+                                    if get_setting('auto_ban_instances_keywords', '').strip() == '':    # if no keywords specified, accept all bans
+                                        accept_ban = True
+                                    else:
+                                        for kw in get_setting('auto_ban_instances_keywords', '').split('\n'):
+                                            if kw.strip() != '' and kw.strip() in reason.lower():
+                                                accept_ban = True
+                                                break
+                                if not accept_ban:
+                                    return
+                                auto_ban = True
 
                             if not already_banned:
                                 blocked.banned = True
@@ -1623,6 +1640,19 @@ def process_inbox_request(request_json, store_ap_json):
                                 elif 'endTime' in core_activity:
                                     blocked.ban_until = core_activity['endTime']
                                 session.commit()
+
+                            if auto_ban and not already_banned:
+                                # Record which instance's ban triggered this, so a later Undo from that instance can reverse it
+                                existing_ban = session.query(InstanceBan).filter_by(user_id=blocked.id,
+                                                                                    instance_id=blocker.instance_id).first()
+                                if not existing_ban:
+                                    marker = InstanceBan(user_id=blocked.id, instance_id=blocker.instance_id)
+                                    if 'expires' in core_activity:
+                                        marker.banned_until = core_activity['expires']
+                                    elif 'endTime' in core_activity:
+                                        marker.banned_until = core_activity['endTime']
+                                    session.add(marker)
+                                    session.commit()
 
                             if remove_data:
                                 site_ban_remove_data(blocker.id, blocked)
@@ -1819,11 +1849,27 @@ def process_inbox_request(request_json, store_ap_json):
                                     'Remote Admin in unbanning one of our users from their site: ' + str(request_json))
                                 return
                             if unblocked.instance_id != unblocker.instance_id:
-                                log_incoming_ap(id, APLOG_USERBAN, APLOG_MONITOR, request_json,
-                                                'Remote Admin is unbanning a user of a different instance from their site')
-                                current_app.logger.error(
-                                    'Remote Admin is unbanning a user of a different instance from their site: ' + str(
-                                        request_json))
+                                # Only reverse the ban if it was auto-applied because of this instance (see /admin/user/auto_ban) -
+                                # also don't let a remote instance unban someone our own admins banned
+                                auto_ban_marker = session.query(InstanceBan).filter_by(user_id=unblocked.id,
+                                                                                       instance_id=unblocker.instance_id).first()
+                                if auto_ban_marker:
+                                    session.delete(auto_ban_marker)
+                                    unblocked.banned = False
+                                    unblocked.ban_until = None
+                                    session.commit()
+                                    reason = shorten_string(core_activity['object']['summary'], 255) \
+                                        if 'summary' in core_activity['object'] else ''
+                                    add_to_modlog('unban_user', actor=unblocker, target_user=unblocked, reason=reason,
+                                                  link_text=unblocked.display_name(), link=f'u/{unblocked.link()}')
+                                    log_incoming_ap(id, APLOG_USERBAN, APLOG_SUCCESS, saved_json,
+                                                    'Auto-ban reversed by the instance that issued the ban')
+                                else:
+                                    log_incoming_ap(id, APLOG_USERBAN, APLOG_MONITOR, request_json,
+                                                    'Remote Admin is unbanning a user of a different instance from their site')
+                                    current_app.logger.error(
+                                        'Remote Admin is unbanning a user of a different instance from their site: ' + str(
+                                            request_json))
                                 return
 
                             unblocked.banned = False

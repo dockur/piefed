@@ -426,3 +426,9 @@ class MassBanForm(FlaskForm):
     reason = StringField(_l('Reason'))
     purge = BooleanField(_l('Delete all content by these accounts'))
     submit = SubmitField(_l('Mass ban'))
+
+
+class AutoBanForm(FlaskForm):
+    instances = TextAreaField(_l('Instances to follow'), validators=[Length(max=1000)], render_kw={'placeholder': _l('Instance domains, one per line')})
+    keywords = TextAreaField(_l('Keywords in ban reason which trigger a local ban'), validators=[Length(max=1000)], render_kw={'placeholder': _l('One keyword or phrase per line')})
+    submit = SubmitField(_l('Save'))

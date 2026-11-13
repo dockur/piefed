@@ -29,11 +29,11 @@ from app.admin.forms import FederationForm, SiteMiscForm, SiteProfileForm, EditC
     EditTopicForm, SendNewsletterForm, AddUserForm, PreLoadCommunitiesForm, ImportExportBannedListsForm, \
     EditInstanceForm, RemoteInstanceScanForm, MoveCommunityForm, EditBlockedImageForm, AddBlockedImageForm, \
     CmsPageForm, CreateOfflineInstanceForm, InstanceChooserForm, CloseInstanceForm, EmojiForm, TopicImportForm, \
-    EmojiFilterForm, ContactInstanceForm, MassBanForm
+    EmojiFilterForm, ContactInstanceForm, MassBanForm, AutoBanForm
 from flask_wtf import FlaskForm
 from app.admin.util import unsubscribe_from_everything_then_delete, unsubscribe_from_community, send_newsletter, \
     topics_for_form, move_community_images_to_here, switch_to_unsilenced, switch_to_silenced, serialize_topic_tree, \
-    create_topic_and_children, get_mass_ban_ids
+    create_topic_and_children, get_mass_ban_ids, get_auto_ban_instance_ids
 from app.auth.util import send_email_verification, random_token
 from app.chat.util import send_message
 from app.community.util import save_icon_file, save_banner_file, search_for_community, is_bad_name
@@ -2841,5 +2841,29 @@ def admin_users_mass_ban():
         flash(_('Banned %(count)d users.', count=count))
 
     return render_template('admin/users_mass_ban.html',
+                           form=form,
+                           roles_with=roles_with('administer all users'))
+
+
+@bp.route('/users/auto_ban', methods=['GET', 'POST'])
+@permission_required('administer all users')
+@login_required
+def admin_users_auto_ban():
+    form = AutoBanForm()
+    if form.validate_on_submit():
+        instance_ids = get_auto_ban_instance_ids(form.instances.data.lower())
+        set_setting('auto_ban_instances', instance_ids)
+        set_setting('auto_ban_instances_keywords', form.keywords.data.lower())
+
+        flash(_('Saved'))
+
+        return redirect(url_for('admin.admin_users'))
+
+    if instance_ids := get_setting('auto_ban_instances', []):
+        instances = Instance.query.filter(Instance.id.in_(instance_ids)).all()
+        form.instances.data = "\n".join([instance.domain for instance in instances])
+        form.keywords.data = get_setting('auto_ban_instances_keywords', '')
+
+    return render_template('admin/users_auto_ban.html',
                            form=form,
                            roles_with=roles_with('administer all users'))
