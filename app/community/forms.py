@@ -16,7 +16,7 @@ from wtforms.validators import ValidationError, DataRequired, Length, Regexp, Op
 from app import db
 from app.constants import DOWNVOTE_ACCEPT_ALL, DOWNVOTE_ACCEPT_MEMBERS, DOWNVOTE_ACCEPT_INSTANCE, \
     DOWNVOTE_ACCEPT_TRUSTED, DOWNVOTE_ACCEPT_NONE
-from app.models import Community, Site, utcnow, User, Feed
+from app.models import Community, Site, utcnow, User, Feed, Blocklist
 from app.utils import domain_from_url, MultiCheckboxField, get_timezones, get_request
 
 
@@ -67,6 +67,10 @@ class AddCommunityForm(FlaskForm):
             if community is not None:
                 self.url.errors.append(_l('A community with this url already exists.'))
                 return False
+            blocklist = Blocklist.query.filter(Blocklist.machine_name == self.url.data.strip().lower(), Blocklist.ap_id == None).first()
+            if blocklist is not None:
+                self.url.errors.append(_l('A blocklist with this url already exists.'))
+                return False
             user = User.query.filter(func.lower(User.user_name) == func.lower(self.url.data.strip())).filter_by(
                 ap_id=None).first()
             if user is not None:
@@ -77,7 +81,7 @@ class AddCommunityForm(FlaskForm):
                 return False
             feed = Feed.query.filter(Feed.name == self.url.data.strip().lower(), Feed.ap_id == None).first()
             if feed is not None:
-                self.url.errors.append(_('This name is in use already.'))
+                self.url.errors.append(_l('This name is in use already.'))
                 return False
         return True
 

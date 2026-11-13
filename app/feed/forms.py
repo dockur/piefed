@@ -4,7 +4,7 @@ from sqlalchemy import func
 from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField, FileField
 from wtforms.validators import DataRequired, Length, Optional
 
-from app.models import Community, User
+from app.models import Community, User, Blocklist
 from app.utils import apply_feed_url_rules
 
 
@@ -37,6 +37,10 @@ class AddCopyFeedForm(FlaskForm):
                                                Community.ap_id == None).first()
             if community is not None:
                 self.url.errors.append(_l('A community with this url already exists.'))
+                return False
+            blocklist = Blocklist.query.filter(Blocklist.machine_name == self.url.data.strip().lower(), Blocklist.ap_id == None).first()
+            if blocklist is not None:
+                self.url.errors.append(_l('A blocklist with this url already exists.'))
                 return False
             user = User.query.filter(func.lower(User.user_name) == func.lower(self.url.data.strip())).filter_by(
                 ap_id=None).first()
