@@ -3180,10 +3180,14 @@ def add_to_modlog(action: str, actor: User, target_user: User = None, reason: st
     post_id = post.id if post else None
     reply_id = reply.id if reply else None
     reason = shorten_string(reason, 512)
-    db.session.add(ModLog(user_id=actor.id, type=action_type, action=action, target_user_id=target_user_id,
-                          community_id=community_id, post_id=post_id, reply_id=reply_id,
-                          reason=reason, link=link, link_text=link_text, public=get_setting('public_modlog', False)))
+    modlog_item = ModLog(user_id=actor.id, type=action_type, action=action, target_user_id=target_user_id,
+                         community_id=community_id, post_id=post_id, reply_id=reply_id,reason=reason, link=link,
+                         link_text=link_text, public=get_setting('public_modlog', False))
+    db.session.add(modlog_item)
     db.session.commit()
+
+    # Fire hook for plugin, after commit so that it has an id field
+    plugins.fire_hook("new_modlog_item", data=modlog_item)
 
 
 def authorise_api_user(auth, return_type=None, id_match=None) -> User | dict | int:

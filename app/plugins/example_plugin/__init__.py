@@ -60,6 +60,13 @@ def example_webhook(data):
         print(f"[PLUGIN DEBUG] Data received by webhook: {data}")
     return data
 
+@hook("new_modlog_item")
+def example_new_modlog_item(modlog_item):
+    """Hook that runs when a new item is added to the modlog."""
+    if int(os.environ.get('FLASK_DEBUG', '0')):
+        print(f"[PLUGIN DEBUG] New modlog item: {modlog_item.type} {modlog_item.action_to_str().lower()}")
+    return modlog_item
+
 
 def plugin_info():
     """Plugin metadata"""
