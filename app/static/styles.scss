@@ -1751,7 +1751,7 @@ details {
   display: none;
 }
 
-#add_local_community_form, #new_feed_form {
+#add_local_community_form, #new_feed_form, #new_blocklist_form {
   #url {
     width: 297px;
     width: calc(var(--spacing-16) * 18.5625); /* 297px */
