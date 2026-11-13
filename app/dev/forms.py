@@ -1,12 +1,7 @@
-from flask import request, g
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, BooleanField, HiddenField, SelectField, FileField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Optional
 from flask_babel import _, lazy_gettext as _l
-
-from app import db
-
 
 class AddTestCommunities(FlaskForm):
     communities_submit = SubmitField(_l('Populate Communities'))
@@ -27,3 +22,9 @@ class DeleteTestTopics(FlaskForm):
 class ActivityPubForm(FlaskForm):
     json = TextAreaField(_l('JSON'), validators=[DataRequired()], render_kw={'rows': 10})
     submit = SubmitField(_l('Submit'))
+
+
+class SendActivityForm(FlaskForm):
+    activity = TextAreaField(_l('Activity to send'), validators=[Length(max=10000), DataRequired()], render_kw={'placeholder': _l('Any JSON'), 'rows': 20})
+    inbox = StringField(_l('Inbox'), validators=[DataRequired()])
+    submit = SubmitField(_l('Send'))

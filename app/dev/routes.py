@@ -7,10 +7,11 @@ from flask_babel import _, ngettext
 
 from app import db, cache
 from app.activitypub.routes import replay_inbox_request
-from app.activitypub.signature import RsaKeys
+from app.activitypub.signature import RsaKeys, send_post_request
 from app.admin.routes import unsubscribe_everyone_then_delete
 from app.dev import bp
-from app.dev.forms import AddTestCommunities, AddTestTopics, DeleteTestCommunities, DeleteTestTopics, ActivityPubForm
+from app.dev.forms import AddTestCommunities, AddTestTopics, DeleteTestCommunities, DeleteTestTopics, ActivityPubForm, \
+    SendActivityForm
 from app.inoculation import inoculation
 from app.models import Site, User, Community, CommunityMember, Language, Topic, utcnow
 from app.utils import render_template, community_membership, moderating_communities, joined_communities, menu_topics, \
@@ -211,3 +212,17 @@ def tools_activitypub():
 
     return render_template('admin/dev_activitypub.html', title=_('Send ActivityPub to local inbox'), form=form,
                            roles_with=roles_with('change instance settings'),)
+
+
+@bp.route('/dev/tools/send_activity', methods=['GET', 'POST'])
+@permission_required('change instance settings')
+@login_required
+def tools_send_activity():
+    form = SendActivityForm()
+    if form.validate_on_submit():
+        send_post_request(form.inbox.data, json.loads(form.activity.data), current_user.private_key, current_user.public_url() + '#main-key')
+        flash(_('Activity sent'))
+
+    return render_template('admin/dev_send_activity.html',
+                           form=form,
+                           roles_with=roles_with('change instance settings'))
