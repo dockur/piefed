@@ -316,7 +316,7 @@ def send_post(post_id, edit=False, session=None):
     note['content'] = ''
     if note['type'] == 'Page' or note['type'] == 'Event':
         note['type'] = 'Note'
-    if post.type == POST_TYPE_LINK or post.type == POST_TYPE_VIDEO:
+    if post.type == POST_TYPE_LINK or post.type == POST_TYPE_VIDEO and post.url:
         note['content'] += '<p><a href=' + post.url + '>' + post.title + '</a></p>'
     elif post.type != POST_TYPE_POLL:
         note['content'] = '<p>' + post.title + '</p>'

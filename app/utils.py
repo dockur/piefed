@@ -236,6 +236,8 @@ def make_cache_key(sort=None, post_id=None, view_filter=None):
 
 
 def is_image_url(url):
+    if url is None or url == '':
+        return False
     common_image_extensions = ['.jpg', '.jpeg', '.jxl', '.png', '.gif', '.bmp', '.tiff', '.webp', '.avif', '.svg+xml',
                                '.svg+xml; charset=utf-8']
     mime_type = mime_type_using_head(url)
@@ -256,6 +258,8 @@ def is_local_image_url(url):
 
 
 def is_video_url(url: str) -> bool:
+    if url is None or url == '':
+        return False
     common_video_extensions = ['.mp4', '.webm']
     parsed_url = urlparse(url)
     path = parsed_url.path.lower()

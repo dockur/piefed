@@ -2769,6 +2769,7 @@ def lookup(community, domain):
 
 
 @bp.route('/check_url_already_posted')
+@login_required
 def check_url_already_posted():
     url = request.args.get('link_url')
     if url:
@@ -2832,7 +2833,7 @@ def retrieve_metadata_of_url(url):
     description = ''
     image = ''
     if is_invalid_get_request_uri(url):
-        return '', ''
+        return '', '', ''
     try:
         metadata = opengraph_parse(url)
         if metadata:
