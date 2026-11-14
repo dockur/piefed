@@ -1085,6 +1085,13 @@ def register(app):
                         scheduled_post.posted_at = utcnow()
                         scheduled_post.created_at = utcnow()
                         scheduled_post.edited_at = None
+                        scheduled_post.reports = 0
+                        scheduled_post.up_votes = 0
+                        scheduled_post.down_votes = 0
+                        scheduled_post.ranking = 0.0
+                        scheduled_post.ranking_scaled = 0.0
+                        scheduled_post.last_active = None
+                        scheduled_post.ip = None
                         scheduled_post.status = POST_STATUS_PUBLISHED
                         scheduled_post.title = render_from_tpl(scheduled_post.title)
                         scheduled_post.flair = post.flair
