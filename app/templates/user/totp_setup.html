@@ -1,0 +1,30 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_form %}
+{% set active_child = 'passkeys' %}
+
+{% block app_content %}
+<div class="row">
+    <main class="col-12 col-lg-8 position-relative main_pane">
+        <nav class="mb-2" id="breadcrumb_nav" title="{{ _('Navigation') }}">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
+            <li class="breadcrumb-item"><a href="/u/{{ user.link() }}">{{ user.display_name() }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.user_passkey_list') }}">{{ _('Security') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Two-factor authentication') }}</li>
+          </ol>
+        </nav>
+        <h1>{{ _('Set up two-factor authentication') }}</h1>
+        {% include "user/_user_nav.html" %}
+        <p>{{ _('Scan this QR code with your authenticator app (e.g. Aegis, Google Authenticator, 2FAS), then enter the 6-digit code it shows to finish setup.') }}</p>
+        <p class="text-center"><img src="data:image/png;base64,{{ qr_base64 }}" alt="{{ _('TOTP QR code') }}"></p>
+        <p>{{ _('Or enter this secret manually:') }} <code>{{ secret }}</code></p>
+        <form method="post" role="form">
+            {{ render_form(form) }}
+        </form>
+    </main>
+</div>
+{% endblock %}

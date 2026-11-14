@@ -299,3 +299,10 @@ class BlockInstanceForm(FlaskForm):
     instance_domain = StringField(_l('Instance domain'), validators=[DataRequired(), Length(min=1, max=255)],
                                  render_kw={'placeholder': _l('e.g. lemmy.example.com')})
     submit = SubmitField(_l('Block instance'))
+
+
+class TotpConfirmForm(FlaskForm):
+    code = StringField(_l('Authentication code'), validators=[DataRequired(), Length(min=6, max=6)],
+                       render_kw={'placeholder': _l('6-digit code'), 'autocomplete': 'one-time-code',
+                                  'inputmode': 'numeric'})
+    submit = SubmitField(_l('Verify and enable'))

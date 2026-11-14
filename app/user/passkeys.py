@@ -1,3 +1,7 @@
+import io
+
+import pyotp
+import segno
 from flask import redirect, url_for, flash, request, make_response, session, current_app, g, abort, jsonify
 import base64
 from webauthn import options_to_json, generate_registration_options, verify_registration_response
@@ -6,10 +10,12 @@ from webauthn.helpers.exceptions import InvalidRegistrationResponse
 from webauthn.helpers.structs import PublicKeyCredentialDescriptor, \
     AttestationConveyancePreference, AuthenticatorSelectionCriteria, ResidentKeyRequirement
 from flask_login import current_user
+from flask_babel import _
 
 from app import db, cache
 from app.user import bp
-from app.models import Passkey
+from app.user.forms import TotpConfirmForm
+from app.models import Passkey, UserTotpSecret, UserTrustedDevice
 from app.utils import render_template, login_required
 
 
@@ -18,8 +24,67 @@ from app.utils import render_template, login_required
 @login_required
 def user_passkey_list():
     return render_template('user/passkeys.html',
-            title = 'Passkeys', add_passkey = request.args.get('add') is not None,
-            passkeys = current_user.passkeys, user=current_user)
+                           title='Security', add_passkey=request.args.get('add') is not None,
+                           totp_secrets=current_user.totp_secrets,
+                           trusted_devices=current_user.trusted_devices,
+                           passkeys=current_user.passkeys, user=current_user)
+
+
+# ----------------------------------------------------------------------
+@bp.route('/user/totp/setup', methods=['GET', 'POST'])
+@login_required
+def user_totp_setup():
+    # keep the same pending secret across page reloads so the QR code stays valid
+    if 'totp_pending_secret' not in session:
+        session['totp_pending_secret'] = pyotp.random_base32()
+    secret = session['totp_pending_secret']
+
+    totp = pyotp.TOTP(secret)
+    uri = totp.provisioning_uri(name=current_user.email, issuer_name=g.site.name)
+    qr = segno.make_qr(uri)
+    output = io.BytesIO()
+    qr.save(output, kind='png', scale=5)
+    qr_base64 = base64.b64encode(output.getvalue()).decode()
+
+    form = TotpConfirmForm()
+    if form.validate_on_submit():
+        if totp.verify(form.code.data.strip(), valid_window=1):
+            totp_secret = UserTotpSecret(user_id=current_user.id)
+            totp_secret.set_secret(secret)
+            db.session.add(totp_secret)
+            db.session.commit()
+            session.pop('totp_pending_secret', None)
+            flash(_('Two-factor authentication enabled.'), 'success')
+            return redirect(url_for('user.user_passkey_list'))
+        flash(_('Invalid code, please try again.'), 'error')
+        return redirect(url_for('user.user_totp_setup'))
+
+    return render_template('user/totp_setup.html', title='Set up two-factor authentication',
+                           form=form, qr_base64=qr_base64, secret=secret, user=current_user)
+
+
+# ----------------------------------------------------------------------
+@bp.route('/user/totp/delete/<int:totp_id>', methods=['POST'])
+@login_required
+def user_totp_delete(totp_id):
+    totp_secret = UserTotpSecret.query.filter(UserTotpSecret.id == totp_id,
+                                              UserTotpSecret.user_id == current_user.id).first()
+    if totp_secret:
+        db.session.delete(totp_secret)
+        db.session.commit()
+    return redirect(url_for('user.user_passkey_list'))
+
+
+# ----------------------------------------------------------------------
+@bp.route('/user/trusted_device/delete/<int:device_id>', methods=['POST'])
+@login_required
+def user_trusted_device_delete(device_id):
+    device = UserTrustedDevice.query.filter(UserTrustedDevice.id == device_id,
+                                            UserTrustedDevice.user_id == current_user.id).first()
+    if device:
+        db.session.delete(device)
+        db.session.commit()
+    return redirect(url_for('user.user_passkey_list'))
 
 
 # ----------------------------------------------------------------------

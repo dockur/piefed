@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import hashlib
 import html
 import math
 import os
@@ -30,6 +32,7 @@ from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy_searchable import SearchQueryMixin
 from sqlalchemy_utils.types import \
     TSVectorType  # https://sqlalchemy-searchable.readthedocs.io/en/latest/installation.html
+from cryptography.fernet import Fernet
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db, login, cache, celery, httpx_client, constants, app_bcrypt
@@ -1119,6 +1122,8 @@ class User(UserMixin, db.Model):
     extra_fields = db.relationship('UserExtraField', lazy='dynamic', cascade="all, delete-orphan")
     roles = db.relationship('Role', secondary=user_role, lazy='dynamic')
     passkeys = db.relationship('Passkey', lazy='dynamic', cascade="all, delete-orphan")
+    totp_secrets = db.relationship('UserTotpSecret', lazy='dynamic', cascade="all, delete-orphan")
+    trusted_devices = db.relationship('UserTrustedDevice', lazy='dynamic', cascade="all, delete-orphan")
     modlog_target = db.relationship('ModLog', lazy='dynamic', foreign_keys="ModLog.target_user_id", back_populates='target_user', cascade="all, delete-orphan")
     modlog_actor = db.relationship('ModLog', lazy='dynamic', foreign_keys="ModLog.user_id", back_populates='author', cascade="all, delete-orphan")
 
@@ -4562,6 +4567,43 @@ class RssFeedItem(db.Model):
     __table_args__ = (
         db.UniqueConstraint('feed_id', 'guid'),
     )
+
+
+def _totp_fernet() -> Fernet:
+    key = base64.urlsafe_b64encode(hashlib.sha256(current_app.config['SECRET_KEY'].encode()).digest())
+    return Fernet(key)
+
+
+class UserTotpSecret(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    totp_secret = db.Column(db.String(165))  # Fernet-encrypted, never plaintext
+    created_at = db.Column(db.DateTime, default=utcnow)
+    last_used_at = db.Column(db.DateTime)
+
+    def set_secret(self, plaintext: str):
+        self.totp_secret = _totp_fernet().encrypt(plaintext.encode()).decode()
+
+    def get_secret(self) -> str:
+        return _totp_fernet().decrypt(self.totp_secret.encode()).decode()
+
+
+class UserTrustedDevice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    token = db.Column(db.String(150))
+    created_at = db.Column(db.DateTime, default=utcnow)
+    last_used_at = db.Column(db.DateTime)
+    expires_at = db.Column(db.DateTime)
+    user_agent = db.Column(db.String(150))
+
+    def device_type(self):
+        ua = self.user_agent.lower()
+        if "mobile" in ua or "iphone" in ua:
+            return "phone"
+        if "ipad" in ua or "tablet" in ua:
+            return "tablet"
+        return "desktop"
 
 
 def _large_community_subscribers() -> float:

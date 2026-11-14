@@ -22,6 +22,14 @@ class LoginForm(FlaskForm):
     submit = SubmitField(_l('Log In'))
 
 
+class TotpLoginForm(FlaskForm):
+    code = StringField(_l('Authentication code'), validators=[DataRequired(), Length(min=6, max=6)],
+                       render_kw={'autofocus': True, 'autocomplete': 'one-time-code', 'inputmode': 'numeric',
+                                  'placeholder': _l('6-digit code')})
+    trust_device = BooleanField(_l('Trust this device'))
+    submit = SubmitField(_l('Log In'))
+
+
 class RegistrationForm(FlaskForm):
     user_name = StringField(_l('User name'), validators=[DataRequired(), Length(min=3, max=50)],
                             render_kw={'autofocus': True, 'autocomplete': 'username'})

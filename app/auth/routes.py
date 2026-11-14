@@ -4,16 +4,13 @@ from flask import flash, g, make_response, redirect, request, url_for, current_a
 from flask_babel import _
 from flask_login import current_user, login_user, logout_user
 from sqlalchemy import func
+import pyotp
 
 from app import db, limiter, oauth
 from app.auth import bp
 from app.auth.forms import LoginForm, RegisterByMastodonForm, RegistrationForm, ResetPasswordForm, \
-    ResetPasswordRequestForm, ResendEmailForm
-from app.auth.oauth_util import (
-    handle_oauth_authorize,
-    finalize_user_login,
-    initialize_new_user,
-)
+    ResetPasswordRequestForm, ResendEmailForm, TotpLoginForm
+from app.auth.oauth_util import handle_oauth_authorize, finalize_user_login, initialize_new_user
 from app.auth.util import (
     handle_abandoned_open_instance,
     notify_admins_of_registration,
@@ -26,18 +23,12 @@ from app.auth.util import (
     get_country,
     send_email_verification,
     random_token,
+    finish_totp_login,
 )
 from app.email import send_password_reset_email, send_registration_approved_email
-from app.models import User, UserRegistration
+from app.models import User, UserRegistration, utcnow
 from app.shared.tasks import task_selector
-from app.utils import (
-    finalize_user_setup,
-    render_template,
-    login_required,
-    ip_address,
-    user_ip_banned,
-    user_cookie_banned,
-)
+from app.utils import finalize_user_setup, render_template, login_required, ip_address, user_ip_banned, user_cookie_banned
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -51,6 +42,35 @@ def login():
         return process_login(form)
 
     return render_login_form(form)
+
+
+@bp.route("/login/totp", methods=["GET", "POST"])
+@limiter.limit("300 per day;10 per 5 minutes", methods=["GET", "POST"])
+def totp_login():
+    user_id = session.get('totp_login_user_id')
+    if not user_id:
+        return redirect(url_for('auth.login'))
+    user = User.query.get(user_id)
+    if user is None or user.deleted or user.banned or user.totp_secrets.count() == 0:
+        session.pop('totp_login_user_id', None)
+        return redirect(url_for('auth.login'))
+
+    form = TotpLoginForm()
+    if form.validate_on_submit():
+        code = form.code.data.strip()
+        matched = None
+        for totp_secret in user.totp_secrets:
+            if pyotp.TOTP(totp_secret.get_secret()).verify(code, valid_window=1):
+                matched = totp_secret
+                break
+        if matched is not None:
+            matched.last_used_at = utcnow()
+            db.session.commit()
+            session.pop('totp_login_user_id', None)
+            return finish_totp_login(user, form.trust_device.data)
+        flash(_('Invalid code, please try again.'), 'error')
+
+    return render_template('auth/totp_login.html', title=_('Two-factor authentication'), form=form)
 
 
 @bp.route('/logout')

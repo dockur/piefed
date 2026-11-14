@@ -283,7 +283,6 @@ def add_post():
 @bp.route('/communities', methods=['GET'])
 @limiter.limit("20 per 1 minutes", methods=['GET', 'POST'])
 @login_required_if_private_instance
-@check_anoobis
 def list_communities():
     verification_warning()
     search_param = request.args.get('search', '').strip()

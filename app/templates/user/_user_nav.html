@@ -25,8 +25,8 @@
         <a href="/user/settings/import_export" class="btn {{ 'btn-primary' if request.path == '/user/settings/import_export' else 'btn-outline-secondary' }}">
             {{ _('Import & Export') }}
         </a>
-        <a href="{{ url_for('user.user_passkey_list') }}" class="btn {{ 'btn-primary' if request.path == '/user/passkeys' else 'btn-outline-secondary' }}">
-            {{ _('Passkeys') }}
+        <a href="{{ url_for('user.user_passkey_list') }}" class="btn {{ 'btn-primary' if request.path == '/user/passkeys' or active_child == 'passkeys' else 'btn-outline-secondary' }}">
+            {{ _('Security') }}
         </a>
         <a href="{{ url_for('user.connect_oauth') }}" class="btn {{ 'btn-primary' if request.path == '/user/connect_oauth' else 'btn-outline-secondary' }}">
             {{ _('Connect OAuth') }}

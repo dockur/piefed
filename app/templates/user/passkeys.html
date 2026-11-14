@@ -14,11 +14,61 @@
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">{{ _('Home') }}</a></li>
             <li class="breadcrumb-item"><a href="/u/{{ user.link() }}">{{ user.display_name() }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ _('Passkeys') }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Security') }}</li>
           </ol>
         </nav>
-        <h1>{{ _('Passkeys') }}</h1>
+        <h1>{{ _('Security') }}</h1>
         {% include "user/_user_nav.html" %}
+        <div class="rh_action_buttons">
+            <a class="btn btn-primary mb-2" href="{{ url_for('user.user_totp_setup') }}">{{ _('Add two-factor authentication') }}</a>
+        </div>
+        <h2>{{ _('Two-factor authentication') }}</h2>
+        {% if totp_secrets.count() %}
+            <table class="table table-striped" role="table">
+                <tr>
+                    <th>{{ _('Added') }}</th>
+                    <th>{{ _('Last used') }}</th>
+                    <th> </th>
+                </tr>
+                {% for totp in totp_secrets %}
+                <tr>
+                    <td class="nowrap"><p>{{ totp.created_at.strftime('%e %b %Y') if totp.created_at else '' }}</p></td>
+                    <td class="nowrap"><p>{{ totp.last_used_at.strftime('%e %b %Y') if totp.last_used_at else '' }}</p></td>
+                    <td class="nowrap text-center"><p><a href="#" data-url="{{ url_for('user.user_totp_delete', totp_id=totp.id) }}" class="confirm_first send_post"><span class="fe fe-delete"></span> {{ _('Delete') }}</a></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>{{ _('Two-factor authentication is not enabled.') }}</p>
+        {% endif %}
+
+        <h2 class="mt-4">{{ _('Trusted devices') }}</h2>
+        {% if trusted_devices.count() %}
+            <table class="table table-striped" role="table">
+                <tr>
+                    <th>{{ _('Device') }}</th>
+                    <th>{{ _('Added') }}</th>
+                    <th>{{ _('Last used') }}</th>
+                    <th>{{ _('Expires') }}</th>
+                    <th>{{ _('Delete') }}</th>
+                </tr>
+                {% for device in trusted_devices %}
+                <tr>
+                    <td class="nowrap"><p><img src="/static/images/{{ device.device_type() }}-icon.png"
+                                                  title="{{ device.user_agent }}" alt="{{ device.device_type() }}" width="30"></p></td>
+                    <td class="nowrap"><p>{{ device.created_at.strftime('%e %b %Y') if device.created_at else '' }}</p></td>
+                    <td class="nowrap"><p>{{ device.last_used_at.strftime('%e %b %Y') if device.last_used_at else '' }}</p></td>
+                    <td class="nowrap"><p>{{ device.expires_at.strftime('%e %b %Y') if device.expires_at else '' }}</p></td>
+                    <td class="nowrap text-center"><p><a href="#" data-url="{{ url_for('user.user_trusted_device_delete', device_id=device.id) }}" class="confirm_first send_post"><span class="fe fe-delete"></span></a></p></td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>{{ _('No trusted devices yet.') }}</p>
+        {% endif %}
+
+        <hr>
+        <h2>{{ _('Passkeys') }}</h2>
 
         <div class="rh_action_buttons">
             <button class="btn btn-primary" href="#" id="add_passkey_button">{{ _('Add passkey') }}</button>

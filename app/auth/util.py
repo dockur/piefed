@@ -21,7 +21,7 @@ from app.auth.forms import LoginForm
 from app.constants import NOTIF_REGISTRATION
 from app.email import send_verification_email
 from app.ldap_utils import sync_user_to_ldap, login_with_ldap
-from app.models import IpBan, Notification, Site, User, UserRegistration, utcnow, Role
+from app.models import IpBan, Notification, Site, User, UserRegistration, UserTrustedDevice, utcnow, Role
 from app.utils import banned_ip_addresses, blocked_referrers, finalize_user_setup, get_request, get_setting, gibberish, \
     ip_address, markdown_to_html, render_template, user_cookie_banned, user_ip_banned, role_access, actor_contains_blocked_words
 
@@ -403,6 +403,10 @@ def process_login(form: LoginForm):
     if user.waiting_for_approval():
         return redirect(url_for("auth.please_wait"))
 
+    if user.totp_secrets.count() and not user_has_trusted_device(user):
+        session['totp_login_user_id'] = user.id
+        return redirect(url_for("auth.totp_login"))
+
     return log_user_in(user, form, ip, country, ldap_sync=ldap_sync)
 
 
@@ -469,9 +473,40 @@ def handle_banned_user(user, ip):
     return response
 
 
+def user_has_trusted_device(user) -> bool:
+    token = request.cookies.get('trusted_device')
+    if not token:
+        return False
+    device = UserTrustedDevice.query.filter_by(user_id=user.id, token=token).first()
+    if device is None:
+        return False
+    if device.expires_at and device.expires_at < utcnow():
+        return False
+    device.last_used_at = utcnow()
+    db.session.commit()
+    return True
+
+
+def finish_totp_login(user, trust_device=False):
+    login_user(user, remember=True)
+    ip = ip_address()
+    update_user_session(user, ip, get_country(ip))
+    response = make_response(redirect(determine_next_page()))
+    configure_bandwidth_cookies(response, g.low_bandwidth)
+    if trust_device:
+        token = random_token(64)
+        db.session.add(UserTrustedDevice(user_id=user.id, token=token,
+                                          user_agent=request.headers.get('User-Agent', '')[:150],
+                                          expires_at=utcnow() + timedelta(days=3000)))
+        db.session.commit()
+        response.set_cookie('trusted_device', token, expires=datetime(year=2099, month=12, day=30),
+                            httponly=True, samesite='Lax')
+    return response
+
+
 def log_user_in(user, form, ip, country, ldap_sync=True):
     login_user(user, remember=True)
-    update_user_session(user, form, ip, country)
+    update_user_session(user, ip, country, form.timezone.data)
     if ldap_sync:
         sync_user_with_ldap(user, form.password.data)
 
@@ -481,11 +516,11 @@ def log_user_in(user, form, ip, country, ldap_sync=True):
     return response
 
 
-def update_user_session(user, form, ip, country):
+def update_user_session(user, ip, country, timezone=None):
     user.last_seen = utcnow()
     user.ip_address = ip
-    if user.timezone is None:
-        user.timezone = form.timezone.data
+    if user.timezone is None and timezone:
+        user.timezone = timezone
     user.ip_address_country = country or user.ip_address_country
     db.session.commit()
 

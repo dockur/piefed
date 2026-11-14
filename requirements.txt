@@ -61,3 +61,5 @@ c2pa-python~=0.37.0
 pwinput
 pillow-jxl-plugin
 certifi==2026.10.19
+pyotp
+segno
