@@ -475,6 +475,9 @@ def allowlist_html(html: str, a_target='_blank', test_env=False) -> str:
             if tag.name == 'ol':
                 allowed_attrs.extend(['start'])
 
+            if tag.name in ['th', 'td']:
+                allowed_attrs.extend(['style'])
+
             for attr in list(tag.attrs):
                 if attr not in allowed_attrs:
                     del tag[attr]
