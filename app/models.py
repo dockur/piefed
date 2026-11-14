@@ -1040,7 +1040,7 @@ class User(UserMixin, db.Model):
     newsletter = db.Column(db.Boolean, default=True)
     email_unread = db.Column(db.Boolean, default=True)  # True if they want to receive 'unread notifications' emails
     email_unread_sent = db.Column(db.Boolean)  # True after a 'unread notifications' email has been sent. None for remote users
-    receive_message_mode = db.Column(db.String(20), default='Closed')  # possible values: Open, TrustedOnly, Closed
+    receive_message_mode = db.Column(db.String(20), default='Closed')  # possible values: Open, TrustedOnly, Closed. Seem used, see user.accept_private_messages
     bounces = db.Column(db.SmallInteger, default=0)
     timezone = db.Column(db.String(30))
     reputation = db.Column(db.Float, default=0.0)
@@ -1686,6 +1686,17 @@ class User(UserMixin, db.Model):
         ) and not (self.is_admin_or_staff() or recipient.is_admin_or_staff()):
             return False
 
+        return True
+
+    # whether this user's 'Accept private messages from' setting allows PMs from the given sender.
+    # Mirrors the incoming-PM checks in app/activitypub/routes.py
+    def accepts_pm_from(self, sender):
+        if self.accept_private_messages is None or self.accept_private_messages == 0:
+            return False
+        if self.accept_private_messages == 1:
+            return sender.is_local()
+        if self.accept_private_messages == 2:
+            return sender.is_local() or sender.instance.trusted
         return True
 
     # instances that have users which follow this user. (excluding the current instance). Optionally limit to instances of the specificed software type

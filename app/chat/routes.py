@@ -6,7 +6,7 @@ from sqlalchemy import desc, or_, text
 from app import db
 from app.chat import bp
 from app.chat.forms import AddReply, ReportConversationForm
-from app.chat.util import send_message
+from app.chat.util import send_message, pm_warnings
 from app.constants import NOTIF_REPORT, SRC_WEB, REPORT_TYPE_MESSAGE
 from app.models import Site, User, Report, ChatMessage, Notification, Conversation, conversation_member, CommunityBan, \
     ModLog
@@ -62,6 +62,9 @@ def chat_home(conversation_id=None):
             current_user.unread_notifications = Notification.query.filter_by(user_id=current_user.id, read=False).count()
             db.session.commit()
 
+            for warning in pm_warnings(current_user, conversation.members):
+                flash(warning, 'warning')
+
             return render_template('chat/conversation.html',
                                    title=_('Chat with %(name)s', name=conversation.member_names(current_user.id)),
                                    conversations=conversations, messages=messages, form=form, alone=alone,
@@ -96,6 +99,8 @@ def new_message(to):
         send_message(form.message.data, conversation.id)
         return redirect(url_for('chat.chat_home', conversation_id=conversation.id, _anchor='message'))
     else:
+        for warning in pm_warnings(current_user, [recipient]):
+            flash(warning, 'warning')
         return render_template('chat/new_message.html', form=form,
                                title=_('New message to "%(recipient_name)s"', recipient_name=recipient.link()),
                                recipient=recipient,

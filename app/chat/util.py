@@ -1,4 +1,4 @@
-from flask import flash, current_app, json
+from flask import current_app, json
 from flask_babel import _
 from flask_login import current_user
 
@@ -7,6 +7,21 @@ from app.activitypub.signature import send_post_request
 from app.constants import NOTIF_MESSAGE, SRC_WEB
 from app.models import User, ChatMessage, Notification, utcnow, Conversation
 from app.utils import shorten_string, gibberish, markdown_to_html, publish_sse_event
+
+
+def pm_warnings(user: User, recipients) -> list:
+    # Warnings to show when composing a message
+    warnings = []
+    for recipient in recipients:
+        if recipient.id == user.id:
+            continue
+        if not user.accepts_pm_from(recipient):
+            warnings.append(_('You will not receive a reply from %(name)s while your "Accept private messages from" setting does not allow messages from them. You can change this in your settings.',
+                              name=recipient.display_name()))
+        if not recipient.is_local() and not recipient.accepts_pm_from(user):
+            warnings.append(_('%(name)s will not receive your messages because they do not allow messages from your instance.',
+                              name=recipient.display_name()))
+    return warnings
 
 
 def send_message(message: str, conversation_id: int, user: User = current_user, src=SRC_WEB) -> ChatMessage:
