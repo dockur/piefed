@@ -2578,7 +2578,7 @@ def create_post_reply(store_ap_json, community: Community, in_reply_to, request_
                     # if checking for previous comments seems overly-involved, a cheaper solution is perhaps to just be to reject Mentions from MBIN in comments with a depth > 0
 
                 blocked_senders = blocked_users(recipient.id)
-                if post_reply.user_id not in blocked_senders:
+                if post_reply.user_id not in blocked_senders and post_reply.instance_id not in blocked_or_banned_instances(recipient.id):
                     author = User.query.get(post_reply.user_id)
                     targets_data = {'gen': '0',
                                     'post_id': post_reply.post_id,
@@ -2935,7 +2935,7 @@ def update_post_reply_from_activity(reply: PostReply, request_json: dict):
                                             continue
 
                                 blocked_senders = blocked_users(recipient.id)
-                                if reply.user_id not in blocked_senders:
+                                if reply.user_id not in blocked_senders and reply.instance_id not in blocked_or_banned_instances(recipient.id):
                                     existing_notification = Notification.query.filter(Notification.user_id == recipient.id,
                                                                                       Notification.url == f"{current_app.config['SERVER_URL']}/comment/{reply.id}").first()
                                     if not existing_notification:
@@ -3044,7 +3044,7 @@ def update_post_from_activity(post: Post, request_json: dict):
                             recipient = User.query.filter_by(ap_profile_id=profile_id, ap_id=None).first()
                             if recipient:
                                 blocked_senders = blocked_users(recipient.id)
-                                if post.user_id not in blocked_senders:
+                                if post.user_id not in blocked_senders and post.instance_id not in blocked_or_banned_instances(recipient.id):
                                     existing_notification = Notification.query.filter(Notification.user_id == recipient.id,
                                                                                       Notification.url == f"{current_app.config['SERVER_URL']}/post/{post.id}").first()
                                     if not existing_notification:

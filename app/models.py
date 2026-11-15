@@ -1904,7 +1904,8 @@ class Post(db.Model):
         from app.utils import allowlist_html, markdown_to_html, html_to_text, microblog_content_to_title, \
             microblog_content_to_link, blocked_phrases, get_setting, \
             is_image_url, is_video_url, domain_from_url, opengraph_parse, shorten_string, fixup_url, \
-            is_video_hosting_site, communities_banned_from, recently_upvoted_posts, blocked_users
+            is_video_hosting_site, communities_banned_from, recently_upvoted_posts, blocked_users, \
+            blocked_or_banned_instances
 
         microblog = False
         private = False
@@ -2214,8 +2215,8 @@ class Post(db.Model):
                             recipient = User.query.filter_by(ap_profile_id=profile_id, ap_id=None).first()
                             if recipient:
                                 blocked_senders = blocked_users(recipient.id)
-                                if post.user_id not in blocked_senders:
-                                    author = User.query.get(post.user_id).first()
+                                if post.user_id not in blocked_senders and post.instance_id not in blocked_or_banned_instances(recipient.id):
+                                    author = User.query.get(post.user_id)
                                     targets_data = {'gen': '0',
                                                     'post_id': post.id,
                                                     'post_body': post.body,
