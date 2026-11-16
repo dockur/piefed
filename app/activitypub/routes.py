@@ -2257,7 +2257,17 @@ def comment_ap(comment_id):
     if is_activitypub_request():
         if reply.community.local_only or reply.community.private:
             abort(403)
-        reply_data = comment_model_to_json(reply) if request.method == 'GET' else []
+        if reply.deleted:
+            reply_data = {
+                "@context": [
+                    "https://join-lemmy.org/context.json",
+                    "https://www.w3.org/ns/activitystreams"
+                ],
+                "id": reply.ap_id,
+                "type": "Tombstone"
+            }
+        else:
+            reply_data = comment_model_to_json(reply) if request.method == 'GET' else []
         resp = jsonify(reply_data)
         resp.content_type = 'application/activity+json'
         resp.headers.set('Vary', 'Accept')
@@ -2281,11 +2291,20 @@ def post_ap(post_id):
         if post.is_local():
             if post.community.local_only or post.community.private or post.status < POST_STATUS_PUBLISHED:
                 abort(403)
-            if request.method == 'GET':
-                post_data = post_to_page(post)
-                post_data['@context'] = default_context()
-            else:  # HEAD request
-                post_data = []
+            post_data = []
+            if post.deleted:
+                post_data = {
+                  "@context": [
+                    "https://join-lemmy.org/context.json",
+                    "https://www.w3.org/ns/activitystreams"
+                  ],
+                  "id": post.ap_id,
+                  "type": "Tombstone"
+                }
+            else:
+                if request.method == 'GET':
+                    post_data = post_to_page(post)
+                    post_data['@context'] = default_context()
             resp = jsonify(post_data)
             resp.content_type = 'application/activity+json'
             resp.headers.set('Cache-Control', 'public, max-age=120')
