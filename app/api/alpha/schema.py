@@ -1469,6 +1469,7 @@ class EditPostRequest(DefaultSchema):
     body = fields.String()
     url = fields.String(allow_none=True, metadata={"description": "Pass value of null to remove the post url", "format": "url"})
     nsfw = fields.Boolean()
+    ai_generated = fields.Boolean()
     language_id = fields.Integer()
     event = fields.Nested(PostEvent, allow_none=True)
     poll = fields.Nested(PostPoll, allow_none=True)
