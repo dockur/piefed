@@ -1,0 +1,25 @@
+{% if theme() != 'piefed' and file_exists('app/templates/themes/' + theme() + '/base.html') -%}
+    {% extends 'themes/' + theme() + '/base.html' -%}
+{% else -%}
+    {% extends "base.html" -%}
+{% endif -%}
+{% from 'bootstrap5/form.html' import render_field -%}
+
+{% block app_content -%}
+    <div class="row">
+        <div class="col col-login mx-auto">
+            <div class="card mt-5">
+                <div class="card-body p-6">
+                    <h1 class="card-title text-center">{{ _('Two-factor authentication') }}</h1>
+                    <p class="text-center">{{ _('Enter the 6-digit code from your authenticator app.') }}</p>
+                    <form method="post">
+                        {{ form.csrf_token() }}
+                        {{ render_field(form.code) }}
+                        {{ render_field(form.trust_device) }}
+                        {{ render_field(form.submit) }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
