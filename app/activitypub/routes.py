@@ -707,13 +707,15 @@ def shared_inbox():
             log_incoming_ap(id, APLOG_NOTYPE, APLOG_FAILURE, saved_json, 'Could not verify HTTP signature: ' + str(e))
             return '', 400
 
-    if actor.instance_id:
-        actor.instance.last_seen = utcnow()
+    now_minute = utcnow().replace(second=0, microsecond=0)  # Only update instance stats once per minute, to reduce DB writes
+    if actor.instance_id and (actor.instance.last_seen is None or
+                              actor.instance.last_seen.replace(second=0, microsecond=0) != now_minute):
+        actor.instance.last_seen = now_minute
         actor.instance.dormant = False
         actor.instance.gone_forever = False
         actor.instance.failures = 0
         actor.instance.ip_address = ip_address() if not bounced else ''
-    db.session.commit()
+        db.session.commit()
 
     # When a user is deleted, the only way to be fairly sure they get deleted everywhere is to tell the whole fediverse.
     # Earlier check means this is only for users that already exist, processing it here means that http signature will have been verified
@@ -978,6 +980,7 @@ def process_inbox_request(request_json, store_ap_json):
                                 user.last_seen = utcnow()
                                 session.commit()
                                 cache.delete_memoized(community_membership, user, community)
+                                community.invalidate_following_instances()
                                 # send accept message to acknowledge the follow
                                 accept = {"@context": default_context(), "actor": community.public_url(),
                                           "to": [user.public_url()],
@@ -2085,6 +2088,7 @@ def announce_activity_to_followers(community: Community, creator: User, activity
         instances = community.following_instances(include_dormant=True)
 
     send_async = []
+    batched = []
     for instance in instances:
         # awaken dormant instances if they've been sleeping for long enough to be worth trying again
         awaken_dormant_instance(instance)
@@ -2093,9 +2097,8 @@ def announce_activity_to_followers(community: Community, creator: User, activity
         if instance and instance.online() and instance.inbox and not instance_banned(instance.inbox):
             if creator.instance_id != instance.id:  # don't send it to the instance that hosts the creator as presumably they already have the content
                 if can_batch and (instance.software == 'piefed' or instance.software == 'pylova'):
-                    db.session.add(ActivityBatch(instance_id=instance.id, community_id=community.id,
+                    batched.append(ActivityBatch(instance_id=instance.id, community_id=community.id,
                                                  payload=activity))
-                    db.session.commit()
                 else:
                     if current_app.config['NOTIF_SERVER'] and is_vote(announce_activity):   # Votes make up a very high percentage of activities, so it is more efficient to send them via piefed_notifs. However piefed_notifs does not retry failed sends. For votes this is acceptable.
                         send_async.append(HttpSignature.signed_request(instance.inbox, announce_activity,
@@ -2104,6 +2107,10 @@ def announce_activity_to_followers(community: Community, creator: User, activity
                                                                        send_via_async=True))
                     else:
                         send_to_remote_instance_fast(instance.inbox, community.private_key, community.ap_profile_id, announce_activity)
+
+    if batched:
+        db.session.add_all(batched)
+        db.session.commit()
 
     if len(send_async):
         from app import redis_client

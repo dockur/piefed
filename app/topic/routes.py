@@ -17,6 +17,7 @@ from app.inoculation import inoculation
 from app.models import Topic, Community, NotificationSubscription, PostReply, utcnow
 from app.topic import bp
 from app.topic.forms import SuggestTopicsForm
+from app.utils import site_last_active
 from app.utils import render_template, user_filters_posts, validation_required, login_required, \
     gibberish, get_deduped_post_ids, paginate_post_ids, post_ids_to_models, blocked_communities, \
     recently_upvoted_posts, recently_downvoted_posts, blocked_or_banned_instances, blocked_users, \
@@ -245,7 +246,7 @@ def show_topic_rss(topic_path):
 
         response = make_response(feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
-        response.headers.add_header('ETag', f"{topic.id}_{hash(g.site.last_active)}")
+        response.headers.add_header('ETag', f"{topic.id}_{site_last_active()}")
         response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
         return response
     else:

@@ -25,6 +25,7 @@ from app.models import Feed, FeedMember, FeedItem, Community, NotificationSubscr
     CommunityMember, User, FeedJoinRequest, Instance, Topic, CommunityJoinRequest
 from app.shared.feed import join_feed, _feed_add_community, announce_feed_delete_to_subscribers, edit_feed, \
     form_communities_to_ids, make_feed, delete_feed
+from app.utils import site_last_active
 from app.utils import show_ban_message, piefed_markdown_to_lemmy_markdown, markdown_to_html, render_template, \
     user_filters_posts, joined_communities, menu_instance_feeds, validation_required, feed_membership, \
     gibberish, get_task_session, instance_banned, menu_subscribed_feeds, referrer, community_membership, \
@@ -697,7 +698,7 @@ def show_feed_rss(feed_path):
 
         response = make_response(rss_feed.create_feed(posts, server_url))
         response.headers.set('Content-Type', 'application/rss+xml')
-        response.headers.add_header('ETag', f"{feed.id}_{hash(g.site.last_active)}")
+        response.headers.add_header('ETag', f"{feed.id}_{site_last_active()}")
         response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
         return response
     else:

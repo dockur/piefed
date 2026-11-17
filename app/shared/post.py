@@ -22,7 +22,7 @@ from app.models import File, Notification, NotificationSubscription, Poll, PollC
     Report, Site, User, utcnow, Instance, Event, Community, CommunityFlair, votes_cast_today, post_file, \
     ap_parse_datetime
 from app.shared.tasks import task_selector
-from app.utils import render_template, authorise_api_user, shorten_string, gibberish, ensure_directory_exists, \
+from app.utils import render_template, mark_site_active, authorise_api_user, shorten_string, gibberish, ensure_directory_exists, \
     piefed_markdown_to_lemmy_markdown, markdown_to_html, fixup_url, domain_from_url, \
     opengraph_parse, url_to_thumbnail_file, can_create_post, is_video_hosting_site, recently_upvoted_posts, \
     is_image_url, add_to_modlog, store_files_in_s3, guess_mime_type, retrieve_image_hash, \
@@ -221,7 +221,7 @@ def make_post(input, community, type, src, auth=None, uploaded_file=None, upload
     cache.delete_memoized(recently_upvoted_posts, user.id)
 
     community.post_count += 1
-    community.last_active = g.site.last_active = utcnow()
+    community.last_active = utcnow()
     user.post_count += 1
     user.last_seen = utcnow()
     user.ip_address = ip_address()
@@ -231,6 +231,7 @@ def make_post(input, community, type, src, auth=None, uploaded_file=None, upload
     vote = PostVote(user_id=user.id, post_id=post.id, author_id=user.id, effect=1)
     db.session.add(vote)
     db.session.commit()
+    mark_site_active()
 
     try:    # federation is done in edit_post
         post = edit_post(input, post, type, src, user, auth, uploaded_file, from_scratch=True,

@@ -101,6 +101,23 @@ def render_template(template_name: str, skip_protocol_replacement: bool = False,
     return resp
 
 
+def mark_site_active():
+    # Record that new content has arrived, so ETags based on site_last_active() change.
+    from app import redis_client
+    redis_client.set('site_last_active', str(int(time.time() * 1000)))
+
+
+def site_last_active() -> str:
+    # timestamp of when the most recent post or comment arrived, for use in ETags.
+    from app import redis_client
+    value = redis_client.get('site_last_active')
+    if value is None:
+        value = str(int(time.time() * 1000))
+        if not redis_client.set('site_last_active', value, nx=True):
+            value = redis_client.get('site_last_active') or value
+    return value
+
+
 def request_etag_matches(etag):
     if 'If-None-Match' in request.headers:
         old_etag = request.headers['If-None-Match']

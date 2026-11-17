@@ -874,15 +874,18 @@ class Community(db.Model):
 
     # instances that have users which are members of this community. (excluding the current instance)
     def following_instances(self, include_dormant=False, mod_hosts_only=False) -> List[Instance]:
-        instances = db.session.query(Instance).join(User, User.instance_id == Instance.id).join(CommunityMember,
-                                                                                                CommunityMember.user_id == User.id)
-        instances = instances.filter(CommunityMember.community_id == self.id, CommunityMember.is_banned == False)
-        if mod_hosts_only:
-            instances = instances.filter(CommunityMember.is_moderator == True)
+        # The membership-derived instance ids are cached; dormant/gone_forever are checked fresh on every call
+        instance_ids = _community_following_instance_ids(self.id, mod_hosts_only)
+        if not instance_ids:
+            return []
+        instances = db.session.query(Instance).filter(Instance.id.in_(instance_ids), Instance.gone_forever == False)
         if not include_dormant:
             instances = instances.filter(Instance.dormant == False)
-        instances = instances.filter(Instance.id != 1, Instance.gone_forever == False)
-        return instances.distinct().all()
+        return instances.all()
+
+    def invalidate_following_instances(self):
+        cache.delete_memoized(_community_following_instance_ids, self.id, False)
+        cache.delete_memoized(_community_following_instance_ids, self.id, True)
 
 
     def has_followers_from_domain(self, domain: str) -> bool:
@@ -2198,12 +2201,13 @@ class Post(db.Model):
             community.last_active = utcnow()
             db.session.execute(text('UPDATE "user" SET post_count = post_count + 1, last_seen = now() WHERE id = :user_id'),
                                {'user_id': user.id})
-            db.session.execute(text('UPDATE "site" SET last_active = NOW()'))
             try:
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
                 return Post.query.filter_by(ap_id=request_json['object']['id']).one()
+            from app.utils import mark_site_active
+            mark_site_active()
 
             # Mentions also need a post_id
             if 'tag' in request_json['object'] and isinstance(request_json['object']['tag'], list):
@@ -3057,8 +3061,9 @@ class PostReply(db.Model):
                 post.community.last_active = post.last_active = utcnow()
             session.execute(text('UPDATE "user" SET post_reply_count = post_reply_count + 1, last_seen = now() WHERE id = :user_id'),
                                {'user_id': user.id})
-            session.execute(text('UPDATE "site" SET last_active = NOW()'))
             session.commit()
+            from app.utils import mark_site_active
+            mark_site_active()
 
             # update reply_count_cross_posted
             if post.cross_posts and len(post.cross_posts) > 0:
@@ -3633,7 +3638,8 @@ class PostVote(db.Model):
             'ix_post_vote_post_created',
             'post_id', 'created_at'
         ),
-        db.Index('ix_post_vote_created', 'created_at')
+        db.Index('ix_post_vote_created', 'created_at'),
+        db.Index('ix_post_vote_post_id_user_id', 'post_id', 'user_id'),  # for finding an existing vote in Post.vote()
     )
 
 
@@ -3652,7 +3658,8 @@ class PostReplyVote(db.Model):
             'ix_post_reply_vote_reply_created',
             'post_reply_id', 'created_at'
         ),
-        db.Index('ix_post_reply_vote_created', 'created_at')
+        db.Index('ix_post_reply_vote_created', 'created_at'),
+        db.Index('ix_post_reply_vote_post_reply_id_user_id', 'post_reply_id', 'user_id'),  # for finding an existing vote in PostReply.vote()
     )
 
 
@@ -4616,6 +4623,17 @@ class UserTrustedDevice(db.Model):
         if "ipad" in ua or "tablet" in ua:
             return "tablet"
         return "desktop"
+
+
+@cache.memoize(timeout=60)
+def _community_following_instance_ids(community_id: int, mods_only: bool) -> List[int]:
+    # ids of remote instances that have non-banned users who are members of the community.
+    query = db.session.query(User.instance_id).join(CommunityMember, CommunityMember.user_id == User.id). \
+        filter(CommunityMember.community_id == community_id, CommunityMember.is_banned == False,
+               User.instance_id != 1, User.instance_id != None)
+    if mods_only:
+        query = query.filter(CommunityMember.is_moderator == True)
+    return [row[0] for row in query.distinct()]
 
 
 def _large_community_subscribers() -> float:

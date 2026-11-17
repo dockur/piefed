@@ -33,6 +33,7 @@ from app.main.util import sidebar_active_communities, sidebar_new_instances, sid
 from app.shared.tasks.maintenance import refresh_instance_chooser
 from app.translation import LibreTranslateAPI
 from app.utils import render_template, get_setting, request_etag_matches, return_304, blocked_domains, \
+    site_last_active, \
     ap_datetime, shorten_string, user_filters_home, \
     joined_communities, moderating_communities, markdown_to_html, \
     blocked_or_banned_instances, communities_banned_from, topic_tree, recently_upvoted_posts, recently_downvoted_posts, \
@@ -73,7 +74,7 @@ def index(sort=None, view_filter=None):
             view_filter = 'subscribed' if current_user.is_authenticated else 'popular'
 
     # If nothing has changed since their last visit, return HTTP 304
-    current_etag = f"{sort}_{view_filter}_{hash(str(g.site.last_active))}"
+    current_etag = f"{sort}_{view_filter}_{site_last_active()}"
     if current_user.is_anonymous and request_etag_matches(current_etag):
         return return_304(current_etag)
 
@@ -89,6 +90,7 @@ def index(sort=None, view_filter=None):
 
 def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
 
+    current_etag = f"{sort}_{view_filter}_{site_last_active()}"
     page_length = 20 if low_bandwidth else current_app.config['PAGE_LENGTH']
 
     if current_user.is_authenticated and current_user.page_length and current_user.page_length < page_length:
@@ -204,7 +206,7 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
                                              communities_banned_from_list=communities_banned_from_list,
                                              SUBSCRIPTION_PENDING=SUBSCRIPTION_PENDING,
                                              SUBSCRIPTION_MEMBER=SUBSCRIPTION_MEMBER,
-                                             etag=f"{sort}_{view_filter}_{hash(str(g.site.last_active))}",
+                                             etag=current_etag,
                                              instance_stickies=instance_stickies,
                                              content_filters=content_filters, sort=sort, view_filter=view_filter,
                                              reported_posts=reported_posts(user_id, user_id in g.admin_ids),
@@ -222,7 +224,7 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
                                recently_downvoted=recently_downvoted, new_instances=instances,
                                communities_banned_from_list=communities_banned_from_list,
                                SUBSCRIPTION_PENDING=SUBSCRIPTION_PENDING, SUBSCRIPTION_MEMBER=SUBSCRIPTION_MEMBER,
-                               etag=f"{sort}_{view_filter}_{hash(str(g.site.last_active))}", next_url=next_url,
+                               etag=current_etag, next_url=next_url,
                                prev_url=prev_url, instance_stickies=instance_stickies,
                                title=f"{g.site.name} - {g.site.description}",
                                description=shorten_string(html_to_text(g.site.sidebar), 150),
@@ -240,7 +242,7 @@ def home_page(sort, view_filter, page, result_id, low_bandwidth, tag):
                                tags=hashtags_recent(content_filters),
                                ))
     if current_user.is_anonymous:
-        resp.headers.set('ETag', f"{sort}_{view_filter}_{hash(str(g.site.last_active))}")
+        resp.headers.set('ETag', current_etag)
         resp.headers.set('Vary', 'Accept, Accept-Language')
         resp.headers.set('Cache-Control', 'public, max-age=60')
     else:
@@ -1232,7 +1234,7 @@ def explore():
 def index_rss(feed_type=None):
 
     # If nothing has changed since their last visit, return HTTP 304
-    current_etag = f"home_{hash(g.site.last_active)}"
+    current_etag = f"home_{site_last_active()}"
     if request_etag_matches(current_etag):
         return return_304(current_etag, 'application/rss+xml')
 
@@ -1306,7 +1308,7 @@ def index_rss(feed_type=None):
 
     response = make_response(feed.create_feed(posts, server_url))
     response.headers.set('Content-Type', 'application/rss+xml')
-    response.headers.add_header('ETag', f"home_{hash(g.site.last_active)}")
+    response.headers.add_header('ETag', current_etag)
     response.headers.add_header('Cache-Control', f'public, max-age={calculate_rss_cache_timeout(posts)}')
     return response
 
