@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-10-29 22:19+1300\n"
-"PO-Revision-Date: 2026-10-13 18:00+0000\n"
-"Last-Translator: Zai Diocson <zaidiocson7@gmail.com>\n"
+"PO-Revision-Date: 2026-11-15 16:10+0000\n"
+"Last-Translator: hankskyjames777 <iamjuanz30312@gmail.com>\n"
 "Language: ceb\n"
-"Language-Team: Cebuano <http://translate.piefed.social/projects/piefed"
-"/main-web-app/ceb/>\n"
+"Language-Team: Cebuano <http://translate.piefed.social/projects/piefed/main-"
+"web-app/ceb/>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+"X-Generator: Weblate 2026.9\n"
 
 #: app/__init__.py:55
 msgid "Please log in to access this page."
@@ -808,7 +809,7 @@ msgstr "Gikinahanglan ang mga bag-ong moderator"
 #: app/templates/community/_community_nav.html:174
 #: app/templates/community/_community_nav.html:491
 msgid "Everyone"
-msgstr "Ang tanan"
+msgstr "Tanan"
 
 #: app/admin/forms.py:156 app/community/forms.py:108
 msgid "Nobody"
@@ -829,7 +830,7 @@ msgstr "Masaligan nga instance"
 
 #: app/admin/forms.py:162 app/community/forms.py:114
 msgid "Accept downvotes from"
-msgstr "dawat sa mga downvote gikan sa"
+msgstr "Dawaton ang mga downvote gikan sa"
 
 #: app/admin/forms.py:164
 msgid "Posts can be popular"
@@ -4393,8 +4394,9 @@ msgstr "Karon nga uso"
 #: app/templates/themes/dillo/_home_nav.html:4
 #: app/templates/user/_read_posts_nav.html:9 app/user/forms.py:80
 #: app/user/forms.py:89
+#, fuzzy
 msgid "Hot"
-msgstr "Hot"
+msgstr "Lab-as"
 
 #: app/templates/_home_nav.html:6 app/templates/_home_nav.html:95
 #: app/templates/themes/dillo/_home_nav.html:9
@@ -6109,7 +6111,7 @@ msgstr "File"
 #: app/templates/user/filters.html:63
 #: app/templates/user/scheduled_posts.html:48
 msgid "Edit"
-msgstr "I-edit"
+msgstr "Bag-ohon"
 
 #: app/templates/admin/blocked_images.html:30
 #: app/templates/admin/cms_pages.html:40
@@ -11808,7 +11810,7 @@ msgstr "Font"
 
 #: app/user/forms.py:119
 msgid "Allow community themes"
-msgstr "Togti ang tema sa komunidad"
+msgstr "Tugoti ang mga tema gikan sa komunidad"
 
 #: app/user/forms.py:122
 msgid "Code syntax highlighting color scheme"
@@ -12449,4 +12451,3 @@ msgstr "Ang imong donasyon gi-cancel na."
 
 #~ msgid "Defederation"
 #~ msgstr "Pagbungkag sa paghiusa"
-

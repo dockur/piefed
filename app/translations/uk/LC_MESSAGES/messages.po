@@ -8,17 +8,18 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-10-29 22:19+1300\n"
-"PO-Revision-Date: 2026-10-06 00:57+0000\n"
+"PO-Revision-Date: 2026-11-16 21:16+0000\n"
 "Last-Translator: Denys Nykula <nykula@ukr.net>\n"
 "Language: uk\n"
-"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed"
-"/main-web-app/uk/>\n"
+"Language-Team: Ukrainian <http://translate.piefed.social/projects/piefed/"
+"main-web-app/uk/>\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+"X-Generator: Weblate 2026.9\n"
 
 #: app/__init__.py:55
 msgid "Please log in to access this page."
@@ -586,12 +587,11 @@ msgstr "Брати участь у виборі сервера"
 
 #: app/admin/forms.py:88
 msgid "Retrieve list of instances from"
-msgstr ""
+msgstr "Джерело списку серверів"
 
 #: app/admin/forms.py:89
-#, fuzzy
 msgid "Publish instance list"
-msgstr "Порушує правила сервера"
+msgstr "Оприлюднити список серверів"
 
 #: app/admin/forms.py:90
 msgid "One-sentence elevator pitch"
@@ -919,9 +919,8 @@ msgid "Posting warning"
 msgstr "Засторога при створенні допису"
 
 #: app/admin/forms.py:186
-#, fuzzy
 msgid "Posting warning override"
-msgstr "Засторога при створенні допису"
+msgstr "Заміна застороги при створенні допису"
 
 #: app/admin/forms.py:187 app/community/forms.py:45 app/community/forms.py:117
 msgid "Languages"
@@ -2363,7 +2362,7 @@ msgstr "Назва колись використовувалась. Повтор
 
 #: app/community/forms.py:119
 msgid "Default hashtag on new posts"
-msgstr ""
+msgstr "Типовий хештег для нових дописів"
 
 #: app/community/forms.py:125 app/templates/community/add_post.html:13
 #: app/templates/search/_search_form.html:45
@@ -3654,6 +3653,8 @@ msgid ""
 "%(num)d people will be followed. Please wait a few minutes while this "
 "happens in the background."
 msgstr ""
+"Зачекайте кілька хвилин, поки підписки (%(num)d) активуються у фоновому "
+"режимі."
 
 #: app/instance/routes.py:322 app/templates/instance/posts.html:21
 #, python-format
@@ -6437,18 +6438,16 @@ msgstr "Підтримуваний формат введення: <strong>https:
 
 #: app/templates/admin/high_posts_per_day.html:15
 #: app/templates/admin/votes.html:81
-#, fuzzy
 msgid "Creates many posts"
-msgstr "Новий допис"
+msgstr "Створює багато дописів"
 
 #: app/templates/admin/high_posts_per_day.html:18
-#, fuzzy
 msgid "These accounts have unusually high stamina, like a bot."
-msgstr "Ці облікові записи ніколи не голосують — імовірно боти."
+msgstr "Ці облікові записи підозріло витривалі — ймовірно боти."
 
 #: app/templates/admin/high_posts_per_day.html:23
 msgid "Average number of posts created per day"
-msgstr ""
+msgstr "Середня кількість дописів, створених за день"
 
 #: app/templates/admin/high_posts_per_day.html:34
 #: app/templates/admin/no_link_diversity.html:34
@@ -6546,13 +6545,15 @@ msgstr ""
 
 #: app/templates/admin/instance_chooser.html:28
 msgid "Data sharing"
-msgstr ""
+msgstr "Поширення даних"
 
 #: app/templates/admin/instance_chooser.html:31
 msgid ""
 "This can be set to any instance that you know has the \"Publish instance "
 "list\" checkbox ticked."
 msgstr ""
+"Можна зазначити будь-який сервер, у якого стоїть пташка «Оприлюднити список "
+"серверів»."
 
 #: app/templates/admin/instance_contact.html:13
 msgid ""
@@ -6751,19 +6752,18 @@ msgstr "Пам'ятайте, ця дія незворотна. Точно про
 
 #: app/templates/admin/no_link_diversity.html:15
 #: app/templates/admin/votes.html:82
-#, fuzzy
 msgid "Always links to the same place"
-msgstr "Де фільтрувати"
+msgstr "Завжди посилається на те саме місце"
 
 #: app/templates/admin/no_link_diversity.html:18
-#, fuzzy
 msgid "These accounts always create posts to the same domain, like a bot."
-msgstr "Ці облікові записи ніколи не голосують — імовірно боти."
+msgstr ""
+"Ці облікові записи щоразу створюють дописи про той самий домен — імовірно "
+"боти."
 
 #: app/templates/admin/no_link_diversity.html:23
-#, fuzzy
 msgid "Posts created"
-msgstr "Автор допису"
+msgstr "Створені дописи"
 
 #: app/templates/admin/permissions.html:23
 msgid "User ID #1"
@@ -6911,7 +6911,7 @@ msgstr "Повторити перевірку"
 #: app/templates/user/voting_patterns.html:160
 #, python-format
 msgid "All these statistics are for activity in the last %(days)d days."
-msgstr ""
+msgstr "Уся ця статистика стосується діяльності за минулі %(days)d днів."
 
 #: app/templates/admin/votes.html:21
 msgid "Accounts that only ever vote on one person"
@@ -6924,22 +6924,22 @@ msgstr "Перевірка тривала надто довго. Її припи
 #: app/templates/admin/votes.html:30
 #, python-format
 msgid "cast %(votes)d votes against"
-msgstr ""
+msgstr "голосує (%(votes)d) проти"
 
 #: app/templates/admin/votes.html:32
 #, python-format
 msgid "cast %(votes)d votes for"
-msgstr ""
+msgstr "голосує (%(votes)d) за"
 
 #: app/templates/admin/votes.html:36
-#, fuzzy, python-format
+#, python-format
 msgid "in %(span)s"
-msgstr "Долучитись до %(domain)s"
+msgstr "у %(span)s"
 
 #: app/templates/admin/votes.html:38
-#, fuzzy, python-format
+#, python-format
 msgid "across %(n)d different communities,"
-msgstr "Дописи в спільнотах"
+msgstr "у %(n)d різних спільнотах,"
 
 #: app/templates/admin/votes.html:40
 #, python-format
@@ -6955,12 +6955,12 @@ msgid "The same username on several servers, voting for itself"
 msgstr "Одне ім'я на кількох серверах, голосує за себе"
 
 #: app/templates/admin/votes.html:56
-#, fuzzy, python-format
+#, python-format
 msgid "%(num)d account called"
 msgid_plural "%(num)d accounts called"
-msgstr[0] "%(num)d коментар"
-msgstr[1] "%(num)d коментарі"
-msgstr[2] "%(num)d коментарів"
+msgstr[0] "%(num)d покликаний обліковий запис"
+msgstr[1] "%(num)d покликані облікові записи"
+msgstr[2] "%(num)d покликаних облікових записів"
 
 #: app/templates/admin/votes.html:58
 msgid "on another server"
@@ -6972,18 +6972,17 @@ msgstr[2] "на інших серверах"
 #: app/templates/admin/votes.html:60
 #, python-format
 msgid "cast %(votes)d downvotes against"
-msgstr ""
+msgstr "голосує (%(votes)d) проти"
 
 #: app/templates/admin/votes.html:62
 #, python-format
 msgid "cast %(votes)d upvotes for"
-msgstr ""
+msgstr "голосує (%(votes)d) за"
 
 #: app/templates/admin/votes.html:77
 #: app/templates/admin/votes_for_noone.html:15
-#, fuzzy
 msgid "Accounts that never vote"
-msgstr "Облікові записи, які завжди голосують щодо когось одного"
+msgstr "Облікові записи, які ніколи не голосують"
 
 #: app/templates/admin/votes.html:78
 #: app/templates/admin/votes_serial_downvoters.html:15
@@ -6991,9 +6990,8 @@ msgid "Serial downvoters"
 msgstr "Масові голоси проти"
 
 #: app/templates/admin/votes.html:80
-#, fuzzy
 msgid "Other reports"
-msgstr "Скарги"
+msgstr "Інші скарги"
 
 #: app/templates/admin/votes_for_noone.html:18
 msgid "These accounts never vote on anyone else, like a bot."
@@ -7027,7 +7025,7 @@ msgstr "Голосує проти"
 
 #: app/templates/admin/votes_serial_downvoters.html:23
 msgid "Victim"
-msgstr ""
+msgstr "Жертва"
 
 #: app/templates/admin/votes_serial_downvoters.html:24
 msgid "Vote burst"
@@ -11008,12 +11006,10 @@ msgid "Commenting pattern"
 msgstr "Закономірність коментування"
 
 #: app/templates/user/show_upvoted.html:89
-#, fuzzy
 msgid "Post created"
-msgstr "Автор допису"
+msgstr "Допис створено"
 
 #: app/templates/user/show_upvoted.html:89
-#, fuzzy
 msgid "Upvoted at"
 msgstr "Схвалено"
 
@@ -11076,7 +11072,7 @@ msgstr "Поскаржитись на «%(user_name)s»"
 #: app/templates/user/voting_patterns.html:24
 #, python-format
 msgid "%(total)d votes"
-msgstr ""
+msgstr "%(total)d голосів"
 
 #: app/templates/user/voting_patterns.html:38
 msgid "Up"
@@ -11087,9 +11083,8 @@ msgid "Down"
 msgstr "Засудження"
 
 #: app/templates/user/voting_patterns.html:49
-#, fuzzy
 msgid "votes"
-msgstr "Голоси"
+msgstr "голоси"
 
 #: app/templates/user/voting_patterns.html:71
 msgid "Upvotes"
@@ -11129,7 +11124,7 @@ msgstr ""
 
 #: app/templates/user/voting_patterns_down.html:76
 msgid "Votes are sent in batches so the When column is not totally accurate."
-msgstr ""
+msgstr "Голоси надсилаються пакетами, тож колонка дати не дуже точна."
 
 #: app/templates/user/voting_patterns_down.html:80
 msgid "Target"
@@ -11140,9 +11135,8 @@ msgid "Post / comment"
 msgstr "Допис / коментар"
 
 #: app/templates/user/voting_patterns_down.html:84
-#, fuzzy
 msgid "view"
-msgstr "Переглянути"
+msgstr "переглянути"
 
 #: app/templates/user/alerts/_comments.html:3
 msgid "You will be notified of replies to these comments"
@@ -12238,4 +12232,3 @@ msgstr "Внесок скасовано."
 
 #~ msgid "Defederation"
 #~ msgstr "Блокування серверів"
-

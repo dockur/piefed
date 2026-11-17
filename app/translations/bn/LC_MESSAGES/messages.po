@@ -8,19 +8,21 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-10-29 22:19+1300\n"
-"PO-Revision-Date: 2026-10-29 22:19+1300\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2026-10-30 09:50+0000\n"
+"Last-Translator: astro_ray <ritamsaha00@gmail.com>\n"
 "Language: bn\n"
-"Language-Team: bn <LL@li.org>\n"
+"Language-Team: Bengali <http://translate.piefed.social/projects/piefed/main-"
+"web-app/bn/>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+"X-Generator: Weblate 2026.9\n"
 
 #: app/__init__.py:55
 msgid "Please log in to access this page."
-msgstr ""
+msgstr "এই পৃষ্ঠাটি অ্যাক্সেস করতে লগ ইন করুন।"
 
 #: app/cli.py:1153
 #, python-format
@@ -34,12 +36,12 @@ msgstr ""
 
 #: app/cli.py:1590 app/main/routes.py:816
 msgid "[PieFed] You have unread notifications"
-msgstr ""
+msgstr "[PieFed] আপনার অপঠিত বিজ্ঞপ্তি আছে"
 
 #: app/cli.py:1779 app/shared/post.py:146
 #, python-format
 msgid "Replies to my post %(post_title)s"
-msgstr ""
+msgstr "আপনার %(post_title)s পোস্টে উত্তর"
 
 #: app/cli.py:1789 app/models.py:3000 app/shared/reply.py:121
 #, python-format
@@ -48,39 +50,39 @@ msgstr ""
 
 #: app/email.py:22
 msgid "Check the console for a link."
-msgstr ""
+msgstr "লিঙ্কের জন্য কনসোলটি দেখুন।"
 
 #: app/email.py:24
 msgid "[PieFed] Reset Your Password"
-msgstr ""
+msgstr "[PieFed] আপনার পাসওয়ার্ড রিসেট করুন"
 
 #: app/email.py:34
 msgid "[PieFed] Please verify your email address"
-msgstr ""
+msgstr "[PieFed] অনুগ্রহ করে আপনার ইমেল ঠিকানা যাচাই করুন"
 
 #: app/email.py:42
 msgid "Your application has been approved - welcome to PieFed"
-msgstr ""
+msgstr "আপনার আবেদন অনুমোদিত হয়েছে - PieFed এ স্বাগতম"
 
 #: app/models.py:2919
 msgid "Comments are disabled on this post"
-msgstr ""
+msgstr "এই পোস্টে মন্তব্যগুলি অক্ষম করা হয়েছে"
 
 #: app/models.py:2922
 msgid "Banned from commenting"
-msgstr ""
+msgstr "মন্তব্য করা থেকে নিষিদ্ধ"
 
 #: app/models.py:2953
 msgid "Blocked phrase in comment"
-msgstr ""
+msgstr "মন্তব্যে ব্লক করা বাক্যাংশ"
 
 #: app/models.py:2964
 msgid "Replier blocked"
-msgstr ""
+msgstr "উত্তর ব্লক করা হয়েছে"
 
 #: app/models.py:2967
 msgid "Duplicate reply"
-msgstr ""
+msgstr "ডুপ্লিকেট উত্তর"
 
 #: app/models.py:2974
 msgid "Gif comment ignored"
@@ -88,15 +90,15 @@ msgstr ""
 
 #: app/models.py:2977
 msgid "Low quality reply"
-msgstr ""
+msgstr "নিম্ন মানের উত্তর"
 
 #: app/models.py:3837
 msgid "Added moderator"
-msgstr ""
+msgstr "মডারেটর যোগ করা হয়েছে"
 
 #: app/models.py:3838
 msgid "Removed moderator"
-msgstr ""
+msgstr "মডারেটর সরানো হয়েছে"
 
 #: app/models.py:3839
 msgid "Featured post"
@@ -11717,4 +11719,3 @@ msgstr ""
 #: app/user/subscription.py:162
 msgid "Your donation has been cancelled."
 msgstr ""
-
