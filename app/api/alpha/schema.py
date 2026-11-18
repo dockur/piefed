@@ -1058,8 +1058,6 @@ class MediaView(DefaultSchema):
 class UserMediaRequest(DefaultSchema):
     limit = fields.Integer(metadata={"default": 10})
     page = fields.Integer(metadata={"default": 1})
-    sort = fields.String(validate=validate.OneOf(comment_sort_list), metadata={"default": "New"})
-    unread_only = fields.Boolean(metadata={"default": True})
 
 
 class UserMediaResponse(DefaultSchema):
