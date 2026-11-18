@@ -1761,6 +1761,11 @@ details {
   height: calc(var(--spacing-16) * 14.375); /* 230px */
 }
 
+#incr_scheduled_for {
+  position: relative;
+  top: 3px;
+}
+
 .table {
   tr th {
     vertical-align: middle;

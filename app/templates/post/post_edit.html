@@ -125,6 +125,28 @@
         // Override DownArea image button to use media library
         mediaLibrary.overrideDownAreaImageButton('#body', 1500);
         {% endif %}
+
+        // make the +1 hour button add an hour on to the value of the scheduled_for field
+        const incr_scheduled_for = document.getElementById("incr_scheduled_for");
+        if(incr_scheduled_for) {
+            incr_scheduled_for.addEventListener('click', function () {
+                const scheduled_for = document.getElementById("scheduled_for");
+                if(scheduled_for) {
+                    let date = scheduled_for.value
+                        ? new Date(scheduled_for.value)
+                        : new Date();
+
+                    date.setHours(date.getHours() + 1);
+
+                    // Format as YYYY-MM-DDTHH:MM (datetime-local format)
+                    scheduled_for.value = date.getFullYear() + '-' +
+                        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(date.getDate()).padStart(2, '0') + 'T' +
+                        String(date.getHours()).padStart(2, '0') + ':' +
+                        String(date.getMinutes()).padStart(2, '0');
+                }
+            });
+        }
     });
 </script>
 <div class="row">
@@ -317,7 +339,13 @@
                 {{ render_field(form.nsfw) }}
                 {{ render_field(form.nsfl) }}
                 {{ render_field(form.ai_generated) }}
-                {{ render_field(form.scheduled_for) }}
+                <div class="row align-items-center">
+                    <div class="col">
+                        {{ render_field(form.scheduled_for) }}
+                    </div>
+                    <div class="col-2"><input id="incr_scheduled_for" type="button" class="btn btn-outline-secondary" value="{{ _('+1 hour') }}"> </div>
+                </div>
+
                 {{ render_field(form.timezone) }}
                 {{ render_field(form.repeat) }}
 
