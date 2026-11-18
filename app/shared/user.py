@@ -196,7 +196,7 @@ def ban_user(input, src, auth=None):
             db.session.add(IpBan(ip_address=to_ban.ip_address, notes=reason))
             db.session.commit()
 
-    task_selector('ban_from_site', user_id=to_ban.id, mod_id=user.id, expiry=None, reason=reason, remove_data=purge_content and to_ban.is_local())
+    task_selector('ban_from_site', user_id=to_ban.id, mod_id=user.id, expiry=None, reason=reason, remove_data=purge_content)
 
     # Fire plugin hook for ban
     plugins.fire_hook("ban_user", to_ban)
