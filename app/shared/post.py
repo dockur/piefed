@@ -530,7 +530,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
         image_format = current_app.config['MEDIA_IMAGE_FORMAT']
         image_quality = current_app.config['MEDIA_IMAGE_QUALITY']
 
-        if not final_place.endswith('.svg') and not final_place.endswith('.gif') and not is_video_url(final_place):
+        if not final_place.endswith('.svg') and not final_place.endswith('.gif') and not final_place.endswith('.avif') and not is_video_url(final_place):
             img = Image.open(final_place)
             if '.' + img.format.lower() in allowed_extensions:
                 img = ImageOps.exif_transpose(img)
@@ -759,7 +759,7 @@ def edit_post(input, post: Post, type, src, user=None, auth=None, uploaded_file=
                     if final_ext == '.svg':
                         sanitize_svg(final_place)
 
-                    if not final_place.endswith('.svg') and not final_place.endswith('.gif'):
+                    if not final_place.endswith('.svg') and not final_place.endswith('.gif') and not final_place.endswith('.avif'):
                         img = Image.open(final_place)
                         if '.' + img.format.lower() in allowed_extensions:
                             img = ImageOps.exif_transpose(img)

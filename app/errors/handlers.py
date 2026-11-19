@@ -14,7 +14,7 @@ def not_found_error(error):
             request.path.startswith('/admin/') or
             request.path.startswith('/auth/') or
             request.path.endswith(('.jpg', '.jpeg', '.png', '.gif', '.css', '.js', '.ico', '.svg', '.woff', '.woff2',
-                                   '.ttf', '.webp', '.txt'))):
+                                   '.ttf', '.webp', '.txt', '.jxl', '.avif'))):
         return render_template('errors/404.html'), 404
 
     # Check if there's a page for this URL

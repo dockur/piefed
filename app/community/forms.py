@@ -315,7 +315,7 @@ class CreateImageForm(CreatePostForm):
         super().validate(extra_validators)
 
         uploaded_file = request.files['image_file']
-        if uploaded_file and uploaded_file.filename != '' and not uploaded_file.filename.endswith('.svg') and not uploaded_file.filename.endswith('.gif'):
+        if uploaded_file and uploaded_file.filename != '' and not uploaded_file.filename.endswith('.svg') and not uploaded_file.filename.endswith('.gif') and not uploaded_file.filename.endswith('.avif'):
             Image.MAX_IMAGE_PIXELS = 89478485
 
             site = Site.query.get(1)
@@ -337,7 +337,7 @@ class CreateImageForm(CreatePostForm):
                         self.image_file.errors.append("This image is from 4chan.")
                         db.session.commit()
                         return False
-        if uploaded_file.filename.endswith('.gif'):
+        if uploaded_file.filename.endswith('.gif') or uploaded_file.filename.endswith('.avif'):
             max_size_in_mb = 10 * 1024 * 1024  # 10 MB
             if len(uploaded_file.read()) > max_size_in_mb:
                 error_message = "This image filesize is too large."

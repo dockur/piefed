@@ -1267,7 +1267,7 @@ def delete_from_s3(s3_files_to_delete):
 
 @celery.task
 def clean_up_tmp():
-    DELETABLE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic", ".mp3", ".mp4"}
+    DELETABLE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic", ".mp3", ".mp4", ".avif", ".jxl"}
     ONE_DAY = 24 * 60 * 60
 
     now = time.time()
