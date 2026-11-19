@@ -1,5 +1,5 @@
 /* LIBERTATIA — Cold // Steel blue on near-black // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=4");
+@import url("../hacker_bbs_shared/base.css?v=5");
 :root {
   --lt-bg: #03080f; --lt-bg-raised: #060d18; --lt-bg-sunken: #020508;
   --lt-bg-header: #010408; --lt-bg-hover: #0a1525; --lt-bg-active: #081020;
@@ -18,3 +18,6 @@
   --lt-title-border: #50c060;
   --lt-title-bg: #041520;
 }
+
+/* Theme-colored matrix tile (2026-11-19) */
+:root { --lt-bg-tile: url("/static/themes/hacker_bbs_cold/matrix-bg-tile-cold.svg?v=1"); }

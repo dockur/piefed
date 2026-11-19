@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
-  <rect width="200" height="300" fill="#0a0e0a"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="300" viewBox="0 0 180 300">
+  <rect width="180" height="300" fill="#0a0e0a"/>
   
   <!-- Column 1 -->
   <text x="12" y="20"  font-family="monospace" font-size="13" fill="#1a4d1a" opacity="0.9">1</text>
