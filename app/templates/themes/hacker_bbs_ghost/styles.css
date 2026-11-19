@@ -1,5 +1,5 @@
 /* LIBERTATIA — Ghost // Off-white on black terminal // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=4");
+@import url("../hacker_bbs_shared/base.css?v=5");
 
 
 :root {
@@ -20,3 +20,6 @@
   --lt-title-border: #a0a09a;
   --lt-title-bg: #101010;
 }
+
+/* Theme-colored matrix tile (2026-11-19) */
+:root { --lt-bg-tile: url("/static/themes/hacker_bbs_ghost/matrix-bg-tile-ghost.svg?v=1"); }

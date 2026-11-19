@@ -1,5 +1,5 @@
 /* LIBERTATIA — Amber // Warm phosphor gold on near-black // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=4");
+@import url("../hacker_bbs_shared/base.css?v=5");
 :root {
   --lt-bg: #0d0c00; --lt-bg-raised: #0f0e00; --lt-bg-sunken: #0a0900;
   --lt-bg-header: #080700; --lt-bg-hover: #1a1600; --lt-bg-active: #141200;
@@ -18,3 +18,6 @@
   --lt-title-border: #8a7030;
   --lt-title-bg: #1a1400;
 }
+
+/* Theme-colored matrix tile (2026-11-19) */
+:root { --lt-bg-tile: url("/static/themes/hacker_bbs_amber/matrix-bg-tile-amber.svg?v=1"); }

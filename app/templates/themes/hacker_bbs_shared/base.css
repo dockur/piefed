@@ -5,7 +5,7 @@
  * importing theme's styles.css via CSS custom properties.
  *
  * DO NOT use this folder as a theme directly.
- * It is imported by each libertatia_* theme.
+ * It is imported by each hacker_bbs_* theme.
  *
  * libertatia.org // AGPL licensed
  */
@@ -117,7 +117,7 @@ body {
       var(--lt-scan-color) 4px
     ),
     linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
-    url('/static/themes/hacker_bbs_shared/matrix-bg-tile.svg');
+    var(--lt-bg-tile, url('/static/themes/hacker_bbs_shared/matrix-bg-tile.svg?v=2')); /* per-theme tile; absolute URL (var() urls resolve oddly) */
   background-size: auto, auto, auto;
   background-position: top left, top left, top left;
   background-attachment: local, local, local;
@@ -1122,13 +1122,25 @@ dialog {
   display: none;
 }
 
-/* Rebrand bookmarklet link text from "Share on PieFed" to "Share on Libertatia" */
-.main_pane hr + p + p a[href^="javascript:"] {
-  font-size: 0;
+/* ============================================================
+   OP HIGHLIGHT (2026-11-19) - matrix green, all themes.
+   Themes may override: --lt-op (border/rail), --lt-op-rgb, --lt-op-text (name),
+   --lt-op-bg + --lt-op-badge-text (badge fill/text; see phosphor).
+   ============================================================ */
+.user_flair.original_poster {
+  background: var(--lt-op-bg, #030603) !important;
+  border: 1px solid var(--lt-op, #00ff41) !important;
+  color: var(--lt-op-badge-text, var(--lt-op-text, #2ec94f)) !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 4px rgba(var(--lt-op-rgb, 0, 255, 65), .3);
 }
-.main_pane hr + p + p a[href^="javascript:"]::before {
-  content: "Share on Libertatia";
-  font-size: 1rem;
-  text-decoration: underline;
-  cursor: grab;
+.comment.original_poster > .row > .comment_author .author_link {
+  color: var(--lt-op-text, #2ec94f) !important;
+  text-shadow: 0 0 4px rgba(var(--lt-op-rgb, 0, 255, 65), .25);
+}
+/* rail on the OP comment's own rows only, not its nested replies */
+.comment.original_poster > .row {
+  border-left: 3px solid var(--lt-op, #00ff41);
+  background: rgba(var(--lt-op-rgb, 0, 255, 65), .035);
 }

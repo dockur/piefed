@@ -1,5 +1,5 @@
 /* LIBERTATIA — Danger // Blood red on near-black // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=4");
+@import url("../hacker_bbs_shared/base.css?v=5");
 :root {
   --lt-bg: #0d0000; --lt-bg-raised: #120000; --lt-bg-sunken: #080000;
   --lt-bg-header: #060000; --lt-bg-hover: #1e0000; --lt-bg-active: #180000;
@@ -18,3 +18,6 @@
   --lt-title-border: #3090c0;
   --lt-title-bg: #1a0000;
 }
+
+/* Theme-colored matrix tile (2026-11-19) */
+:root { --lt-bg-tile: url("/static/themes/hacker_bbs_danger/matrix-bg-tile-danger.svg?v=1"); }
