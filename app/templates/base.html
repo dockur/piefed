@@ -103,6 +103,10 @@
         {% endif -%}
         {% if post -%}
             <link rel="alternate" type="application/json+oembed" href="{{ url_for('post.post_oembed', post_id=post.id, _external=True) }}" title="{{ post.title }}" />
+            <link rel="alternate" type="application/activity+json" href="{{ post.ap_id }}">
+        {% endif -%}
+        {% if alternate_url -%}
+            <link rel="alternate" type="application/activity+json" href="{{ alternate_url }}">
         {% endif -%}
       {% if preconnect and not low_bandwidth -%}
         <link rel="preconnect" href='{{ preconnect }}'>

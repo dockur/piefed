@@ -214,7 +214,8 @@ def show_profile(user):
                            same_user_name=same_user_name,
                            archived_post_replies=archived_post_replies,
                            followers=followers, following=following,
-                           bot_challenge=bot_challenge, vote_quota_used=vote_quota_used)
+                           bot_challenge=bot_challenge, vote_quota_used=vote_quota_used,
+                           alternate_url=user.profile_id())
 
 
 @bp.route('/u/<actor>/upvotes')
