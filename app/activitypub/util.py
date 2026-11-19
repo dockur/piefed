@@ -38,7 +38,7 @@ from app.utils import get_request, allowlist_html, get_setting, ap_datetime, mar
     blocked_users, piefed_markdown_to_lemmy_markdown, store_files_in_s3, guess_mime_type, get_recipient_language, \
     patch_db_session, to_srgb, communities_banned_from_all_users, blocked_communities, blocked_or_banned_instances, \
     instance_community_ids, banned_instances, communities_run_by_inactive_mods, inspect_image_c2pa, can_downvote, \
-    can_upvote
+    can_upvote, activity_is_type
 
 
 def public_key():
@@ -1095,7 +1095,7 @@ def actor_json_to_model(activity_json, address, server):
         return None
     if server not in activity_json['id']:
         return None
-    if activity_json['type'] == 'Person' or activity_json['type'] == 'Service':
+    if activity_is_type(activity_json, ['Person', 'Service']):
         user = db.session.query(User).filter(User.ap_profile_id == activity_json['id'].lower()).first()
         if user:
             return user
@@ -1117,7 +1117,7 @@ def actor_json_to_model(activity_json, address, server):
                         ap_fetched_at=utcnow(),
                         ap_domain=server,
                         public_key=activity_json['publicKey']['publicKeyPem'],
-                        bot=True if activity_json['type'] == 'Service' else False,
+                        bot=True if activity_is_type(activity_json, 'Service') else False,
                         instance_id=find_instance_id(server),
                         accept_private_messages=activity_json['acceptPrivateMessages'] if 'acceptPrivateMessages' in activity_json else 3
                         # language=community_json['language'][0]['identifier'] # todo: language
@@ -1187,7 +1187,7 @@ def actor_json_to_model(activity_json, address, server):
         if user.cover_id and get_setting('cache_remote_images_locally', True):
             make_image_sizes(user.cover_id, 878, None, 'users')
         return user
-    elif activity_json['type'] == 'Group':
+    elif activity_is_type(activity_json, 'Group'):
         community = db.session.query(Community).filter(Community.ap_profile_id == activity_json['id'].lower()).first()
         if community:
             return community
@@ -1329,7 +1329,7 @@ def actor_json_to_model(activity_json, address, server):
         plugins.fire_hook("new_remote_community", community)
 
         return community
-    elif activity_json['type'] == 'Feed':
+    elif activity_is_type(activity_json, 'Feed'):
         feed = db.session.query(Feed).filter(Feed.ap_profile_id == activity_json['id'].lower()).first()
         if feed:
             return feed
@@ -1466,7 +1466,7 @@ def actor_json_to_model(activity_json, address, server):
             for child_feed in activity_json['childFeeds']:
                 populate_child_feed(feed.id, child_feed)
         return feed
-    elif activity_json['type'] == 'Blocklist':
+    elif activity_is_type(activity_json, 'Blocklist'):
         blocklist = db.session.query(Blocklist).filter(Blocklist.ap_profile_id == activity_json['id'].lower()).first()
         if blocklist:
             return blocklist
@@ -4165,14 +4165,14 @@ def find_community(request_json):
                 return comment_being_replied_to.community
 
     # Update / Video from PeerTube (possibly an edit, more likely an invite to query Likes / Replies endpoints)
-    if rj['type'] == 'Video':
+    if activity_is_type(rj, 'Video'):
         if 'attributedTo' in rj and isinstance(rj['attributedTo'], list):
             for a in rj['attributedTo']:
                 if isinstance(a, str):
                     potential_community = Community.query.filter_by(ap_profile_id=a.lower()).first()
                     if potential_community:
                         return potential_community
-                elif a['type'] == 'Group':
+                elif activity_is_type(a, 'Group'):
                     potential_community = db.session.query(Community).filter_by(ap_profile_id=a['id'].lower()).first()
                     if potential_community:
                         return potential_community

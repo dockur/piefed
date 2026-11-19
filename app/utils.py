@@ -5197,6 +5197,28 @@ def calculate_rss_cache_timeout(posts):
 
 def months_since(dt: datetime):
     """ How many months have passed since dt """
-
     now = datetime.now()
     return (now.year - dt.year) * 12 + now.month - dt.month
+
+
+# Types on activitypub objects are strings, 99.9% of the time but theoretically they can be lists of strings,
+# see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-type
+# Usage: activity_is_type(activity, 'Group') or activity_is_type(activity, ['Page', 'Note']) if checking for multiple types.
+def activity_is_type(obj: dict, type_to_find: str | list | tuple | set) -> bool:
+    obj_type = obj.get('type')
+
+    # when obj['type'] is a string (most common case)
+    if isinstance(obj_type, str):
+        if isinstance(type_to_find, str):
+            return obj_type == type_to_find
+        elif isinstance(type_to_find, (list, tuple, set)):
+            return obj_type in type_to_find
+
+    # when it's a list
+    elif isinstance(obj_type, (list, tuple, set)):
+        if isinstance(type_to_find, str):
+            return type_to_find in obj_type
+        elif isinstance(type_to_find, (list, tuple, set)):
+            return bool(set(obj_type) & set(type_to_find))  # never turn down a chance to use set intersection, it makes you look brainy
+
+    return False

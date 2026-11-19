@@ -39,7 +39,7 @@ from app.utils import gibberish, get_setting, community_membership, ap_datetime,
     feed_membership, get_task_session, patch_db_session, \
     blocked_phrases, orjson_response, moderating_communities, joined_communities, moderating_communities_ids, \
     moderating_communities_ids_all_users, publish_sse_event, blocked_users, block_honey_pot, instance_allowed, \
-    requestor_domain, markdown_to_html, allowlist_html, blocklist_membership
+    requestor_domain, markdown_to_html, allowlist_html, blocklist_membership, activity_is_type
 
 
 @bp.route('/testredis')
@@ -849,9 +849,9 @@ def process_inbox_request(request_json, store_ap_json):
                             log_incoming_ap(id, APLOG_ADD, APLOG_IGNORED, saved_json, 'NodeBB Topic Management')
                             return
                         elif request_json['type'] == 'Update' and 'type' in request_json['object']:
-                            if request_json['object']['type'] == 'Group':
+                            if activity_is_type(request_json['object'], 'Group'):
                                 community = actor  # process it same as Update/Group from Lemmy
-                            elif request_json['object']['type'] == 'OrderedCollection':
+                            elif activity_is_type(request_json['object'], 'OrderedCollection'):
                                 log_incoming_ap(id, APLOG_ADD, APLOG_IGNORED, saved_json, 'Follower count update from a.gup.pe')
                                 return
                             else:
@@ -1278,12 +1278,11 @@ def process_inbox_request(request_json, store_ap_json):
                                 log_incoming_ap(id, APLOG_CREATE, APLOG_FAILURE, saved_json, 'Remote Create in local_only community')
                                 return
 
-                        object_type = core_activity['object']['type']
                         new_content_types = ['Page', 'Article', 'Link', 'Note', 'Question', 'Event']
-                        if object_type in new_content_types:  # create or update a post
+                        if activity_is_type(core_activity['object'], new_content_types): # create or update a post
                             process_new_content(user, community, store_ap_json, request_json, announced)
                             return
-                        elif object_type == 'Video':  # PeerTube: editing a video (mostly used to update post score)
+                        elif activity_is_type(core_activity['object'], 'Video'):  # PeerTube: editing a video (mostly used to update post score)
                             post = Post.get_by_ap_id(core_activity['object']['id'])
                             if post:
                                 if user.id == post.user_id:
@@ -1296,7 +1295,7 @@ def process_inbox_request(request_json, store_ap_json):
                             else:
                                 log_incoming_ap(id, APLOG_UPDATE, APLOG_FAILURE, saved_json, 'PeerTube post not found')
                                 return
-                        elif object_type == 'Group' and core_activity['type'] == 'Update':  # update community/category info
+                        elif activity_is_type(core_activity['object'], 'Group') and activity_is_type(core_activity, 'Update'):  # update community/category info
                             if community.is_local() and not community.is_moderator(user):
                                 log_incoming_ap(id, APLOG_CREATE, APLOG_FAILURE, saved_json, 'Comm edit by non-moderator')
                             else:
@@ -1305,7 +1304,7 @@ def process_inbox_request(request_json, store_ap_json):
                                 if community.is_local():
                                     announce_activity_to_followers(community, user, request_json)
                         else:
-                            log_incoming_ap(id, APLOG_CREATE, APLOG_FAILURE, saved_json, 'Unacceptable type (create): ' + object_type)
+                            log_incoming_ap(id, APLOG_CREATE, APLOG_FAILURE, saved_json, f'Unacceptable type (create): {core_activity["object"]["type"]}')
                     return
 
                 if core_activity['type'] == 'Delete':
