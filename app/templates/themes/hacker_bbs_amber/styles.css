@@ -1,5 +1,5 @@
 /* LIBERTATIA — Amber // Warm phosphor gold on near-black // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=5");
+@import url("../hacker_bbs_shared/base.css?v=6");
 :root {
   --lt-bg: #0d0c00; --lt-bg-raised: #0f0e00; --lt-bg-sunken: #0a0900;
   --lt-bg-header: #080700; --lt-bg-hover: #1a1600; --lt-bg-active: #141200;

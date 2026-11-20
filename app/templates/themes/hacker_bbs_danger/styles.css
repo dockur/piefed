@@ -1,5 +1,5 @@
 /* LIBERTATIA — Danger // Blood red on near-black // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=5");
+@import url("../hacker_bbs_shared/base.css?v=6");
 :root {
   --lt-bg: #0d0000; --lt-bg-raised: #120000; --lt-bg-sunken: #080000;
   --lt-bg-header: #060000; --lt-bg-hover: #1e0000; --lt-bg-active: #180000;

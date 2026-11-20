@@ -1,5 +1,5 @@
 /* LIBERTATIA — Paper // Black ink on off-white // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=5");
+@import url("../hacker_bbs_shared/base.css?v=6");
 :root {
   --lt-bg: #f5f0e8; --lt-bg-raised: #ffffff; --lt-bg-sunken: #ede8e0;
   --lt-bg-header: #e8e0d0; --lt-bg-hover: #e8e0d0; --lt-bg-active: #ddd8cc;

@@ -1,5 +1,5 @@
 /* LIBERTATIA — Cold // Steel blue on near-black // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=5");
+@import url("../hacker_bbs_shared/base.css?v=6");
 :root {
   --lt-bg: #03080f; --lt-bg-raised: #060d18; --lt-bg-sunken: #020508;
   --lt-bg-header: #010408; --lt-bg-hover: #0a1525; --lt-bg-active: #081020;
