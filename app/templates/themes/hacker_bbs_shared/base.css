@@ -12,11 +12,13 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Press+Start+2P&family=Silkscreen&family=Major+Mono+Display&family=Crimson+Pro:wght@300;400&display=swap');
 
+/* Logo font: Noto Sans Mono, self-hosted Latin subset (SIL OFL 1.1, see noto_sans_mono_OFL.txt). */
 @font-face {
-  font-family: 'Web IBM VGA 8x16';
+  font-family: 'Hacker BBS Logo Mono';
   font-style: normal;
   font-weight: 400;
-  src: url('https://int10h.org/oldschool-pc-fonts/fontlist/woff/web_ibm_vga_8x16.woff') format('woff');
+  font-display: swap;
+  src: url('/static/themes/hacker_bbs_shared/noto_sans_mono_latin.woff2') format('woff2');
 }
 
 /* ============================================================
@@ -175,7 +177,7 @@ input, textarea, [contenteditable],
 }
 
 .navbar-brand {
-  font-family: 'Web IBM VGA 8x16', monospace !important;
+  font-family: 'Hacker BBS Logo Mono', 'Noto Sans Mono', monospace !important;
   font-size: 1.5rem !important;
   color: var(--lt-primary) !important;
   letter-spacing: 0.05em;
