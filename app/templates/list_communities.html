@@ -183,6 +183,12 @@
                                             placeholder="{{ _("e.g. piefed.social") }}"
                                             value="{{ instance }}">
                                 </div>
+                                <div class="col-12 col-sm-6 col-lg-4 mb-2 px-1 pt-4">
+                                    <label for="faves_checkbox">
+                                        <input id="faves_checkbox" type="checkbox" name="faves" value="1" {{ 'checked' if faves }}>
+                                        {{ _('My favourite communities') }}
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

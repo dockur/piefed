@@ -296,6 +296,7 @@ def list_communities():
     nsfw = request.args.get('nsfw', 'all')
     page = request.args.get('page', 1, type=int)
     instance = request.args.get('instance', '')
+    faves = request.args.get('faves', '')   # favourite communities. Using a cute name to avoid name conflict with the favourite_communities function.
     low_bandwidth = request.cookies.get('low_bandwidth', '0') == '1'
     sort_by = request.args.get('sort_by', 'post_reply_count desc')
 
@@ -417,6 +418,8 @@ def list_communities():
         filtered_out_community_ids = filtered_out_communities(current_user)
         if len(filtered_out_community_ids):
             communities = communities.filter(Community.id.not_in(filtered_out_community_ids))
+        if faves:
+            communities = communities.filter(Community.id.in_(favorite_communities(current_user.id)))
 
     else:
         communities = communities.filter(Community.nsfl == False)
@@ -470,6 +473,7 @@ def list_communities():
         "hide_nsfw": hide_nsfw,
         "create_admin_only": create_admin_only,
         "is_admin": is_admin,
+        "faves": faves
     })
 
     return render_template('list_communities.html', **context)
