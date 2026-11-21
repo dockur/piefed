@@ -1,5 +1,5 @@
 /* LIBERTATIA — Phosphor // Classic green terminal // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=4");
+@import url("../hacker_bbs_shared/base.css?v=5");
 :root {
   --lt-bg: #000d00; --lt-bg-raised: #001200; --lt-bg-sunken: #000800;
   --lt-bg-header: #000600; --lt-bg-hover: #001a00; --lt-bg-active: #001500;
@@ -18,3 +18,13 @@
   --lt-title-border: #30c0b8;
   --lt-title-bg: #001a0a;
 }
+
+/* OP highlight: amber accent (palette is already green) */
+:root {
+  --lt-op: #ffb000; --lt-op-rgb: 255, 176, 0;
+  --lt-op-text: #ffb000;
+  --lt-op-bg: #4a3200; --lt-op-badge-text: #ffb000;
+}
+
+/* Theme-colored matrix tile (2026-11-19) */
+:root { --lt-bg-tile: url("/static/themes/hacker_bbs_phosphor/matrix-bg-tile-phosphor.svg?v=1"); }

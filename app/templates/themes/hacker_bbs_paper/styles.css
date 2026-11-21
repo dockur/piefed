@@ -1,8 +1,8 @@
 /* LIBERTATIA — Paper // Black ink on off-white // libertatia.org // AGPL */
-@import url("../hacker_bbs_shared/base.css?v=4");
+@import url("../hacker_bbs_shared/base.css?v=5");
 :root {
   --lt-bg: #f5f0e8; --lt-bg-raised: #ffffff; --lt-bg-sunken: #ede8e0;
-  --lt-bg-header: #1a1a14; --lt-bg-hover: #e8e0d0; --lt-bg-active: #ddd8cc;
+  --lt-bg-header: #e8e0d0; --lt-bg-hover: #e8e0d0; --lt-bg-active: #ddd8cc;
   --lt-primary: #1a1a14; --lt-primary-rgb: 26, 26, 20;
   --lt-primary-hi: #000000; --lt-primary-lo: #4a4a3a;
   --lt-primary-dim: #c8c0b0; --lt-primary-deep: #e8e0d0;
@@ -19,3 +19,15 @@
   --lt-title-bg: #e8e0d0;
 }
 .form-check-input:checked[type="checkbox"] { --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23f5f0e8' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e"); }
+
+/* Light header (2026-11-19): shared rule lightens nav text for dark bars; use full ink here */
+.navbar-nav .nav-link { color: var(--lt-text-lo) !important; }
+
+/* Ink-on-cream matrix tile (2026-11-19): replaces the shared dark green tile + 45% black overlay */
+body {
+  background-image: url("matrix-bg-tile-paper.svg?v=3");
+  background-size: auto;
+  background-position: top left;
+  background-attachment: local;
+  background-repeat: repeat;
+}
