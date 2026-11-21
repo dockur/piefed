@@ -47,6 +47,9 @@
                     <span class="warning_badge nsfl" title="{{ _('Not safe for life') }}">nsfl</span>
                 {% endif -%}
                 {% if current_user.is_authenticated -%}
+                    {% if community_membership(current_user, community) not in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] and not community.instance.gone_forever %}
+                        <div class="d-inline-block pl-2">{% include "community/_join_button.html" %}</div>
+                    {% endif -%}
                     <span>{% include 'community/_notification_toggle.html' -%}</span>
                 {% endif -%}
             </h1>
@@ -84,6 +87,9 @@
                             <span class="warning_badge nsfl" title="{{ _('Not safe for life') }}">nsfl</span>
                         {% endif -%}
                         {% if current_user.is_authenticated -%}
+                            {% if community_membership(current_user, community) not in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] and not community.instance.gone_forever %}
+                                <div class="d-inline-block pl-2">{% include "community/_join_button.html" %}</div>
+                            {% endif -%}
                             {% include 'community/_notification_toggle.html' -%}
                         {% endif -%}
                     </h1>
@@ -118,6 +124,9 @@
                     <span class="warning_badge nsfl" title="{{ _('Not safe for life') }}">nsfl</span>
                 {% endif -%}
                 {% if current_user.is_authenticated -%}
+                    {% if community_membership(current_user, community) not in [SUBSCRIPTION_MEMBER, SUBSCRIPTION_MODERATOR, SUBSCRIPTION_OWNER] and not community.instance.gone_forever %}
+                        <div class="d-inline-block pl-2">{% include "community/_join_button.html" %}</div>
+                    {% endif -%}
                     {% include 'community/_notification_toggle.html' -%}
                 {% endif -%}
             </h1>
