@@ -2090,6 +2090,10 @@ a.unread, div.unread {
   }
 }
 
+#about_community .card-body img {
+  height: var(--spacing-20) !important;
+}
+
 .comment_body img {
   max-height: 40vh;
 }

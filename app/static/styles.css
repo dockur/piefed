@@ -2748,6 +2748,10 @@ a.unread:before, div.unread:before {
   float: none;
 }
 
+#about_community .card-body img {
+  height: var(--spacing-20) !important;
+}
+
 .comment_body img {
   max-height: 40vh;
 }
