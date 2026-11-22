@@ -875,8 +875,8 @@ def feeds_menu():
 
 @bp.route('/share', methods=['GET', 'POST'])
 def share():
-    url = request.args.get('url')
-    url = remove_tracking_from_link(url.strip())
+    url = request.args.get('url') or request.args.get('text')
+    url = remove_tracking_from_link(url.strip()) if url else None
     form = ShareLinkForm()
     form.which_community.choices = possible_communities()
     if form.validate_on_submit():
