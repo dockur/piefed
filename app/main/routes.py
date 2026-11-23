@@ -6,7 +6,6 @@ from random import randint
 
 import flask
 from markupsafe import Markup
-from pyld import jsonld
 from sqlalchemy import or_, and_, func
 from ua_parser import parse as uaparse
 
@@ -768,8 +767,6 @@ And if you want to add your score to the database to help your fellow Bookworms 
     }
 
     r = User.query.get(1)
-
-    jsonld.set_document_loader(jsonld.requests_document_loader(timeout=5))
 
     ld = LDSignature.create_signature(json, r.private_key, r.public_url() + '#main-key')
     json.update(ld)

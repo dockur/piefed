@@ -118,3 +118,11 @@ SESSION_COOKIE_HTTPONLY='False'
 ```
 
 **Do not use those values in production.**
+
+## JSON-LD contexts
+
+Signature hashing (`jsonld.normalize` in `app/activitypub/signature.py`) needs the ActivityStreams and security/v1 JSON-LD contexts. They are bundled in `app/activitypub/contexts/` and served locally by the custom pyld document loader in `app/jsonld_loader.py`, so w3.org rate limiting (HTTP 429) can't break federation. To refresh the bundled copies from their canonical URLs:
+
+```bash
+flask refresh-jsonld-contexts
+```

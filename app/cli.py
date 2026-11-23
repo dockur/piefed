@@ -102,6 +102,17 @@ def register(app):
         db.session.commit()
         print('Admin keys have been reset')
 
+    @app.cli.command("refresh-jsonld-contexts")
+    def refresh_jsonld_contexts():
+        """Re-download the bundled JSON-LD context files (activitystreams, security/v1)."""
+        from app.jsonld_loader import download_bundled_contexts
+        try:
+            written = download_bundled_contexts()
+        except Exception as e:
+            raise click.ClickException(f'Failed to download contexts: {e}')
+        for filename, url in written.items():
+            print(f'{filename} <- {url}')
+
     @app.cli.command("init-db")
     @click.option("--interactive", default='yes', help="Create admin user during setup.")
     def init_db(interactive):

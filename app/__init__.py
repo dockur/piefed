@@ -23,6 +23,7 @@ import httpx
 from authlib.integrations.flask_client import OAuth
 
 from config import Config
+from app.jsonld_loader import JsonLdLoader
 
 
 def get_locale():
@@ -65,6 +66,7 @@ oauth = OAuth()
 redis_client = None  # Will be initialized in create_app()
 rest_api = Api()
 app_bcrypt = Bcrypt()
+jsonld_loader = JsonLdLoader()
 
 
 class StripCookieVaryForAnonymous:
@@ -172,6 +174,7 @@ def create_app(config_class=Config):
     compress.init_app(app)   # registered before the after_request in pyfedi.py, so it runs after it
     limiter.init_app(app)
     app_bcrypt.init_app(app)
+    jsonld_loader.init_app(app)  # serve bundled JSON-LD contexts locally, cache remote ones
     celery.conf.update(app.config)
 
     celery.conf.update(CELERY_ROUTES={
