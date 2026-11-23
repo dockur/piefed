@@ -3857,7 +3857,11 @@ def create_resolved_object(uri, post_data, uri_domain, community, announce_id, s
     user = find_actor_or_create(actor)
     if user and community and post_data:
         activity = 'update' if 'updated' in post_data else 'create'
+        # make a fake activity, to feed in to the usual content creation functions
         request_json = {'id': f"https://{uri_domain}/activities/{activity}/{gibberish(15)}", 'object': post_data}
+        for field in ('to', 'cc'):      # to / cc are used to determine if a post is private
+            if field in post_data:
+                request_json[field] = post_data[field] if isinstance(post_data[field], list) else [post_data[field]]
         if 'inReplyTo' in request_json['object'] and request_json['object']['inReplyTo']:
             if activity == 'update':
                 post_reply = PostReply.get_by_ap_id(uri)
