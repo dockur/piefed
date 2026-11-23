@@ -2815,6 +2815,26 @@ def admin_no_link_diversity():
                            roles_with=roles_with('administer all communities'))
 
 
+@bp.route('/old_silent_voters', methods=['GET'])
+@permission_required('administer all communities')
+@login_required
+def admin_old_silent_voters():
+    rows = db.session.execute(text(sql_file('old_voters_by_community'))).all()
+    return render_template('admin/old_silent_voters.html',
+                           rows=rows, title=_('Old silent voters - grouped by community'),
+                           roles_with=roles_with('administer all communities'))
+
+
+@bp.route('/old_silent_voters_weekly', methods=['GET'])
+@permission_required('administer all communities')
+@login_required
+def admin_old_silent_voters_weekly():
+    rows = db.session.execute(text(sql_file('old_voters_by_community_in_the_last_week'))).all()
+    return render_template('admin/old_silent_voters.html',
+                           rows=rows, title=_('Old silent voters - grouped by community - in the last week'),
+                           roles_with=roles_with('administer all communities'))
+
+
 @bp.route('/users/mass_ban', methods=['GET', 'POST'])
 @permission_required('administer all users')
 @login_required

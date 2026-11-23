@@ -13,6 +13,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>{{ _('Votes without posting') }}</h2>
+            <p class="float-right"><a class="btn btn-outline-secondary" href="{{ url_for('admin.admin_old_silent_voters') }}">{{ _('Group by community') }}</a></p>
         </div>
 
         <p>{{ _('These accounts have cast at least 20 votes in the last 2 months, but have never posted or replied themselves (post_count = 0 and post_reply_count = 0). That is quite common but also can be a sign of being a bot.') }}</p>

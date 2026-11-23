@@ -1772,6 +1772,51 @@ def register(app):
                             other_user = User.query.get(other_user_id)
                             print(f'{first_user.link()} votes the same as {other_user.link()}')
 
+    @app.cli.command("find-alt-accounts")
+    @click.argument('authors_file', default='authors.txt', type=click.Path(exists=True))
+    def find_alt_accounts(authors_file):
+        """Print same-username accounts on other instances for each author URL in AUTHORS_FILE."""
+        with app.app_context():
+            authors = []
+            with open(authors_file) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    match = re.match(r'https?://([^/]+)/u/([^/?#\s]+)', line)
+                    if match:
+                        authors.append((match.group(1).lower(), match.group(2)))
+                    else:
+                        match = re.match(r'@?([^@\s]+)@([^\s]+)', line)
+                        if match:
+                            authors.append((match.group(2).lower(), match.group(1)))
+
+            if not authors:
+                print('No authors found in', authors_file)
+                return
+
+            usernames = list({name.lower() for _, name in authors})
+            users = User.query.filter(User.ap_id.isnot(None),
+                                      db.func.lower(User.user_name).in_(usernames)).all()
+            by_name = defaultdict(list)
+            for user in users:
+                # ap_profile_id is the full https://server/u/username URL; ap_id is user@server
+                by_name[user.user_name.lower()].append(user.ap_profile_id or user.ap_id)
+
+            for home_domain, name in authors:
+                alts = []
+                for profile_id in sorted(by_name.get(name.lower(), [])):
+                    match = re.match(r'https?://([^/]+)/', profile_id)
+                    if match:
+                        if match.group(1).lower() != home_domain:
+                            alts.append(profile_id)
+                    elif '@' in profile_id and profile_id.rsplit('@', 1)[1].lower() != home_domain:
+                        alts.append(profile_id)
+                if alts:
+                    print(f'https://{home_domain}/u/{name}')
+                    for alt in alts:
+                        print(f'  {alt}')
+
     @app.cli.command("migrate_community_notifs")
     def migrate_community_notifs():
         with app.app_context():
