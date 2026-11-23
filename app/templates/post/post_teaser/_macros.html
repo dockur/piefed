@@ -384,9 +384,7 @@
                 </a>
                 {% for gallery_image in post.gallery -%}
                     {% if not loop.first -%}
-                        <a href="{{ gallery_image.view_url() }}" class="hidden_gallery_image" data-caption="{{ gallery_image.alt_text or '' }}" rel="nofollow ugc" target="_blank">
-                            <img src="{{ gallery_image.view_url() }}" decoding="async" referrerpolicy="no-referrer" alt="{{ gallery_image.alt_text or '' }}" loading="lazy" />
-                        </a>
+                        <a href="{{ gallery_image.view_url() }}" class="hidden_gallery_image" data-caption="{{ gallery_image.alt_text or '' }}" rel="nofollow ugc" target="_blank"></a>
                     {% endif -%}
                 {% endfor -%}
             </div>
@@ -401,9 +399,7 @@
                 </a>
                 {% for gallery_image in post.gallery -%}
                     {% if not loop.first -%}
-                        <a href="{{ gallery_image.view_url() }}" class="hidden_gallery_image" data-caption="{{ gallery_image.alt_text or '' }}" rel="nofollow ugc" target="_blank">
-                            <img src="{{ gallery_image.view_url() }}" decoding="async" referrerpolicy="no-referrer" alt="{{ gallery_image.alt_text or '' }}" loading="lazy" />
-                        </a>
+                        <a href="{{ gallery_image.view_url() }}" class="hidden_gallery_image" data-caption="{{ gallery_image.alt_text or '' }}" rel="nofollow ugc" target="_blank"></a>
                     {% endif -%}
                 {% endfor -%}
             </div>
