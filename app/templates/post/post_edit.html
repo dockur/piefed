@@ -343,7 +343,7 @@
                     <div class="col">
                         {{ form.scheduled_for.label(class_="form-label") }} {{ form.scheduled_for(class_="form-control") }}
                     </div>
-                    <div class="col-3"><input id="incr_scheduled_for" type="button" class="btn btn-outline-secondary" value="{{ _('+1 hour') }}"> </div>
+                    <div class="col-3 align-self-end mb-1"><input id="incr_scheduled_for" type="button" class="btn btn-outline-secondary" value="{{ _('+1 hour') }}"> </div>
                 </div>
 
                 {{ render_field(form.timezone) }}
