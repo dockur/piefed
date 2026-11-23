@@ -378,15 +378,35 @@
 <div class="col post_teaser_body {{ 'reported' if post.id in reported_posts }}">
     {% if compact_thumbs and post.image_id -%}
         <div class="col_thumbnail thumbnail">
-            <a href="{{ post.slug }}" class="post_link" rel="nofollow ugc" aria-label="{{ _('View image') }}" target="_blank"><span class="fe fe-image"></span><img src="{{ post.image.thumbnail_url() }}" decoding="async" referrerpolicy="no-referrer"
-                    alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.width }}" height="{{ post.image.height }}" /></a>
+            <div class="post_gallery">
+                <a href="{{ post.gallery[0].view_url() }}" data-caption="{{ post.gallery[0].alt_text or '' }}" rel="nofollow ugc" aria-label="{{ _('View image') }}" target="_blank"><span class="fe fe-image"></span><img src="{{ post.image.thumbnail_url() }}" decoding="async" referrerpolicy="no-referrer"
+                        alt="{{ post.gallery[0].alt_text or '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.width }}" height="{{ post.image.height }}" />
+                </a>
+                {% for gallery_image in post.gallery -%}
+                    {% if not loop.first -%}
+                        <a href="{{ gallery_image.view_url() }}" class="hidden_gallery_image" data-caption="{{ gallery_image.alt_text or '' }}" rel="nofollow ugc" target="_blank">
+                            <img src="{{ gallery_image.view_url() }}" decoding="async" referrerpolicy="no-referrer" alt="{{ gallery_image.alt_text or '' }}" loading="lazy" />
+                        </a>
+                    {% endif -%}
+                {% endfor -%}
+            </div>
         </div>
     {% endif -%}
     {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
     {% if post.image_id and not low_bandwidth and not compact_thumbs -%}
         <div class="post_teaser_image_preview">
-            <a href="{{ post.slug }}" class="post_link" rel="nofollow ugc" aria-label="{{ _('View image') }}"><img src="{{ post.image.medium_url() }}" decoding="async" referrerpolicy="no-referrer"
-                    alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.width }}" height="{{ post.image.height }}" /></a>
+            <div class="post_gallery">
+                <a href="{{ post.gallery[0].view_url() }}" data-caption="{{ post.gallery[0].alt_text or '' }}" rel="nofollow ugc" aria-label="{{ _('View image') }}"><img src="{{ post.image.medium_url() }}" decoding="async" referrerpolicy="no-referrer"
+                        alt="{{ post.gallery[0].alt_text or '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.width }}" height="{{ post.image.height }}" />
+                </a>
+                {% for gallery_image in post.gallery -%}
+                    {% if not loop.first -%}
+                        <a href="{{ gallery_image.view_url() }}" class="hidden_gallery_image" data-caption="{{ gallery_image.alt_text or '' }}" rel="nofollow ugc" target="_blank">
+                            <img src="{{ gallery_image.view_url() }}" decoding="async" referrerpolicy="no-referrer" alt="{{ gallery_image.alt_text or '' }}" loading="lazy" />
+                        </a>
+                    {% endif -%}
+                {% endfor -%}
+            </div>
         </div>
     {% endif -%}
     {% if post.body_html -%}
