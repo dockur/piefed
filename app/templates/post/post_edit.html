@@ -339,11 +339,11 @@
                 {{ render_field(form.nsfw) }}
                 {{ render_field(form.nsfl) }}
                 {{ render_field(form.ai_generated) }}
-                <div class="row align-items-center">
+                <div class="row align-items-center mb-3">
                     <div class="col">
-                        {{ render_field(form.scheduled_for) }}
+                        {{ form.scheduled_for.label(class_="form-label") }} {{ form.scheduled_for(class_="form-control") }}
                     </div>
-                    <div class="col-2"><input id="incr_scheduled_for" type="button" class="btn btn-outline-secondary" value="{{ _('+1 hour') }}"> </div>
+                    <div class="col-3 align-self-end mb-1"><input id="incr_scheduled_for" type="button" class="btn btn-outline-secondary" value="{{ _('+1 hour') }}"> </div>
                 </div>
 
                 {{ render_field(form.timezone) }}
