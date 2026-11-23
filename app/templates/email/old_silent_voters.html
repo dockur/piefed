@@ -1,0 +1,22 @@
+<p>Hello {{ user.display_name() }},</p>
+<p>Here is the old silent voters report you requested from {{ domain }} - communities with the highest share of votes from accounts that have not been seen for over 6 months.</p>
+<p>NSFW and anime communities naturally have a higher percentage of accounts that don't say anything.</p>
+{% if rows %}
+<table cellpadding="4" style="border-collapse: collapse;">
+    <tr>
+        <th align="left">Community</th>
+        <th align="right">Percent old</th>
+    </tr>
+    {% for row in rows %}
+        {% set link = row.ap_id if row.ap_id else row.title %}
+        <tr>
+            {# Link text must not look like an address on another domain (e.g. linux@lemmy.ml) or spam filters
+               flag the mismatch with the href as phishing, so the ap_id goes outside the link. #}
+            <td><a href="{{ server_url }}/c/{{ link }}">{{ row.title }}</a>{% if row.ap_id %} <small>({{ row.ap_id }})</small>{% endif %}</td>
+            <td align="right">{{ row.pct_blocked }}%</td>
+        </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p><em>Nothing found.</em></p>
+{% endif %}

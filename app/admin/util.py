@@ -13,8 +13,10 @@ from app.activitypub.signature import default_context, send_post_request
 from app.community.routes import do_subscribe
 from app.community.util import search_for_community
 from app.constants import POST_TYPE_IMAGE
-from app.models import User, Community, Instance, CommunityMember, Post, Topic
-from app.utils import gibberish, topic_tree, get_request, store_files_in_s3, ensure_directory_exists, guess_mime_type, get_task_session, patch_db_session
+from app.email import send_email
+from app.models import User, Community, Instance, CommunityMember, Post, Topic, Site
+from app.utils import gibberish, topic_tree, get_request, store_files_in_s3, ensure_directory_exists, guess_mime_type, \
+    get_task_session, patch_db_session, sql_file
 
 
 def unsubscribe_from_everything_then_delete(user_id):
@@ -439,3 +441,27 @@ def get_mass_ban_ids(to_ban):
 def get_auto_ban_instance_ids(domains):
     domains = get_mass_ban_ids(domains)     # this function is not really intended for this but what the hell
     return [instance.id for instance in Instance.query.filter(Instance.domain.in_(domains))]
+
+
+@celery.task
+def email_old_silent_voters_report(user_id):
+    with current_app.app_context():
+        session = get_task_session()
+        try:
+            user = session.get(User, user_id)
+            if user is None or not user.email:
+                return
+            site = session.get(Site, 1)
+            rows = session.execute(text(sql_file('old_voters_by_community'))).all()
+            domain = current_app.config['SERVER_NAME']
+            context = dict(user=user, rows=rows, domain=domain, server_url=current_app.config['SERVER_URL'])
+            send_email(_('[PieFed] Old silent voters report'),
+                       sender=f'{site.name} <{current_app.config["MAIL_FROM"]}>',
+                       recipients=[user.email],
+                       text_body=render_template('email/old_silent_voters.txt', **context),
+                       html_body=render_template('email/old_silent_voters.html', **context))
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()

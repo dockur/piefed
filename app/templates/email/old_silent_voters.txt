@@ -1,0 +1,8 @@
+Hello {{ user.display_name() }},
+
+Here is the old silent voters report you requested from {{ domain }} - communities with the highest share of votes from accounts that have not been seen for over 6 months.
+NSFW and anime communities naturally have a higher percentage of accounts that don't say anything.
+
+{% if rows %}{% for row in rows %}{{ row.pct_blocked }}%  {{ row.ap_id if row.ap_id else row.title }}
+{% endfor %}{% else %}Nothing found.
+{% endif %}

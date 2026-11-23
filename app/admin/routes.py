@@ -1,4 +1,3 @@
-import datetime
 import os
 import re
 from types import SimpleNamespace
@@ -8,7 +7,7 @@ from io import BytesIO
 import orjson
 import shutil
 
-from flask import request, flash, json, url_for, current_app, redirect, g, abort, send_file, make_response
+from flask import request, flash, json, url_for, current_app, redirect, g, abort, send_file
 from flask_login import current_user, login_user
 from flask_babel import _, ngettext
 from markupsafe import Markup
@@ -33,13 +32,13 @@ from app.admin.forms import FederationForm, SiteMiscForm, SiteProfileForm, EditC
 from flask_wtf import FlaskForm
 from app.admin.util import unsubscribe_from_everything_then_delete, unsubscribe_from_community, send_newsletter, \
     topics_for_form, move_community_images_to_here, switch_to_unsilenced, switch_to_silenced, serialize_topic_tree, \
-    create_topic_and_children, get_mass_ban_ids, get_auto_ban_instance_ids
+    create_topic_and_children, get_mass_ban_ids, get_auto_ban_instance_ids, email_old_silent_voters_report
 from app.auth.util import send_email_verification, random_token
 from app.chat.util import send_message
 from app.community.util import save_icon_file, save_banner_file, search_for_community, is_bad_name
 from app.community.routes import do_subscribe
 from app.constants import REPORT_STATE_NEW, REPORT_STATE_ESCALATED, POST_STATUS_REVIEWING, ROLE_ADMIN, SRC_WEB
-from app.email import send_registration_approved_email
+from app.email import send_registration_approved_email, send_email
 from app.models import AllowedInstances, BannedInstances, ActivityPubLog, CronJobLog, utcnow, Site, Community, \
     CommunityMember, \
     User, Instance, File, Report, Topic, UserRegistration, Role, Post, PostReply, Language, RolePermission, Domain, \
@@ -2819,10 +2818,14 @@ def admin_no_link_diversity():
 @permission_required('administer all communities')
 @login_required
 def admin_old_silent_voters():
-    rows = db.session.execute(text(sql_file('old_voters_by_community'))).all()
-    return render_template('admin/old_silent_voters.html',
-                           rows=rows, title=_('Old silent voters - grouped by community'),
-                           roles_with=roles_with('administer all communities'))
+    # The all-time query takes ~40s+ on a large instance - too slow for a web request - so it
+    # runs in the background and the results are emailed.
+    if current_app.debug:
+        email_old_silent_voters_report(current_user.id)
+    else:
+        email_old_silent_voters_report.delay(current_user.id)
+    flash(_('The report is being generated and will be emailed to %(email)s.', email=current_user.email))
+    return redirect(referrer(url_for('admin.admin_votes')))
 
 
 @bp.route('/old_silent_voters_weekly', methods=['GET'])
