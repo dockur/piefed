@@ -541,7 +541,7 @@ And if you want to add your score to the database to help your fellow Bookworms 
 
     def test_indented_code_blocks(self):
         """
-        Tests functionality around indented code blocks. They can especially interfere with footnotes.
+        Tests functionality around indented code blocks. They can especially interfere with footnotes and lists.
         """
 
         # Basic functionality
@@ -584,6 +584,12 @@ And if you want to add your score to the database to help your fellow Bookworms 
         markdown = "1. First level\n    1. Second level"
         result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
         target_html = "<ol>\n<li>First level\n<ol>\n<li>Second level</li>\n</ol></li>\n</ol>\n"
+        self.assertEqual(target_html, result)
+
+        # Second paragraphs in list items should not be code blocks
+        markdown = "- Top level\n\n    Second paragraph\n\n  - Second level\n\n      Second paragraph\n\n      - Third level\n\n        Second paragraph."
+        result = markdown_to_html(markdown, test_env={"fn_string": "fn-test"})
+        target_html = "<ul>\n<li><p>Top level</p>\n<p>Second paragraph</p>\n<ul>\n<li><p>Second level</p>\n<p>Second paragraph</p>\n<ul>\n<li><p>Third level</p>\n<p>Second paragraph.</p></li>\n</ul></li>\n</ul></li>\n</ul>\n"
         self.assertEqual(target_html, result)
 
 

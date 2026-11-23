@@ -1523,9 +1523,33 @@ def stash_lists(text: str, placeholder: str) -> tuple[list, str]:
 
         # Start looking at the following lines to see if they continue the list or not
         line_index += 1
-        while line_index < len(lines) and any_level_list.match(lines[line_index]):
-            # This line is continuing the list...keep iterating
-            line_index += 1
+        while line_index < len(lines):
+            line = lines[line_index]
+            if any_level_list.match(line) or line.startswith(("    ", "\t")):
+                # This line continues the list, either as another item or as indented content.
+                line_index += 1
+            elif line.isspace():
+                # Keep blank lines only if followed by indented content in this list item.
+                blank_line_start = line_index
+                while line_index < len(lines) and lines[line_index].isspace():
+                    # Looping through blank lines
+                    line_index += 1
+
+                # This conditional is kind of complex, but basically tries to include any line that is part of a list or
+                # is indented under a list item as part of the stashed list
+                if line_index < len(lines) and (
+                    any_level_list.match(lines[line_index])
+                    or lines[line_index].startswith(("    ", "\t"))
+                ):
+                    line_index += 1
+                else:
+                    # Here we realized that below the blank line is not continuing the list, so just go back to the
+                    # blank line and stash
+                    line_index = blank_line_start
+                    break
+            else:
+                # Getting here means we have reached the end of a stashable section
+                break
 
         # Getting here means that the list has ended, stash it
         list_snippets.append("".join(lines[list_start:line_index]))
