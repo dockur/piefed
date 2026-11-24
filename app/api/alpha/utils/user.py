@@ -1453,3 +1453,45 @@ def post_user_filter(auth, data):
     cache.delete_memoized(filtered_out_communities, user)
 
     return filter_view(new_filter, variant=1)
+
+
+def put_user_filter(auth, data):
+    user = authorise_api_user(auth, return_type='model')
+    user_id = user.id
+
+    filter_id = data["filter_id"]
+    filter = Filter.query.get(filter_id)
+
+    if not filter.user_id == user_id:
+        raise Exception("incorrect_login")
+
+    title = data["title"] if "title" in data else filter.title
+    filter_home = data["filter_home"] if "filter_home" in data else filter.filter_home
+    filter_posts = data["filter_posts"] if "filter_posts" in data else filter.filter_posts
+    filter_replies = data["filter_replies"] if "filter_replies" in data else filter.filter_replies
+    expire_after = data["expire_after"] if "expire_after" in data else filter.expire_after
+    keywords = data["keywords"] if "keywords" in data else filter.keywords
+
+    if "hide_type" in data:
+        if data["hide_type"] == "Transparent":
+            hide_int = 0
+        else:
+            hide_int = 1
+    else:
+        hide_int = filter.hide_type
+
+    filter.title = title
+    filter.filter_home = filter_home
+    filter.filter_posts = filter_posts
+    filter.filter_replies = filter_replies
+    filter.expire_after = expire_after
+    filter.hide_type = hide_int
+    filter.keywords = keywords
+
+    db.session.commit()
+    cache.delete_memoized(user_filters_home, user_id)
+    cache.delete_memoized(user_filters_posts, user_id)
+    cache.delete_memoized(user_filters_replies, user_id)
+    cache.delete_memoized(filtered_out_communities, user)
+
+    return filter_view(filter, variant=1)
