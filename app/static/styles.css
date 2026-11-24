@@ -2159,6 +2159,10 @@ details {
   height: auto;
 }
 
+.hidden_gallery_image {
+  display: none !important;
+}
+
 .post_gallery > div > a {
   display: block;
 }
