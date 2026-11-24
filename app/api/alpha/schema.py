@@ -2353,6 +2353,10 @@ class EditFilterRequest(DefaultSchema):
     expire_after = fields.Date(allow_none=True, metadata={"description": "ISO8601 formatted date e.g. YYYY-MM-DD"})
     keywords = fields.String(metadata={"description": "Newline separated list of keywords (case insensitive)"})
 
+
+class DeleteFilterRequest(DefaultSchema):
+    filter_id = fields.Integer(required=True)
+
 class FilterListRequest(DefaultSchema):
     page = fields.Integer(metadata={"default": 1})
     limit = fields.Integer(metadata={"default": 20})

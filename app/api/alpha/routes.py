@@ -41,7 +41,8 @@ from app.api.alpha.utils.user import get_user, post_user_block, get_user_unread_
     put_user_mark_all_notifications_read, post_user_verify_credentials, post_user_set_flair, get_user_details, \
     get_user_media, post_user_set_note, post_user_ban, post_user_unban, post_user_register, get_user_captcha, \
     post_user_logout, post_user_follow, post_user_unfollow, get_user_activity_alerts, post_user_activity_alert, \
-    post_user_activity_alert_delete, get_user_block_list_all, post_user_filter, put_user_filter
+    post_user_activity_alert_delete, get_user_block_list_all, post_user_filter, put_user_filter, \
+    post_user_filter_delete
 from app.api.alpha.utils.admin import get_registration_list, put_registration_approve
 from app.constants import *
 from app.utils import orjson_response, get_setting, auth_required_if_private
@@ -1679,6 +1680,19 @@ def put_alpha_user_filter(data):
     auth = request.headers.get("Authorization")
     resp = put_user_filter(auth, data)
     return KeywordFilter().load(resp)
+
+
+@user_bp.route("user/filter/delete", methods=["POST"])
+@user_bp.doc(summary="Delete a keyword filter")
+@user_bp.arguments(DeleteFilterRequest)
+@user_bp.response(200)
+@user_bp.alt_response(400, schema=DefaultError)
+@auth_required_if_private
+def post_alpha_user_filter_delete(data):
+    if not enable_api():
+        return abort(400, message="alpha api is not enabled")
+    auth = request.headers.get("Authorization")
+    post_user_filter_delete(auth, data)
 
 
 @user_bp.route('/user/mark_all_as_read', methods=['POST'])

@@ -1462,6 +1462,9 @@ def put_user_filter(auth, data):
     filter_id = data["filter_id"]
     filter = Filter.query.get(filter_id)
 
+    if not filter:
+        raise Exception("filter does not exist")
+
     if not filter.user_id == user_id:
         raise Exception("incorrect_login")
 
@@ -1495,3 +1498,26 @@ def put_user_filter(auth, data):
     cache.delete_memoized(filtered_out_communities, user)
 
     return filter_view(filter, variant=1)
+
+
+def post_user_filter_delete(auth, data):
+    user = authorise_api_user(auth, return_type='model')
+    user_id = user.id
+
+    filter_id = data["filter_id"]
+    filter = Filter.query.get(filter_id)
+
+    if not filter:
+        raise Exception("filter does not exist")
+
+    if not filter.user_id == user_id:
+        raise Exception("incorrect_login")
+
+    db.session.delete(filter)
+    db.session.commit()
+    cache.delete_memoized(user_filters_home, user_id)
+    cache.delete_memoized(user_filters_posts, user_id)
+    cache.delete_memoized(user_filters_replies, user_id)
+    cache.delete_memoized(filtered_out_communities, user)
+
+    return
