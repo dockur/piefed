@@ -1,5 +1,14 @@
 # Admin Area Settings Reference
 
+## Admin Home - /admin
+
+Not a settings page, but the admin landing page. Shows:
+
+- **Resource usage** - Load average (1/5/15 min, highlighted red when above the CPU core count) and disk storage used (highlighted red above 95%).
+- **Post translation** - Languages available from the configured `TRANSLATE_ENDPOINT` service, if any.
+- **Installed plugins** - Table of loaded plugins with version, description, source URL and registered hooks.
+- **Cron warnings** - A warning banner is flashed if any maintenance cron task has not run within its expected frequency.
+
 ## Site Profile - /admin/site
 
 - **Site Name** - The display name of the instance, shown in the page title, header and federation metadata.
@@ -96,6 +105,13 @@
 - **Import Bans List Json File** - Upload a JSON file of banned instances/users exported from another instance to import those bans here.
 - **Export** - Downloads the current ban lists as a JSON file.
 
+## Communities - /admin/communities
+
+A table for administering all communities:
+
+- **Sub-filters** - `/admin/communities/no-topic` (communities without a topic), `/admin/communities/low-quality` (low-quality/toxic communities), `/admin/communities/un-moderated` (communities without moderators).
+- **Delete** - Each community can be deleted.
+
 ## Edit Community - /admin/communities, edit
 
 - **Title** - Human-readable community title.
@@ -130,6 +146,14 @@
 - **New url** - The new local URL slug to move the community to; must not already exist.
 - **Set new owner** - Transfers ownership of the community when it is moved.
 
+## Topics - /admin/topics
+
+List of topics, in a tree:
+
+- **Import** - `/admin/topics/import` create topics based on a json file. Feel free to use https://join.piefed.social/piefed.social_topics.json
+- **Export** - `/admin/topics/export` downloads the whole topic tree as JSON.
+- **Delete** - Topics can be deleted from the list (POST-only action).
+
 ## Edit Topic - /admin/topics, add/edit
 
 - **Name** - Human-readable topic name.
@@ -162,6 +186,14 @@
 ## Create Offline Instance - /admin/instances, create offline
 
 - **Domain (not including https://)** - Registers a known-but-offline instance domain locally so it can be referenced/blocked without federating with it.
+
+## Users - /admin/users
+
+List of user accounts, with local/remote filter and search:
+
+- **Resend verification email** - Per-user action (`/admin/user/<id>/resend_email`).
+- **Reset password** - Per-user action (`/admin/user/<id>/reset_password`).
+- **Delete user** - Per-user action (`/admin/user/<id>/delete`).
 
 ## Add User - /admin/users, add
 
@@ -204,6 +236,72 @@
 
 - **Instances to follow** - Instance domains whose ban lists are monitored, one per line.
 - **Keywords in ban reason which trigger a local ban** - If a followed instance bans a user with one of these keywords/phrases in the reason, the user is automatically banned locally too.
+
+## Media - /admin/media
+
+List page  of all media files uploaded to users' personal libraries (for use in post/comment bodies):
+
+- **Filter by user** - `?user_id=<id>` shows only that user's files.
+- **Delete** - `/admin/media/<file_id>/delete` removes a single file.
+- **Delete everything by this user** - `/admin/media/<user_id>/delete_all` removes all of a user's media.
+
+## Registration Applications - /admin/approve_registrations
+
+Only shown when registration mode is RequireApplication. A table of pending registration applications:
+
+- Shows each applicant's **name, email, email-verified status, answer to the application question, IP and country code, source, and similar usernames**.
+- **Search** - Free-text search box.
+- **Approve** - accepts the application.
+- **Deny** - denies the application.
+
+## Content Moderation - /admin/content
+
+Content needing attention:
+
+- **Approval queue / Trash / Spammy / Deleted** - Selecting which queue to display.
+- **Posts/Comments** - Filter to posts only, comments only, or all.
+- Per-item moderation actions are available from the list.
+
+## Moderation - /admin/reports
+
+List page  of all moderation reports:
+
+- **Search** - Free-text query.
+- **Local/Remote** - Filter reports by local or remote content.
+- **Report types** - Multi-select filter by report type.
+
+## Votes - /admin/votes
+
+Vote-manipulation overview and sub-reports (all list pages, no settings form):
+
+- **Main page** - Overview of key vote-manipulation findings.
+- **Votes for no one** - `/admin/votes_for_noone` - accounts that have not cast any votes.
+- **Serial downvoters** - `/admin/serial_downvoters` - accounts that downvote in rapid succession.
+- **Votes without posting** - `/admin/votes_without_posting` - accounts that vote but never post.
+- **High posts per day** - `/admin/high_posts_per_day` - accounts posting unusually often.
+- **No link diversity** - `/admin/no_link_diversity` - accounts repeatedly posting the same domains.
+- **Old silent voters** - `/admin/old_silent_voters` - communities with lots of voters who never comment or post, generated in the background and emailed to the requesting admin; `/admin/old_silent_voters_weekly` shows the last-week variant inline, grouped by community.
+
+## Activities - /admin/activities
+
+Table showing ActivityPub activities that have been sent and received:
+
+- **Filters** - All / Failure / Success / Ignored (via `result` parameter), plus direction.
+- **View JSON** - `/admin/activity_json/<activity_id>` shows the raw payload of one activity.
+- **Replay** - `/admin/activity_json/<activity_id>/replay` re-processes an activity (POST).
+
+## Permissions - /admin/permissions
+
+- **Role permission matrix** - Checkboxes assigning each permission to the Staff and/or Admin role.
+
+## Modlog - /modlog
+
+Linked from the admin navigation. Read-only log of moderation actions (public visibility depends on the "Show moderation actions publicly" misc setting).
+
+## Other admin actions
+
+- **Purge posts with a blocked image** - `/admin/block_image_purge_posts` deletes all posts containing a given blocked image.
+- **Delete actions** - POST-only deletes for communities, topics, emoji, CMS pages and blocked images from their respective list pages.
 
 ## Newsletter - /admin/newsletter
 
