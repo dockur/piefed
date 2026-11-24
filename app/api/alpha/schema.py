@@ -2297,3 +2297,26 @@ class DeleteBlocklistRequest(DefaultSchema):
 class TopicSubscribeRequest(DefaultSchema):
     topic_id = fields.Integer(required=True)
     subscribe = fields.Boolean(required=True)
+
+
+class UserAllBlockRequest(DefaultSchema):
+    page = fields.Integer(metadata={"default": 1})
+    limit = fields.Integer(metadata={"default": 20})
+
+
+class Domain(DefaultSchema):
+    id = fields.Integer(required=True)
+    name = fields.String(required=True)
+    post_count = fields.Integer(required=True)
+    banned = fields.Boolean(required=True, metadata={"description": "Banned sitewide by the admins."})
+    blocked = fields.Boolean(required=True, metadata={"description": "Blocked by an individual user."})
+    post_warning = fields.String(metadata={"description": "Reminder/disclaimer displayed on posts pointing to this domain."})
+
+
+class UserAllBlockResponse(DefaultSchema):
+    users = fields.List(fields.Nested(PersonView), required=True)
+    communities = fields.List(fields.Nested(CommunityView), required=True)
+    domains = fields.List(fields.Nested(Domain), required=True)
+    instances = fields.List(fields.Nested(Instance), required=True)
+    flair = fields.List(fields.Nested(CommunityFlair), required=True)
+    next_page = fields.String(allow_none=True)

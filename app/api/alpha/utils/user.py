@@ -10,10 +10,12 @@ from app import db, cache
 from app.activitypub.util import make_image_sizes
 from app.api.alpha.utils.post import get_post_list
 from app.api.alpha.utils.reply import get_reply_list
-from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view, topic_view, feed_view
+from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view, topic_view, feed_view, \
+    domain_view, instance_view, flair_view
 from app.constants import *
 from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community, File, UserFlair, \
-    user_file, UserExtraField, UserNote, RevokedToken, utcnow, NotificationSubscription, Topic, Feed, CommunityMember
+    user_file, UserExtraField, UserNote, RevokedToken, utcnow, NotificationSubscription, Topic, Feed, CommunityMember, \
+    UserBlock, CommunityBlock, Domain, DomainBlock, Instance, InstanceBlock, CommunityFlair, CommunityFlairBlock
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user, follow_user, \
     unfollow_user
 from app.shared.post import subscribe_post
@@ -1345,3 +1347,72 @@ def post_user_activity_alert(auth, data, subscribe = True):
 
 def post_user_activity_alert_delete(auth, data):
     return post_user_activity_alert(auth, data, subscribe=False)
+
+def get_user_block_list_all(auth, data):
+    page = data["page"] if "page" in data else 1
+    limit = data["limit"] if "limit" in data else 20
+
+    user_id = authorise_api_user(auth)
+
+    # Blocked people
+    blocked_users = User.query.filter_by(deleted=False).join(UserBlock, UserBlock.blocked_id == User.id). \
+        filter(UserBlock.blocker_id == user_id).order_by(User.user_name)
+    blocked_users = blocked_users.paginate(page=page, per_page=limit, error_out=False)
+    next_page = str(blocked_users.next_num) if blocked_users.next_num else None
+
+    # Blocked communities
+    blocked_communities = Community.query.join(CommunityBlock, CommunityBlock.community_id == Community.id). \
+        filter(CommunityBlock.user_id == user_id).order_by(Community.title)
+    blocked_communities = blocked_communities.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_communities.next_num) if blocked_communities.next_num else None
+
+    # Blocked domains
+    blocked_domains = Domain.query.join(DomainBlock, DomainBlock.domain_id == Domain.id). \
+        filter(DomainBlock.user_id == user_id).order_by(Domain.name)
+    blocked_domains = blocked_domains.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_domains.next_num) if blocked_domains.next_num else None
+
+    # Blocked instances
+    blocked_instances = Instance.query.join(InstanceBlock, InstanceBlock.instance_id == Instance.id). \
+        filter(InstanceBlock.user_id == user_id).order_by(Instance.domain)
+    blocked_instances = blocked_instances.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_instances.next_num) if blocked_instances.next_num else None
+
+    # Blocked flair
+    blocked_flair = CommunityFlair.query.join(CommunityFlairBlock,
+                                              CommunityFlairBlock.community_flair_id == CommunityFlair.id). \
+                                                filter(CommunityFlairBlock.user_id == user_id). \
+                                                    order_by(CommunityFlair.flair)
+    blocked_flair = blocked_flair.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_flair.next_num) if blocked_flair.next_num else None
+
+    resp = {"next_page": next_page}
+
+    user_list = []
+    community_list = []
+    domain_list = []
+    instance_list = []
+    flair_list = []
+
+    for user in blocked_users:
+        user_list.append(user_view(user=user, variant=2, user_id=user_id))
+    for comm in blocked_communities:
+        community_list.append(community_view(community=comm, variant=2, user_id=user_id))
+    for domain in blocked_domains:
+        domain_list.append(domain_view(domain=domain, variant=1, user_id=user_id))
+    for instance in blocked_instances:
+        instance_list.append(instance_view(instance=instance, variant=1))
+    for flair in blocked_flair:
+        flair_list.append(flair_view(flair=flair))
+
+    resp["users"] = user_list
+    resp["communities"] = community_list
+    resp["domains"] = domain_list
+    resp["instances"] = instance_list
+    resp["flair"] = flair_list
+
+    return resp
