@@ -14,7 +14,7 @@ from app.constants import *
 from app.models import ChatMessage, Community, Language, Instance, Post, PostReply, User, \
     AllowedInstances, BannedInstances, utcnow, Site, Feed, FeedItem, Topic, CommunityFlair, \
     UserNote, Poll, Event, PollChoice, Conversation, Report, NotificationSubscription, Blocklist, BlocklistItem, \
-    Domain, DomainBlock
+    Domain, Filter
 from app.post.util import tags_to_string, flair_to_string
 from app.utils import blocked_communities, blocked_or_banned_instances, blocked_users, communities_banned_from, \
     get_setting, \
@@ -1627,5 +1627,27 @@ def domain_view(domain: Domain | int, variant: int, user_id: int | None = None) 
             v1["blocked"] = domain.blocked_by(user=user)
         else:
             v1["blocked"] = False
+
+        return v1
+
+
+def filter_view(filter: Filter | int, variant: int) -> dict:
+    if isinstance(filter, int):
+        filter = Filter.query.get(filter)
+
+    if variant == 1:
+        v1 = dict()
+        v1["id"] = filter.id
+        v1["title"] = filter.title
+        v1["filter_home"] = filter.filter_home
+        v1["filter_posts"] = filter.filter_posts
+        v1["filter_replies"] = filter.filter_replies
+        v1["expire_after"] = str(filter.expire_after) if filter.expire_after else None
+        v1["keywords"] = filter.keywords
+
+        if filter.hide_type == 0:
+            v1["hide_type"] = "Transparent"
+        else:
+            v1["hide_type"] = "Hide"
 
         return v1

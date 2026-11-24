@@ -11,11 +11,12 @@ from app.activitypub.util import make_image_sizes
 from app.api.alpha.utils.post import get_post_list
 from app.api.alpha.utils.reply import get_reply_list
 from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view, topic_view, feed_view, \
-    domain_view, instance_view, flair_view
+    domain_view, instance_view, flair_view, filter_view
 from app.constants import *
 from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community, File, UserFlair, \
     user_file, UserExtraField, UserNote, RevokedToken, utcnow, NotificationSubscription, Topic, Feed, CommunityMember, \
-    UserBlock, CommunityBlock, Domain, DomainBlock, Instance, InstanceBlock, CommunityFlair, CommunityFlairBlock
+    UserBlock, CommunityBlock, Domain, DomainBlock, Instance, InstanceBlock, CommunityFlair, CommunityFlairBlock, \
+    Filter
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user, follow_user, \
     unfollow_user
 from app.shared.post import subscribe_post
@@ -25,7 +26,8 @@ from app.shared.community import subscribe_community
 from app.shared.topic import subscribe_topic
 from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes, \
     get_setting, create_captcha, moderating_communities_ids, communities_banned_from, joined_or_modding_communities, \
-    blocked_communities, blocked_or_banned_instances, subscribed_feeds
+    blocked_communities, blocked_or_banned_instances, subscribed_feeds, user_filters_home, user_filters_posts, \
+    user_filters_replies, filtered_out_communities
 
 
 def get_user(auth, data):
@@ -1416,3 +1418,38 @@ def get_user_block_list_all(auth, data):
     resp["flair"] = flair_list
 
     return resp
+
+
+def post_user_filter(auth, data):
+    title = data["title"]
+    filter_home = data["filter_home"]
+    filter_posts = data["filter_posts"]
+    filter_replies = data["filter_replies"]
+    hide_type = data["hide_type"]
+    hide_int = 1
+    expire_after = data["expire_after"]
+    keywords = data["keywords"]
+
+    user = authorise_api_user(auth, return_type='model')
+    user_id = user.id
+
+    if hide_type == "Transparent":
+        hide_int = 0
+
+    new_filter = Filter(title=title,
+                        filter_home=filter_home,
+                        filter_posts=filter_posts,
+                        filter_replies=filter_replies,
+                        hide_type=hide_int,
+                        expire_after=expire_after,
+                        keywords=keywords,
+                        user_id=user_id)
+
+    db.session.add(new_filter)
+    db.session.commit()
+    cache.delete_memoized(user_filters_home, user_id)
+    cache.delete_memoized(user_filters_posts, user_id)
+    cache.delete_memoized(user_filters_replies, user_id)
+    cache.delete_memoized(filtered_out_communities, user)
+
+    return filter_view(new_filter, variant=1)
