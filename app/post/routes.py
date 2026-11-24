@@ -1683,9 +1683,10 @@ def post_flair_list(post_id):
 
         flair_choices = flair_for_form(post.community.id)
         if not flair_choices:
-            return ""
-
-        flair_objs = [CommunityFlair.query.get(choice[0]) for choice in flair_choices]
+            flair_objs = None
+        else:
+            flair_objs = [CommunityFlair.query.get(choice[0]) for choice in flair_choices]
+        
         post_flair = [flair.id for flair in post.flair]
 
         return render_template('post/_flair_choices.html', post_id=post.id, post_preview=post_preview,
