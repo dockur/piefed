@@ -1521,3 +1521,26 @@ def post_user_filter_delete(auth, data):
     cache.delete_memoized(filtered_out_communities, user)
 
     return
+
+
+def get_user_filter_list(auth, data):
+    page = data["page"] if "page" in data else 1
+    limit = data["limit"] if "limit" in data else 20
+
+    user_id = authorise_api_user(auth)
+
+    filters = Filter.query.filter_by(user_id=user_id).order_by(Filter.title)
+
+    filters = filters.paginate(page=page, per_page=limit, error_out=False)
+    next_page = str(filters.next_num) if filters.next_num else None
+
+    filter_list = []
+
+    for filter_item in filters:
+        filter_list.append(filter_view(filter=filter_item, variant=1))
+
+    resp = dict()
+    resp["filters"] = filter_list
+    resp["next_page"] = next_page
+
+    return resp
