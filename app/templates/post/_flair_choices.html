@@ -1,19 +1,31 @@
 <form class="p-1 pt-0">
-  {% if flair_objs %}
-  <ul class="form-control form-multicheck-columns row-gap-1" id="flair-post-{{ post_id }}">
-    {% for flair in flair_objs %}
-      <li>
-        <input class="form-multicheck-columns" id="flair-{{ flair.id }}" name="flair-{{ flair.id }}" type="checkbox" value="{{ flair.id }}"{{ " checked" if flair.id in post_flair }}>
-        <label for="flair-{{ flair.id }}" style="color: {{ flair.text_color }}; background-color: {{ flair.background_color}}; border-radius: 3px;">{{ flair.flair }}</label>
-      </li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-  <ul class="form-control form-multicheck-columns row-gap-1 mt-2">
-      <li><label><input type="checkbox" name="nsfw" value="1" {{ 'checked' if post.nsfw else '' }}> {{ _('NSFW') }}</label></li>
-      <li><label><input type="checkbox" name="nsfl" value="1" {{ 'checked' if post.nsfl else '' }}> {{ _('NSFL') }}</label></li>
-      <li><label><input type="checkbox" name="ai_generated" value="1" {{ 'checked' if post.ai_generated else '' }}> {{ _('AI generated') }}</label></li>
-  </ul>
-  <button type="submit" class="btn btn-primary" hx-post="{{ url_for("post.post_set_flair", post_id=post_id) }}" hx-trigger="click throttle:1s"
-    {% if post_preview %}hx-target="#post_{{ post_id }}" {% endif %}hx-swap="outerHTML">{{ _('Save') }}</button>
+    {% if flair_objs %}
+        <ul class="form-control form-multicheck-columns row-gap-1" id="flair-post-{{ post_id }}">
+            {% for flair in flair_objs %}
+                <li>
+                    <input class="form-multicheck-columns" id="flair-{{ flair.id }}" name="flair-{{ flair.id }}" type="checkbox" value="{{ flair.id }}"{{ " checked" if flair.id in post_flair }}>
+                    <label for="flair-{{ flair.id }}" style="color: {{ flair.text_color }}; background-color: {{ flair.background_color}}; border-radius: 3px;">{{ flair.flair }}</label>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <ul class="form-control form-multicheck-columns row-gap-1 mt-2">
+        <li>
+            <label>
+                <input type="checkbox" name="nsfw" value="1" {{ 'checked' if post.nsfw else '' }}> {{ _('NSFW') }}
+            </label>
+        </li>
+        <li>
+            <label>
+                <input type="checkbox" name="nsfl" value="1" {{ 'checked' if post.nsfl else '' }}> {{ _('NSFL') }}
+            </label>
+        </li>
+        <li>
+            <label>
+                <input type="checkbox" name="ai_generated" value="1" {{ 'checked' if post.ai_generated else '' }}> {{ _('AI generated') }}
+            </label>
+        </li>
+    </ul>
+    <button type="submit" class="btn btn-primary" hx-post="{{ url_for("post.post_set_flair", post_id=post_id) }}" hx-trigger="click throttle:1s"
+            {% if post_preview %}hx-target="#post_{{ post_id }}" {% endif %}hx-swap="outerHTML">{{ _('Save') }}</button>
 </form>
