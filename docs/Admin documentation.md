@@ -44,11 +44,11 @@
 - **Trim read posts table after this many days** - Read-post history older than this many days is purged (default 180).
 - **Default home filter** - The feed shown by default on the home page: Local, Popular, or All.
 - **Cache remote images locally** - Downloads and serves remote images from local storage instead of hotlinking.
-- **Report comments containing an em dash (-) from newly created users** - Automatically flags likely spam/AI comments that use an em dash from new accounts.
+- **Report comments containing an em dash (—) from newly created users** - Automatically flags likely spam/AI comments that use an em dash from new accounts.
 - **Limit em dash reports to just the first occurrence per user** - Only reports the first em-dash comment per user instead of every one.
-- **Log ActivityPub JSON for debugging** - Writes incoming/outgoing ActivityPub payloads to the log.
+- **Log ActivityPub JSON for debugging** - Writes incoming/outgoing ActivityPub payloads to the log. Use with the `LOG_ACTIVITYPUB_TO_DB` environment variable (see last section).
 - **Show moderation actions publicly** - Makes the modlog visible to the public instead of only moderators.
-- **Private instance - require login to browse** - Requires visitors to log in before viewing any content.
+- **Private instance - require login to browse** - Requires visitors to log in before viewing any content. Good for privacy.
 - **Show Rational Discourse Toolkit in sidebar** - Displays the inoculation/Rational Discourse Toolkit block in the sidebar.
 - **Allow non-admins to add remote communities** - Lets regular users add remote (federated) communities to the instance.
 - **Honeypot to block bad crawlers** - Enables a hidden honeypot field/trap that silently blocks bots and scrapers.
@@ -59,7 +59,7 @@
 
 ## Instance Chooser - /admin/instance_chooser
 
-- **Enable instance chooser** - Lists this instance on the public instance-chooser so people can discover it when picking a server.
+- **Enable instance chooser** - Lists this instance on the public instance-chooser so people can discover it when picking a server. Also displays instance chooser on your instance.
 - **Retrieve list of instances from** - The server to fetch the canonical instance list from (defaults to piefed.social).
 - **Publish instance list** - Crawls known instances and publishes this instance's own list for others to use.
 - **One-sentence elevator pitch** - Short description of the instance shown in the chooser (max 90 chars).
@@ -77,7 +77,7 @@
 - **Discard all posts, comments and PMs with these phrases (one per line)** - Content containing any of these phrases is silently dropped.
 - **Discard all posts and comments by users with these words in their name (one per line)** - Content from actors whose username contains any of these words is dropped.
 - **Discard all posts and comments by users with these phrases in their bio (one per line)** - Content from actors whose profile bio contains any of these phrases is dropped.
-- **Automatically add new remote communities** - New communities discovered on federated instances are added automatically without manual approval.
+- **Automatically add new remote communities** - New communities discovered on federated instances are added automatically. Join them to make future posts arrive.
 
 ## Pre-load Communities - /admin/federation/preload
 
@@ -156,7 +156,7 @@
 
 ## Contact Instance - /admin/instances, contact
 
-- **Admin** - Which admin of the remote instance to address the message to.
+- **Admin** - Which admin of the remote instance to address the message to. Defaults to most recently active one.
 - **Message** - The message body (1–5000 chars) sent to the remote instance's admin.
 
 ## Create Offline Instance - /admin/instances, create offline
@@ -182,9 +182,9 @@
 
 ## Edit User - /admin/users, edit
 
-- **This profile is a bot** / **Flag their posts as from a bot** - Mark the account as a bot / force the bot label on their posts.
+- **This profile is a bot** / **Flag their posts as from a bot** - Mark the account as a bot / force the bot label on their posts. Votes from bots are ignored.
 - **This profile is a reposter** / **Flag their posts as from a reposter (bot)** - Mark as a reposter / force the reposter label on their posts.
-- **Suppress cross-posts** - Hides this user's cross-posts from feeds.
+- **Suppress cross-posts** - Hides this user's cross-posts from feeds if the viewer would have seen an alternative elsewhere in their feed.
 - **Email address is verified** - Marks the user's email as verified.
 - **Banned** - Bans (or unbans) the account.
 - **Ban posts** / **Ban comments** / **Ban votes** - Prevents this user from posting, commenting, or voting respectively.
