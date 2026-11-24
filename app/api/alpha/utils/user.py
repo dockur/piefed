@@ -1523,6 +1523,21 @@ def post_user_filter_delete(auth, data):
     return
 
 
+def get_user_filter(auth, data):
+    user_id = authorise_api_user(auth)
+
+    filter_id = data["filter_id"]
+    filter = Filter.query.get(filter_id)
+
+    if not filter:
+        raise Exception("filter does not exist")
+
+    if not filter.user_id == user_id:
+        raise Exception("incorrect_login")
+
+    return filter_view(filter, variant=1)
+
+
 def get_user_filter_list(auth, data):
     page = data["page"] if "page" in data else 1
     limit = data["limit"] if "limit" in data else 20

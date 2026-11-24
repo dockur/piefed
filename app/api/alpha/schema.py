@@ -2354,7 +2354,7 @@ class EditFilterRequest(DefaultSchema):
     keywords = fields.String(metadata={"description": "Newline separated list of keywords (case insensitive)"})
 
 
-class DeleteFilterRequest(DefaultSchema):
+class SingleFilterRequest(DefaultSchema):
     filter_id = fields.Integer(required=True)
 
 class FilterListRequest(DefaultSchema):
