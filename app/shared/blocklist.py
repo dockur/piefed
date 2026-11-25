@@ -216,8 +216,11 @@ def sync_remote_blocklist(blocklist_id: int, then_apply_to_user_id: int | None =
 
 # ----- Subscribing / unsubscribing -----
 
-def join_blocklist(blocklist: Blocklist, src, auth=None):
-    user_id = authorise_api_user(auth) if src == SRC_API else current_user.id
+def join_blocklist(blocklist: Blocklist, src, auth=None, user_id=None):
+    if src == SRC_API:
+        user_id = authorise_api_user(auth)
+    elif not user_id:
+        user_id = current_user.id
     user = db.session.query(User).get(user_id)
 
     if blocklist.subscribed(user.id) != SUBSCRIPTION_NONMEMBER:
