@@ -31,7 +31,7 @@
     <div class="row">
         <div class="col-auto comment_author">
             <span class="visually-hidden">{{ _('by') }}</span>
-            {{ render_username(post_reply.author, htmx_redirect_back_to=request.path + '#comment_' + str(post_reply.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
+            {{ render_username(post_reply.author, htmx_redirect_back_to=request.path + '#comment_' + str(post_reply.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes, is_notable=in_sorted_list(notable, post_reply.author.user_name)) }}
             {%- if user_flair and post_reply.author.id in user_flair -%}
                 <span class="user_flair">{{ user_flair[post_reply.author.id] }}</span>
             {% elif post_reply.author.id in user_pronouns and user_pronouns[post_reply.author.id] not in post_reply.author.display_name() -%}

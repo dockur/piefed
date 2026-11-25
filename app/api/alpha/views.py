@@ -18,7 +18,7 @@ from app.post.util import tags_to_string, flair_to_string
 from app.utils import blocked_communities, blocked_or_banned_instances, blocked_users, communities_banned_from, \
     get_setting, \
     num_topics, moderating_communities_ids, moderating_communities, joined_communities, \
-    moderating_communities_ids_all_users, community_membership_private, months_since
+    moderating_communities_ids_all_users, community_membership_private, months_since, in_sorted_list
 from app.shared.community import get_comm_flair_list
 from app.shared.post import get_post_flair_list
 
@@ -857,7 +857,7 @@ def reply_view(reply: PostReply | int, variant: int, user_id=None,
         if is_creator_blocked is not None:
             creator_blocked = is_creator_blocked
         else:
-            creator_blocked = reply.user_id in blocked_users(user_id) if user_id else False
+            creator_blocked = in_sorted_list(blocked_users(user_id), reply.user_id) if user_id else False
 
         if vote_effect is not None:
             my_vote = vote_effect
@@ -954,7 +954,7 @@ def reply_report_view(report, reply_id, user_id, variant=1) -> dict:
     # /comment/report api endpoint
     # similar to a reply_view in many ways, except that the 'creator' is the report creator,
     # not the reported comment's creator.
-    is_creator_blocked = report.reporter_id in blocked_users(user_id)
+    is_creator_blocked = in_sorted_list(blocked_users(user_id), report.reporter_id)
     is_creator_banned_from_community = report.suspect_community_id in communities_banned_from(report.reporter_id)
     is_creator_moderator = report.suspect_community_id in moderating_communities_ids(report.reporter_id)
     is_creator_admin = report.reporter_id in g.admin_ids

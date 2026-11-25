@@ -244,9 +244,9 @@ def get_user_replies(auth, data, mentions=False):
             vote_effect = -1
         reply_json = reply_view(reply=reply, variant=3, user_id=user_id,
             is_user_banned_from_community=reply.community_id in user_details['user_ban_community_ids'],
-            is_user_following_community=reply.community_id in user_details['followed_community_ids'],
+            is_user_following_community=in_sorted_list(user_details['followed_community_ids'], reply.community_id),
             is_reply_bookmarked=reply.id in user_details['bookmarked_reply_ids'],
-            is_creator_blocked=reply.user_id in user_details['blocked_creator_ids'],
+            is_creator_blocked=in_sorted_list(user_details['blocked_creator_ids'], reply.user_id),
             vote_effect=vote_effect,
             is_reply_subscribed=reply.id in user_details['subscribed_reply_ids'],
             is_user_moderator=reply.community_id in user_details['moderated_community_ids'])

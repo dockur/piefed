@@ -99,7 +99,7 @@ def get_reply_list(auth, data, user_details=None):
         else:
             replies = replies.filter_by(user_id=person_id)
         add_creator_in_view = False
-        is_creator_blocked = person_id in user_details['blocked_creator_ids'] if user_details else False
+        is_creator_blocked = in_sorted_list(user_details['blocked_creator_ids'], person_id) if user_details else False
         is_creator_admin = person_id in g.admin_ids
         by_person_id = True
 
@@ -117,7 +117,7 @@ def get_reply_list(auth, data, user_details=None):
             replies = replies.filter_by(community_id=community_id)
         add_community_in_view = False
         is_user_banned_from_community = community_id in user_details['user_ban_community_ids'] if user_details else False
-        is_user_following_community = community_id in user_details['followed_community_ids'] if user_details else False
+        is_user_following_community = in_sorted_list(user_details['followed_community_ids'], community_id) if user_details else False
         is_user_moderator = community_id in user_details['moderated_community_ids'] if user_details else False
         by_community_id = True
 
@@ -358,19 +358,19 @@ def get_reply_list(auth, data, user_details=None):
             is_reply_bookmarked = reply.id in user_details['bookmarked_reply_ids'] if user_details else False
 
         if by_person_id == False:
-            is_creator_blocked = reply.user_id in user_details['blocked_creator_ids'] if user_details else False
+            is_creator_blocked = in_sorted_list(user_details['blocked_creator_ids'], reply.user_id) if user_details else False
 
         if by_community_id == False:
             if add_community_in_view == False:
                 if is_user_banned_from_community is None:
                     is_user_banned_from_community = reply.community_id in user_details['user_ban_community_ids'] if user_details else False
                 if is_user_following_community is None:
-                    is_user_following_community = reply.community_id in user_details['followed_community_ids'] if user_details else False
+                    is_user_following_community = in_sorted_list(user_details['followed_community_ids'], reply.community_id) if user_details else False
                 if is_user_moderator is None:
                     is_user_moderator = reply.community_id in user_details['moderated_community_ids'] if user_details else False
             else:
                 is_user_banned_from_community = reply.community_id in user_details['user_ban_community_ids'] if user_details else False
-                is_user_following_community = reply.community_id in user_details['followed_community_ids'] if user_details else False
+                is_user_following_community = in_sorted_list(user_details['followed_community_ids'], reply.community_id) if user_details else False
                 is_user_moderator = reply.community_id in user_details['moderated_community_ids'] if user_details else False
 
         is_reply_subscribed = reply.id in user_details['subscribed_reply_ids'] if user_details else False
@@ -673,9 +673,9 @@ def post_reply_mark_as_read(auth, data):
         vote_effect = -1
     reply_json = reply_view(reply=reply, variant=3, user_id=user_id,
         is_user_banned_from_community=reply.community_id in user_details['user_ban_community_ids'],
-        is_user_following_community=reply.community_id in user_details['followed_community_ids'],
+        is_user_following_community=in_sorted_list(user_details['followed_community_ids'], reply.community_id),
         is_reply_bookmarked=reply.id in user_details['bookmarked_reply_ids'],
-        is_creator_blocked=reply.user_id in user_details['blocked_creator_ids'],
+        is_creator_blocked=in_sorted_list(user_details['blocked_creator_ids'], reply.user_id),
         vote_effect=vote_effect,
         is_reply_subscribed=reply.id in user_details['subscribed_reply_ids'],
         is_user_moderator=reply.community_id in user_details['moderated_community_ids'])
@@ -705,9 +705,9 @@ def post_reply_mark_as_answer(auth, data):
         vote_effect = -1
     reply_json = reply_view(reply=reply, variant=3, user_id=user_id,
         is_user_banned_from_community=reply.community_id in user_details['user_ban_community_ids'],
-        is_user_following_community=reply.community_id in user_details['followed_community_ids'],
+        is_user_following_community=in_sorted_list(user_details['followed_community_ids'], reply.community_id),
         is_reply_bookmarked=reply.id in user_details['bookmarked_reply_ids'],
-        is_creator_blocked=reply.user_id in user_details['blocked_creator_ids'],
+        is_creator_blocked=in_sorted_list(user_details['blocked_creator_ids'], reply.user_id),
         vote_effect=vote_effect,
         is_reply_subscribed=reply.id in user_details['subscribed_reply_ids'],
         is_user_moderator=reply.community_id in user_details['moderated_community_ids'])

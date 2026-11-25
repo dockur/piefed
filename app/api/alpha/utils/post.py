@@ -1530,7 +1530,7 @@ def get_post_replies(auth, data):
         replies = post_replies(post, sort.lower(), user)
 
     is_user_banned_from_community = post.community_id in user_details['user_ban_community_ids'] if user_details else False
-    is_user_following_community = post.community_id in user_details['followed_community_ids'] if user_details else False
+    is_user_following_community = in_sorted_list(user_details['followed_community_ids'], post.community_id) if user_details else False
     is_user_moderator = post.community_id in user_details['moderated_community_ids'] if user_details else False
 
     # Apply max_depth filter to the nested reply tree
@@ -1638,7 +1638,7 @@ def get_post_replies(auth, data):
         for item in reply_tree:
             reply = item['comment']
             is_reply_bookmarked = reply.id in user_details['bookmarked_reply_ids'] if user_details else None
-            is_creator_blocked = reply.user_id in user_details['blocked_creator_ids'] if user_details else False
+            is_creator_blocked = in_sorted_list(user_details['blocked_creator_ids'], reply.user_id) if user_details else False
             vote_effect = 0
             if user_details and in_sorted_list(user_details['upvoted_reply_ids'], reply.id):
                 vote_effect = 1

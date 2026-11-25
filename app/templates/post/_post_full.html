@@ -60,7 +60,7 @@
                 {% if post.type != POST_TYPE_EVENT -%}
                     <small>{{ _('submitted') }} <time datetime="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}" title="{{ pendulum.instance(post.posted_at).format('YYYY-MM-DD HH:mm:ss ZZ') }}">{{ localize_datetime(post.posted_at, locale) }}</time> {{ _('by') }}
                         {% if not post.deleted or post.community.is_moderator() or post.community.is_owner() or current_user.get_id() in admin_ids -%}
-                            {{ render_username(post.author, htmx_redirect_back_to=request.path, user_notes=user_notes, current_user=current_user, admin_ids=admin_ids, low_bandwidth=low_bandwidth) }}
+                            {{ render_username(post.author, htmx_redirect_back_to=request.path, user_notes=user_notes, current_user=current_user, admin_ids=admin_ids, low_bandwidth=low_bandwidth, is_notable=in_sorted_list(notable, post.author.user_name)) }}
                         {% else -%}
                             [{{ _('deleted') }}]
                         {% endif -%}

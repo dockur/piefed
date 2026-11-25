@@ -1759,7 +1759,7 @@ def blocked_users(user_id) -> List[int]:
     if user_id == 0:
         return []
     blocks = db.session.query(UserBlock).filter_by(blocker_id=user_id)
-    return [block.blocked_id for block in blocks]
+    return sorted([block.blocked_id for block in blocks])  # sorted so that in_sorted_list can be used
 
 
 @cache.memoize(timeout=86400)
@@ -3278,9 +3278,9 @@ def authorise_api_user(auth, return_type=None, id_match=None) -> User | dict | i
             return user
         elif return_type and return_type == 'dict':
             user_ban_community_ids = communities_banned_from(user_id)
-            followed_community_ids = list(db.session.execute(text(
+            followed_community_ids = sorted(db.session.execute(text(
                 'SELECT community_id FROM "community_member" WHERE user_id = :user_id'),
-                {'user_id': user_id}).scalars())
+                {'user_id': user_id}).scalars())  # sorted so that in_sorted_list can be used
             bookmarked_reply_ids = list(db.session.execute(text(
                 'SELECT post_reply_id FROM "post_reply_bookmark" WHERE user_id = :user_id'),
                 {'user_id': user_id}).scalars())
@@ -5246,3 +5246,10 @@ def activity_is_type(obj: dict, type_to_find: str | list | tuple | set) -> bool:
             return bool(set(obj_type) & set(type_to_find))  # never turn down a chance to use set intersection, it makes you look brainy
 
     return False
+
+
+def get_notable_accounts():
+    def username(url):
+        parts = url.strip().split('/u/')
+        return parts[-1].lower()
+    return sorted([username(url) for url in file_get_contents('notable.txt').split('\n')])

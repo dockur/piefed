@@ -5,7 +5,7 @@
     <small style="color: red;">[{{ name }}] {{ "%.3f"|format(now) }} s{% if delta > 0 %} (+{{ "%.3f"|format(delta) }} s){% endif %}</small>
 {% endmacro %}
 
-{% macro render_username(user, add_domain=True, htmx_redirect_back_to=None, current_user=None, low_bandwidth=False, collapsed=False, admin_ids=None, user_notes=None, inline=False) -%}
+{% macro render_username(user, add_domain=True, htmx_redirect_back_to=None, current_user=None, low_bandwidth=False, collapsed=False, admin_ids=None, user_notes=None, inline=False, is_notable=False) -%}
 {% if not inline -%}
     <div class="render_username" xmlns="http://www.w3.org/1999/xhtml">
 {% else -%}
@@ -20,7 +20,7 @@
             [deleted]
         {% endif -%}
     {% else -%}
-        <a href="/u/{{ user.link() }}" class="author_link {{ 'donor' if user.stripe_subscription_id }}" title="" rel="author">
+        <a href="/u/{{ user.link() }}" class="author_link {{ 'donor' if user.stripe_subscription_id }} {{ 'notable' if is_notable }}" title="" rel="author">
             {% if user.avatar_id and not low_bandwidth and not collapsed -%}
                 <img src="{{ user.avatar_thumbnail() }}" alt="" loading="lazy" class="{{ 'gif' if user.avatar_thumbnail().endswith('.gif') }}" decoding="async" referrerpolicy="no-referrer" />
             {% endif -%}

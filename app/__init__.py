@@ -191,8 +191,10 @@ def create_app(config_class=Config):
 
     # Initialize redis_client
     global redis_client
-    from app.utils import get_redis_connection
+    from app.utils import get_redis_connection, get_notable_accounts
     redis_client = get_redis_connection(app.config['CACHE_REDIS_URL'])
+
+    app.notable = get_notable_accounts()
 
     oauth.init_app(app)
     if app.config['GOOGLE_OAUTH_CLIENT_ID']:

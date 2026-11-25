@@ -2,7 +2,7 @@
 {% from "_macros.html" import render_username, render_communityname %}
 {% from "post/reply/_macros.html" import render_post_emoji_button %}
 
-{% macro render_title(post, user_pronouns=None, sort=None, embed=False, show_post_community=True, low_bandwidth=False, current_user=None, request=None, locale=None, reported_posts=None, user_flair=None, admin_ids=None, user_notes=None) -%}
+{% macro render_title(post, user_pronouns=None, sort=None, embed=False, show_post_community=True, low_bandwidth=False, current_user=None, request=None, locale=None, reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, is_notable=False) -%}
 {% set POST_TYPE_LINK = 1 -%}
 {% set POST_TYPE_ARTICLE = 2 -%}
 {% set POST_TYPE_IMAGE = 3 -%}
@@ -14,7 +14,7 @@
     <div class="microblog_teaser_header">
         <h3 lang="{{ post.language_code() }}" class="visually-hidden"><a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None, _external=embed) }}" {{ 'target="_blank"' if embed }} class="post_teaser_title_a" {% if not post.indexable %}rel="noindex"{% endif %} >{{ post.title }}</a></h3>
         <div class="author">
-            {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
+            {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
             <div class="time small"><time datetime="{{ post.last_active }}" title="{{ post.last_active }}">{{ post.posted_at_localized(sort, locale) }}</time></div>
             {%- if user_flair and post.author.id in user_flair -%}
                 <span class="user_flair">{{ user_flair[post.author.id] }}</span>
@@ -66,7 +66,7 @@
     <div class="author small">{% if show_post_community -%}<a href="{{ (request.url_root + 'c/' + post.community.link() if embed else '/c/' + post.community.link()) }}" {{ 'target="_blank"' if embed }}>
         {% if post.community.icon_id and not low_bandwidth %}<img class="community_icon_small rounded-circle" src="{{ post.community.icon_image('tiny') }}" alt="Community icon" loading="lazy" />{% endif -%}
         {{ post.community.name }}</a><span class="community_instance text-muted {{ 'local' if post.community.is_local() }}">@{{ post.community.ap_domain }}</span> {% endif -%}
-        {{ _('by') }} {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
+        {{ _('by') }} {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
         {%- if user_flair and post.author.id in user_flair -%}
             <span class="user_flair">{{ user_flair[post.author.id] }}</span>
         {% elif post.author.id in user_pronouns and user_pronouns[post.author.id] not in post.author.display_name() -%}
@@ -246,7 +246,7 @@
 </div><hr class="visually-hidden">
 {%- endmacro %}
 
-{% macro render_article(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None) -%}
+{% macro render_article(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, is_notable=False) -%}
 <div class="col post_teaser_body">
     {% if post.image_id -%}
         <div class="col_thumbnail thumbnail{{ ' lbw' if low_bandwidth }}" aria-hidden="true">
@@ -259,7 +259,7 @@
         </div>
     {% endif -%}
 
-    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
+    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
     {% if post.body_html -%}
         <div class="post_teaser_article_preview small post_teaser_clickable {{ 'blur' if blur_content }}" lang="{{ post.language_code() }}">
             {{ first_paragraph(post.body_html) | safe }}
@@ -270,7 +270,7 @@
 </div>
 {%- endmacro %}
 
-{% macro render_event(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None) -%}
+{% macro render_event(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, is_notable=False) -%}
 <div class="col post_teaser_body">
     {% if post.image_id -%}
         <div class="col_thumbnail thumbnail{{ ' lbw' if low_bandwidth }}" aria-hidden="true">
@@ -283,7 +283,7 @@
         </div>
     {% endif -%}
 
-    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
+    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
     {% if post.body_html -%}
         <div class="post_teaser_article_preview small post_teaser_clickable {{ 'blur' if blur_content }}" lang="{{ post.language_code() }}">
             {% if post.is_event() and get_event_start(post.id) %}<time class="convert_to_local">{{ get_event_start(post.id).strftime('%Y-%m-%dT%H:%M:%SZ') }}</time>{% endif %}
@@ -295,7 +295,7 @@
 </div>
 {%- endmacro %}
 
-{% macro render_link(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None) -%}
+{% macro render_link(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, is_notable=False) -%}
 <div class="col post_teaser_body">
     {% if post.image_id -%}
         <div class="col_thumbnail thumbnail{{ ' lbw' if low_bandwidth }}" aria-hidden="true">
@@ -311,7 +311,7 @@
             <a href="{{ post.url }}" rel="nofollow ugc" class="post_link" target="_blank" aria-label="{{ _('Follow link') }}"><span class="fe fe-external fe-external-noimg"></span></a>
         </div>
     {% endif -%}
-    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
+    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
     {% if post.body_html -%}
         <div class="post_teaser_link_preview small post_teaser_clickable {{ 'blur' if blur_content }}" lang="{{ post.language_code() }}">
             {{ first_paragraph(post.body_html) | safe }}
@@ -322,7 +322,7 @@
 </div>
 {%- endmacro %}
 
-{% macro render_poll(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None) -%}
+{% macro render_poll(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, is_notable=False) -%}
 <div class="col post_teaser_body">
     {% if post.image_id -%}
         <div class="col_thumbnail thumbnail{{ ' lbw' if low_bandwidth }}" aria-hidden="true">
@@ -338,7 +338,7 @@
             <a href="{{ post.slug if post.slug else url_for('activitypub.post_ap', post_id=post.id, sort='new' if sort == 'active' else None) }}"><span class="fe fe-poll"></span></a>
         </div>
     {% endif -%}
-    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
+    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
     {% if post.body_html -%}
         <div class="post_teaser_link_preview small post_teaser_clickable {{ 'blur' if blur_content }}" lang="{{ post.language_code() }}">
             {{ first_paragraph(post.body_html) | safe }}
@@ -349,7 +349,7 @@
 </div>
 {%- endmacro %}
 
-{% macro render_image(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, compact_thumbs=False) -%}
+{% macro render_image(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, compact_thumbs=False, is_notable=False) -%}
 <div class="col post_teaser_body {{ 'reported' if post.id in reported_posts }}">
     {% if compact_thumbs and post.image_id -%}
         <div class="col_thumbnail thumbnail">
@@ -357,7 +357,7 @@
                     alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.width }}" height="{{ post.image.height }}" /></a>
         </div>
     {% endif -%}
-    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
+    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
     {% if post.image_id and not low_bandwidth and not compact_thumbs -%}
         <div class="post_teaser_image_preview">
             <a href="{{ post.image.view_url() }}" class="post_link" rel="nofollow ugc" aria-label="{{ _('View image') }}" target="_blank"><img src="{{ post.image.medium_url() }}" decoding="async" referrerpolicy="no-referrer"
@@ -374,7 +374,7 @@
 </div>
 {%- endmacro %}
 
-{% macro render_gallery(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, compact_thumbs=False) -%}
+{% macro render_gallery(post, user_pronouns=None, low_bandwidth=False, blur_content=False, sort=None, current_user=None, request=None, locale=None, show_post_community=show_post_community, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, compact_thumbs=False, is_notable=False) -%}
 <div class="col post_teaser_body {{ 'reported' if post.id in reported_posts }}">
     {% if compact_thumbs and post.image_id -%}
         <div class="col_thumbnail thumbnail">
@@ -390,7 +390,7 @@
             </div>
         </div>
     {% endif -%}
-    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
+    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
     {% if post.image_id and not low_bandwidth and not compact_thumbs -%}
         <div class="post_teaser_image_preview">
             <div class="post_gallery">
@@ -415,9 +415,9 @@
 </div>
 {%- endmacro %}
 
-{% macro render_video(post, user_pronouns=None, show_post_community=show_post_community, low_bandwidth=False, blur_content=False, sort=None, autoplay=False, current_user=None, request=None, locale=None, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None) -%}
+{% macro render_video(post, user_pronouns=None, show_post_community=show_post_community, low_bandwidth=False, blur_content=False, sort=None, autoplay=False, current_user=None, request=None, locale=None, joined_communities=None, can_upvote_here=None, can_downvote_here=None, disable_voting=False, recently_upvoted=None, recently_downvoted=None, communities_banned_from_list=None, upvoted_class='', downvoted_class='', reported_posts=None, user_flair=None, admin_ids=None, user_notes=None, moderated_community_ids=None, is_notable=False) -%}
 <div class="col post_teaser_body">
-    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes) }}
+    {{ render_title(post, user_pronouns=user_pronouns, sort=sort, current_user=current_user, request=request, locale=locale, show_post_community=show_post_community, low_bandwidth=low_bandwidth, reported_posts=reported_posts, user_flair=user_flair, admin_ids=admin_ids, user_notes=user_notes, is_notable=is_notable) }}
     {% if not low_bandwidth %}
         <div class="post_teaser_video_preview">
             <div class="max_width_512">
