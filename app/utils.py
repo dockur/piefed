@@ -5252,4 +5252,7 @@ def get_notable_accounts():
     def username(url):
         parts = url.strip().split('/u/')
         return parts[-1].lower()
-    return sorted([username(url) for url in file_get_contents('notable.txt').split('\n')])
+    try:
+        return sorted([username(url) for url in file_get_contents('notable.txt').split('\n')])
+    except:
+        return []
