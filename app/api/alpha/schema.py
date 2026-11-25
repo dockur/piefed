@@ -2297,3 +2297,71 @@ class DeleteBlocklistRequest(DefaultSchema):
 class TopicSubscribeRequest(DefaultSchema):
     topic_id = fields.Integer(required=True)
     subscribe = fields.Boolean(required=True)
+
+
+class UserAllBlockRequest(DefaultSchema):
+    page = fields.Integer(metadata={"default": 1})
+    limit = fields.Integer(metadata={"default": 20})
+
+
+class Domain(DefaultSchema):
+    id = fields.Integer(required=True)
+    name = fields.String(required=True)
+    post_count = fields.Integer(required=True)
+    banned = fields.Boolean(required=True, metadata={"description": "Banned sitewide by the admins."})
+    blocked = fields.Boolean(required=True, metadata={"description": "Blocked by an individual user."})
+    post_warning = fields.String(metadata={"description": "Reminder/disclaimer displayed on posts pointing to this domain."})
+
+
+class UserAllBlockResponse(DefaultSchema):
+    users = fields.List(fields.Nested(PersonView), required=True)
+    communities = fields.List(fields.Nested(CommunityView), required=True)
+    domains = fields.List(fields.Nested(Domain), required=True)
+    instances = fields.List(fields.Nested(Instance), required=True)
+    flair = fields.List(fields.Nested(CommunityFlair), required=True)
+    next_page = fields.String(allow_none=True)
+
+
+class KeywordFilter(DefaultSchema):
+    id = fields.Integer(required=True)
+    title = fields.String(required=True)
+    filter_home = fields.Boolean(required=True, metadata={"description": "Apply filter to the home feed."})
+    filter_posts = fields.Boolean(required=True, metadata={"description": "Additionally apply filter outside the home feed, like on a community's page."})
+    filter_replies = fields.Boolean(required=True, metadata={"description": "Note that this is currently unimplemented, but included for completeness"})
+    hide_type = fields.String(required=True, validate=validate.OneOf(["Hide", "Transparent"]))
+    expire_after = fields.Date(required=True, allow_none=True, metadata={"description": "ISO8601 formatted date e.g. YYYY-MM-DD"})
+    keywords = fields.String(required=True, metadata={"description": "Newline separated list of keywords (case insensitive)"})
+
+
+class AddFilterRequest(DefaultSchema):
+    title = fields.String(required=True)
+    filter_home = fields.Boolean(required=True, metadata={"description": "Apply filter to the home feed."})
+    filter_posts = fields.Boolean(required=True, metadata={"description": "Additionally apply filter outside the home feed, like on a community's page."})
+    filter_replies = fields.Boolean(required=True, metadata={"description": "Note that this is currently unimplemented, but included for completeness"})
+    hide_type = fields.String(required=True, validate=validate.OneOf(["Hide", "Transparent"]))
+    expire_after = fields.Date(required=True, allow_none=True, metadata={"description": "ISO8601 formatted date e.g. YYYY-MM-DD"})
+    keywords = fields.String(required=True, metadata={"description": "Newline separated list of keywords (case insensitive)"})
+
+
+class EditFilterRequest(DefaultSchema):
+    filter_id = fields.Integer(required=True)
+    title = fields.String()
+    filter_home = fields.Boolean(metadata={"description": "Apply filter to the home feed."})
+    filter_posts = fields.Boolean(metadata={"description": "Additionally apply filter outside the home feed, like on a community's page."})
+    filter_replies = fields.Boolean(metadata={"description": "Note that this is currently unimplemented, but included for completeness"})
+    hide_type = fields.String(validate=validate.OneOf(["Hide", "Transparent"]))
+    expire_after = fields.Date(allow_none=True, metadata={"description": "ISO8601 formatted date e.g. YYYY-MM-DD"})
+    keywords = fields.String(metadata={"description": "Newline separated list of keywords (case insensitive)"})
+
+
+class SingleFilterRequest(DefaultSchema):
+    filter_id = fields.Integer(required=True)
+
+class FilterListRequest(DefaultSchema):
+    page = fields.Integer(metadata={"default": 1})
+    limit = fields.Integer(metadata={"default": 20})
+
+
+class FilterListResponse(DefaultSchema):
+    filters = fields.List(fields.Nested(KeywordFilter), required=True)
+    next_page = fields.String(required=True, allow_none=True)

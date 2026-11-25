@@ -10,10 +10,13 @@ from app import db, cache
 from app.activitypub.util import make_image_sizes
 from app.api.alpha.utils.post import get_post_list
 from app.api.alpha.utils.reply import get_reply_list
-from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view, topic_view, feed_view
+from app.api.alpha.views import user_view, reply_view, post_view, community_view, captcha_view, topic_view, feed_view, \
+    domain_view, instance_view, flair_view, filter_view
 from app.constants import *
 from app.models import Conversation, ChatMessage, Notification, PostReply, User, Post, Community, File, UserFlair, \
-    user_file, UserExtraField, UserNote, RevokedToken, utcnow, NotificationSubscription, Topic, Feed, CommunityMember
+    user_file, UserExtraField, UserNote, RevokedToken, utcnow, NotificationSubscription, Topic, Feed, CommunityMember, \
+    UserBlock, CommunityBlock, Domain, DomainBlock, Instance, InstanceBlock, CommunityFlair, CommunityFlairBlock, \
+    Filter
 from app.shared.user import block_another_user, unblock_another_user, subscribe_user, ban_user, unban_user, follow_user, \
     unfollow_user
 from app.shared.post import subscribe_post
@@ -23,7 +26,8 @@ from app.shared.community import subscribe_community
 from app.shared.topic import subscribe_topic
 from app.utils import authorise_api_user, in_sorted_list, user_in_restricted_country, user_access, user_notes, \
     get_setting, create_captcha, moderating_communities_ids, communities_banned_from, joined_or_modding_communities, \
-    blocked_communities, blocked_or_banned_instances, subscribed_feeds
+    blocked_communities, blocked_or_banned_instances, subscribed_feeds, user_filters_home, user_filters_posts, \
+    user_filters_replies, filtered_out_communities
 
 
 def get_user(auth, data):
@@ -1345,3 +1349,213 @@ def post_user_activity_alert(auth, data, subscribe = True):
 
 def post_user_activity_alert_delete(auth, data):
     return post_user_activity_alert(auth, data, subscribe=False)
+
+def get_user_block_list_all(auth, data):
+    page = data["page"] if "page" in data else 1
+    limit = data["limit"] if "limit" in data else 20
+
+    user_id = authorise_api_user(auth)
+
+    # Blocked people
+    blocked_users = User.query.filter_by(deleted=False).join(UserBlock, UserBlock.blocked_id == User.id). \
+        filter(UserBlock.blocker_id == user_id).order_by(User.user_name)
+    blocked_users = blocked_users.paginate(page=page, per_page=limit, error_out=False)
+    next_page = str(blocked_users.next_num) if blocked_users.next_num else None
+
+    # Blocked communities
+    blocked_communities = Community.query.join(CommunityBlock, CommunityBlock.community_id == Community.id). \
+        filter(CommunityBlock.user_id == user_id).order_by(Community.title)
+    blocked_communities = blocked_communities.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_communities.next_num) if blocked_communities.next_num else None
+
+    # Blocked domains
+    blocked_domains = Domain.query.join(DomainBlock, DomainBlock.domain_id == Domain.id). \
+        filter(DomainBlock.user_id == user_id).order_by(Domain.name)
+    blocked_domains = blocked_domains.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_domains.next_num) if blocked_domains.next_num else None
+
+    # Blocked instances
+    blocked_instances = Instance.query.join(InstanceBlock, InstanceBlock.instance_id == Instance.id). \
+        filter(InstanceBlock.user_id == user_id).order_by(Instance.domain)
+    blocked_instances = blocked_instances.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_instances.next_num) if blocked_instances.next_num else None
+
+    # Blocked flair
+    blocked_flair = CommunityFlair.query.join(CommunityFlairBlock,
+                                              CommunityFlairBlock.community_flair_id == CommunityFlair.id). \
+                                                filter(CommunityFlairBlock.user_id == user_id). \
+                                                    order_by(CommunityFlair.flair)
+    blocked_flair = blocked_flair.paginate(page=page, per_page=limit, error_out=False)
+    if not next_page:
+        next_page = str(blocked_flair.next_num) if blocked_flair.next_num else None
+
+    resp = {"next_page": next_page}
+
+    user_list = []
+    community_list = []
+    domain_list = []
+    instance_list = []
+    flair_list = []
+
+    for user in blocked_users:
+        user_list.append(user_view(user=user, variant=2, user_id=user_id))
+    for comm in blocked_communities:
+        community_list.append(community_view(community=comm, variant=2, user_id=user_id))
+    for domain in blocked_domains:
+        domain_list.append(domain_view(domain=domain, variant=1, user_id=user_id))
+    for instance in blocked_instances:
+        instance_list.append(instance_view(instance=instance, variant=1))
+    for flair in blocked_flair:
+        flair_list.append(flair_view(flair=flair))
+
+    resp["users"] = user_list
+    resp["communities"] = community_list
+    resp["domains"] = domain_list
+    resp["instances"] = instance_list
+    resp["flair"] = flair_list
+
+    return resp
+
+
+def post_user_filter(auth, data):
+    title = data["title"]
+    filter_home = data["filter_home"]
+    filter_posts = data["filter_posts"]
+    filter_replies = data["filter_replies"]
+    hide_type = data["hide_type"]
+    hide_int = 1
+    expire_after = data["expire_after"]
+    keywords = data["keywords"]
+
+    user = authorise_api_user(auth, return_type='model')
+    user_id = user.id
+
+    if hide_type == "Transparent":
+        hide_int = 0
+
+    new_filter = Filter(title=title,
+                        filter_home=filter_home,
+                        filter_posts=filter_posts,
+                        filter_replies=filter_replies,
+                        hide_type=hide_int,
+                        expire_after=expire_after,
+                        keywords=keywords,
+                        user_id=user_id)
+
+    db.session.add(new_filter)
+    db.session.commit()
+    cache.delete_memoized(user_filters_home, user_id)
+    cache.delete_memoized(user_filters_posts, user_id)
+    cache.delete_memoized(user_filters_replies, user_id)
+    cache.delete_memoized(filtered_out_communities, user)
+
+    return filter_view(new_filter, variant=1)
+
+
+def put_user_filter(auth, data):
+    user = authorise_api_user(auth, return_type='model')
+    user_id = user.id
+
+    filter_id = data["filter_id"]
+    filter = Filter.query.get(filter_id)
+
+    if not filter:
+        raise Exception("filter does not exist")
+
+    if not filter.user_id == user_id:
+        raise Exception("incorrect_login")
+
+    title = data["title"] if "title" in data else filter.title
+    filter_home = data["filter_home"] if "filter_home" in data else filter.filter_home
+    filter_posts = data["filter_posts"] if "filter_posts" in data else filter.filter_posts
+    filter_replies = data["filter_replies"] if "filter_replies" in data else filter.filter_replies
+    expire_after = data["expire_after"] if "expire_after" in data else filter.expire_after
+    keywords = data["keywords"] if "keywords" in data else filter.keywords
+
+    if "hide_type" in data:
+        if data["hide_type"] == "Transparent":
+            hide_int = 0
+        else:
+            hide_int = 1
+    else:
+        hide_int = filter.hide_type
+
+    filter.title = title
+    filter.filter_home = filter_home
+    filter.filter_posts = filter_posts
+    filter.filter_replies = filter_replies
+    filter.expire_after = expire_after
+    filter.hide_type = hide_int
+    filter.keywords = keywords
+
+    db.session.commit()
+    cache.delete_memoized(user_filters_home, user_id)
+    cache.delete_memoized(user_filters_posts, user_id)
+    cache.delete_memoized(user_filters_replies, user_id)
+    cache.delete_memoized(filtered_out_communities, user)
+
+    return filter_view(filter, variant=1)
+
+
+def post_user_filter_delete(auth, data):
+    user = authorise_api_user(auth, return_type='model')
+    user_id = user.id
+
+    filter_id = data["filter_id"]
+    filter = Filter.query.get(filter_id)
+
+    if not filter:
+        raise Exception("filter does not exist")
+
+    if not filter.user_id == user_id:
+        raise Exception("incorrect_login")
+
+    db.session.delete(filter)
+    db.session.commit()
+    cache.delete_memoized(user_filters_home, user_id)
+    cache.delete_memoized(user_filters_posts, user_id)
+    cache.delete_memoized(user_filters_replies, user_id)
+    cache.delete_memoized(filtered_out_communities, user)
+
+    return
+
+
+def get_user_filter(auth, data):
+    user_id = authorise_api_user(auth)
+
+    filter_id = data["filter_id"]
+    filter = Filter.query.get(filter_id)
+
+    if not filter:
+        raise Exception("filter does not exist")
+
+    if not filter.user_id == user_id:
+        raise Exception("incorrect_login")
+
+    return filter_view(filter, variant=1)
+
+
+def get_user_filter_list(auth, data):
+    page = data["page"] if "page" in data else 1
+    limit = data["limit"] if "limit" in data else 20
+
+    user_id = authorise_api_user(auth)
+
+    filters = Filter.query.filter_by(user_id=user_id).order_by(Filter.title)
+
+    filters = filters.paginate(page=page, per_page=limit, error_out=False)
+    next_page = str(filters.next_num) if filters.next_num else None
+
+    filter_list = []
+
+    for filter_item in filters:
+        filter_list.append(filter_view(filter=filter_item, variant=1))
+
+    resp = dict()
+    resp["filters"] = filter_list
+    resp["next_page"] = next_page
+
+    return resp
