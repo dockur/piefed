@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const setups = [
         setupMobileNav,
         setupLightDark,
+        setupLazyLoading,
         setupConfirmFirst,
         setupSendPost,
         setupVotingLongPress,
@@ -87,7 +88,6 @@ document.addEventListener("DOMContentLoaded", function () {
         setupMarkdownKeyboardShortcuts,
         setupQuotingHighlightedText,
         setupJoinListener,
-        setupLazyLoading,
 
         // must be last - see comment above
         setupDynamicContentObserver
