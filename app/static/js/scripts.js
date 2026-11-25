@@ -1800,6 +1800,10 @@ function setupLazyLoading() {
         return;
     }
 
+    // Desktops get a wider prefetch margin: they usually have a large viewport and a fast connection, so loading images a bit earlier is fine.
+    const isDesktop = window.matchMedia('(min-width: 1024px) and (pointer: fine)').matches;
+    const rootMargin = isDesktop ? '800px 0px' : '400px 0px';
+
     const lazyAvatarObserver = new IntersectionObserver((entries, obs) => {
         for (const entry of entries) {
             if (entry.isIntersecting) {
@@ -1807,10 +1811,10 @@ function setupLazyLoading() {
                 obs.unobserve(entry.target);
             }
         }
-    }, { rootMargin: '400px 0px' });
+    }, { rootMargin: rootMargin });
 
     observe(document);
-    // htmx swaps in new teasers/comments; observe any avatars inside them
+    // htmx swaps in new teasers/comments; observe any lazy images inside them
     document.addEventListener('htmx:afterSwap', (e) => observe(e.detail.elt || document));
     document.addEventListener('htmx:oobAfterSwap', (e) => observe(e.detail.elt || document));
 }
