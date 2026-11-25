@@ -22,7 +22,7 @@
     {% else -%}
         <a href="/u/{{ user.link() }}" class="author_link {{ 'donor' if user.stripe_subscription_id }} {{ 'notable' if is_notable }}" title="" rel="author">
             {% if user.avatar_id and not low_bandwidth and not collapsed -%}
-                <img src="{{ user.avatar_thumbnail() }}" alt="" loading="lazy" class="{{ 'gif' if user.avatar_thumbnail().endswith('.gif') }}" decoding="async" referrerpolicy="no-referrer" />
+                <img data-src="{{ user.avatar_thumbnail() }}" alt="" class="lazy-load {{ 'gif' if user.avatar_thumbnail().endswith('.gif') }}" decoding="async" referrerpolicy="no-referrer" />
             {% endif -%}
             {{ user.display_name() }}{% if add_domain and not user.is_local() %}<span class="text-muted">@{{ user.ap_domain }}</span>{% endif %}
         </a>
@@ -70,7 +70,7 @@
     <span class="render_community">
         <a href="/c/{{ community.link() }}">
             {% if community.icon_id and not low_bandwidth and not collapsed -%}
-                <img src="{{ community.icon_image('tiny') }}" class="community_icon rounded-circle" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+                <img data-src="{{ community.icon_image('tiny') }}" class="lazy-load community_icon rounded-circle" alt="" decoding="async" referrerpolicy="no-referrer" />
             {% endif -%}
             {{ community.title }}{% if add_domain and not community.is_local() %}<span class="text-muted">@{{ community.ap_domain }}</span>{% endif %}
         </a>
@@ -81,7 +81,7 @@
     <span class="render_feed">
         <a href="/f/{{ feed.link() }}">
             {% if feed.icon_id and not low_bandwidth and not collapsed -%}
-                <img src="{{ feed.icon_image('tiny') }}" class="community_icon rounded-circle" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+                <img data-src="{{ feed.icon_image('tiny') }}" class="lazy-load community_icon rounded-circle" alt="" decoding="async" referrerpolicy="no-referrer" />
             {% endif -%}
             {{ feed.title }}{% if add_domain and not feed.is_local() %}<span class="text-muted">@{{ feed.ap_domain }}</span>{% endif %}
         </a>

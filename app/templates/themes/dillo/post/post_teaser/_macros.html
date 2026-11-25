@@ -49,7 +49,7 @@
     {% if post.deleted -%}<span class="red fe fe-delete" title="{{ _('Post deleted') }}"></span>{% endif -%}
 </h3>
 <div class="author small">{% if show_post_community -%}<a href="{{ (request.url_root + 'c/' + post.community.link() if embed else '/c/' + post.community.link()) }}" {{ 'target="_blank"' if embed }}>
-    {% if post.community.icon_id and not low_bandwidth %}<img class="community_icon_small rounded-circle" src="{{ post.community.icon_image('tiny') }}" alt="Community icon" loading="lazy" />{% endif -%}
+    {% if post.community.icon_id and not low_bandwidth %}<img class="lazy-load community_icon_small rounded-circle" data-src="{{ post.community.icon_image('tiny') }}" alt="Community icon" />{% endif -%}
     c/{{ post.community.name }}</a><span class="community_instance text-muted {{ 'local' if post.community.is_local() }}">@{{ post.community.ap_domain }}</span> {% endif -%}
     {{ _('by') }} {{ render_username(post.author, htmx_redirect_back_to=request.path + '#post_' + str(post.id), current_user=current_user, low_bandwidth=low_bandwidth, admin_ids=admin_ids, user_notes=user_notes) }}
     {%- if user_flair and post.author.id in user_flair -%}

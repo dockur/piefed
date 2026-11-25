@@ -5,7 +5,7 @@
     {% else -%}
         <a href="{{ url_for('activitypub.user_profile', actor=user.link(), _external=embed) }}" target="_blank" class="author_link {{ 'donor' if user.stripe_subscription_id }}" title="" rel="author">
             {% if user.avatar_id and not low_bandwidth and not collapsed -%}
-                <img src="{{ user.avatar_thumbnail() }}" alt="" loading="lazy" class="{{ 'gif' if user.avatar_thumbnail().endswith('.gif') }}" decoding="async" referrerpolicy="no-referrer" />
+                <img data-src="{{ user.avatar_thumbnail() }}" alt="" class="lazy-load {{ 'gif' if user.avatar_thumbnail().endswith('.gif') }}" decoding="async" referrerpolicy="no-referrer" />
             {% endif -%}
             {{ user.display_name() }}{% if add_domain and not user.is_local() %}<span class="text-muted">@{{ user.ap_domain }}</span>{% endif %}
         </a>

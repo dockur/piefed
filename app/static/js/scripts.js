@@ -87,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupMarkdownKeyboardShortcuts,
         setupQuotingHighlightedText,
         setupJoinListener,
+        setupLazyLoading,
 
         // must be last - see comment above
         setupDynamicContentObserver
@@ -1772,6 +1773,46 @@ function setupVideoSpoilers() {
             vid.classList.add("blur");
         });
     });
+}
+
+// Load images only when they approach the viewport.
+// Native loading="lazy" uses a browser-chosen distance that can cover the whole
+// feed, so these images use data-src plus this observer with a small rootMargin to make images that load extra lazily
+function setupLazyLoading() {
+    const loadImg = (img) => {
+        if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+        }
+    };
+
+    const observe = (root) => {
+        root.querySelectorAll('img.lazy-load[data-src]').forEach((img) => {
+            if (!img.dataset.lazyObserved) {
+                img.dataset.lazyObserved = 'true';
+                lazyAvatarObserver.observe(img);
+            }
+        });
+    };
+
+    if (!('IntersectionObserver' in window)) {
+        document.querySelectorAll('img.lazy-load[data-src]').forEach(loadImg);
+        return;
+    }
+
+    const lazyAvatarObserver = new IntersectionObserver((entries, obs) => {
+        for (const entry of entries) {
+            if (entry.isIntersecting) {
+                loadImg(entry.target);
+                obs.unobserve(entry.target);
+            }
+        }
+    }, { rootMargin: '400px 0px' });
+
+    observe(document);
+    // htmx swaps in new teasers/comments; observe any avatars inside them
+    document.addEventListener('htmx:afterSwap', (e) => observe(e.detail.elt || document));
+    document.addEventListener('htmx:oobAfterSwap', (e) => observe(e.detail.elt || document));
 }
 
 // Setup MutationObserver to detect dynamically loaded content (e.g., from htmx)
