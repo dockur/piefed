@@ -31,6 +31,7 @@
             {{ form.csrf_token() }}
             {{ render_field(form.title) }}
             {{ render_field(form.description) }}
+            <small class="field_hint">{{ _('Markdown is allowed.') }}</small>
             {{ render_field(form.posting_warning) }}
             <small class="field_hint">{{ _('This is shown above the field where people compose their content. Only use this if really necessary.') }}</small>
             {% if community.icon_id %}
