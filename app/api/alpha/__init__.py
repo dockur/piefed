@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app, jsonify, request
 from flask_smorest import Blueprint as ApiBlueprint
 from flask_limiter import RateLimitExceeded
+from marshmallow import ValidationError
 from sqlalchemy.orm.exc import NoResultFound
 import sentry_sdk
 from werkzeug.exceptions import UnprocessableEntity
@@ -105,12 +106,16 @@ def shared_error_handler(e):
     elif isinstance(e, BlockingIOError):
         response = {"code": 400, "message": str(e), "status": "Bad credentials"}
         return jsonify(response), 400
-    elif isinstance(e, UnprocessableEntity):
-        # Log using the standard logging mechanism
+    elif isinstance(e, ValidationError):
+        # Response schema validation failed - a server-side bug, worth reporting
+        current_app.logger.exception("API response validation failed")
         if current_app.config['SENTRY_DSN']:
             sentry_sdk.capture_exception(e)
-        
-        response = {"code": 400, "message": "Validation failed", "status": str(e.data['messages'])}
+        response = {"code": 500, "message": "Response validation failed", "status": e.messages}
+        return jsonify(response), 500
+    elif isinstance(e, UnprocessableEntity):
+        # Request validation failed - a client-side bug, not reported to Sentry
+        response = {"code": 400, "message": "Validation failed", "status": e.data['messages']}
         return jsonify(response), 400
     else:
         if str(e) != 'incorrect_login' and str(e) != 'No object found.':

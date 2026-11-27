@@ -145,6 +145,7 @@ class Community(DefaultSchema):
     name = fields.String(required=True)
     nsfw = fields.Boolean(required=True)
     ai_generated = fields.Boolean(required=True)
+    downvote_accept_mode = fields.Integer(required=True, metadata={'example': '-1 = None, 0 = All, 2 = Community members, 4 = This instance, 6 = Trusted instances'})
     published = fields.String(required=True, validate=validate_datetime_string, metadata={"example": "2025-06-07T02:29:07.980084Z", "format": "datetime"})
     removed = fields.Boolean(required=True)
     restricted_to_mods = fields.Boolean(required=True)
@@ -763,6 +764,8 @@ class CreateCommunityRequest(DefaultSchema):
     nsfw = fields.Boolean()
     question_answer = fields.Boolean()
     restricted_to_mods = fields.Boolean()
+    ai_generated = fields.Boolean()
+    downvote_accept_mode = fields.Integer(metadata={'example': '-1 = None, 0 = All, 2 = Community members, 4 = This instance, 6 = Trusted instances'})
     rules = fields.String()
 
 
@@ -782,6 +785,8 @@ class EditCommunityRequest(DefaultSchema):
     nsfw = fields.Boolean()
     restricted_to_mods = fields.Boolean()
     question_answer = fields.Boolean()
+    ai_generated = fields.Boolean()
+    downvote_accept_mode = fields.Integer(metadata={'example': '-1 = None, 0 = All, 2 = Community members, 4 = This instance, 6 = Trusted instances'})
     rules = fields.String()
 
 
