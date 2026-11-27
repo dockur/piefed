@@ -2736,6 +2736,9 @@ a.unread:before, div.unread:before {
 .post_body ol li > p, .post_body ul li > p, .comment_body ol li > p, .comment_body ul li > p, #preview ol li > p, #preview ul li > p, .reply_preview ol li > p, .reply_preview ul li > p, .accordion-body ol li > p, .accordion-body ul li > p, .post_col ol li > p, .post_col ul li > p, #about_community .card-body ol li > p, #about_community .card-body ul li > p, .message_body ol li > p, .message_body ul li > p {
   margin-bottom: 0;
 }
+.post_body ol li:has(> input.task-list-item-checkbox), .post_body ul li:has(> input.task-list-item-checkbox), .comment_body ol li:has(> input.task-list-item-checkbox), .comment_body ul li:has(> input.task-list-item-checkbox), #preview ol li:has(> input.task-list-item-checkbox), #preview ul li:has(> input.task-list-item-checkbox), .reply_preview ol li:has(> input.task-list-item-checkbox), .reply_preview ul li:has(> input.task-list-item-checkbox), .accordion-body ol li:has(> input.task-list-item-checkbox), .accordion-body ul li:has(> input.task-list-item-checkbox), .post_col ol li:has(> input.task-list-item-checkbox), .post_col ul li:has(> input.task-list-item-checkbox), #about_community .card-body ol li:has(> input.task-list-item-checkbox), #about_community .card-body ul li:has(> input.task-list-item-checkbox), .message_body ol li:has(> input.task-list-item-checkbox), .message_body ul li:has(> input.task-list-item-checkbox) {
+  list-style-type: none;
+}
 .post_body img[align=left], .comment_body img[align=left], #preview img[align=left], .reply_preview img[align=left], .accordion-body img[align=left], .post_col img[align=left], #about_community .card-body img[align=left], .message_body img[align=left] {
   margin-right: var(--spacing-12);
   margin-bottom: var(--spacing-12);

@@ -2072,6 +2072,10 @@ a.unread, div.unread {
       > p {
         margin-bottom: 0;
       }
+
+      &:has(> input.task-list-item-checkbox) {
+        list-style-type: none;
+      }
     }
   }
 
