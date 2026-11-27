@@ -320,7 +320,7 @@ allowed_tags = ['p', 'strong', 'a', 'ul', 'ol', 'li', 'em', 'blockquote', 'cite'
                 'h6', 'pre', 'div', 'video', 'source',
                 'code', 'img', 'details', 'summary', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'hr', 'span', 'small',
                 'sub', 'sup',
-                's', 'tg-spoiler', 'ruby', 'rt', 'rp']
+                's', 'tg-spoiler', 'ruby', 'rt', 'rp', 'input']
 
 
 LINK_PATTERN = re.compile(
@@ -495,6 +495,13 @@ def allowlist_html(html: str, a_target='_blank', test_env=False) -> str:
 
             if tag.name == 'ol':
                 allowed_attrs.extend(['start'])
+
+            if tag.name == 'input':
+                allowed_attrs.extend(['type', 'checked', 'disabled'])
+                # only allow checkboxes (from markdown task lists), strip any other input type
+                if tag.attrs.get('type') != 'checkbox':
+                    tag.extract()
+                    continue
 
             if tag.name in ['th', 'td']:
                 allowed_attrs.extend(['style'])
@@ -1065,6 +1072,7 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
                                             'fenced-code-blocks': None,
                                             'strike': True,
                                             'tg-spoiler': True,
+                                            'task_list': True,
                                             'link-patterns': [(LINK_PATTERN, r'\1')],
                                             'breaks': {'on_backslash': True},
                                             'tag-friendly': True,
@@ -1083,6 +1091,7 @@ def markdown_to_html(markdown_text, anchors_new_tab=True, allow_img=True, a_targ
                                                 'tables': True,
                                                 'strike': True,
                                                 'tg-spoiler': True,
+                                                'task_list': True,
                                                 'link-patterns': [(LINK_PATTERN, r'\1')],
                                                 'breaks': {'on_backslash': True},
                                                 'tag-friendly': True,

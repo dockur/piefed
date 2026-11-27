@@ -592,6 +592,15 @@ And if you want to add your score to the database to help your fellow Bookworms 
         target_html = "<ul>\n<li><p>Top level</p>\n<p>Second paragraph</p>\n<ul>\n<li><p>Second level</p>\n<p>Second paragraph</p>\n<ul>\n<li><p>Third level</p>\n<p>Second paragraph.</p></li>\n</ul></li>\n</ul></li>\n</ul>\n"
         self.assertEqual(target_html, result)
 
+    def test_task_list_checkboxes(self):
+        """Test that markdown task lists render as checkboxes"""
+        markdown = "- [ ] unchecked task\n- [x] checked task\n- regular item"
+        result = markdown_to_html(markdown, test_env={'fn_string': 'fn-test'})
+        self.assertIn('type="checkbox"', result)
+        self.assertIn('checked', result)
+        self.assertIn('unchecked task', result)
+        self.assertIn('regular item', result)
+
 
 if __name__ == '__main__':
     unittest.main()

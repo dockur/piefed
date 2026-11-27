@@ -247,6 +247,25 @@ class TestAllowlistHtml(unittest.TestCase):
         result = allowlist_html(html, test_env={"fn_string": "fn-test"})
         self.assertIn('style="text-align:center;"', result)
 
+    def test_checkbox_input_allowed(self):
+        """Test that task-list checkbox inputs survive sanitization"""
+        html = '<ul><li><input type="checkbox" disabled class="task-list-item-checkbox"/> item</li></ul>'
+        result = allowlist_html(html, test_env={"fn_string": "fn-test"})
+        self.assertIn('type="checkbox"', result)
+        self.assertIn('disabled', result)
+
+    def test_checked_checkbox_input_allowed(self):
+        """Test that checked checkbox inputs survive sanitization"""
+        html = '<ul><li><input type="checkbox" checked disabled class="task-list-item-checkbox"/> item</li></ul>'
+        result = allowlist_html(html, test_env={"fn_string": "fn-test"})
+        self.assertIn('checked', result)
+
+    def test_non_checkbox_input_removed(self):
+        """Test that non-checkbox input tags are removed"""
+        html = '<p>hi <input type="text" value="x"/> there</p>'
+        result = allowlist_html(html, test_env={"fn_string": "fn-test"})
+        self.assertNotIn('<input', result)
+
 
 if __name__ == '__main__':
     unittest.main()
