@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setupMarkdownKeyboardShortcuts,
         setupQuotingHighlightedText,
         setupJoinListener,
+        setupGetDimensions,
 
         // must be last - see comment above
         setupDynamicContentObserver
@@ -1925,7 +1926,8 @@ function setupDynamicContent() {
         setupShareIcons,
         setupPopupTooltips,
         setupHandleUrlPaste,
-        setupMarkdownKeyboardShortcuts
+        setupMarkdownKeyboardShortcuts,
+        setupGetDimensions
     ]);
 
 
@@ -2872,5 +2874,40 @@ function setupPopupTooltips() {
           delay: { show: 750, hide: 200 }
       });
       el.dataset.tooltipInitialized = 'true';
+    });
+}
+
+function setupGetDimensions() {
+    document.querySelectorAll('img.needs_dimensions, video.needs_dimensions').forEach(el => {
+       if(el.hasAttribute('data-fid') && !el.dataset.dimensionsSetup) {
+           const isVideo = el.tagName === 'VIDEO';
+           const postDimensions = () => {
+               const width = isVideo ? el.videoWidth : el.naturalWidth;
+               const height = isVideo ? el.videoHeight : el.naturalHeight;
+               const csrfToken = JSON.parse(document.body.getAttribute("hx-headers"))["x-csrftoken"];
+               fetch(`/post_image/${el.dataset.fid}/set_dimensions`, {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/x-www-form-urlencoded',
+                       'x-csrftoken': csrfToken
+                   },
+                   body: new URLSearchParams({ width: width, height: height })
+               });
+           };
+           if (isVideo) {
+               // video dimensions are available once metadata is loaded (preload="metadata" triggers this)
+               if (el.readyState >= 1 && el.videoWidth) {  // HAVE_METADATA - metadata already loaded
+                   postDimensions();
+               } else {
+                   el.addEventListener('loadedmetadata', postDimensions);
+               }
+           } else if (el.complete && el.naturalWidth) {
+               // image already loaded (e.g. from cache) - the load event won't fire again
+               postDimensions();
+           } else {
+               el.addEventListener('load', postDimensions);
+           }
+           el.dataset.dimensionsSetup = 'true';
+       }
     });
 }

@@ -2467,6 +2467,7 @@ def show_post_ical(post_id: int):
 
 
 @bp.route('/post/<int:post_id>/check_ai', methods=['POST'])
+@login_required
 def post_check_ai(post_id):
     post = Post.query.get(post_id)
     if current_app.config['DETECT_AI_ENDPOINT']:
@@ -2502,6 +2503,7 @@ def post_check_ai(post_id):
 
 
 @bp.route('/post/<int:post_id>/set_ai', methods=['POST'])
+@login_required
 def post_set_ai(post_id):
     post = Post.query.get(post_id)
     if current_user.is_authenticated and (current_user.is_admin_or_staff() or post.user_id == current_user.id or post.community.is_moderator()):
@@ -2518,6 +2520,7 @@ def post_set_read(post_id):
 
 
 @bp.route('/post_reply/<int:post_reply_id>/check_ai', methods=['POST'])
+@login_required
 def post_reply_check_ai(post_reply_id):
     post_reply = PostReply.query.get(post_reply_id)
     if current_app.config['DETECT_AI_ENDPOINT']:
@@ -2542,6 +2545,7 @@ def post_reply_check_ai(post_reply_id):
 
 
 @bp.route('/post_reply/<int:post_reply_id>/choose_answer', methods=['POST'])
+@login_required
 def post_reply_choose_answer(post_reply_id):
     post_reply = PostReply.query.get(post_reply_id)
     if current_user.is_authenticated and (current_user.is_admin_or_staff() or post_reply.user_id == current_user.id or post_reply.community.is_moderator()):
@@ -2552,6 +2556,7 @@ def post_reply_choose_answer(post_reply_id):
 
 
 @bp.route('/post_reply/<int:post_reply_id>/unchoose_answer', methods=['POST'])
+@login_required
 def post_reply_unchoose_answer(post_reply_id):
     post_reply = PostReply.query.get(post_reply_id)
     if current_user.is_authenticated and (current_user.is_admin_or_staff() or post_reply.user_id == current_user.id or post_reply.community.is_moderator()):
@@ -2572,3 +2577,16 @@ def post_share_mastodon(post_id):
 
     form.domain.data = request.cookies.get('mastodon_share', 'mastodon.social')
     return render_template('generic_form.html', form=form, title=_('Share on Mastodon'))
+
+
+@bp.route('/post_image/<int:fid>/set_dimensions', methods=['POST'])
+@login_required
+def post_image_set_dimensions(fid):
+    fid = File.query.get(fid)
+    if fid:
+        if not fid.width:
+            fid.width = int(request.form.get('width'))
+        if not fid.height:
+            fid.height = int(request.form.get('height'))
+        db.session.commit()
+    return ''

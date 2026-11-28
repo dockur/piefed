@@ -361,7 +361,7 @@
     {% if post.image_id and not low_bandwidth and not compact_thumbs -%}
         <div class="post_teaser_image_preview">
             <a href="{{ post.image.view_url() }}" class="post_link" rel="nofollow ugc" aria-label="{{ _('View image') }}" target="_blank"><img src="{{ post.image.medium_url() }}" decoding="async" referrerpolicy="no-referrer"
-                    alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur' if blur_content }}" width="{{ post.image.width }}" height="{{ post.image.height }}" /></a>
+                    alt="{{ post.image.alt_text if post.image.alt_text else '' }}" loading="lazy" class="{{ 'blur ' if blur_content }}{{ 'needs_dimensions ' if current_user.is_authenticated and (post.image.width == none or post.image.height == none) }}" width="{{ post.image.width }}" height="{{ post.image.height }}" {% if current_user.is_authenticated and (post.image.width == none or post.image.height == none) %}data-fid="{{ post.image_id }}"{% endif %} /></a>
         </div>
     {% endif -%}
     {% if post.body_html -%}
@@ -424,7 +424,7 @@
                 {% if post.url -%}
                     {% if post.url.endswith('.mp4') or post.url.endswith('.webm') or '.mp4?' in post.url or '.webm?' in post.url -%}
                         <p>
-                            <video class="responsive-video {{ 'blur' if blur_content }}" controls preload="{{ 'none' if low_bandwidth else 'metadata' }}" {{ 'autoplay muted' if autoplay }} {{ 'loop' if post.community.loop_videos() }}>
+                            <video class="responsive-video {{ 'blur' if blur_content }}{{ ' needs_dimensions' if current_user.is_authenticated and post.image_id and (post.image.width == none or post.image.height == none) }}" controls preload="{{ 'none' if low_bandwidth else 'metadata' }}" {{ 'autoplay muted' if autoplay }} {{ 'loop' if post.community.loop_videos() }} {% if current_user.is_authenticated and post.image_id and (post.image.width == none or post.image.height == none) %}data-fid="{{ post.image_id }}"{% endif %}>
                             {% if post.url.endswith('.mp4') or '.mp4?' in post.url -%}
                                 <source src="{{ post.url }}" type="video/mp4" />
                             {% elif post.url.endswith('.webm') or '.webm?' in post.url -%}
@@ -440,7 +440,7 @@
                     {% elif post.url.startswith('https://loops.video/') -%}
                         {% if post.image -%}
                         <p>
-                            <video class="responsive-video {{ 'blur' if blur_content }}" controls preload="{{ 'none' if low_bandwidth else 'metadata' }}" {{ 'autoplay muted' if autoplay }} {{ 'loop' if post.community.loop_videos() }}>
+                            <video class="responsive-video {{ 'blur' if blur_content }}{{ ' needs_dimensions' if current_user.is_authenticated and post.image_id and (post.image.width == none or post.image.height == none) }}" controls preload="{{ 'none' if low_bandwidth else 'metadata' }}" {{ 'autoplay muted' if autoplay }} {{ 'loop' if post.community.loop_videos() }} {% if current_user.is_authenticated and post.image_id and (post.image.width == none or post.image.height == none) %}data-fid="{{ post.image_id }}"{% endif %}>
                             {% if post.image.source_url.endswith('.mp4') or '.mp4?' in post.url -%}
                                 <source src="{{ post.image.source_url }}" type="video/mp4" />
                             {% elif post.image.source_url.endswith('.webm') or '.webm?' in post.url -%}
